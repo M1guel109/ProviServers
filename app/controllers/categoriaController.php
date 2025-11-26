@@ -124,55 +124,55 @@ function mostrarCategoriaId($id)
 
 function actualizarCategoria()
 {
-    // $id = $_POST['id'] ?? '';
-    // $nombre = $_POST['nombre'] ?? '';
-    // $descripcion = $_POST['descripcion'] ?? '';
+    $id = $_POST['id'] ?? '';
+    $nombre = $_POST['nombre'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
 
-    // if (empty($id) || empty($nombre) || empty($descripcion)) {
-    //     mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
-    //     exit();
-    // }
+    if (empty($id) || empty($nombre) || empty($descripcion)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
+        exit();
+    }
 
-    // $ruta_destino = BASE_PATH . '/public/uploads/categorias/';
-    // $ruta_icono = null;
+    $ruta_destino = BASE_PATH . '/public/uploads/categorias/';
+    $ruta_icono = null;
 
-    // // Si suben un nuevo icono
-    // if (!empty($_FILES['icono_url']) && $_FILES['icono_url']['error'] === UPLOAD_ERR_OK) {
-    //     $file = $_FILES['icono_url'];
-    //     $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    //     $permitidas = ['png', 'jpg', 'jpeg', 'svg'];
+    // Si suben un nuevo icono
+    if (!empty($_FILES['icono_url']) && $_FILES['icono_url']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['icono_url'];
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $permitidas = ['png', 'jpg', 'jpeg', 'svg'];
 
-    //     if (!in_array($extension, $permitidas)) {
-    //         mostrarSweetAlert('error', 'Extensión no permitida', 'Por favor cargue un archivo válido');
-    //         exit();
-    //     }
+        if (!in_array($extension, $permitidas)) {
+            mostrarSweetAlert('error', 'Extensión no permitida', 'Por favor cargue un archivo válido');
+            exit();
+        }
 
-    //     if ($file['size'] > 512 * 1024) {
-    //         mostrarSweetAlert('error', 'Error al cargar el ícono', 'El ícono supera el límite permitido');
-    //         exit();
-    //     }
+        if ($file['size'] > 512 * 1024) {
+            mostrarSweetAlert('error', 'Error al cargar el ícono', 'El ícono supera el límite permitido');
+            exit();
+        }
 
-    //     $ruta_icono = uniqid('cat_') . '.' . $extension;
-    //     move_uploaded_file($file['tmp_name'], $ruta_destino . $ruta_icono);
-    // }
+        $ruta_icono = uniqid('cat_') . '.' . $extension;
+        move_uploaded_file($file['tmp_name'], $ruta_destino . $ruta_icono);
+    }
 
-    // $objCategoria = new Categoria();
-    // $data = [
-    //     'id' => $id,
-    //     'nombre' => $nombre,
-    //     'descripcion' => $descripcion,
-    //     'icono_url' => $ruta_icono
-    // ];
+    $objCategoria = new Categoria();
+    $data = [
+        'id' => $id,
+        'nombre' => $nombre,
+        'descripcion' => $descripcion,
+        'icono_url' => $ruta_icono
+    ];
 
-    // $resultado = $objCategoria->actualizar($data);
+    $resultado = $objCategoria->actualizar($data);
 
-    // if ($resultado === true) {
-    //     mostrarSweetAlert('success', 'Categoría actualizada', 'Datos actualizados correctamente', '/ProviServers/admin/categorias');
-    // } else {
-    //     mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar la categoría');
-    // }
+    if ($resultado === true) {
+        mostrarSweetAlert('success', 'Categoría actualizada', 'Datos actualizados correctamente', '/ProviServers/admin/consultar-categorias');
+    } else {
+        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar la categoría');
+    }
 
-    // exit();
+    exit();
 }
 
 function eliminarCategoria($id)

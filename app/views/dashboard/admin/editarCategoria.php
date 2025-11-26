@@ -63,7 +63,7 @@ $categoria = mostrarCategoriaId($id);
 
         <section id="formulario-categorias">
             <div class="contenedor-formulario">
-                <form action="<?= BASE_URL ?>/admin/categorias" method="post" class="formulario-usuario" enctype="multipart/form-data">
+                <form action="<?= BASE_URL ?>/admin/actualizar-categoria" method="post" class="formulario-usuario" enctype="multipart/form-data">
                     <div class="row g-3">
 
                         <input type="hidden" name="accion" value="actualizar">

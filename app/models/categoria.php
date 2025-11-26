@@ -54,23 +54,22 @@ class Categoria
         }
     }
 
-    public function eliminar($id)
+    public function actualizar($data)
     {
-
         try {
 
-            // 1. Sentencia SQL para eliminar la fila
-            $eliminar = "DELETE FROM categorias WHERE id = :id";
+            $actualizar = "UPDATE categorias SET  nombre = :nombre, descripcion = :descripcion, icono_url = :icono_url WHERE id = :id ";
 
-            // 2. Preparar y ejecutar
-            $resultado = $this->conexion->prepare($eliminar);
-            $resultado->bindParam(':id', $id);
-
+            $resultado = $this->conexion->prepare($actualizar);
+            $resultado->bindParam(':id', $data['id']);
+            $resultado->bindParam(':nombre', $data['nombre']);
+            $resultado->bindParam(':descripcion', $data['descripcion']);
+            $resultado->bindParam(':icono_url', $data['icono_url']);
+            
 
             return $resultado->execute();
         } catch (PDOException $e) {
-            // Manejo de error si la categoría no se puede eliminar (ej. por una clave foránea activa)
-            error_log("Error en Categoria::eliminar -> " . $e->getMessage());
+            error_log("Error en Usuario::actualizar->" . $e->getMessage());
             return false;
         }
     }
@@ -88,6 +87,27 @@ class Categoria
             return $resultado->fetch();
         } catch (PDOException $e) {
             error_log("Error en Categoria::mostrarId -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function eliminar($id)
+    {
+
+        try {
+
+            // 1. Sentencia SQL para eliminar la fila
+            $eliminar = "DELETE FROM categorias WHERE id = :id";
+
+            // 2. Preparar y ejecutar
+            $resultado = $this->conexion->prepare($eliminar);
+            $resultado->bindParam(':id', $id);
+
+
+            return $resultado->execute();
+        } catch (PDOException $e) {
+            // Manejo de error si la categoría no se puede eliminar (ej. por una clave foránea activa)
+            error_log("Error en Categoria::eliminar -> " . $e->getMessage());
             return false;
         }
     }
