@@ -82,7 +82,6 @@ function registrarCategoria()
         // MOVEMOS EL ARCHIVO
         $destino = $ruta_destino . $ruta_icono;
         move_uploaded_file($file['tmp_name'], $destino);
-
     } else {
         mostrarSweetAlert('error', 'Ícono requerido', 'Debe subir un ícono para la categoría');
         exit();
@@ -117,8 +116,10 @@ function mostrarCategorias()
 
 function mostrarCategoriaId($id)
 {
-    // $objCategoria = new Categoria();
-    // return $objCategoria->mostrarId($id);
+    $objCategoria = new Categoria();
+    $categoria = $objCategoria->mostrarId($id);
+
+    return $categoria;
 }
 
 function actualizarCategoria()
@@ -176,12 +177,12 @@ function actualizarCategoria()
 
 function eliminarCategoria($id)
 {
-    // $objCategoria = new Categoria();
-    // $respuesta = $objCategoria->eliminar($id);
+    $objCategoria = new Categoria();
+    $respuesta = $objCategoria->eliminar($id);
 
-    // if ($respuesta === true) {
-    //     mostrarSweetAlert('success', 'Categoría eliminada', 'Se ha eliminado la categoría', '/ProviServers/admin/categorias');
-    // } else {
-    //     mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo eliminar la categoría');
-    // }
+    if ($respuesta === true) {
+        mostrarSweetAlert('success', 'Categoría eliminada', 'Se ha eliminado la categoría', '/ProviServers/admin/consultar-categorias');
+    } else {
+        mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo eliminar la categoría');
+    }
 }

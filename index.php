@@ -104,6 +104,14 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/gestionarCategorias.php';
         break;
 
+    case '/admin/eliminar-categoria':
+        require BASE_PATH . '/app/controllers/categoriaController.php';
+        break;
+
+    case '/admin/editar-categoria':
+        require BASE_PATH . '/app/views/dashboard/admin/editarCategoria.php';
+        break;
+
     // Fin de rutas login
 
     // Rutas del proveedor

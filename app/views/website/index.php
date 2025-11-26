@@ -59,7 +59,7 @@
                         </h1>
                         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
                             <a href="<?= BASE_URL ?>/registro" class="btn-primary-proviservers">REGISTRARME</a>
-                            <a href="extras/error404.html" class="btn-secondary-proviservers">VER SERVICIOS</a>
+                            <a href="#" class="btn-secondary-proviservers">VER SERVICIOS</a>
                         </div>
                     </div>
                 </div>
