@@ -1,0 +1,227 @@
+/* --------------------------------------------- */
+/* RESTABLECER CONTRASEÑA - ESTILO UNIFICADO     */
+/* --------------------------------------------- */
+
+:root {
+    --primary-color: #3A86FF;
+    --secondary-color: #8338EC;
+    --accent-color: #FF006E;
+    --light-color: #FB5607;
+    --dark-color: #2A2A2A;
+}
+
+/* CONTENEDOR PRINCIPAL */
+#reset-password {
+    flex: 1;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    animation: fadeIn 0.6s ease;
+}
+
+#reset-password h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--dark-color);
+    text-align: center;
+}
+
+#reset-password > p {
+    color: #666;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 15px;
+}
+
+/* -------- CAJA DE PASOS ---------- */
+
+.reset-steps {
+    margin-bottom: 35px;
+    padding: 22px;
+    background: #fefefe;
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease;
+}
+
+.reset-steps:hover {
+    transform: translateY(-4px);
+}
+
+.reset-steps h3 {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--dark-color);
+}
+
+.reset-steps ol {
+    padding-left: 20px;
+    color: #555;
+}
+
+.reset-steps li {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    font-size: 15px;
+}
+
+/* -------- FORMULARIO ---------- */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.3s;
+    resize: none;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+}
+
+/* -------- BOTÓN ---------- */
+
+.btn-reset {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-reset:hover {
+    background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
+}
+
+/* -------- MENSAJES ---------- */
+
+.success-message,
+.error-message {
+    display: none;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.success-message {
+    background: #d3f6e4;
+    color: #117a43;
+    border: 1px solid #95e3c3;
+}
+
+.error-message {
+    background: #fde2e2;
+    color: #a8272c;
+    border: 1px solid #f4b5b5;
+}
+
+.success-message i,
+.error-message i {
+    font-size: 18px;
+}
+
+/* -------- LOADING ---------- */
+
+.loading {
+    display: none;
+    text-align: center;
+    margin: 15px 0;
+}
+
+.loading-spinner {
+    border: 3px solid #eee;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    margin: auto;
+    animation: spin 1s linear infinite;
+}
+
+/* -------- LINK VOLVER ---------- */
+
+.back-to-login {
+    text-align: center;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+.back-to-login a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.25s;
+}
+
+.back-to-login a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* -------- ANIMACIONES ---------- */
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
+/* -------- RESPONSIVE ---------- */
+
+@media (max-width: 576px) {
+    #reset-password {
+        padding: 30px 20px;
+    }
+
+    #reset-password h1 {
+        font-size: 28px;
+    }
+
+    .reset-steps {
+        padding: 18px;
+    }
+
+    .reset-steps h3 {
+        font-size: 17px;
+    }
+
+    .reset-steps li {
+        font-size: 14px;
+    }
+}

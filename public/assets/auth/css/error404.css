@@ -1,0 +1,209 @@
+/* -------------------------------------- */
+/* 1. Reset Básico y Estilos Generales */
+/* -------------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #0d111c;
+    font-family: 'Roboto', sans-serif;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    text-align: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 2. Efecto de Fondo Estrellado (Animado) */
+
+@keyframes star-scroll {
+    from {
+        background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;
+    }
+
+    to {
+        background-position: 500px 500px, -300px 300px, 400px -400px, -600px 600px, 250px -250px, -150px 150px, 700px 700px, -450px -450px;
+    }
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Estrellas: 5 blancas y 3 azules, con más repeticiones para mayor densidad */
+    background:
+        /* 1. Blancas */
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        /* Blanco 1 */
+        radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.6) 1.2px, transparent 1.2px),
+        /* Blanco 2 (más grande) */
+        radial-gradient(circle at 80% 40%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        /* Blanco 3 */
+        radial-gradient(circle at 30% 60%, rgba(255, 255, 255, 0.7) 0.8px, transparent 0.8px),
+        /* Blanco 4 (más pequeño) */
+        radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+        /* Blanco 5 */
+
+        /* 2. Azules (Añadidos) */
+        radial-gradient(circle at 20% 70%, rgba(173, 216, 230, 0.5) 1px, transparent 1px),
+        /* Azul claro 1 */
+        radial-gradient(circle at 70% 30%, rgba(100, 149, 237, 0.4) 1.1px, transparent 1.1px),
+        /* Azul medio 2 */
+        radial-gradient(circle at 45% 15%, rgba(173, 216, 230, 0.5) 0.9px, transparent 0.9px);
+    /* Azul claro 3 */
+
+    /* Más tamaños de fondo para mayor densidad de puntos */
+    background-size: 500px 500px, 300px 300px, 400px 400px, 600px 600px, 250px 250px,
+        550px 550px, 350px 350px, 450px 450px;
+    /* 8 tamaños para 8 sets de puntos */
+    opacity: 0.8;
+    z-index: -1;
+    /* Aumentado el 'to' de la animación para mover más puntos */
+    animation: star-scroll 100s linear infinite alternate;
+}
+
+/* -------------------------------------- */
+/* 3. Contenedores y Escena Espacial */
+/* -------------------------------------- */
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    z-index: 10; 
+    width: 90%;
+    max-width: 800px; 
+}
+
+.space-scene {
+    width: 100%; 
+    height: 350px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.big-404 {
+    font-size: 350px; /* Incrementado para una base más grande */
+    font-weight: 700; 
+    color: rgba(255, 255, 255, 0.15); 
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Posición vertical centrada, sin gran desplazamiento */
+    transform: translate(-50%, -50%); 
+    z-index: 1; 
+    line-height: 1;
+    /* Separación grande para el ancho de la ilustración con cohete */
+    letter-spacing: 50px; 
+}
+
+
+.main-illustration {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* AJUSTE CLAVE: Subida ligera para que el planeta encaje en el hueco del 404 */
+    transform: translate(-50%, calc(-50% - 20px)); 
+    /* AJUSTE CLAVE: El ancho grande para la ilustración con cohete */
+    width: 380px; /* Aumentado a 380px */
+    height: auto; 
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    z-index: 2; 
+}
+
+/* 4. Mensajes de Texto */
+
+.text-content {
+    text-align: center;
+    /* AJUSTE CLAVE: Bajamos el texto considerablemente */
+    margin-top: 200px; 
+}
+.text-content {
+    text-align: center;
+    /* AJUSTE CLAVE: Aumentamos el margen para bajarlo */
+    margin-top: 70px; /* Cambiado de 50px a 70px */
+}
+.message-title {
+    font-size: 1.5em; 
+    font-weight: 400;
+    letter-spacing: 5px; 
+    margin-bottom: 10px;
+}
+
+.message-subtitle {
+    font-size: 1.2em; 
+    font-weight: 700; 
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+/* 5. Botones (Mantener el estilo original) */
+
+.actions {
+    display: flex;
+    justify-content: center; 
+    gap: 20px; 
+    margin-top: 20px;
+    
+}
+
+.btn {
+    text-decoration: none;
+    font-weight: 700;
+    padding: 12px 25px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background-color: transparent;
+    border: 1px solid #ffffff; 
+    color: #ffffff;
+}
+
+.btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Media Query para pantallas pequeñas */
+@media (max-width: 600px) {
+    .actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 10px 15px;
+    }
+    
+    .big-404 {
+        font-size: 150px; 
+        letter-spacing: 60px; /* Ajuste para móvil */
+    }
+
+    .space-scene {
+        height: 250px; 
+    }
+
+    .main-illustration {
+        width: 100px; /* Ajuste para móvil */
+        transform: translate(-50%, calc(-50% + 10px));
+    }
+    .text-content {
+        margin-top: -15px;
+    }
+}

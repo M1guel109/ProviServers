@@ -1,0 +1,239 @@
+/* ============ VARIABLES ============ */
+:root {
+  --primary-color: #3A86FF;
+  --secondary-color: #8338EC;
+  --accent-color: #FF006E;
+  --light-color: #FB5607;
+  --dark-color: #2A2A2A;
+}
+
+/* ============ RESET ============ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#contenedor {
+  width: 100%;
+  max-width: 1200px;
+  height: 700px;
+  margin: auto;
+  background: white;
+  display: flex;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* ============ COLUMNAS ============ */
+.columna {
+  flex: 1;
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.izquierda h1 {
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.izquierda p {
+  color: #666;
+  text-align: center;
+}
+
+.titulo-paso {
+  text-align: center;
+}
+
+
+.fila-botones {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.olvido-pass {
+  text-align: left;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+
+/* ============ FORMULARIO DEL WIZARD ============ */
+#registro-wizard {
+  width: 100%;
+}
+
+.wizard-step {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Inputs */
+#registro-wizard input,
+#registro-wizard select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+#registro-wizard input:focus,
+#registro-wizard select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+  outline: none;
+}
+
+/* Botones del wizard */
+.btn-next,
+.btn-prev,
+#btn-finalizar {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+/* Botón principal */
+.btn-next,
+#btn-finalizar {
+  background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+  color: white;
+}
+
+.btn-next:hover,
+#btn-finalizar:hover {
+  background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+  transform: translateY(-2px);
+}
+
+/* Botón atrás */
+.btn-prev {
+  background: #ddd;
+}
+
+.btn-prev:hover {
+  background: #c4c4c4;
+}
+
+/* NAV botones */
+.wizard-nav {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Resumen final */
+#resumen-registro {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* ============ CARRUSEL DERECHA ============ */
+.derecha {
+  padding: 0;
+  position: relative;
+}
+
+.contenido-derecha {
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.contenido-derecha h2 {
+  font-size: 28px;
+  color: white;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  margin-bottom: 20px;
+}
+
+.imagen-persona {
+  width: 70%;
+  max-width: 380px;
+  margin: auto;
+  filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.3));
+}
+
+.derecha .carousel-inner {
+  height: 100%;
+}
+
+.carousel-item {
+  height: 100%;
+  backdrop-filter: blur(4px);
+  background-size: cover;
+  background-position: center;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 992px) {
+  #contenedor {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .derecha {
+    height: 350px;
+  }
+
+  .contenido-derecha h2 {
+    font-size: 22px;
+  }
+
+  .imagen-persona {
+    width: 60%;
+  }
+}
+
+@media (max-width: 576px) {
+  .izquierda {
+    padding: 30px;
+  }
+
+  .derecha {
+    height: 300px;
+  }
+
+  .contenido-derecha h2 {
+    font-size: 18px;
+  }
+}
