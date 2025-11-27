@@ -134,21 +134,65 @@ class Usuario
 
     public function actualizar($data)
     {
+
+        $this->conexion->beginTransaction();
+
+
+        // 1. Determinar la tabla de detalle según el rol
+        $tabla_detalle = '';
+        switch ($data['rol']) {
+            case 'cliente':
+                $tabla_detalle = 'clientes';
+                break;
+            case 'proveedor':
+                $tabla_detalle = 'proveedores';
+                break;
+            case 'admin':
+                $tabla_detalle = 'admins';
+                break;
+            default:
+                error_log("Error: Rol de usuario inválido ({$data['rol']}).");
+                return false;
+        }
+
         try {
+            // A. Actualización de la tabla base 'usuarios' (solo campos esenciales)
+            $actualizar = "UPDATE usuarios 
+                             SET email = :email,
+                             documento = :documento,
+                              rol = :rol 
+                             WHERE id = :id";
 
-            $actualizar = "UPDATE usuarios SET  nombre = :nombre, email = :email, telefono = :telefono, ubicacion = :ubicacion, rol = :rol  WHERE id = :id ";
-
-            $resultado = $this->conexion->prepare($actualizar);
+            $resultado = $this ->conexion->prepare($actualizar);
             $resultado->bindParam(':id', $data['id']);
-            $resultado->bindParam(':nombre', $data['nombre']);
             $resultado->bindParam(':email', $data['email']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':ubicacion', $data['ubicacion']);
+            $resultado->bindParam(':documento', $data['documento']);
             $resultado->bindParam(':rol', $data['rol']);
 
-            return $resultado->execute();
+            $resultado->execute();
+
+            // B. Actualización de la tabla de detalle (clientes/proveedores/admins)
+            // Se asume que el ID de la tabla de detalle es 'usuario_id'
+            $actualizar = "UPDATE {$tabla_detalle} 
+                            SET nombres = :nombres, apellidos = :apellidos, telefono = :telefono, ubicacion = :ubicacion ,foto = :foto
+                            WHERE usuario_id = :usuario_id";
+
+            $resultado = $this->conexion->prepare($actualizar);
+            $resultado->bindParam(':usuario_id', $data['id']);
+            $resultado->bindParam(':nombres', $data['nombres']);
+            $resultado->bindParam(':apellidos', $data['apellidos']);
+            $resultado->bindParam(':telefono', $data['telefono']);
+            $resultado->bindParam(':ubicacion', $data['ubicacion']);
+            $resultado->bindParam(':foto', $data['foto_perfil']);
+
+
+            $resultado->execute();
+
+            // 2. Si ambas consultas fueron exitosas, hacemos commit
+            $this->conexion->commit();
+            return true;
         } catch (PDOException $e) {
-            error_log("Error en Usuario::actualizar->" . $e->getMessage());
+            error_log("Error en Usuario::actualizarDetallesUsuario -> " . $e->getMessage());
             return false;
         }
     }
