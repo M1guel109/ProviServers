@@ -28,7 +28,7 @@
             <div>
                 <h1 class="mb-1">Registrar Servicio</h1>
                 <p class="text-muted mb-0">
-                    Registra tu nuevo servicio para que sea visible en la plataforma.
+                    Registra tu nuevo servicio para que sea visible en la plataforma bueno.
                 </p>
             </div>
 
