@@ -1,6 +1,7 @@
 <?php
 // (Opcional) validar sesión de proveedor, similar a session_admin.php
-// require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+
 
 // Enlazamos el controlador que tiene la función mostrarServicios()
 require_once BASE_PATH . '/app/controllers/proveedorController.php';
@@ -42,6 +43,7 @@ foreach ($categorias as $categoria) {
 
     <!-- tu css (puedes usar el mismo de tablas del admin) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css">
 </head>
 
 <body>
@@ -97,8 +99,8 @@ foreach ($categorias as $categoria) {
                                 <td>
                                     <?php if (!empty($servicio['imagen'])): ?>
                                         <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($servicio['imagen']) ?>"
-                                             alt="Imagen del servicio" width="60" height="60"
-                                             style="object-fit: cover; border-radius: 8px;">
+                                            alt="Imagen del servicio" width="60" height="60"
+                                            style="object-fit: cover; border-radius: 8px;">
                                     <?php else: ?>
                                         <span class="text-muted">Sin imagen</span>
                                     <?php endif; ?>
@@ -135,14 +137,17 @@ foreach ($categorias as $categoria) {
                                         </a>
 
                                         <!-- Editar servicio (cuando tengas vista/route de edición) -->
-                                        <a href="#" class="btn-action btn-edit" title="Editar servicio">
+                                        <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicio['id'] ?>"
+                                            class="btn-action btn-edit"
+                                            title="Editar servicio">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
 
+
                                         <!-- Eliminar servicio: reutilizamos proveedorController (GET, accion=eliminar) -->
                                         <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicio['id'] ?>"
-                                           class="btn-action btn-delete"
-                                           title="Eliminar servicio">
+                                            class="btn-action btn-delete"
+                                            title="Eliminar servicio">
                                             <i class="bi bi-trash3"></i>
                                         </a>
                                     </div>
@@ -186,6 +191,31 @@ foreach ($categorias as $categoria) {
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
+    
+    toggleSubmenuButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const contenedor = this.closest('.has-submenu');
+            if (!contenedor) return;
+
+            const submenu = contenedor.querySelector('.submenu');
+            contenedor.classList.toggle('active');
+
+            if (submenu) {
+                if (contenedor.classList.contains('active')) {
+                    submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                } else {
+                    submenu.style.maxHeight = '0';
+                }
+            }
+        });
+    });
+});
+</script>
+
 </body>
 
 </html>

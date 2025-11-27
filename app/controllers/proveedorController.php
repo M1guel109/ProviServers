@@ -182,7 +182,7 @@ function actualizarServicio()
             'success',
             'Servicio actualizado con éxito',
             'Los datos del servicio se han actualizado correctamente.',
-            '/ProviServers/proveedor/dashboard'
+            '/ProviServers/proveedor/listar-servicio'
         );
     } else {
         mostrarSweetAlert(
@@ -205,7 +205,7 @@ function eliminarServicio($id)
             'success',
             'Eliminación exitosa',
             'Se ha eliminado el servicio.',
-            '/ProviServers/proveedor/dashboard'
+           '/ProviServers/proveedor/listar-servicio'
         );
     } else {
         mostrarSweetAlert(
