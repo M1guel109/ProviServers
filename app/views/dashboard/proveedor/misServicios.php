@@ -76,6 +76,11 @@ foreach ($categorias as $categoria) {
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
             </nav>
+            <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor" target="_blank" class="btn btn-primary mt-3">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
+            </a>
+
+
         </section>
 
         <!-- Tabla de servicios -->
@@ -193,28 +198,28 @@ foreach ($categorias as $categoria) {
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 
     <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-    
-    toggleSubmenuButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const contenedor = this.closest('.has-submenu');
-            if (!contenedor) return;
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
 
-            const submenu = contenedor.querySelector('.submenu');
-            contenedor.classList.toggle('active');
+            toggleSubmenuButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const contenedor = this.closest('.has-submenu');
+                    if (!contenedor) return;
 
-            if (submenu) {
-                if (contenedor.classList.contains('active')) {
-                    submenu.style.maxHeight = submenu.scrollHeight + 'px';
-                } else {
-                    submenu.style.maxHeight = '0';
-                }
-            }
+                    const submenu = contenedor.querySelector('.submenu');
+                    contenedor.classList.toggle('active');
+
+                    if (submenu) {
+                        if (contenedor.classList.contains('active')) {
+                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
+                        } else {
+                            submenu.style.maxHeight = '0';
+                        }
+                    }
+                });
+            });
         });
-    });
-});
-</script>
+    </script>
 
 </body>
 
