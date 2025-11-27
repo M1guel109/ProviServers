@@ -127,9 +127,23 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/registrarServicio.php';
         break;
 
-    case '/admin/guardar-usuario':
+    case '/proveedor/guardar-servicio':
         require BASE_PATH . '/app/controllers/proveedorController.php';
         break;
+    case '/proveedor/listar-servicio':
+        require BASE_PATH . '/app/views/dashboard/proveedor/misServicios.php';
+        break;
+    case '/proveedor/editar-servicio':
+        require BASE_PATH . '/app/views/dashboard/proveedor/editarServicio.php';
+        break;
+    // Rutas del proveedor
+    case '/proveedor/reporte':
+        require BASE_PATH . '/app/controllers/reportesPdfController.php';
+        reportesPdfController();
+        break;
+
+
+
 
     // Rutas del cliente
     case '/cliente/dashboard':

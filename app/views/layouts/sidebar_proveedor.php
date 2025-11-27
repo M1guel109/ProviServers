@@ -12,7 +12,7 @@
                         class="bi bi-house-door"></i><span>Panel Principal</span></a></li>
 
             <li class="has-submenu">
-                <a href="#" data-title="Servicios" class="menu-link">
+                <a href="<?= BASE_URL ?>/proveedor/listar-servicio" data-title="Servicios" class="menu-link">
                     <i class="bi bi-briefcase"></i><span>Servicios</span>
                 </a>
                 <button class="toggle-submenu" aria-label="Mostrar opciones">
@@ -20,7 +20,7 @@
                 </button>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/proveedor/registrar-servicio" class="submenu-link"><i class="bi bi-plus-circle"></i>Registrar Servicio</a></li>
-                    <li><a href="<?= BASE_URL ?>/proveedor/consultar" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
+                    <li><a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
                 </ul>
             </li>
             <li class="has-submenu">
@@ -51,7 +51,7 @@
 
     <div class="menu-footer">
         <a href="#" data-title="Soporte"><i class="bi bi-headset"></i><span>Soporte</span></a>
-        <a href="<?= BASE_URL ?>/public/extras/inicioSesion.html" data-title="Cerrar Sesión"><i
+        <a href="<?= BASE_URL ?>/public/extras/inicioSesion.h" data-title="Cerrar Sesión"><i
                 class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></a>
     </div>
 </aside>
