@@ -20,7 +20,7 @@
                 </button>
                 <ul class="submenu">
                     <li><a href="<?= BASE_URL ?>/proveedor/registrar-servicio" class="submenu-link"><i class="bi bi-plus-circle"></i>Registrar Servicio</a></li>
-                    <li><a href="<?= BASE_URL ?>/proveedor/consultar" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
+                    <li><a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
                 </ul>
             </li>
             <li class="has-submenu">
