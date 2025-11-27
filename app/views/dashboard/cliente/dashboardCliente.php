@@ -1,385 +1,449 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProviServers - Portal de Cliente</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <title>Proviservers | Mi Cuenta</title>
 
-    <!-- Tu CSS -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="public/assets/estilosGenerales/style.css">
+
+    <!-- Estilos específicos de cliente -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardCliente.css">
 </head>
 
 <body>
-    <?php
-    // 1. Incluir el Head, CSS y la etiqueta
-    include 'app/views/layouts/header_cliente.php';
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <a href="#">
+                <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers" class="logo-completo">
+                <img src="public/assets/img/logos/FAVICON.png" alt="Logo Proviservers" class="logo-favicon">
+            </a>
+        </div>
 
-    ?>
+        <!-- Menú principal -->
+        <nav class="menu-principal">
+            <ul>
+                <li>
+                    <a href="#inicio" class="active" data-title="Inicio">
+                        <i class="bi bi-house-door"></i>
+                        <span>Inicio</span>
+                    </a>
+                </li>
 
+                <li>
+                    <a href="#explorar" data-title="Explorar Servicios">
+                        <i class="bi bi-compass"></i>
+                        <span>Explorar Servicios</span>
+                    </a>
+                </li>
 
-    <!-- Hero Section -->
-    <section id="inicio" class="hero-cliente">
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1>¡Bienvenido de nuevo, Carlos! 👋</h1>
-                <p>Gestiona tus servicios, explora nuevos proveedores y mantente conectado con los mejores profesionales
-                </p>
-                <div class="hero-buttons">
-                    <button class="btn-primary">
-                        <i class="bi bi-plus-circle"></i>
-                        Buscar Servicio
-                    </button>
-                    <button class="btn-secondary">
+                <li>
+                    <a href="#mis-servicios" data-title="Mis Servicios">
+                        <i class="bi bi-briefcase"></i>
+                        <span>Mis Servicios</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#favoritos" data-title="Favoritos">
+                        <i class="bi bi-heart"></i>
+                        <span>Favoritos</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#mensajes" data-title="Mensajes">
+                        <i class="bi bi-chat-dots"></i>
+                        <span>Mensajes</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#historial" data-title="Historial">
                         <i class="bi bi-clock-history"></i>
-                        Ver Servicios Activos
-                    </button>
-                </div>
+                        <span>Historial</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#perfil" data-title="Mi Perfil">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Mi Perfil</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Menú secundario -->
+        <nav class="menu-secundario">
+            <p>Más</p>
+            <ul>
+                <li>
+                    <a href="#ayuda" data-title="Ayuda">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Ayuda</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="login.html" data-title="Cerrar Sesión">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+        <!-- HEADER -->
+        <header class="barra-superior">
+            <button id="btn-toggle-menu" class="btn-toggle">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div class="buscador">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Buscar servicios, proveedores...">
             </div>
-            <div class="hero-stats">
-                <div class="stat-box">
-                    <div class="stat-icon" style="background: #dbeafe;">
-                        <i class="bi bi-briefcase" style="color: #0066FF;"></i>
+
+            <div class="acciones-barra">
+                <div class="notificaciones item-barra">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="badge">3</span>
+                </div>
+
+                <a href="#perfil" class="usuario item-barra">
+                    <img src="public/assets/dashBoard/img/Foto-usuario.png" alt="Usuario">
+                    <div class="info-usuario">
+                        <span class="nombre">Carlos M.</span>
+                        <span class="rol">Cliente</span>
                     </div>
-                    <div class="stat-info">
-                        <h3>5</h3>
+                    <i class="bi bi-chevron-down"></i>
+                </a>
+            </div>
+        </header>
+
+        <!-- SECCIÓN: INICIO -->
+        <section id="inicio">
+            <div class="section-hero">
+                <h1>¡Hola Carlos! 👋</h1>
+                <p>Bienvenido a tu espacio personal. Encuentra los mejores profesionales para cualquier servicio que necesites.</p>
+            </div>
+
+            <div class="section-content">
+                <!-- Estadísticas visuales -->
+                <div class="stats-visual">
+                    <div class="stat-visual-item">
+                        <i class="bi bi-clock-history"></i>
+                        <h3>3</h3>
                         <p>Servicios Activos</p>
                     </div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon" style="background: #dcfce7;">
-                        <i class="bi bi-check-circle" style="color: #16a34a;"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>23</h3>
+                    <div class="stat-visual-item">
+                        <i class="bi bi-check-circle"></i>
+                        <h3>12</h3>
                         <p>Completados</p>
                     </div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-icon" style="background: #fef3c7;">
-                        <i class="bi bi-star-fill" style="color: #f59e0b;"></i>
+                    <div class="stat-visual-item">
+                        <i class="bi bi-heart"></i>
+                        <h3>8</h3>
+                        <p>Favoritos</p>
                     </div>
-                    <div class="stat-info">
-                        <h3>4.9</h3>
-                        <p>Tu Calificación</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="activity-board">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="alert-card pending-payment-alert">
-                        <i class="bi bi-credit-card-2-front me-2"></i>
-                        <div>
-                            <h4>Tienes 1 Pago Pendiente</h4>
-                            <p class="mb-1">El pago de "Diseño Gráfico" vence en 3 días.</p>
-                            <a href="<?= BASE_URL ?>/customers/quotations" class="alert-link">Pagar Ahora <i class="bi bi-arrow-right"></i></a>
-                        </div>
+                    <div class="stat-visual-item">
+                        <i class="bi bi-star"></i>
+                        <h3>4.8</h3>
+                        <p>Calificación</p>
                     </div>
                 </div>
 
-                <div class="col-lg-4 mb-4">
-                    <div class="alert-card new-messages-alert">
-                        <i class="bi bi-chat-dots me-2"></i>
-                        <div>
-                            <h4>Mensajes sin Leer</h4>
-                            <p class="mb-1">Tienes 2 mensajes nuevos de "Juan García".</p>
-                            <a href="<?= BASE_URL ?>/customers/messages" class="alert-link">Ver Conversación <i class="bi bi-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 mb-4">
-                    <div class="alert-card appointment-alert">
-                        <i class="bi bi-calendar-check me-2"></i>
-                        <div>
-                            <h4>Cita Próxima</h4>
-                            <p class="mb-1">Cita con "Carlos Ruiz" (Plomería) el 08 Nov a las 10:00 AM.</p>
-                            <a href="<?= BASE_URL ?>/customers/services#cita" class="alert-link">Gestionar Cita <i class="bi bi-arrow-right"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Servicios Activos -->
-    <section id="servicios" class="servicios-section">
-        <div class="container">
-            <div class="section-header">
-                <div>
-                    <h2>Servicios en Progreso</h2>
-                    <p>Mantén el control de todos tus servicios activos</p>
-                </div>
-                <a href="#" class="ver-todo">Ver todos <i class="bi bi-arrow-right"></i></a>
-            </div>
-
-            <div class="servicios-grid">
-                <!-- Servicio 1 -->
-                <div class="servicio-card">
-                    <div class="card-header">
-                        <span class="status-badge active">En Progreso</span>
-                        <div class="card-menu">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </div>
-                    </div>
-
-                    <div class="proveedor-info">
-                        <img src="https://via.placeholder.com/60" alt="Proveedor">
-                        <div>
-                            <h4>Juan García</h4>
-                            <p>Desarrollo Web Profesional</p>
-                            <div class="rating">
-                                <span class="stars">★★★★★</span>
-                                <span>5.0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="servicio-details">
-                        <div class="detail-row">
-                            <i class="bi bi-calendar3"></i>
-                            <span>Inicio: 01 Nov 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-clock"></i>
-                            <span>Entrega: 15 Nov 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-cash"></i>
-                            <span>$500.00</span>
-                        </div>
-                    </div>
-
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span>Progreso del proyecto</span>
-                            <span class="progress-percent">65%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 65%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="btn-outline">
-                            <i class="bi bi-chat"></i>
-                            Mensaje
-                        </button>
-                        <button class="btn-primary-small">
-                            Ver Detalles
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Servicio 2 -->
-                <div class="servicio-card">
-                    <div class="card-header">
-                        <span class="status-badge pending">Pendiente Pago</span>
-                        <div class="card-menu">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </div>
-                    </div>
-
-                    <div class="proveedor-info">
-                        <img src="https://via.placeholder.com/60" alt="Proveedor">
-                        <div>
-                            <h4>María López</h4>
-                            <p>Diseño Gráfico & Branding</p>
-                            <div class="rating">
-                                <span class="stars">★★★★★</span>
-                                <span>4.9</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="servicio-details">
-                        <div class="detail-row">
-                            <i class="bi bi-calendar3"></i>
-                            <span>Completado: 30 Oct 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-exclamation-circle"></i>
-                            <span>Vence: 05 Nov 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-cash"></i>
-                            <span class="highlight">$150.00</span>
-                        </div>
-                    </div>
-
-                    <div class="payment-alert">
-                        <i class="bi bi-info-circle"></i>
-                        <span>Pago pendiente - Vence en 3 días</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="btn-outline">
-                            <i class="bi bi-download"></i>
-                            Descargar
-                        </button>
-                        <button class="btn-primary-small">
-                            <i class="bi bi-credit-card"></i>
-                            Pagar Ahora
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Servicio 3 -->
-                <div class="servicio-card">
-                    <div class="card-header">
-                        <span class="status-badge scheduled">Programado</span>
-                        <div class="card-menu">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </div>
-                    </div>
-
-                    <div class="proveedor-info">
-                        <img src="https://via.placeholder.com/60" alt="Proveedor">
-                        <div>
-                            <h4>Carlos Ruiz</h4>
-                            <p>Plomería y Reparaciones</p>
-                            <div class="rating">
-                                <span class="stars">★★★★★</span>
-                                <span>4.8</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="servicio-details">
-                        <div class="detail-row">
-                            <i class="bi bi-calendar-check"></i>
-                            <span>Fecha: 08 Nov 2024</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-clock"></i>
-                            <span>Hora: 10:00 AM</span>
-                        </div>
-                        <div class="detail-row">
-                            <i class="bi bi-geo-alt"></i>
-                            <span>A domicilio</span>
-                        </div>
-                    </div>
-
-                    <div class="appointment-info">
-                        <i class="bi bi-calendar3"></i>
-                        <span>Tu cita es en 4 días</span>
-                    </div>
-
-                    <div class="card-actions">
-                        <button class="btn-outline">
-                            <i class="bi bi-pencil"></i>
-                            Reprogramar
-                        </button>
-                        <button class="btn-primary-small">
-                            Ver Detalles
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="discovery-section bg-light py-5">
-        <div class="container">
-            <div class="section-header">
-                <div>
-                    <h2>Proveedores Recomendados</h2>
-                    <p>Basado en tus servicios anteriores y preferencias</p>
-                </div>
-                <a href="<?= BASE_URL ?>/customers/providers" class="ver-todo">Ver todos <i
-                        class="bi bi-arrow-right"></i></a>
-            </div>
-            <div class="proveedores-grid mb-5">
-            </div>
-
-            <div class="section-header mt-5">
-                <div>
-                    <h2>Explora por Categoría</h2>
-                    <p>Encuentra el servicio que necesitas</p>
-                </div>
-                <a href="<?= BASE_URL ?>/customers/search#categories" class="ver-todo">Ver todas <i
-                        class="bi bi-arrow-right"></i></a>
-            </div>
-            <div class="categorias-grid">
-            </div>
-        </div>
-    </section>
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content">
-                <h2>¿Eres un Profesional?</h2>
-                <p>Únete a ProviServers y conecta con miles de clientes que necesitan tus servicios</p>
-                <button class="btn-cta">
-                    <i class="bi bi-briefcase"></i>
-                    Conviértete en Proveedor
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="footer-logo">
-                        <a href="#">
-                            <img src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png"
-                                alt="Logo Proviservers" class="logo-completo" width="100">
+                <!-- Acciones rápidas -->
+                <div class="mt-5">
+                    <h2 class="mb-4">¿Qué necesitas hoy?</h2>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="#explorar" class="btn-modern">
+                            <i class="bi bi-search"></i>
+                            Buscar Servicio
                         </a>
+                        <a href="#mis-servicios" class="btn-modern-outline">
+                            <i class="bi bi-briefcase"></i>
+                            Ver Mis Servicios
+                        </a>
+                    </div>
+                </div>
 
+                <!-- Servicios recientes -->
+                <div class="mt-5">
+                    <h2 class="mb-4">Servicios en Curso</h2>
+                    <ul class="modern-list">
+                        <li class="modern-list-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-tree" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <div>
+                                    <h5 class="mb-1" style="color: var(--dark-color);">Jardinería y Paisajismo</h5>
+                                    <p class="mb-0 text-muted">Con Miguel Torres · Progreso: 65%</p>
+                                </div>
+                            </div>
+                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                        </li>
+                        <li class="modern-list-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <i class="bi bi-wrench" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                <div>
+                                    <h5 class="mb-1" style="color: var(--dark-color);">Plomería</h5>
+                                    <p class="mb-0 text-muted">Con Carlos Ruiz · Cita: 28 Nov 10:00 AM</p>
+                                </div>
+                            </div>
+                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: EXPLORAR SERVICIOS -->
+        <section id="explorar" style="display: none;">
+            <div class="section-hero">
+                <h1>Explorar Servicios 🔍</h1>
+                <p>Descubre profesionales verificados listos para ayudarte. Más de 1000 proveedores disponibles.</p>
+            </div>
+
+            <div class="section-content">
+                <!-- Buscador adicional -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="¿Qué servicio necesitas?">
                     </div>
-                    <p>Conectamos personas con los mejores proveedores de servicios profesionales.</p>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option>Todas las categorías</option>
+                            <option>Jardinería</option>
+                            <option>Plomería</option>
+                            <option>Belleza</option>
+                            <option>Mascotas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Ubicación">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-modern w-100">Buscar</button>
+                    </div>
                 </div>
-                <div class="footer-col">
-                    <h4>Empresa</h4>
-                    <ul>
-                        <li><a href="#">Sobre Nosotros</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li><a href="#">Carreras</a></li>
-                        <li><a href="#">Prensa</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Soporte</h4>
-                    <ul>
-                        <li><a href="#">Centro de Ayuda</a></li>
-                        <li><a href="#">Contacto</a></li>
-                        <li><a href="#">Términos</a></li>
-                        <li><a href="#">Privacidad</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Síguenos</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="bi bi-facebook"></i></a>
-                        <a href="#"><i class="bi bi-instagram"></i></a>
-                        <a href="#"><i class="bi bi-twitter"></i></a>
-                        <a href="#"><i class="bi bi-linkedin"></i></a>
+
+                <!-- Grid de servicios -->
+                <h2 class="mb-4">Categorías Populares</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+                        <div class="service-content">
+                            <h3>🌳 Jardinería</h3>
+                            <p>Mantenimiento, diseño de jardines y paisajismo profesional.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></div>
+                        <div class="service-content">
+                            <h3>🔧 Plomería</h3>
+                            <p>Reparaciones, instalaciones y mantenimiento de tuberías.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);"></div>
+                        <div class="service-content">
+                            <h3>✂️ Belleza</h3>
+                            <p>Peluquería, estética y cuidado personal a domicilio.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                        <div class="service-content">
+                            <h3>🐾 Mascotas</h3>
+                            <p>Veterinaria, grooming y cuidado de mascotas.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                        <div class="service-content">
+                            <h3>⚡ Electricidad</h3>
+                            <p>Instalaciones eléctricas y reparaciones seguras.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);"></div>
+                        <div class="service-content">
+                            <h3>🏠 Limpieza</h3>
+                            <p>Limpieza profunda y mantenimiento de espacios.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 ProviServers. Todos los derechos reservados.</p>
+        </section>
+
+        <!-- SECCIÓN: MIS SERVICIOS -->
+        <section id="mis-servicios" style="display: none;">
+            <div class="section-hero">
+                <h1>Mis Servicios 💼</h1>
+                <p>Gestiona todos tus servicios contratados y programados desde aquí.</p>
             </div>
-        </div>
-    </footer>
+
+            <div class="section-content">
+                <h2 class="mb-4">En Curso</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">En Progreso</span>
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </div>
+                            <h3>Jardinería y Paisajismo</h3>
+                            <p><strong>Proveedor:</strong> Miguel Torres</p>
+                            <p><strong>Inicio:</strong> 20 Nov 2024 · <strong>Estimado:</strong> 3 días</p>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Progreso</small>
+                                    <small class="text-primary fw-bold">65%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" style="width: 65%; background: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn-modern-outline flex-fill">Mensaje</a>
+                                <a href="#" class="btn-modern flex-fill">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge" style="background: #fef3c7; color: #92400e;">Programado</span>
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </div>
+                            <h3>Plomería y Reparaciones</h3>
+                            <p><strong>Proveedor:</strong> Carlos Ruiz</p>
+                            <p><strong>Fecha:</strong> 28 Nov 2024 · <strong>Hora:</strong> 10:00 AM</p>
+                            <div class="alert alert-info p-2 mb-3">
+                                <small><i class="bi bi-calendar3"></i> Tu cita es en 2 días</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn-modern-outline flex-fill">Reprogramar</a>
+                                <a href="#" class="btn-modern flex-fill">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: FAVORITOS -->
+        <section id="favoritos" style="display: none;">
+            <div class="section-hero">
+                <h1>Mis Favoritos ❤️</h1>
+                <p>Los proveedores que más te gustan, siempre a un click de distancia.</p>
+            </div>
+
+            <div class="section-content">
+                <p class="text-muted mb-4">Has guardado 8 proveedores como favoritos</p>
+                <div class="services-grid">
+                    <!-- Aquí irían las cards de proveedores favoritos -->
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h3>Miguel Torres</h3>
+                                <i class="bi bi-heart-fill" style="color: #ec4899; font-size: 1.5rem;"></i>
+                            </div>
+                            <p>Jardinería y Paisajismo</p>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="text-warning">★★★★★</span>
+                                <span class="text-muted">5.0 (48 reseñas)</span>
+                            </div>
+                            <a href="#" class="btn-modern w-100">Contactar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: PERFIL -->
+        <section id="perfil" style="display: none;">
+            <div class="section-hero">
+                <h1>Mi Perfil 👤</h1>
+                <p>Administra tu información personal y configuración de cuenta.</p>
+            </div>
+
+            <div class="section-content">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="service-item text-center">
+                            <div class="service-content">
+                                <img src="public/assets/dashBoard/img/Foto-usuario.png" alt="Perfil" 
+                                     style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
+                                <h3>Carlos M.</h3>
+                                <p class="text-muted">cliente@correo.com</p>
+                                <button class="btn-modern-outline w-100">Cambiar foto</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="service-item">
+                            <div class="service-content">
+                                <h3 class="mb-4">Información Personal</h3>
+                                <form class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre completo</label>
+                                        <input type="text" class="form-control" value="Carlos M.">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Correo electrónico</label>
+                                        <input type="email" class="form-control" value="cliente@correo.com">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="text" class="form-control" value="+57 300 000 0000">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Ubicación</label>
+                                        <input type="text" class="form-control" value="Bogotá, Colombia">
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="button" class="btn-modern">Guardar cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Tu JS -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+    <!-- JS propio -->
+    <script src="public/assets/dashBoard/js/dashboardCliente.js"></script>
 </body>
-
 </html>
