@@ -59,64 +59,122 @@ $datos = mostrarCategorias();
             </div>
         </section>
 
-
         <section id="tabla-arriba">
-            <table id="tabla-1" class="display nowrap">
-                <thead>
-                    <tr>
-                        <th>Ícono</th>
-                        <th>Nombre</th>
-                        <th>Descripción</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-servicios">
-                    <?php if (!empty($datos)) : ?>
 
-                        <?php foreach ($datos as $categoria) : ?>
+            <ul class="nav nav-tabs mb-3" id="tablaTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tabla-tab" data-bs-toggle="tab" data-bs-target="#tabla-pane" type="button" role="tab" aria-controls="tabla-pane" aria-selected="true">
+                        <i class="bi bi-table"></i> Datos y Acciones
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones-pane" type="button" role="tab" aria-controls="acciones-pane" aria-selected="false">
+                        <i class="bi bi-box-arrow-in-right"></i> Opciones de Exportación
+                    </button>
+                </li>
+            </ul>
 
+            <div class="tab-content" id="tablaTabsContent">
+
+                <div class="tab-pane fade show active" id="tabla-pane" role="tabpanel" aria-labelledby="tabla-tab">
+
+                    <table id="tabla" class="display nowrap">
+                        <thead>
                             <tr>
-                                <td>
-                                    <img src="<?= BASE_URL ?>/public/uploads/categorias/<?= $categoria['icono_url'] ?>"
-                                        alt="Ícono de Categoría"
-                                        width="40" height="40"
-                                        style="border-radius: 50%; object-fit: cover;">
-                                </td>
+                                <th>Ícono</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-servicios">
+                            <?php if (!empty($datos)) : ?>
 
-                                <td><?= $categoria['nombre'] ?></td>
+                                <?php foreach ($datos as $categoria) : ?>
 
-                                <td><?= substr($categoria['descripcion'], 0, 80) . (strlen($categoria['descripcion']) > 80 ? '...' : '') ?></td>
+                                    <tr>
+                                        <td>
+                                            <img src="<?= BASE_URL ?>/public/uploads/categorias/<?= $categoria['icono_url'] ?>"
+                                                alt="Ícono de Categoría"
+                                                width="40" height="40"
+                                                style="border-radius: 50%; object-fit: cover;">
+                                        </td>
+
+                                        <td><?= $categoria['nombre'] ?></td>
+
+                                        <td><?= substr($categoria['descripcion'], 0, 80) . (strlen($categoria['descripcion']) > 80 ? '...' : '') ?></td>
 
 
-                                <td>
-                                    <div class="action-buttons">
+                                        <td>
+                                            <div class="action-buttons">
 
-                                        <!-- <a href="#" class="btn-action btn-view" title="Ver detalle">
+                                                <!-- <a href="#" class="btn-action btn-view" title="Ver detalle">
                                             <i class="bi bi-eye"></i>
                                         </a> -->
 
-                                        <a href="<?= BASE_URL ?>/admin/editar-categoria?id=<?= $categoria['id'] ?>" class="btn-action btn-edit" title="Editar categoría">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                                <a href="<?= BASE_URL ?>/admin/editar-categoria?id=<?= $categoria['id'] ?>" class="btn-action btn-edit" title="Editar categoría">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
 
-                                        <a href="<?= BASE_URL ?>/admin/eliminar-categoria?accion=eliminar&id=<?= $categoria['id'] ?>" class="btn-action btn-delete" title="Eliminar categoría">
-                                            <i class="bi bi-trash3"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="5" class="text-center">
-                                <h2>No hay categorías registradas aún.</h2>
-                                <p class="text-muted">Utiliza el botón "Registrar Nueva" para empezar.</p>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+                                                <a href="<?= BASE_URL ?>/admin/eliminar-categoria?accion=eliminar&id=<?= $categoria['id'] ?>" class="btn-action btn-delete" title="Eliminar categoría">
+                                                    <i class="bi bi-trash3"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <h2>No hay categorías registradas aún.</h2>
+                                        <p class="text-muted">Utiliza el botón "Registrar Nueva" para empezar.</p>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
 
-                </tbody>
-            </table>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="tab-pane fade" id="acciones-pane" role="tabpanel" aria-labelledby="acciones-tab">
+                    <div id="botones-exportacion-container" class="p-3">
+                        <p class="text-muted">Use las opciones a continuación para copiar, imprimir o exportar los datos de la tabla.</p>
+
+                        <table id="tabla-1" class="display nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-servicios">
+                                <?php if (!empty($datos)) : ?>
+
+                                    <?php foreach ($datos as $categoria) : ?>
+
+                                        <tr>
+
+                                            <td><?= $categoria['nombre'] ?></td>
+
+                                            <td><?= substr($categoria['descripcion'], 0, 80) . (strlen($categoria['descripcion']) > 80 ? '...' : '') ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center">
+                                            <h2>No hay categorías registradas aún.</h2>
+                                            <p class="text-muted">Utiliza el botón "Registrar Nueva" para empezar.</p>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
     </main>

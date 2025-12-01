@@ -102,7 +102,7 @@ $datos = mostrarUsuarios();
 
                 <div class="tab-pane fade show active" id="tabla-pane" role="tabpanel" aria-labelledby="tabla-tab">
 
-                    <table id="tabla-1" class="display nowrap">
+                    <table id="tabla" class="display nowrap">
                         <thead>
                             <tr>
                                 <th>Foto</th>
@@ -177,6 +177,57 @@ $datos = mostrarUsuarios();
                 <div class="tab-pane fade" id="acciones-pane" role="tabpanel" aria-labelledby="acciones-tab">
                     <div id="botones-exportacion-container" class="p-3">
                         <p class="text-muted">Use las opciones a continuación para copiar, imprimir o exportar los datos de la tabla.</p>
+
+                        <table id="tabla-1" class="display nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Nombre completo</th>
+                                    <th>Correo electrónico</th>
+                                    <th>Teléfono</th>
+                                    <th>Ubicación</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-servicios">
+                                <?php if (!empty($datos)) : ?>
+
+                                    <?php foreach ($datos as $usuario) : ?>
+
+                                        <tr>
+                                            <td><?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?></td>
+                                            <td><?= $usuario['email'] ?></td>
+                                            <td><?= $usuario['telefono'] ?></td>
+                                            <td><?= $usuario['ubicacion'] ?></td>
+                                            <td><?= $usuario['rol'] ?></td>
+                                            <td>
+                                                <?php
+                                                // Determina la clase de estilo basada en el valor de 'estado'
+                                                $estado_clase = '';
+                                                if ($usuario['estado'] === 'Activo') {
+                                                    $estado_clase = 'status-activo';
+                                                } elseif ($usuario['estado'] === 'Inactivo') {
+                                                    $estado_clase = 'status-inactivo';
+                                                }
+                                                // Si quieres usar una clase preexistente para ejemplo:
+                                                // $estado_clase = ($usuario['estado'] === 'Activo') ? 'status-completed' : 'status-pending';
+                                                ?>
+                                                <span class="status-badge <?= $estado_clase ?>">
+                                                    <?= $usuario['estado'] ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td>
+                                            <h2>No hay usuarios registrados</h2>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
