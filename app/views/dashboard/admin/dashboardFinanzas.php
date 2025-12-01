@@ -1,84 +1,56 @@
+<?php
+require_once BASE_PATH . '/app/helpers/session_admin.php';
+?>
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finanzas - ProviServers</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="logo">
-            <svg width="180" height="40" viewBox="0 0 180 40" fill="none">
-                <text x="0" y="28" font-family="Roboto" font-size="24" font-weight="700" fill="#0066FF">PROVISERVERS</text>
-            </svg>
-        </div>
-        
-        <nav>
-            <div class="menu-item">
-                <i class="bi bi-speedometer2"></i>
-                <span>Panel Principal</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-people"></i>
-                <span>Usuarios</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-grid"></i>
-                <span>Categorías de Servicios</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-file-text"></i>
-                <span>Reportes</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-graph-up"></i>
-                <span>Estadísticas</span>
-            </div>
-            <div class="menu-item active">
-                <i class="bi bi-cash-coin"></i>
-                <span>Finanzas</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-calendar3"></i>
-                <span>Calendario</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-receipt"></i>
-                <span>Facturación</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-megaphone"></i>
-                <span>Marketing</span>
-            </div>
-            <div class="menu-item">
-                <i class="bi bi-plug"></i>
-                <span>Integraciones</span>
-            </div>
-        </nav>
-    </aside>
+    <title>Finanzas | Proviservers</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-title">
-                <h1>Finanzas</h1>
-                <div class="breadcrumb">
-                    <span>Inicio</span>
-                    <span>></span>
-                    <span>ProviServers</span>
-                    <span>></span>
-                    <span>Admin</span>
-                    <span>></span>
-                    <span>Finanzas</span>
-                </div>
-            </div>
-        </div>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- CSS de estilos globales -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
+
+    <!-- CSS de Finanzas -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardFinanzas.css">
+</head>
+
+<body>
+    <!-- SIDEBAR -->
+    <?php include_once __DIR__ . '/../../layouts/sidebar_administrador.php'; ?>
+
+    <main class="contenido">
+        <!-- HEADER -->
+        <?php include_once __DIR__ . '/../../layouts/header_administrador.php'; ?>
+
+        <!-- Título Principal -->
+        <section id="titulo-principal">
+            <h1>Finanzas</h1>
+            <p class="text-muted mb-0">
+                Gestiona y visualiza los ingresos, gastos y transacciones financieras de la plataforma Proviservers.
+            </p>
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/administrador/dashboard">Inicio</a></li>
+                    <li class="breadcrumb-item">ProviServers</li>
+                    <li class="breadcrumb-item">Admin</li>
+                    <li class="breadcrumb-item active" aria-current="page">Finanzas</li>
+                </ol>
+            </nav>
+        </section>
 
         <!-- Cards Resumen -->
-        <div class="cards-container">
+        <section class="cards-container">
             <div class="finance-card">
                 <div class="card-header">
                     <div class="card-icon icon-blue">
@@ -134,10 +106,10 @@
                     <span>124 transacciones</span>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Charts Section -->
-        <div class="charts-section">
+        <section class="charts-section">
             <div class="chart-container">
                 <div class="chart-header">
                     <h2 class="chart-title">Flujo de Ingresos y Gastos</h2>
@@ -160,13 +132,13 @@
                     <canvas id="pieChart"></canvas>
                 </div>
             </div>
-        </div>
+        </section>
 
         <!-- Transactions Table -->
-        <div class="transactions-section">
+        <section class="transactions-section">
             <div class="section-header">
                 <h2 class="chart-title">Transacciones Recientes</h2>
-                <button class="btn-primary-proviservers">
+                <button class="btn-primary-proviservers" data-bs-toggle="modal" data-bs-target="#nuevaTransaccionModal">
                     <i class="bi bi-plus-circle"></i> Nueva Transacción
                 </button>
             </div>
@@ -233,11 +205,19 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </section>
     </main>
 
-    <!-- Scripts -->
+    <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <script src="js/main.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <!-- JavaScript de Finanzas -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/finanzas.js"></script>
 </body>
+
 </html>

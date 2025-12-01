@@ -46,7 +46,7 @@
                         class="bi bi-file-earmark-bar-graph"></i><span>Reportes</span></a></li>
             <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a>
             </li>
-            <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
+            <li><a href="<?= BASE_URL ?>/admin/finanzas" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
             <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a>
             </li>
             <li><a href="#" data-title="Facturación"><i class="bi bi-receipt"></i><span>Facturación</span></a></li>

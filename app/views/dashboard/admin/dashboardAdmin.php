@@ -17,7 +17,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard.css">
 </head>
 
 <body>
