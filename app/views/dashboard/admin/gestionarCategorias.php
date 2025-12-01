@@ -37,26 +37,26 @@ $datos = mostrarCategorias();
         include_once __DIR__ . '/../../layouts/header_administrador.php';
         ?>
 
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Gestión de Categorías</h1>
-                <p class="text-muted mb-0">
-                    Lista de todas las categorías de servicios registradas en la plataforma.
-                </p>
-            </div>
+        <section id="titulo-principal">
+            <div class="row">
 
-            <div class="d-flex gap-2 align-items-center mt-3">
-                <a href="<?= BASE_URL ?>/admin/registrar-categoria" class="btn btn-success">
-                    <i class="bi bi-plus-circle-fill"></i> Registrar Nueva
-                </a>
-                <a href="<?= BASE_URL ?>/admin/reporte?tipo=categorias" target="_blank" class="btn btn-primary">
-                    <i class="bi bi-file-earmark-pdf-fill"></i> Reporte PDF
-                </a>
-            </div>
+                <div class="col-md-8">
+                    <h1 class="mb-1">Gestión de Categorías</h1>
+                    <p class="text-muted mb-0">
+                        Lista de todas las categorías de servicios registradas en la plataforma.
+                    </p>
+                </div>
 
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
-            </nav>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/admin/dashboard">Panel Principal</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Gestión de Categorías</li>
+                        </ol>
+                    </nav>
+                </div>
+
+            </div>
         </section>
 
 
