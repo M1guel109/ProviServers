@@ -18,6 +18,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
     <!-- tu css -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardReportes.css">
 </head>
 
 <body>
@@ -172,9 +173,21 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2022-10-15</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">72 Servicios</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Ver Perfil</a>
-                                <button class="text-red-600 hover:text-red-900">Bloquear</button>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-action btn-view" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <a href="#" class="btn-action btn-edit" title="Editar usuario">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <a href="#" class="btn-action btn-delete" title="Eliminar usuario">
+                                        <i class="bi bi-trash3"></i>
+                                    </a>
+                                </div>
+
                             </td>
                         </tr>
                         <!-- Fila de ejemplo (Cliente) -->
@@ -190,9 +203,21 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-01-20</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">8 Órdenes</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-                                <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Ver Perfil</a>
-                                <button class="text-gray-600 hover:text-gray-900">Editar</button>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="#" class="btn-action btn-view" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <a href="#" class="btn-action btn-edit" title="Editar usuario">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <a href="#" class="btn-action btn-delete" title="Eliminar usuario">
+                                        <i class="bi bi-trash3"></i>
+                                    </a>
+                                </div>
+
                             </td>
                         </tr>
                         <!-- Más filas aquí... -->
