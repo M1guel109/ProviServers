@@ -116,6 +116,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/categoriaController.php';
         break;
 
+    case '/admin/reportes-usuarios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
+        break;
+
     // Fin de rutas login
 
     // Rutas del proveedor
