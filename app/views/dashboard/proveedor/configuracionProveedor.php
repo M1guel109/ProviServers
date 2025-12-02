@@ -2,6 +2,19 @@
 // Protegemos la vista: solo proveedor logueado
 $redirect_path = '/login';
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
+
+$idUsuario = $_SESSION['user']['id'] ?? null;
+$perfil    = [];
+
+if ($idUsuario) {
+    $modeloPerfil = new ProveedorPerfil();
+    $perfilBD = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    if ($perfilBD) {
+        $perfil = $perfilBD;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -109,15 +122,250 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             <!-- Contenido de cada tab -->
             <div class="tab-content mt-4" id="configTabsContent">
                 <!-- Perfil profesional -->
+                <!-- Perfil profesional -->
                 <div class="tab-pane fade show active" id="perfil" role="tabpanel" aria-labelledby="perfil-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Perfil profesional</h2>
-                        <p class="text-muted mb-0">
-                            Aquí irá el formulario para configurar tu perfil público: nombre comercial, descripción,
-                            foto, categorías de servicios, etc.
+                        <p class="text-muted mb-4">
+                            Esta información será visible para tus clientes cuando te encuentren en Proviservers.
+                            No mostraremos tu número ni tu correo; los clientes te contactarán a través de la plataforma.
                         </p>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-perfil-profesional"
+                            method="POST"
+                            enctype="multipart/form-data">
+
+                            <div class="row g-4">
+
+                                <!-- Columna izquierda: Perfil público -->
+                                <div class="col-lg-8">
+                                    <h5 class="mb-3">Tu perfil público</h5>
+
+                                    <div class="row g-3">
+                                        <!-- Nombre comercial -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nombre comercial <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="nombre_comercial"
+                                                class="form-control"
+                                                placeholder="Ej: Plomería Martínez"
+                                                value="<?= htmlspecialchars($perfil['nombre_comercial'] ?? '') ?>">
+                                        </div>
+
+                                        <!-- Tipo de proveedor -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Tipo de proveedor <span class="text-danger">*</span></label>
+                                            <select name="tipo_proveedor" class="form-select">
+                                                <option value="">Selecciona una opción</option>
+                                                <option value="persona"
+                                                    <?= (isset($perfil['tipo_proveedor']) && $perfil['tipo_proveedor'] === 'persona') ? 'selected' : '' ?>>
+                                                    Persona natural
+                                                </option>
+                                                <option value="empresa"
+                                                    <?= (isset($perfil['tipo_proveedor']) && $perfil['tipo_proveedor'] === 'empresa') ? 'selected' : '' ?>>
+                                                    Empresa
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Eslogan corto -->
+                                        <div class="col-12">
+                                            <label class="form-label">Eslogan corto <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="eslogan"
+                                                class="form-control"
+                                                maxlength="120"
+                                                placeholder="Ej: Especialistas en plomería residencial 24/7"
+                                                value="<?= htmlspecialchars($perfil['eslogan'] ?? '') ?>">
+                                            <small class="text-muted">
+                                                Una frase breve que resuma lo que haces. Se mostrará junto a tu nombre.
+                                            </small>
+                                        </div>
+
+                                        <!-- Descripción profesional -->
+                                        <div class="col-12">
+                                            <label class="form-label">Descripción profesional <span class="text-danger">*</span></label>
+                                            <textarea
+                                                name="descripcion"
+                                                class="form-control"
+                                                rows="4"
+                                                placeholder="Cuenta tu experiencia, cómo trabajas, qué te diferencia, etc."><?= htmlspecialchars($perfil['descripcion'] ?? '') ?></textarea>
+                                            <small class="text-muted">
+                                                Esto aparecerá en tu perfil y ayuda a generar confianza con el cliente.
+                                            </small>
+                                        </div>
+
+                                        <!-- Años de experiencia -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">Años de experiencia</label>
+                                            <input
+                                                type="number"
+                                                name="anios_experiencia"
+                                                class="form-control"
+                                                min="0"
+                                                max="80"
+                                                value="<?= htmlspecialchars($perfil['anios_experiencia'] ?? '') ?>">
+                                        </div>
+
+                                        <!-- Idiomas -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">Idiomas que hablas</label>
+                                            <select name="idiomas[]" class="form-select" multiple>
+                                                <?php
+                                                // Opciones estáticas por ahora; luego puedes cargarlas desde BD
+                                                $idiomasDisponibles = ['Español', 'Inglés', 'Portugués', 'Francés'];
+                                                $idiomasSeleccionados = $perfil['idiomas'] ?? []; // idealmente como array
+                                                if (!is_array($idiomasSeleccionados)) {
+                                                    $idiomasSeleccionados = explode(',', (string) $idiomasSeleccionados);
+                                                }
+                                                foreach ($idiomasDisponibles as $idioma):
+                                                ?>
+                                                    <option value="<?= $idioma ?>"
+                                                        <?= in_array($idioma, $idiomasSeleccionados) ? 'selected' : '' ?>>
+                                                        <?= $idioma ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <small class="text-muted">
+                                                Mantén presionada Ctrl (o Cmd en Mac) para seleccionar varios.
+                                            </small>
+                                        </div>
+
+                                        <!-- Categorías principales -->
+                                        <div class="col-md-4">
+                                            <label class="form-label">Categorías principales <span class="text-danger">*</span></label>
+                                            <select name="categorias[]" class="form-select" multiple>
+                                                <!-- Por ahora estático; luego puedes reemplazar por un foreach con categorías desde BD -->
+                                                <?php
+                                                $categoriasDisponibles = ['Plomería', 'Electricidad', 'Limpieza', 'Jardinería', 'Pintura', 'Belleza', 'Mascotas'];
+                                                $categoriasSeleccionadas = $perfil['categorias'] ?? [];
+                                                if (!is_array($categoriasSeleccionadas)) {
+                                                    $categoriasSeleccionadas = explode(',', (string) $categoriasSeleccionadas);
+                                                }
+                                                foreach ($categoriasDisponibles as $categoria):
+                                                ?>
+                                                    <option value="<?= $categoria ?>"
+                                                        <?= in_array($categoria, $categoriasSeleccionadas) ? 'selected' : '' ?>>
+                                                        <?= $categoria ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <small class="text-muted">
+                                                Elige 1 a 3 categorías donde realmente te especializas.
+                                            </small>
+                                        </div>
+
+                                        <!-- Ubicación visible -->
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ciudad principal <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="ciudad"
+                                                class="form-control"
+                                                placeholder="Ej: Bogotá, Colombia"
+                                                value="<?= htmlspecialchars($perfil['ciudad'] ?? '') ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Barrio o zona principal</label>
+                                            <input
+                                                type="text"
+                                                name="zona"
+                                                class="form-control"
+                                                placeholder="Ej: Chapinero, El Poblado, etc."
+                                                value="<?= htmlspecialchars($perfil['zona'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: Foto + datos internos -->
+                                <div class="col-lg-4">
+                                    <!-- Foto / logo -->
+                                    <div class="mb-4">
+                                        <h5 class="mb-3">Foto o logotipo</h5>
+                                        <div class="d-flex flex-column align-items-center">
+                                            <?php
+                                            $foto = $perfil['foto'] ?? 'default_user.png';
+                                            ?>
+                                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($foto) ?>"
+                                                alt="Foto proveedor"
+                                                style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-color); margin-bottom: 1rem;">
+
+                                            <label class="form-label w-100 text-center">Cambiar imagen</label>
+                                            <input
+                                                type="file"
+                                                name="foto"
+                                                class="form-control"
+                                                accept="image/*">
+                                            <small class="text-muted d-block mt-1 text-center">
+                                                Formatos permitidos: JPG, PNG. Tamaño máximo sugerido: 2MB.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Datos internos -->
+                                    <div>
+                                        <h5 class="mb-3">Datos internos (no visibles para el cliente)</h5>
+                                        <p class="text-muted" style="font-size: 0.9rem;">
+                                            Usaremos estos datos para enviarte notificaciones y coordinar aspectos internos.
+                                            <strong>No se mostrarán en tu perfil público.</strong>
+                                        </p>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Teléfono de contacto</label>
+                                            <input
+                                                type="text"
+                                                name="telefono_contacto"
+                                                class="form-control"
+                                                placeholder="Ej: +57 300 000 0000"
+                                                value="<?= htmlspecialchars($perfil['telefono_contacto'] ?? '') ?>">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">WhatsApp</label>
+                                            <input
+                                                type="text"
+                                                name="whatsapp"
+                                                class="form-control"
+                                                placeholder="Ej: +57 300 000 0000"
+                                                value="<?= htmlspecialchars($perfil['whatsapp'] ?? '') ?>">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Correo alternativo</label>
+                                            <input
+                                                type="email"
+                                                name="correo_alternativo"
+                                                class="form-control"
+                                                placeholder="Ej: proveedor@miempresa.com"
+                                                value="<?= htmlspecialchars($perfil['correo_alternativo'] ?? '') ?>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    <span class="text-danger">*</span> Campos obligatorios
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar perfil
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Cuenta y seguridad -->
                 <div class="tab-pane fade" id="cuenta" role="tabpanel" aria-labelledby="cuenta-tab">

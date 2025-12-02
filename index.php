@@ -144,6 +144,13 @@ switch ($request) {
     case '/proveedor/configuracion':
         require BASE_PATH . '/app/views/dashboard/proveedor/configuracionProveedor.php';
         break;
+    case '/proveedor/guardar-perfil-profesional':
+        require BASE_PATH . '/app/controllers/proveedorPerfilController.php';
+        break;
+    case '/proveedor/guardar-perfil-profesional':
+        require BASE_PATH . '/app/controllers/proveedorPerfilController.php';
+        break;
+
 
 
     case '/proveedor/logout':
