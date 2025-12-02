@@ -138,4 +138,121 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
             </div>
         </section>
 
-       
+        <!-- Tabla de Pagos Recientes -->
+        <section class="transactions-section">
+            <div class="section-header">
+                <h2 class="chart-title">Pagos de Membresías Recientes</h2>
+                <button class="btn-primary-proviservers" data-bs-toggle="modal" data-bs-target="#filtrosModal">
+                    <i class="bi bi-funnel"></i> Filtrar
+                </button>
+            </div>
+
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>ID Pago</th>
+                        <th>Proveedor</th>
+                        <th>Plan</th>
+                        <th>Método</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#PAY-0001</td>
+                        <td>Juan Pérez</td>
+                        <td><span class="badge bg-primary">Premium</span></td>
+                        <td>Transferencia</td>
+                        <td class="amount-positive">$150,000</td>
+                        <td>27 Nov 2025</td>
+                        <td><span class="status-badge status-completado">Verificado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#PAY-0002</td>
+                        <td>María González</td>
+                        <td><span class="badge bg-success">Basic</span></td>
+                        <td>PSE</td>
+                        <td class="amount-positive">$80,000</td>
+                        <td>26 Nov 2025</td>
+                        <td><span class="status-badge status-completado">Verificado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#PAY-0003</td>
+                        <td>Carlos Rodríguez</td>
+                        <td><span class="badge bg-primary">Premium</span></td>
+                        <td>Transferencia</td>
+                        <td class="amount-positive">$150,000</td>
+                        <td>25 Nov 2025</td>
+                        <td><span class="status-badge status-pendiente">Pendiente</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success" title="Verificar">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Rechazar">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#PAY-0004</td>
+                        <td>Ana Martínez</td>
+                        <td><span class="badge bg-success">Basic</span></td>
+                        <td>PSE</td>
+                        <td class="amount-positive">$80,000</td>
+                        <td>24 Nov 2025</td>
+                        <td><span class="status-badge status-completado">Verificado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#PAY-0005</td>
+                        <td>Luis Ramírez</td>
+                        <td><span class="badge bg-secondary">Free → Basic</span></td>
+                        <td>Efectivo</td>
+                        <td class="amount-positive">$80,000</td>
+                        <td>23 Nov 2025</td>
+                        <td><span class="status-badge status-pendiente">Pendiente</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-success" title="Verificar">
+                                <i class="bi bi-check-circle"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" title="Rechazar">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#PAY-0006</td>
+                        <td>Patricia Silva</td>
+                        <td><span class="badge bg-primary">Premium</span></td>
+                        <td>Tarjeta</td>
+                        <td class="amount-positive">$150,000</td>
+                        <td>22 Nov 2025</td>
+                        <td><span class="status-badge status-completado">Verificado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        
