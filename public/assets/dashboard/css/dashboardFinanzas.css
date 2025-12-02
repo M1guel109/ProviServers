@@ -15,7 +15,7 @@
 }
 
 #titulo-principal h1 {
-    /* Ya usa var(--font-title) de estilos globales */
+    
     font-size: var(--fs-title2);
     color: var(--dark-color);
     margin-bottom: 8px;
@@ -23,7 +23,7 @@
 }
 
 #titulo-principal p {
-    /* Ya usa var(--font-text) de estilos globales */
+
     font-size: var(--fs-text);
     color: #6B7280;
     margin-bottom: 12px;
@@ -50,3 +50,111 @@
     text-decoration: underline;
 }
 
+titulo-principal .breadcrumb-item.active {
+    color: #6B7280;
+}
+
+/* ==================== CARDS DE RESUMEN FINANCIERO ==================== */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.finance-card {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.finance-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    border-color: #E5E7EB;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    transition: transform 0.3s ease;
+}
+
+.finance-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.icon-blue {
+    background-color: #EBF4FF;
+    color: var(--primary-color);
+}
+
+.icon-green {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.icon-orange {
+    background-color: #FFF7ED;
+    color: #F59E0B;
+}
+
+.icon-purple {
+    background-color: #F3E8FF;
+    color: #9333EA;
+}
+
+.card-value {
+    font-family: var(--font-title);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.card-label {
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
+    color: #6B7280;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.card-trend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #F3F4F6;
+}
+
+.card-trend i {
+    font-size: 16px;
+}
+
+.trend-positive {
+    color: #10B981;
+}
+
+.trend-negative {
+    color: #EF4444;
+}
