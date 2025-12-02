@@ -1,15 +1,6 @@
-/* ==================== CONFIGURACIÓN BASE ==================== */
-/* Tipografías adicionales si no están en estilosGenerales */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap');
-
-/* Variables locales para Finanzas */
-:root {
-    --finance-card-radius: 12px;
-    --finance-shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-    --finance-shadow-md: 0 4px 16px rgba(0,0,0,0.1);
-    --finance-transition: all 0.25s ease;
-}
+/* ==================== FINANZAS - PROVISERVERS ==================== */
+/* Este archivo complementa los estilos globales de style.css */
+/* Solo incluye estilos específicos del módulo de Finanzas */
 
 /* ==================== LAYOUT PRINCIPAL ==================== */
 .contenido {
@@ -24,22 +15,22 @@
 }
 
 #titulo-principal h1 {
-    font-family: var(--font-title, 'Roboto', sans-serif);
-    font-size: var(--fs-title2, 32px);
-    color: var(--dark-color, #0E1116);
+    
+    font-size: var(--fs-title2);
+    color: var(--dark-color);
     margin-bottom: 8px;
     font-weight: 700;
 }
 
 #titulo-principal p {
-    font-family: var(--font-text, 'Poppins', sans-serif);
-    font-size: var(--fs-text, 16px);
+
+    font-size: var(--fs-text);
     color: #6B7280;
     margin-bottom: 12px;
 }
 
 #titulo-principal .breadcrumb {
-    font-size: var(--fs-small, 14px);
+    font-size: var(--fs-small);
     background: transparent;
     padding: 0;
 }
@@ -49,8 +40,8 @@
 }
 
 #titulo-principal .breadcrumb-item a {
-    color: var(--primary-color, #0066FF);
-    text-decoration: none;
+    color: var(--primary-color);
+    /* text-decoration ya está en none en estilos globales */
     transition: color 0.2s ease;
 }
 
@@ -59,7 +50,7 @@
     text-decoration: underline;
 }
 
-#titulo-principal .breadcrumb-item.active {
+titulo-principal .breadcrumb-item.active {
     color: #6B7280;
 }
 
@@ -72,17 +63,17 @@
 }
 
 .finance-card {
-    background: var(--white-color, #FFFFFF);
-    border-radius: var(--finance-card-radius);
+    background: var(--white-color);
+    border-radius: 12px;
     padding: 24px;
-    box-shadow: var(--finance-shadow-sm);
-    transition: var(--finance-transition);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
     border: 1px solid transparent;
 }
 
 .finance-card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--finance-shadow-md);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
     border-color: #E5E7EB;
 }
 
@@ -94,13 +85,13 @@
 }
 
 .card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 26px;
     transition: transform 0.3s ease;
 }
 
@@ -110,7 +101,7 @@
 
 .icon-blue {
     background-color: #EBF4FF;
-    color: var(--primary-color, #0066FF);
+    color: var(--primary-color);
 }
 
 .icon-green {
@@ -129,17 +120,17 @@
 }
 
 .card-value {
-    font-family: var(--font-title, 'Roboto', sans-serif);
+    font-family: var(--font-title);
     font-size: 32px;
     font-weight: 700;
-    color: var(--dark-color, #0E1116);
-    margin-bottom: 4px;
+    color: var(--dark-color);
+    margin-bottom: 6px;
     line-height: 1.2;
 }
 
 .card-label {
-    font-family: var(--font-text, 'Poppins', sans-serif);
-    font-size: var(--fs-small, 14px);
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
     color: #6B7280;
     font-weight: 500;
     margin-bottom: 12px;
@@ -149,7 +140,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: var(--fs-small, 14px);
+    font-size: var(--fs-small);
     font-weight: 600;
     margin-top: 12px;
     padding-top: 12px;
@@ -167,7 +158,6 @@
 .trend-negative {
     color: #EF4444;
 }
-
 /* ==================== SECCIÓN DE GRÁFICOS ==================== */
 .charts-section {
     display: grid;
@@ -177,10 +167,10 @@
 }
 
 .chart-container {
-    background: var(--white-color, #FFFFFF);
-    border-radius: var(--finance-card-radius);
+    background: var(--white-color);
+    border-radius: 12px;
     padding: 24px;
-    box-shadow: var(--finance-shadow-sm);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     border: 1px solid #F3F4F6;
 }
 
@@ -194,10 +184,11 @@
 }
 
 .chart-title {
-    font-family: var(--font-title, 'Roboto', sans-serif);
-    font-size: var(--fs-title4, 18px);
+    /* Ya usa h2 de estilos globales */
+    font-family: var(--font-title);
+    font-size: var(--fs-title4);
     font-weight: 600;
-    color: var(--dark-color, #0E1116);
+    color: var(--dark-color);
     margin: 0;
 }
 
@@ -205,22 +196,22 @@
     padding: 8px 16px;
     border: 1px solid #E5E7EB;
     border-radius: 8px;
-    font-family: var(--font-text, 'Poppins', sans-serif);
-    font-size: var(--fs-small, 14px);
-    color: var(--dark-color, #0E1116);
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
+    color: var(--dark-color);
     cursor: pointer;
-    background-color: white;
+    background-color: var(--white-color);
     transition: all 0.2s ease;
     outline: none;
 }
 
 .chart-select:hover {
-    border-color: var(--primary-color, #0066FF);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
 
 .chart-select:focus {
-    border-color: var(--primary-color, #0066FF);
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2);
 }
 
@@ -232,10 +223,10 @@
 
 /* ==================== SECCIÓN DE TRANSACCIONES ==================== */
 .transactions-section {
-    background: var(--white-color, #FFFFFF);
-    border-radius: var(--finance-card-radius);
+    background: var(--white-color);
+    border-radius: 12px;
     padding: 24px;
-    box-shadow: var(--finance-shadow-sm);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     margin-bottom: 32px;
     border: 1px solid #F3F4F6;
 }
@@ -253,18 +244,9 @@
     margin: 0;
 }
 
-/* ==================== BOTONES ==================== */
+/* ==================== BOTONES (Extienden los globales) ==================== */
 .btn-primary-proviservers {
-    background-color: var(--primary-color, #0066FF);
-    color: var(--white-color, #FFFFFF);
-    font-family: var(--font-text, 'Poppins', sans-serif);
-    font-size: var(--fs-text, 16px);
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: var(--finance-transition);
+    /* Ya definido en estilos globales, solo ajustes específicos */
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -272,8 +254,7 @@
 }
 
 .btn-primary-proviservers:hover {
-    background-color: #0052cc;
-    transform: translateY(-2px);
+    /* Ya definido en estilos globales */
     box-shadow: 0 4px 8px rgba(0, 102, 255, 0.3);
 }
 
@@ -286,11 +267,40 @@
     font-size: 18px;
 }
 
+/* Botones pequeños para la tabla */
+.btn-action {
+    padding: 6px 12px;
+    font-size: var(--fs-small);
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+    background: var(--white-color);
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #F9FAFB;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-action.btn-success:hover {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.btn-action.btn-danger:hover {
+    border-color: #EF4444;
+    color: #EF4444;
+    }
+    
+
 /* ==================== TABLA DE TRANSACCIONES ==================== */
 .transactions-table {
     width: 100%;
     border-collapse: collapse;
-    font-family: var(--font-text, 'Poppins', sans-serif);
+    font-family: var(--font-text);
 }
 
 .transactions-table thead {
@@ -311,8 +321,8 @@
 .transactions-table th {
     padding: 16px;
     text-align: left;
-    font-family: var(--font-title, 'Roboto', sans-serif);
-    font-size: var(--fs-small, 14px);
+    font-family: var(--font-title);
+    font-size: var(--fs-small);
     font-weight: 600;
     color: #6B7280;
     text-transform: uppercase;
@@ -323,8 +333,8 @@
 .transactions-table td {
     padding: 16px;
     border-bottom: 1px solid #F3F4F6;
-    font-size: var(--fs-text, 16px);
-    color: var(--dark-color, #0E1116);
+    font-size: var(--fs-text);
+    color: var(--dark-color);
     vertical-align: middle;
 }
 
@@ -345,7 +355,7 @@
 .status-badge {
     padding: 6px 12px;
     border-radius: 20px;
-    font-size: var(--fs-small, 14px);
+    font-size: var(--fs-small);
     font-weight: 600;
     display: inline-block;
     text-transform: capitalize;
@@ -374,13 +384,13 @@
 .amount-positive {
     color: #10B981;
     font-weight: 700;
-    font-family: var(--font-title, 'Roboto', sans-serif);
+    font-family: var(--font-title);
 }
 
 .amount-negative {
     color: #EF4444;
     font-weight: 700;
-    font-family: var(--font-title, 'Roboto', sans-serif);
+    font-family: var(--font-title);
 }
 
 /* ==================== ANIMACIONES ==================== */
@@ -401,37 +411,10 @@
     animation: fadeIn 0.5s ease-out;
 }
 
-.finance-card:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.finance-card:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.finance-card:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.finance-card:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-/* ==================== ESTADOS DE CARGA ==================== */
-.loading-skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
+.finance-card:nth-child(1) { animation-delay: 0.1s; }
+.finance-card:nth-child(2) { animation-delay: 0.2s; }
+.finance-card:nth-child(3) { animation-delay: 0.3s; }
+.finance-card:nth-child(4) { animation-delay: 0.4s; }
 
 /* ==================== RESPONSIVE TABLET ==================== */
 @media screen and (min-width:768px) and (max-width:1080px) {
@@ -464,6 +447,12 @@
         font-size: 28px;
     }
 
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
     /* Gráficos */
     .charts-section {
         grid-template-columns: 1fr;
@@ -494,7 +483,7 @@
     }
 
     #titulo-principal p {
-        font-size: 14px;
+        font-size: var(--fs-small);
     }
 
     /* Tabla */
@@ -504,7 +493,7 @@
     }
 
     .transactions-table {
-        font-size: var(--fs-small, 14px);
+        font-size: var(--fs-small);
         min-width: 600px;
     }
 
@@ -538,75 +527,31 @@
     }
 }
 
-/* ==================== RESPONSIVE EXTRA SMALL ==================== */
-@media screen and (max-width:375px) {
-    .finance-card {
-        padding: 16px;
-    }
-
-    .card-value {
-        font-size: 24px;
-    }
-
-    .card-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 20px;
-    }
-
-    .chart-container {
-        padding: 12px;
-    }
-
-    .transactions-table th,
-    .transactions-table td {
-        padding: 10px 6px;
-    }
+/* ==================== ACCESIBILIDAD ==================== */
+/* Mejora de enfoque para teclado */
+.chart-select:focus-visible,
+.btn-primary-proviservers:focus-visible,
+.transactions-table tbody tr:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
 }
 
-/* ==================== MODO OSCURO (Opcional) ==================== */
-@media (prefers-color-scheme: dark) {
-    .contenido {
-        background-color: #1F2937;
-    }
-
-    .finance-card,
-    .chart-container,
-    .transactions-section {
-        background-color: #374151;
-        border-color: #4B5563;
-    }
-
-    .card-value,
-    .chart-title,
-    .transactions-table td {
-        color: #F9FAFB;
-    }
-
-    .card-label,
-    .transactions-table th {
-        color: #D1D5DB;
-    }
-
-    .transactions-table thead {
-        background-color: #4B5563;
-    }
-
-    .transactions-table tbody tr:hover {
-        background-color: #4B5563;
-    }
-
-    .chart-select {
-        background-color: #374151;
-        border-color: #4B5563;
-        color: #F9FAFB;
+/* Reducir movimiento para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }
 
 /* ==================== IMPRESIÓN ==================== */
 @media print {
     .btn-primary-proviservers,
-    .chart-select {
+    .chart-select,
+    .btn-action {
         display: none;
     }
 
@@ -620,25 +565,5 @@
 
     .charts-section {
         grid-template-columns: 1fr;
-    }
-}
-
-/* ==================== ACCESIBILIDAD ==================== */
-/* Mejora de enfoque para teclado */
-.chart-select:focus-visible,
-.btn-primary-proviservers:focus-visible,
-.transactions-table tbody tr:focus-visible {
-    outline: 3px solid var(--primary-color, #0066FF);
-    outline-offset: 2px;
-}
-
-/* Reducir movimiento para usuarios con preferencias de accesibilidad */
-@media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
     }
 }
