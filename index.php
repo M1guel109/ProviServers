@@ -41,6 +41,12 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/loginController.php';
         break;
 
+    case '/cerrar-sesion':
+        require BASE_PATH . '/app/controllers/cerrarSesionController.php';
+        $controller = new cerrarSesionController();
+        $controller->index();
+        break;
+
     case '/generar-clave':
         require BASE_PATH . '/app/controllers/passwordController.php';
         break;
@@ -124,7 +130,7 @@ switch ($request) {
 
     case '/admin/finanzas':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
-        break; 
+        break;
 
     // Fin de rutas login
 

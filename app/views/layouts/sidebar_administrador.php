@@ -105,7 +105,7 @@
         <a href="#" data-title="Ajustes"><i class="bi bi-gear"></i><span>Ajustes</span></a>
 
         <!-- Cerrar Sesión -->
-        <a href="/login" data-title="Cerrar Sesión"><i
+        <a href="<?= BASE_URL ?>/cerrar-sesion" data-title="Cerrar Sesión"><i
                 class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></a>
     </div>
 </aside>
