@@ -35,17 +35,23 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
         <!-- Secciones -->
         <!-- titulo -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Registrar Usuario</h1>
-                <p class="text-muted mb-0">
-                    Registra nuevos servicios para que los usuarios puedan contratarlos dentro de la plataforma.
-                </p>
-            </div>
+        <section id="titulo-principal">
+            <div class="row">
 
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
-            </nav>
+                <div class="col-md-8">
+                    <h1 class="mb-1">Registrar Usuario</h1>
+                    <p class="text-muted mb-0">
+                        Registra nuevos servicios para que los usuarios puedan contratarlos dentro de la plataforma.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
+                    </nav>
+                </div>
+
+            </div>
         </section>
 
         <!-- Formualior admin -->

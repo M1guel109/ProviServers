@@ -16,7 +16,7 @@ class RecoveryPass
     public function recuperarClave($email)
     {
         try {
-            $consultar = "SELECT * FROM usuarios WHERE email = :email LIMIT 1";
+            $consultar = "SELECT id, email, rol FROM usuarios WHERE email = :email AND estado = 1 LIMIT 1";
 
             $resultado = $this->conexion->prepare($consultar);
             $resultado->bindParam(':email', $email);
@@ -25,6 +25,44 @@ class RecoveryPass
             $user = $resultado->fetch();
 
             if ($user) {
+                $userId = $user['id'];
+                $rol = $user['rol'];
+                $nombreAmigable = '';
+
+                // 2. CONSULTA DE PERFIL: Determinar qué tabla consultar para obtener el nombre
+                $consultarPerfil = "";
+                $tablaPerfil = "";
+
+                if ($rol == 'admin') {
+                    $tablaPerfil = 'admins';
+                } elseif ($rol == 'proveedor') {
+                    $tablaPerfil = 'proveedores';
+                } elseif ($rol == 'cliente') {
+                    $tablaPerfil = 'clientes';
+                } else {
+                    // Rol desconocido o incompleto, no se puede continuar con el nombre
+                    $nombreAmigable = 'Usuario';
+                }
+
+                // Si el rol es válido, se consulta la tabla de perfil correspondiente
+                if ($tablaPerfil !== '') {
+                    $consultarPerfil = "SELECT nombres, apellidos FROM {$tablaPerfil} WHERE usuario_id = :userId LIMIT 1";
+                    $resultadoPerfil = $this->conexion->prepare($consultarPerfil);
+                    $resultadoPerfil->bindParam(':userId', $userId);
+                    $resultadoPerfil->execute();
+                    $perfil = $resultadoPerfil->fetch(PDO::FETCH_ASSOC);
+
+                    if ($perfil) {
+                        $nombreAmigable = trim($perfil['nombres']);
+                    } else {
+                        $nombreAmigable = 'Usuario';
+                    }
+                }
+
+                // Si el nombre quedó vacío (por un error de perfil) se usa "Usuario"
+                if (empty($nombreAmigable)) {
+                    $nombreAmigable = 'Usuario';
+                }
 
                 // Generamos la nueva contraseña a partir de una base de caracteres y un random
                 $caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -82,15 +120,12 @@ class RecoveryPass
                                 <title>Recuperación de contraseña - Proviservers</title>
                                 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700" rel="stylesheet">
                             </head>
-
                             <body style="margin:0;padding:0;background:#d4d4d4;font-family: Open Sans, Arial, sans-serif">
-
                             <table cellspacing="0" cellpadding="0" width="100%" class="es-wrapper">
                             <tr>
                             <td valign="top">
-
                                 <!-- HEADER -->
-                                <table cellpadding="0" cellspacing="0" align="center" width="600" style="background:#0E1116;color:white;border-radius:4px 4px 0 0">
+                                <table cellpadding="0" cellspacing="0" align="center" width="600" style="background:#0066ff;color:white;border-radius:4px 4px 0 0">
                                     <tr>
                                         <td align="center" style="padding:25px">
 
@@ -102,22 +137,19 @@ class RecoveryPass
                                                 alt="Logo Proviservers"
                                                 width="200"
                                                 style="display:block;margin-top:15px">
-
                                         </td>
                                     </tr>
                                 </table>
-
                                 <!-- CONTENIDO -->
                                 <table align="center" cellpadding="0" cellspacing="0" width="600" style="background:#FFFFFF;">
                                     <tr>
                                         <td style="padding:40px 20px;text-align:center;">
-
                                             <h1 style="color:#0E1116;margin:0;font-size:24px;">
                                                 Tu nueva contraseña temporal
                                             </h1>
 
                                             <p style="color:#444;font-size:15px;margin-top:15px;">
-                                                Has solicitado recuperar el acceso a tu cuenta en  
+                                                '.htmlspecialchars($nombreAmigable) . ' Has solicitado recuperar el acceso a tu cuenta en  
                                                 <strong>Proviservers</strong>.<br>
                                                 Aquí tienes tu nueva contraseña temporal.
                                             </p>
@@ -142,9 +174,8 @@ class RecoveryPass
                                         </td>
                                     </tr>
                                 </table>
-
                                 <!-- FOOTER -->
-                                <table align="center" cellpadding="0" cellspacing="0" width="600" style="background:#0066FF;color:white;border-radius:0 0 4px 4px">
+                                <table align="center" cellpadding="0" cellspacing="0" width="600" style="background:#0e1116;color:white;border-radius:0 0 4px 4px">
                                     <tr>
                                         <td style="padding:30px;text-align:left;font-size:14px;line-height:20px;">
 
@@ -160,18 +191,14 @@ class RecoveryPass
                                                 Este correo fue generado automáticamente.<br>
                                                 Si no realizaste esta solicitud puedes ignorarlo sin problema.
                                             </p>
-
                                         </td>
                                     </tr>
                                 </table>
-
                             </td>
                             </tr>
                             </table>
-
                             </body>
                             </html>
-
                     ';
 
                 $mail->send();
