@@ -158,3 +158,66 @@ titulo-principal .breadcrumb-item.active {
 .trend-negative {
     color: #EF4444;
 }
+/* ==================== SECCIÓN DE GRÁFICOS ==================== */
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-container {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #F3F4F6;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.chart-title {
+    /* Ya usa h2 de estilos globales */
+    font-family: var(--font-title);
+    font-size: var(--fs-title4);
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.chart-select {
+    padding: 8px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
+    color: var(--dark-color);
+    cursor: pointer;
+    background-color: var(--white-color);
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.chart-select:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.chart-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2);
+}
+
+.chart-canvas {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
