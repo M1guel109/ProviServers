@@ -487,7 +487,7 @@ body {
 }
 
 /* --- Botones en el formulario --- */
-.section.profile .btn-primary {
+/* .section.profile .btn-primary {
   background: var(--primary-color);
   border: none;
   padding: 10px 30px;
@@ -495,12 +495,12 @@ body {
   font-size: 14px;
   font-weight: 500;
   transition: background-color 0.3s ease, transform 0.2s ease;
-}
+} */
 
-.section.profile .btn-primary:hover {
-  background-color: darken(var(--primary-color), 8%);
+/* .section.profile .btn-primary:hover {
+  background-color: darken(var(--dark-color), 8%);
   transform: translateY(-2px);
-}
+} */
 
 
 

@@ -30,9 +30,97 @@ $usuarioP = mostrarPerfilAdmin($id);
     </div>
     <div class="acciones-barra">
         <!-- Notificaiones -->
-        <div class="notificaciones item-barra">
-            <i class="bi bi-bell-fill"></i>
-            <span class="badge">6</span>
+        <div class="nav-item dropdown">
+
+            <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown">
+                <i class="bi bi-bell"></i>
+                <span class="badge bg-danger badge-number">5</span>
+            </a><!-- End Notification Icon -->
+
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+                <li class="dropdown-header">
+                    Tienes 5 nuevas notificaciones
+                    <a href="#"><span class="badge rounded-pill bg-primary p-2 ms-2">Ver todas</span></a>
+                </li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <!-- 1. Nueva Solicitud de Servicio (Requiere Revisión) -->
+                <li class="notification-item">
+                    <i class="bi bi-clipboard-check text-warning"></i>
+                    <div>
+                        <h4>Servicio Pendiente</h4>
+                        <p>El Proveedor 'Plomero 3000' ha enviado un nuevo servicio para aprobación.</p>
+                        <p>Hace 1 min.</p>
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <!-- 2. Alerta de Pago Fallido (Atención Urgente) -->
+                <li class="notification-item">
+                    <i class="bi bi-x-circle text-danger"></i>
+                    <div>
+                        <h4>Transacción Fallida</h4>
+                        <p>Falló el pago de membresía (ID: 541) del Proveedor: Construcciones A&M.</p>
+                        <p>Hace 15 min.</p>
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <!-- 3. Nuevo Registro de Usuario (Información) -->
+                <li class="notification-item">
+                    <i class="bi bi-person-plus text-primary"></i>
+                    <div>
+                        <h4>Nuevo Registro</h4>
+                        <p>Un nuevo cliente 'Juana Pérez' se ha registrado en la plataforma.</p>
+                        <p>Hace 1 hora</p>
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <!-- 4. Nuevo Ticket de Soporte (Interacción) -->
+                <li class="notification-item">
+                    <i class="bi bi-chat-dots text-info"></i>
+                    <div>
+                        <h4>Nuevo Ticket de Soporte</h4>
+                        <p>El Cliente 'Roberto G.' abrió un ticket sobre facturación (ID: #405).</p>
+                        <p>Hace 3 horas</p>
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+
+                <!-- 5. Membresía a punto de Expirar (Acción preventiva) -->
+                <li class="notification-item">
+                    <i class="bi bi-credit-card-2-back text-secondary"></i>
+                    <div>
+                        <h4>Membresía Próxima a Vencer</h4>
+                        <p>La membresía Pro de 365 días del Proveedor (ID: 10) vence en 3 días.</p>
+                        <p>Ayer</p>
+                    </div>
+                </li>
+
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li class="dropdown-footer">
+                    <a href="#">Mostrar todas las notificaciones</a>
+                </li>
+
+            </ul><!-- End Notification Dropdown Items -->
+
         </div>
 
         <!-- Idioma -->
@@ -102,7 +190,7 @@ $usuarioP = mostrarPerfilAdmin($id);
                 </li>
 
                 <li>
-                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/login">
+                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/cerrar-sesion">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Salir</span>
                     </a>

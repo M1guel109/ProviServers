@@ -41,6 +41,12 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/loginController.php';
         break;
 
+    case '/cerrar-sesion':
+        require BASE_PATH . '/app/controllers/cerrarSesionController.php';
+        $controller = new cerrarSesionController();
+        $controller->index();
+        break;
+
     case '/generar-clave':
         require BASE_PATH . '/app/controllers/passwordController.php';
         break;
@@ -61,6 +67,7 @@ switch ($request) {
 
     case '/admin/perfil/cambiar-clave':
         require BASE_PATH . '/app/controllers/perfilController.php';
+        cambiarContrasenaUsuario();
         break;
 
     case '/admin/registrar-usuario':
@@ -116,10 +123,23 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/categoriaController.php';
         break;
 
+    case '/admin/registrar-membresia':
+        require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
+        break;
+
+    case '/admin/guardar-membresia':
+        require BASE_PATH . '/app/controllers/membresiaController.php';
+        break;
+
+    case '/admin/reportes-usuarios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
+        break;
+
 
     case '/admin/finanzas':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
-        break; 
+        break;
+
     // Fin de rutas login
 
     // Rutas del proveedor
@@ -146,7 +166,13 @@ switch ($request) {
         reportesPdfController();
         break;
 
+    case '/proveedor/nuevas_solicitudes':
+        require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
+        break;
 
+    case '/proveedor/logout':
+        require BASE_PATH . '/app/controllers/logoutController.php';
+        break;
 
 
     // Rutas del cliente
