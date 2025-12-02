@@ -221,3 +221,76 @@ titulo-principal .breadcrumb-item.active {
     width: 100%;
 }
 
+/* ==================== SECCIÓN DE TRANSACCIONES ==================== */
+.transactions-section {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 32px;
+    border: 1px solid #F3F4F6;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.section-header .chart-title {
+    margin: 0;
+}
+
+/* ==================== BOTONES (Extienden los globales) ==================== */
+.btn-primary-proviservers {
+    /* Ya definido en estilos globales, solo ajustes específicos */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 102, 255, 0.2);
+}
+
+.btn-primary-proviservers:hover {
+    /* Ya definido en estilos globales */
+    box-shadow: 0 4px 8px rgba(0, 102, 255, 0.3);
+}
+
+.btn-primary-proviservers:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 102, 255, 0.2);
+}
+
+.btn-primary-proviservers i {
+    font-size: 18px;
+}
+
+/* Botones pequeños para la tabla */
+.btn-action {
+    padding: 6px 12px;
+    font-size: var(--fs-small);
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+    background: var(--white-color);
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #F9FAFB;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-action.btn-success:hover {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.btn-action.btn-danger:hover {
+    border-color: #EF4444;
+    color: #EF4444;
+    }
