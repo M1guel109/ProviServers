@@ -382,6 +382,17 @@ body {
 #titulo-principal {
     margin-bottom: 30px;
     border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .col-md-8 > a.btn {
+    width: 50%;
+    margin-right: auto ;
+    background: var(--primary-color);
+}
+
+#titulo-principal .col-md-8 > a.btn:hover {
+    background: var(--dark-color);
 }
 
 #titulo-principal h1 {
@@ -461,54 +472,22 @@ tbody tr:last-child td {
     border-bottom: none;
 }
 
-/* 6. Estados específicos */
-td:last-child {
-    font-weight: 500;
+/* ------------------------------------------- */
+/* 17. Badges para estados */
+/* ------------------------------------------- */
+
+/* ... Tus clases existentes (status-completed, status-in-progress, status-pending) ... */
+
+/* Estado: ACTIVO (Verde/Éxito) */
+.status-activo {
+    background-color: #d1fae5; /* Fondo verde muy claro */
+    color: #065f46; /* Texto verde oscuro */
 }
 
-/* Estados para la columna de estado */
-td:nth-child(6) {
-    position: relative;
-    padding-left: 30px;
-    font-weight: 600;
-}
-
-td:nth-child(6)::before {
-    content: "";
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-/* Estado: Completado */
-td:nth-child(6):contains("Completado")::before {
-    background-color: #10b981;
-}
-
-td:nth-child(6):contains("Completado") {
-    color: #10b981;
-}
-
-/* Estado: En proceso */
-td:nth-child(6):contains("En proceso")::before {
-    background-color: #f59e0b;
-}
-
-td:nth-child(6):contains("En proceso") {
-    color: #f59e0b;
-}
-
-/* Estado: Pendiente */
-td:nth-child(6):contains("Pendiente")::before {
-    background-color: #ef4444;
-}
-
-td:nth-child(6):contains("Pendiente") {
-    color: #ef4444;
+/* Estado: INACTIVO (Rojo/Alerta) */
+.status-inactivo {
+    background-color: #fee2e2; /* Fondo rojo muy claro */
+    color: #991b1b; /* Texto rojo oscuro */
 }
 
 /* 7. Botones de acción */
