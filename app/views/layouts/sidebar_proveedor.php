@@ -50,8 +50,12 @@
 
 
     <div class="menu-footer">
-        <a href="#" data-title="Soporte"><i class="bi bi-headset"></i><span>Soporte</span></a>
-        <a href="<?= BASE_URL ?>/public/extras/inicioSesion.h" data-title="Cerrar Sesión"><i
-                class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></a>
+        <a href="#" data-title="Soporte">
+            <i class="bi bi-headset"></i><span>Soporte</span>
+        </a>
+        <a href="<?= BASE_URL ?>/logout" data-title="Cerrar Sesión">
+            <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
+        </a>
     </div>
+
 </aside>

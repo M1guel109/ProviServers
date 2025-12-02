@@ -43,7 +43,7 @@ if ($id) {
         <div class="nav-item dropdown pe-3">
             <a class="usuario item-barra d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
                 <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($usuarioP['foto']) ?>"
-                     alt="Foto usuario" class="rounded-circle">
+                    alt="Foto usuario" class="rounded-circle">
 
                 <div class="info-usuario d-none d-md-block ps-2">
                     <span class="nombre"><?= htmlspecialchars($usuarioP['nombres']) ?></span>
@@ -59,7 +59,9 @@ if ($id) {
                     <span><?= htmlspecialchars($usuarioP['rol'] ?? 'Proveedor') ?></span>
                 </li>
 
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
 
                 <li>
                     <a class="dropdown-item d-flex align-items-center" href="#">
@@ -68,7 +70,9 @@ if ($id) {
                     </a>
                 </li>
 
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
 
                 <li>
                     <a class="dropdown-item d-flex align-items-center" href="#">
@@ -77,7 +81,9 @@ if ($id) {
                     </a>
                 </li>
 
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
 
                 <li>
                     <a class="dropdown-item d-flex align-items-center" href="#">
@@ -86,14 +92,17 @@ if ($id) {
                     </a>
                 </li>
 
-                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
 
                 <li>
-                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/login">
+                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/logout">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Salir</span>
                     </a>
                 </li>
+
             </ul>
         </div>
 
