@@ -321,15 +321,15 @@ body {
 
 .badge {
     /* position: absolute; */
-    top: -5px;
-    right: -5px;
+    /* top: -5px;
+    right: -5px; */
     background-color: #ef4444;
     color: white;
-    border-radius: 50%;
-    /* width: 20px;
+    /* border-radius: 50%;
+    width: 20px;
     height: 20px; */
     font-size: 0.7rem;
-    display: flex;
+    /* display: flex; */
     align-items: center;
     justify-content: center;
     font-weight: 600;
