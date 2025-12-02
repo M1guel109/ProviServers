@@ -76,11 +76,14 @@
             <li><a href="/admin/estadisticas" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a>
             </li>
 
-            <!-- 6. Finanzas -->
-            <li><a href="/admin/finanzas" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
+
 
             <!-- 7. Calendario -->
             <li><a href="/admin/calendario" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a>
+
+            <li><a href="<?= BASE_URL ?>/admin/finanzas" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
+
+
             </li>
 
             <!-- 8. Facturación -->
