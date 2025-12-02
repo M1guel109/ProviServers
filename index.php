@@ -135,8 +135,9 @@ switch ($request) {
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
         break;
-    default:
-        http_response_code(404);
-        require BASE_PATH . '/app/views/auth/error404.php';
-        break;
+
+    case '/cliente/explorar':
+    require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
+    break;
+
 }

@@ -7,34 +7,29 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <!-- Estilos globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-
     <!-- Estilos específicos de cliente -->
-    <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
-
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
         <?php
-        // Si quieres usar el nombre del cliente en el saludo
+        // Nombre dinámico del cliente
         $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
         ?>
 
-        <!-- SECCIÓN: INICIO -->
+        <!-- 1) INICIO -->
         <section id="inicio">
             <div class="section-hero">
                 <h1>¡Hola <?= htmlspecialchars($nombreSaludo) ?>! 👋</h1>
@@ -70,18 +65,16 @@
                 <div class="mt-5">
                     <h2 class="mb-4">¿Qué necesitas hoy?</h2>
                     <div class="d-flex gap-3 flex-wrap">
-                        <a href="#explorar" class="btn-modern">
-                            <i class="bi bi-search"></i>
-                            Buscar Servicio
+                        <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern">
+                            <i class="bi bi-search"></i> Buscar Servicio
                         </a>
-                        <a href="#mis-servicios" class="btn-modern-outline">
-                            <i class="bi bi-briefcase"></i>
-                            Ver Mis Servicios
+                        <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                            <i class="bi bi-briefcase"></i> Ver Mis Servicios
                         </a>
                     </div>
                 </div>
 
-                <!-- Servicios recientes -->
+                <!-- Servicios en curso -->
                 <div class="mt-5">
                     <h2 class="mb-4">Servicios en Curso</h2>
                     <ul class="modern-list">
@@ -93,8 +86,9 @@
                                     <p class="mb-0 text-muted">Con Miguel Torres · Progreso: 65%</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
+
                         <li class="modern-list-item">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="bi bi-wrench" style="font-size: 2rem; color: var(--primary-color);"></i>
@@ -103,14 +97,14 @@
                                     <p class="mb-0 text-muted">Con Carlos Ruiz · Cita: 28 Nov 10:00 AM</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: EXPLORAR SERVICIOS -->
+        <!-- 2) EXPLORAR SERVICIOS -->
         <section id="explorar" style="display: none;">
             <div class="section-hero">
                 <h1>Explorar Servicios 🔍</h1>
@@ -140,7 +134,7 @@
                     </div>
                 </div>
 
-                <!-- Grid de servicios -->
+                <!-- Grid de categorías -->
                 <h2 class="mb-4">Categorías Populares</h2>
                 <div class="services-grid">
                     <div class="service-item">
@@ -148,7 +142,7 @@
                         <div class="service-content">
                             <h3>🌳 Jardinería</h3>
                             <p>Mantenimiento, diseño de jardines y paisajismo profesional.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
 
@@ -157,7 +151,7 @@
                         <div class="service-content">
                             <h3>🔧 Plomería</h3>
                             <p>Reparaciones, instalaciones y mantenimiento de tuberías.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
 
@@ -166,7 +160,7 @@
                         <div class="service-content">
                             <h3>✂️ Belleza</h3>
                             <p>Peluquería, estética y cuidado personal a domicilio.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
 
@@ -175,7 +169,7 @@
                         <div class="service-content">
                             <h3>🐾 Mascotas</h3>
                             <p>Veterinaria, grooming y cuidado de mascotas.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
 
@@ -184,7 +178,7 @@
                         <div class="service-content">
                             <h3>⚡ Electricidad</h3>
                             <p>Instalaciones eléctricas y reparaciones seguras.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
 
@@ -193,17 +187,17 @@
                         <div class="service-content">
                             <h3>🏠 Limpieza</h3>
                             <p>Limpieza profunda y mantenimiento de espacios.</p>
-                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                            <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">Ver proveedores</a>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: MIS SERVICIOS -->
-        <section id="mis-servicios" style="display: none;">
+        <!-- 3) SERVICIOS CONTRATADOS -->
+        <section id="servicios-contratados" style="display: none;">
             <div class="section-hero">
-                <h1>Mis Servicios 💼</h1>
+                <h1>Servicios Contratados 💼</h1>
                 <p>Gestiona todos tus servicios contratados y programados desde aquí.</p>
             </div>
 
@@ -229,7 +223,7 @@
                                 </div>
                             </div>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn-modern-outline flex-fill">Mensaje</a>
+                                <a href="<?= BASE_URL ?>/cliente/mensajes" class="btn-modern-outline flex-fill">Mensaje</a>
                                 <a href="#" class="btn-modern flex-fill">Ver Detalles</a>
                             </div>
                         </div>
@@ -254,13 +248,29 @@
                         </div>
                     </div>
                 </div>
+
+                <h2 class="mt-5 mb-4">Completados</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <div class="service-content">
+                            <span class="badge bg-success mb-2">Completado</span>
+                            <h3>Limpieza Residencial</h3>
+                            <p><strong>Proveedor:</strong> Ana Gómez</p>
+                            <p><strong>Finalizado:</strong> 12 Nov 2024</p>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn-modern-outline flex-fill">Calificar</a>
+                                <a href="#" class="btn-modern flex-fill">Contratar de nuevo</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: FAVORITOS -->
+        <!-- 4) FAVORITOS -->
         <section id="favoritos" style="display: none;">
             <div class="section-hero">
-                <h1>Mis Favoritos </h1>
+                <h1>Mis Favoritos ❤️</h1>
                 <p>Los proveedores que más te gustan, siempre a un click de distancia.</p>
             </div>
 
@@ -279,14 +289,36 @@
                                 <span class="text-warning">★★★★★</span>
                                 <span class="text-muted">5.0 (48 reseñas)</span>
                             </div>
-                            <a href="#" class="btn-modern w-100">Contactar</a>
+                            <div class="d-flex gap-2">
+                                <a href="<?= BASE_URL ?>/cliente/mensajes" class="btn-modern-outline flex-fill">Contactar</a>
+                                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern flex-fill">Contratar</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Otro ejemplo -->
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h3>Ana Gómez</h3>
+                                <i class="bi bi-heart-fill" style="color: #ec4899; font-size: 1.5rem;"></i>
+                            </div>
+                            <p>Limpieza Residencial</p>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="text-warning">★★★★☆</span>
+                                <span class="text-muted">4.7 (112 reseñas)</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="<?= BASE_URL ?>/cliente/mensajes" class="btn-modern-outline flex-fill">Contactar</a>
+                                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern flex-fill">Contratar</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SECCIÓN: PERFIL -->
+        <!-- 5) MI PERFIL -->
         <section id="perfil" style="display: none;">
             <div class="section-hero">
                 <h1>Mi Perfil 👤</h1>
@@ -333,21 +365,34 @@
                                         <button type="button" class="btn-modern">Guardar cambios</button>
                                     </div>
                                 </form>
+
+                                <hr class="my-4">
+
+                                <h3 class="mb-3">Seguridad</h3>
+                                <form class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Contraseña actual</label>
+                                        <input type="password" class="form-control" placeholder="••••••••">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nueva contraseña</label>
+                                        <input type="password" class="form-control" placeholder="••••••••">
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="button" class="btn-modern-outline">Actualizar contraseña</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- JS propio -->
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
-
-
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
 </body>
 </html>

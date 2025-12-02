@@ -31,7 +31,7 @@ $usuarioC = [
     <div class="acciones-barra">
         <div class="notificaciones item-barra">
             <i class="bi bi-bell-fill"></i>
-            <span class="badge">3</span>
+            <span class="badge"></span>
         </div>
 
         <div class="nav-item dropdown pe-3">
