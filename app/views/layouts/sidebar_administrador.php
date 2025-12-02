@@ -49,6 +49,23 @@
                 </ul>
             </li>
 
+            <li class="has-submenu">
+                <a href="#" data-title="Membresías" class="menu-link">
+                    <i class="bi bi-person-badge"></i><span>Gestión de Membresías</span>
+                </a>
+                <button class="toggle-submenu" aria-label="Mostrar opciones">
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </button>
+                <ul class="submenu">
+                    <li><a href="<?= BASE_URL ?>/admin/registrar-membresia" class="submenu-link"><i
+                                class="bi bi-file-earmark-plus"></i>Crear Plan</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/consultar-membresias" class="submenu-link"><i
+                                class="bi bi-card-list"></i>Ver Planes</a></li>
+                    <li><a href="<?= BASE_URL ?>/admin/consultar-suscripciones" class="submenu-link"><i
+                                class="bi bi-bell"></i>Suscripciones Activas</a></li>
+                </ul>
+            </li>
+
             <!-- 4. Reportes (Estructura completa de submenú estático) -->
             <li class="has-submenu">
                 <a href="#" data-title="Reportes" class="menu-link">

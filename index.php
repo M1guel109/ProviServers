@@ -67,6 +67,7 @@ switch ($request) {
 
     case '/admin/perfil/cambiar-clave':
         require BASE_PATH . '/app/controllers/perfilController.php';
+        cambiarContrasenaUsuario();
         break;
 
     case '/admin/registrar-usuario':
@@ -122,6 +123,13 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/categoriaController.php';
         break;
 
+    case '/admin/registrar-membresia':
+        require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
+        break;
+
+    case '/admin/guardar-membresia':
+        require BASE_PATH . '/app/controllers/membresiaController.php';
+        break;
 
     case '/admin/reportes-usuarios':
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
