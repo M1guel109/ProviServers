@@ -95,13 +95,12 @@ if ($id) {
                 <li>
                     <hr class="dropdown-divider">
                 </li>
+                <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/proveedor/logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Salir</span>
+                </a>
 
-                <li>
-                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Salir</span>
-                    </a>
-                </li>
+
 
             </ul>
         </div>
