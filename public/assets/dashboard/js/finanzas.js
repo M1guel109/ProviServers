@@ -1,23 +1,20 @@
 // ==================== ESPERAR A QUE EL DOM ESTÉ LISTO ====================
 document.addEventListener('DOMContentLoaded', function() {
     
-    // Datos para diferentes períodos
+    // Datos para diferentes períodos - INGRESOS POR MEMBRESÍAS
     const dataMensual = {
         labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-        ingresos: [1200000, 1400000, 1100000, 1600000, 1800000, 1500000, 2000000, 2200000, 1900000, 2100000, 2400000, 2845320],
-        gastos: [800000, 900000, 750000, 1000000, 1100000, 950000, 1200000, 1300000, 1100000, 1250000, 1400000, 895420]
+        ingresos: [1850000, 2100000, 1950000, 2300000, 2450000, 2200000, 2600000, 2750000, 2500000, 2650000, 2800000, 2845320]
     };
 
-    const dataSemanal = {
-        labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
-        ingresos: [650000, 720000, 680000, 795320],
-        gastos: [220000, 240000, 210000, 225420]
+    const dataTrimestral = {
+        labels: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'],
+        ingresos: [5900000, 6950000, 7850000, 8295320]
     };
 
     const dataAnual = {
         labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        ingresos: [12000000, 15000000, 18000000, 21000000, 24000000, 28000000],
-        gastos: [8000000, 9500000, 11000000, 13000000, 15000000, 16500000]
+        ingresos: [8500000, 12000000, 16500000, 21000000, 26000000, 28995320]
     };
 
     // ==================== VERIFICAR QUE LOS CANVAS EXISTAN ====================
@@ -25,48 +22,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const pieChartElement = document.getElementById('pieChart');
     const periodoSelectElement = document.getElementById('periodoSelect');
 
-    // Si no existen los elementos, salir
     if (!lineChartElement || !pieChartElement) {
-        console.error('Error: No se encontraron los elementos canvas');
+        console.error('❌ Error: No se encontraron los elementos canvas');
         return;
     }
 
-    // Verificar que Chart.js esté cargado
     if (typeof Chart === 'undefined') {
-        console.error('Error: Chart.js no está cargado');
+        console.error('❌ Error: Chart.js no está cargado');
         return;
     }
 
-    // ==================== GRÁFICO DE LÍNEA ====================
+    // ==================== GRÁFICO DE LÍNEA - INGRESOS POR MEMBRESÍAS ====================
     const ctxLine = lineChartElement.getContext('2d');
     let lineChart = new Chart(ctxLine, {
         type: 'line',
         data: {
             labels: dataMensual.labels,
             datasets: [{
-                label: 'Ingresos',
+                label: 'Ingresos por Membresías',
                 data: dataMensual.ingresos,
                 borderColor: '#0066FF',
                 backgroundColor: 'rgba(0, 102, 255, 0.1)',
                 tension: 0.4,
                 fill: true,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                pointRadius: 6,
+                pointHoverRadius: 8,
                 pointBackgroundColor: '#0066FF',
                 pointBorderColor: '#FFFFFF',
-                pointBorderWidth: 2
-            }, {
-                label: 'Gastos',
-                data: dataMensual.gastos,
-                borderColor: '#EF4444',
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 5,
-                pointHoverRadius: 7,
-                pointBackgroundColor: '#EF4444',
-                pointBorderColor: '#FFFFFF',
-                pointBorderWidth: 2
+                pointBorderWidth: 3
             }]
         },
         options: {
@@ -98,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     callbacks: {
                         label: function(context) {
-                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString('es-CO');
+                            return 'Ingresos: $' + context.parsed.y.toLocaleString('es-CO');
                         }
                     }
                 }
@@ -134,22 +117,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('✅ Gráfico de línea creado correctamente');
+    console.log('✅ Gráfico de ingresos creado correctamente');
 
-    // ==================== GRÁFICO CIRCULAR ====================
+    // ==================== GRÁFICO CIRCULAR - DISTRIBUCIÓN POR PLAN ====================
     const ctxPie = pieChartElement.getContext('2d');
     const pieChart = new Chart(ctxPie, {
         type: 'doughnut',
         data: {
-            labels: ['Nómina', 'Materiales', 'Servicios', 'Marketing', 'Otros'],
+            labels: ['Premium', 'Basic', 'Free'],
             datasets: [{
-                data: [450000, 180000, 125000, 85000, 55420],
+                data: [45, 72, 30], // Cantidad de proveedores por plan
                 backgroundColor: [
-                    '#0066FF',
-                    '#10B981',
-                    '#F59E0B',
-                    '#9333EA',
-                    '#6B7280'
+                    '#0066FF', // Premium - Azul
+                    '#10B981', // Basic - Verde
+                    '#6B7280'  // Free - Gris
                 ],
                 borderWidth: 0,
                 hoverOffset: 10
@@ -188,16 +169,16 @@ document.addEventListener('DOMContentLoaded', function() {
                             const value = context.parsed;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((value / total) * 100).toFixed(1);
-                            return label + ': $' + value.toLocaleString('es-CO') + ' (' + percentage + '%)';
+                            return label + ': ' + value + ' proveedores (' + percentage + '%)';
                         }
                     }
-                },
-                cutout: '65%'
-            }
+                }
+            },
+            cutout: '65%'
         }
     });
 
-    console.log('✅ Gráfico circular creado correctamente');
+    console.log('✅ Gráfico de distribución creado correctamente');
 
     // ==================== CAMBIO DE PERÍODO ====================
     if (periodoSelectElement) {
@@ -205,8 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let newData;
             
             switch(e.target.value) {
-                case 'semanal':
-                    newData = dataSemanal;
+                case 'trimestral':
+                    newData = dataTrimestral;
                     break;
                 case 'anual':
                     newData = dataAnual;
@@ -218,7 +199,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Actualizar datos del gráfico
             lineChart.data.labels = newData.labels;
             lineChart.data.datasets[0].data = newData.ingresos;
-            lineChart.data.datasets[1].data = newData.gastos;
             lineChart.update('active');
 
             console.log('✅ Período cambiado a:', e.target.value);
