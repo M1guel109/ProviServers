@@ -123,6 +123,9 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/categoriaController.php';
         break;
 
+    case '/admin/registrar-membresia':
+        require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
+        break;
 
     case '/admin/reportes-usuarios':
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
