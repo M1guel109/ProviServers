@@ -294,3 +294,276 @@ titulo-principal .breadcrumb-item.active {
     border-color: #EF4444;
     color: #EF4444;
     }
+    
+
+/* ==================== TABLA DE TRANSACCIONES ==================== */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-text);
+}
+
+.transactions-table thead {
+    background-color: #F9FAFB;
+    border-radius: 8px;
+}
+
+.transactions-table thead tr th:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.transactions-table thead tr th:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.transactions-table th {
+    padding: 16px;
+    text-align: left;
+    font-family: var(--font-title);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #E5E7EB;
+}
+
+.transactions-table td {
+    padding: 16px;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+    vertical-align: middle;
+}
+
+.transactions-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.transactions-table tbody tr:hover {
+    background-color: #F9FAFB;
+    cursor: pointer;
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==================== BADGES DE ESTADO ==================== */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    display: inline-block;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.status-completado {
+    background-color: #ECFDF5;
+    color: #10B981;
+    border: 1px solid #D1FAE5;
+}
+
+.status-pendiente {
+    background-color: #FFF7ED;
+    color: #F59E0B;
+    border: 1px solid #FED7AA;
+}
+
+.status-cancelado {
+    background-color: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #FECACA;
+}
+
+/* ==================== MONTOS ==================== */
+.amount-positive {
+    color: #10B981;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+.amount-negative {
+    color: #EF4444;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+/* ==================== ANIMACIONES ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.finance-card,
+.chart-container,
+.transactions-section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.finance-card:nth-child(1) { animation-delay: 0.1s; }
+.finance-card:nth-child(2) { animation-delay: 0.2s; }
+.finance-card:nth-child(3) { animation-delay: 0.3s; }
+.finance-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* ==================== RESPONSIVE TABLET ==================== */
+@media screen and (min-width:768px) and (max-width:1080px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chart-canvas {
+        height: 280px;
+    }
+}
+
+/* ==================== RESPONSIVE SMARTPHONE ==================== */
+@media screen and (min-width:320px) and (max-width:767px) {
+    /* Cards */
+    .cards-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .finance-card {
+        padding: 20px;
+    }
+
+    .card-value {
+        font-size: 28px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
+    /* Gráficos */
+    .charts-section {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .chart-container {
+        padding: 16px;
+    }
+
+    .chart-canvas {
+        height: 250px;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .chart-select {
+        width: 100%;
+    }
+
+    /* Título */
+    #titulo-principal h1 {
+        font-size: 24px;
+    }
+
+    #titulo-principal p {
+        font-size: var(--fs-small);
+    }
+
+    /* Tabla */
+    .transactions-section {
+        padding: 16px;
+        overflow-x: auto;
+    }
+
+    .transactions-table {
+        font-size: var(--fs-small);
+        min-width: 600px;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 12px 8px;
+    }
+
+    .transactions-table th {
+        font-size: 12px;
+    }
+
+    /* Header de sección */
+    .section-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .btn-primary-proviservers {
+        width: 100%;
+        justify-content: center;
+        font-size: 15px;
+        padding: 10px 20px;
+    }
+
+    /* Badges más pequeños */
+    .status-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+}
+
+/* ==================== ACCESIBILIDAD ==================== */
+/* Mejora de enfoque para teclado */
+.chart-select:focus-visible,
+.btn-primary-proviservers:focus-visible,
+.transactions-table tbody tr:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Reducir movimiento para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================== IMPRESIÓN ==================== */
+@media print {
+    .btn-primary-proviservers,
+    .chart-select,
+    .btn-action {
+        display: none;
+    }
+
+    .finance-card,
+    .chart-container,
+    .transactions-section {
+        box-shadow: none;
+        border: 1px solid #E5E7EB;
+        page-break-inside: avoid;
+    }
+
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+}
