@@ -127,6 +127,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
         break;
 
+    case '/admin/guardar-membresia':
+        require BASE_PATH . '/app/controllers/membresiaController.php';
+        break;
+
     case '/admin/reportes-usuarios':
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
         break;
