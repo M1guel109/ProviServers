@@ -145,6 +145,11 @@ switch ($request) {
     require_once BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
     break;
 
+     case '/proveedor/en-proceso':
+        require_once BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
+        break;
+    
+
 
 
 

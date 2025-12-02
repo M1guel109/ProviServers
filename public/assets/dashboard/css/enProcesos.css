@@ -1,0 +1,496 @@
+/* ============================================================
+   enProcesos.css - Estilos específicos para Servicios en Proceso
+   Estructura basada en el estilo general del dashboard
+   Proyecto: Proviservers
+=============================================================== */
+
+/* 1. Tipografías */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* 2. Iconos */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+
+/* 3. Variables */
+:root {
+    --primary-color: #0066FF;
+    --dark-color: #0E1116;
+    --white-color: #FFFFFF;
+    --gray-light: #f3f4f6;
+    --gray-medium: #e5e7eb;
+    --gray-dark: #64748b;
+
+    --font-title: 'Roboto', sans-serif;
+    --font-text: 'Poppins', sans-serif;
+
+    --fs-title1: 32px;
+    --fs-title2: 24px;
+    --fs-title3: 20px;
+    --fs-text: 16px;
+    --fs-small: 14px;
+}
+
+/* ============================================================
+   4. SIDEBAR COMPLETO
+=============================================================== */
+
+.sidebar {
+    width: 260px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background: #FFFFFF;
+    border-right: 1px solid var(--gray-medium);
+    padding: 20px 15px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.sidebar ul,
+.sidebar li,
+.sidebar a {
+    list-style: none;
+    text-decoration: none;
+    color: var(--dark-color);
+    font-family: var(--font-text);
+    font-size: 15px;
+}
+
+.sidebar .logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo img {
+    display: block;
+    margin: 0 auto;
+}
+
+.sidebar .logo-completo {
+    width: 160px;
+    height: auto;
+}
+
+.sidebar .logo-favicon {
+    width: 55px;
+    height: auto;
+    display: none;
+}
+
+/* Submenús */
+.menu-principal .has-submenu {
+    position: relative;
+}
+
+.menu-principal .toggle-submenu {
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: absolute;
+    top: 12px;
+    right: 5px;
+    font-size: 16px;
+    color: var(--gray-dark);
+}
+
+.submenu {
+    margin-top: 8px;
+    margin-left: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.has-submenu.open .submenu {
+    display: flex;
+}
+
+.submenu-link {
+    font-size: 14px;
+    color: #4b5563;
+}
+
+/* Contenido principal */
+main,
+.contenido,
+.main-content,
+#content,
+.wrapper,
+.page-content {
+    margin-left: 260px !important;
+    padding: 25px;
+    min-height: 100vh;
+    background: #f9fafb;
+}
+
+/* Responsive sidebar */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    main,
+    .contenido,
+    .main-content,
+    #content {
+        margin-left: 200px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        position: absolute;
+        left: -260px;
+        transition: .3s;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    main,
+    .contenido,
+    .main-content,
+    #content {
+        margin-left: 0 !important;
+    }
+}
+
+/* ============================================================
+   5. Título Principal
+=============================================================== */
+
+#titulo-principal {
+    margin-bottom: 30px;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-family: var(--font-title);
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+#titulo-principal .subtitulo {
+    font-size: var(--fs-text);
+    font-family: var(--font-text);
+    color: var(--gray-dark);
+    margin-top: 4px;
+}
+
+/* ============================================================
+   6. Estadísticas rápidas
+=============================================================== */
+
+#estadisticas-proceso {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin-bottom: 35px;
+}
+
+.tarjeta-stat {
+    background-color: var(--white-color);
+    padding: 22px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    border: 1px solid var(--gray-medium);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.icono-stat {
+    font-size: 30px;
+    color: var(--primary-color);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-numero {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+.stat-label {
+    font-size: var(--fs-small);
+    color: var(--gray-dark);
+}
+
+/* ============================================================
+   7. Filtros
+=============================================================== */
+
+#filtros-proceso {
+    background: var(--white-color);
+    padding: 20px 25px;
+    border-radius: 14px;
+    margin-bottom: 35px;
+    border: 1px solid var(--gray-medium);
+}
+
+.contenedor-filtros {
+    display: flex;
+    gap: 20px;
+}
+
+.grupo-filtro {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.grupo-filtro label {
+    font-size: var(--fs-small);
+    color: var(--gray-dark);
+    margin-bottom: 6px;
+}
+
+.grupo-filtro select,
+.grupo-filtro input {
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--gray-medium);
+    font-size: var(--fs-text);
+    font-family: var(--font-text);
+    outline: none;
+    transition: all .25s ease;
+}
+
+.grupo-filtro select:focus,
+.grupo-filtro input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+}
+
+/* ============================================================
+   8. Lista de servicios
+=============================================================== */
+
+#lista-procesos {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* Tarjeta */
+.tarjeta-proceso {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 25px;
+    border: 1px solid var(--gray-medium);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Encabezado */
+.proceso-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.proceso-titulo {
+    font-size: var(--fs-title3);
+    font-family: var(--font-title);
+    margin-bottom: 4px;
+}
+
+.proceso-meta {
+    display: flex;
+    gap: 15px;
+    margin-top: 4px;
+}
+
+/* Categorías */
+.badge-categoria {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: var(--fs-small);
+    color: var(--white-color);
+    font-weight: 600;
+}
+
+.electricidad { background-color: #f59e0b; }
+.limpieza { background-color: #0ea5e9; }
+.plomeria { background-color: #10b981; }
+.pintura { background-color: #a855f7; }
+
+/* Prioridad */
+.badge-prioridad {
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--white-color);
+}
+
+.alta { background-color: #ef4444; }
+.media { background-color: #f59e0b; }
+.baja { background-color: #22c55e; }
+
+/* ============================================================
+   9. Información del cliente
+=============================================================== */
+
+.proceso-cliente {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+}
+
+.cliente-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.cliente-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cliente-nombre {
+    font-weight: 600;
+    font-size: var(--fs-text);
+}
+
+.cliente-contacto {
+    color: var(--gray-dark);
+    font-size: var(--fs-small);
+}
+
+/* ============================================================
+   10. Progreso del servicio
+=============================================================== */
+
+.proceso-progreso {
+    margin-top: 10px;
+}
+
+.progreso-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.progreso-label {
+    color: var(--gray-dark);
+    font-size: var(--fs-small);
+}
+
+.progreso-porcentaje {
+    font-size: var(--fs-text);
+    font-weight: 600;
+}
+
+/* Barra de progreso */
+.barra-progreso {
+    background: var(--gray-light);
+    height: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.barra-progreso-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 6px;
+    transition: width .5s ease;
+}
+
+/* Etapas */
+.proceso-etapas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.etapa {
+    font-size: var(--fs-small);
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.completada { background-color: #d1fae5; color: #047857; }
+.activa { background-color: #dbeafe; color: #1e40af; }
+.pendiente { background-color: #f3f4f6; color: #374151; }
+
+/* ============================================================
+   11. Acciones (botones)
+=============================================================== */
+
+.proceso-acciones {
+    display: flex;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.btn-accion {
+    padding: 10px 18px;
+    font-size: var(--fs-small);
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all .25s ease;
+    font-weight: 600;
+}
+
+.btn-actualizar {
+    background-color: #e0e7ff;
+    color: #3730a3;
+}
+.btn-actualizar:hover {
+    background-color: #c7d2fe;
+}
+
+.btn-contactar {
+    background-color: #cffafe;
+    color: #0e7490;
+}
+.btn-contactar:hover {
+    background-color: #a5f3fc;
+}
+
+.btn-completar {
+    background-color: #dcfce7;
+    color: #166534;
+}
+.btn-completar:hover {
+    background-color: #bbf7d0;
+}
+
+/* ============================================================
+   12. Responsivo
+=============================================================== */
+
+@media (max-width: 992px) {
+    #estadisticas-proceso {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    #estadisticas-proceso {
+        grid-template-columns: 1fr;
+    }
+
+    .contenedor-filtros {
+        flex-direction: column;
+    }
+
+    .proceso-acciones {
+        flex-direction: column;
+    }
+}
