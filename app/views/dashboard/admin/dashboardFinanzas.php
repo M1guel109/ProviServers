@@ -255,4 +255,79 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
             </table>
         </section>
 
-        
+        <!-- Sección de Membresías por Vencer -->
+        <section class="transactions-section">
+            <div class="section-header">
+                <h2 class="chart-title">
+                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                    Membresías Próximas a Vencer
+                </h2>
+                <span class="badge bg-warning text-dark">8 proveedores</span>
+            </div>
+
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>Plan Actual</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Días Restantes</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Roberto Sánchez</td>
+                        <td><span class="badge bg-success">Basic</span></td>
+                        <td>28 Oct 2025</td>
+                        <td>28 Dic 2025</td>
+                        <td><span class="text-warning fw-bold">5 días</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Enviar recordatorio">
+                                <i class="bi bi-envelope"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sandra López</td>
+                        <td><span class="badge bg-primary">Premium</span></td>
+                        <td>05 Nov 2025</td>
+                        <td>05 Ene 2026</td>
+                        <td><span class="text-warning fw-bold">12 días</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Enviar recordatorio">
+                                <i class="bi bi-envelope"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Miguel Torres</td>
+                        <td><span class="badge bg-success">Basic</span></td>
+                        <td>15 Nov 2025</td>
+                        <td>15 Ene 2026</td>
+                        <td><span class="text-info fw-bold">22 días</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" title="Enviar recordatorio">
+                                <i class="bi bi-envelope"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <!-- JavaScript de Finanzas -->
+    <script src="<?= BASE_URL ?>/public/assets/finanzas/js/finanzas.js"></script>
+</body>
+
+</html>
