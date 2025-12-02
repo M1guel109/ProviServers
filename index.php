@@ -117,9 +117,15 @@ switch ($request) {
         break;
 
 
+    case '/admin/reportes-usuarios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
+        break;
+
+
     case '/admin/finanzas':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
         break; 
+
     // Fin de rutas login
 
     // Rutas del proveedor

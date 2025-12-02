@@ -36,21 +36,26 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
         <!-- Secciones -->
         <!-- titulo -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Registrar Categoría</h1>
-                <p class="text-muted mb-0">
-                    Registra nuevas categorías de servicios para la plataforma.
-                </p>
-            </div>
+        <section id="titulo-principal">
+            <div class="row">
 
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <!-- Se puede ajustar la miga de pan aquí -->
-                <ol id="breadcrumb" class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/admin/dashboard">Panel Principal</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Registrar Categoría</li>
-                </ol>
-            </nav>
+                <div class="col-md-8">
+                    <h1 class="mb-1">Registrar Categoría</h1>
+                    <p class="text-muted mb-0">
+                        Registra nuevas categorías de servicios para la plataforma.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/admin/dashboard">Panel Principal</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Registrar Categoría</li>
+                        </ol>
+                    </nav>
+                </div>
+
+            </div>
         </section>
 
         <!-- Formulario de Categoría -->
@@ -59,7 +64,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                 <!-- El action apunta al controlador que creamos antes -->
                 <form action="<?= BASE_URL ?>/admin/guardar-categoria" method="post" class="formulario-usuario" enctype="multipart/form-data">
                     <div class="row g-3">
-                        
+
                         <!-- Ícono/Imagen de Categoría (icono_url) -->
                         <div class="seccion-foto">
                             <div class="tarjeta-foto">
@@ -87,7 +92,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                             <textarea class="form-control" id="descripcion" name="descripcion" rows="4"
                                 placeholder="Describe brevemente qué tipo de servicios abarca esta categoría (Ej: Reparación, instalación y mantenimiento de sistemas de agua potable y drenaje)." required></textarea>
                         </div>
-                        
+
                         <!-- Botón -->
                         <div class="text-center mt-4">
                             <button type="submit" class="btn btn-success px-4">Guardar Categoría</button>

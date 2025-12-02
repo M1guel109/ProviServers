@@ -110,6 +110,7 @@
                 <th>Teléfono</th>
                 <th>Ubicación</th>
                 <th>Rol</th>
+                <th>Estado</th>
             </tr>
         </thead>
         <tbody>
@@ -129,6 +130,7 @@
                         <td><?= htmlspecialchars($usuario['telefono']) ?></td>
                         <td><?= htmlspecialchars($usuario['ubicacion']) ?></td>
                         <td><?= htmlspecialchars(ucfirst($usuario['rol'])) ?></td>
+                        <td><?= htmlspecialchars(ucfirst($usuario['estado'])) ?></td>
                     </tr>
                 <?php endforeach; ?>
 

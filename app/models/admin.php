@@ -73,9 +73,9 @@ class Usuario
     {
         try {
             // VARIABLE QUE ALMAECENA LA SENTENCIA DE SQL A EJECUTAR
-            $consultar = "
-                SELECT 
+            $consultar = "SELECT 
                     u.id, u.email, u.documento, u.rol, u.estado, u.created_at,
+                    CASE u.estado WHEN 1 THEN 'Activo' ELSE 'Inactivo' END AS estado,
                     -- COALESCE selecciona el primer valor NO NULO para cada campo
                     COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
                     COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
@@ -163,7 +163,7 @@ class Usuario
                               rol = :rol 
                              WHERE id = :id";
 
-            $resultado = $this ->conexion->prepare($actualizar);
+            $resultado = $this->conexion->prepare($actualizar);
             $resultado->bindParam(':id', $data['id']);
             $resultado->bindParam(':email', $data['email']);
             $resultado->bindParam(':documento', $data['documento']);
