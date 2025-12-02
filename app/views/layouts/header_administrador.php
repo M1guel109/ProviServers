@@ -102,7 +102,7 @@ $usuarioP = mostrarPerfilAdmin($id);
                 </li>
 
                 <li>
-                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/login">
+                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/cerrar-sesion">
                         <i class="bi bi-box-arrow-right"></i>
                         <span>Salir</span>
                     </a>

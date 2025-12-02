@@ -67,6 +67,7 @@ switch ($request) {
 
     case '/admin/perfil/cambiar-clave':
         require BASE_PATH . '/app/controllers/perfilController.php';
+        cambiarContrasenaUsuario();
         break;
 
     case '/admin/registrar-usuario':
