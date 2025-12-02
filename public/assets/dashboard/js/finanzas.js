@@ -133,3 +133,97 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
+
+    console.log('✅ Gráfico de línea creado correctamente');
+
+    // ==================== GRÁFICO CIRCULAR ====================
+    const ctxPie = pieChartElement.getContext('2d');
+    const pieChart = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ['Nómina', 'Materiales', 'Servicios', 'Marketing', 'Otros'],
+            datasets: [{
+                data: [450000, 180000, 125000, 85000, 55420],
+                backgroundColor: [
+                    '#0066FF',
+                    '#10B981',
+                    '#F59E0B',
+                    '#9333EA',
+                    '#6B7280'
+                ],
+                borderWidth: 0,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            family: 'Poppins',
+                            size: 13
+                        },
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: {
+                        family: 'Roboto',
+                        size: 14
+                    },
+                    bodyFont: {
+                        family: 'Poppins',
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.parsed;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return label + ': $' + value.toLocaleString('es-CO') + ' (' + percentage + '%)';
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        }
+    });
+
+    console.log('✅ Gráfico circular creado correctamente');
+
+    // ==================== CAMBIO DE PERÍODO ====================
+    if (periodoSelectElement) {
+        periodoSelectElement.addEventListener('change', function(e) {
+            let newData;
+            
+            switch(e.target.value) {
+                case 'semanal':
+                    newData = dataSemanal;
+                    break;
+                case 'anual':
+                    newData = dataAnual;
+                    break;
+                default:
+                    newData = dataMensual;
+            }
+            
+            // Actualizar datos del gráfico
+            lineChart.data.labels = newData.labels;
+            lineChart.data.datasets[0].data = newData.ingresos;
+            lineChart.data.datasets[1].data = newData.gastos;
+            lineChart.update('active');
+
+            console.log('✅ Período cambiado a:', e.target.value);
+        });
+    }
+
+    console.log('✅ JavaScript de Finanzas cargado correctamente');
+});
