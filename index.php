@@ -141,6 +141,11 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfController.php';
         reportesPdfController();
         break;
+    case '/proveedor/configuracion':
+        require BASE_PATH . '/app/views/dashboard/proveedor/configuracionProveedor.php';
+        break;
+
+
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
         break;
