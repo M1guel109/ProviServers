@@ -31,7 +31,7 @@
                     <i class="bi bi-chevron-down toggle-icon"></i>
                 </button>
                 <ul class="submenu">
-                    <li><a href="#" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
+                    <li><a href="<?= BASE_URL?>/proveedor/nuevas_solicitudes" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
                     <li><a href="#" class="submenu-link"><i class="bi bi-clock-history"></i>En proceso</a></li>
                     <li><a href="#" class="submenu-link"><i class="bi bi-check-circle"></i>Completadas</a></li>
                 </ul>

@@ -141,6 +141,9 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/reportesPdfController.php';
         reportesPdfController();
         break;
+    case '/proveedor/nuevas_solicitudes':
+    require_once BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
+    break;
 
 
 
