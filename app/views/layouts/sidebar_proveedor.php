@@ -43,15 +43,23 @@
             <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
             <li><a href="#" data-title="Facturación"><i class="bi bi-receipt"></i><span>Facturación</span></a></li>
             <li><a href="#" data-title="Promociones"><i class="bi bi-megaphone"></i><span>Promociones</span></a></li>
-            <li><a href="dashboardFormulario.html" data-title="Configuración"><i
-                        class="bi bi-gear"></i><span>Configuración</span></a></li>
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/configuracion" data-title="Configuración">
+                    <i class="bi bi-gear"></i><span>Configuración</span>
+                </a>
+            </li>
+
         </ul>
     </nav>
 
 
     <div class="menu-footer">
-        <a href="#" data-title="Soporte"><i class="bi bi-headset"></i><span>Soporte</span></a>
-        <a href="<?= BASE_URL ?>/public/extras/inicioSesion.h" data-title="Cerrar Sesión"><i
-                class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span></a>
+        <a href="#" data-title="Soporte">
+            <i class="bi bi-headset"></i><span>Soporte</span>
+        </a>
+        <a href="<?= BASE_URL ?>/logout" data-title="Cerrar Sesión">
+            <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
+        </a>
     </div>
+
 </aside>

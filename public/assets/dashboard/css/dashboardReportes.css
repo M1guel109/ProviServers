@@ -1,0 +1,351 @@
+/* ----------------------------------------------------------------- */
+/* 1. Estilos Específicos para la Página de Gestión de Usuarios */
+/* ----------------------------------------------------------------- */
+
+/* --- Título Principal --- */
+#titulo-principal .text-muted {
+    font-size: var(--fs-text);
+    color: #64748b !important; /* Gris suave para el texto */
+    font-weight: 400;
+}
+
+/* Breadcrumb (para hacer compatible con el estilo del dashboard) */
+#titulo-principal #breadcrumb {
+    justify-content: flex-end; /* Alinear a la derecha en desktop */
+    font-size: var(--fs-small);
+}
+
+/* ----------------------------------------------------------------- */
+/* 2. Zona de Indicadores (KPIs) - #tarjetas-kpis */
+/* ----------------------------------------------------------------- */
+
+#tarjetas-kpis {
+    display: grid;
+    /* desktop: 4 columnas */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px; /* gap-6 en Tailwind */
+    margin-bottom: 32px; /* mb-8 en Tailwind */
+}
+
+.kpi-card {
+    background-color: var(--white-color);
+    padding: 20px; /* p-5 en Tailwind */
+    border-radius: 12px; /* rounded-xl en Tailwind */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* shadow-lg en Tailwind */
+    border-left: 4px solid; /* border-l-4 en Tailwind, el color se define por la clase de color */
+    transition: transform 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-card .text-sm {
+    font-size: var(--fs-small); /* text-sm */
+    font-weight: 500; /* font-medium */
+    color: #64748b; /* text-gray-500 */
+    margin-bottom: 4px;
+}
+
+.kpi-card .text-3xl {
+    font-size: var(--fs-title2); /* text-3xl (ajustado a title2) */
+    font-family: var(--font-title);
+    font-weight: 700; /* font-bold */
+    color: var(--dark-color); /* text-gray-900 */
+    margin-top: 4px;
+}
+
+/* Colores de las barras laterales (border-l-4) */
+.border-indigo-500 { border-color: #6366f1; }
+.border-green-500 { border-color: #22c55e; }
+.border-blue-500 { border-color: var(--primary-color); }
+.border-red-500 { border-color: #ef4444; }
+
+
+/* ----------------------------------------------------------------- */
+/* 3. Zona de Filtros y Acciones - #filtros-y-acciones */
+/* ----------------------------------------------------------------- */
+
+#filtros-y-acciones {
+    background-color: var(--white-color);
+    padding: 24px; /* p-6 */
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 32px;
+    border: 1px solid #e2e8f0;
+}
+
+#filtros-y-acciones h2 {
+    font-size: var(--fs-title3);
+    font-weight: 600;
+    color: #475569; /* text-gray-700 */
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e2e8f0;
+    font-family: var(--font-title);
+}
+
+#filtros-y-acciones .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* lg:grid-cols-4 */
+    gap: 16px; /* gap-4 */
+}
+
+/* Etiquetas de formulario */
+#filtros-y-acciones label {
+    display: block;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 4px;
+}
+
+/* Campos de formulario (Input y Select) */
+#filtros-y-acciones input[type="text"],
+#filtros-y-acciones select {
+    width: 100%; /* w-full */
+    padding: 10px; /* p-2 */
+    border: 1px solid #cbd5e1; /* border-gray-300 */
+    border-radius: 8px; /* rounded-lg */
+    margin-top: 4px; /* mt-1 */
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+    background-color: var(--white-color);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
+}
+
+/* Estilo al enfocar (focus) */
+#filtros-y-acciones input[type="text"]:focus,
+#filtros-y-acciones select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2); /* focus:ring-blue-500 */
+}
+
+/* Contenedor de botones */
+#filtros-y-acciones .flex {
+    display: flex;
+    gap: 16px; /* space-x-4 */
+    margin-top: 24px; /* mt-6 */
+}
+
+/* Botones de acción */
+#filtros-y-acciones button {
+    font-family: var(--font-text);
+    font-weight: 600;
+    padding: 10px 16px; /* py-2 px-4 */
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.bg-blue-600 { /* Aplicar Filtros */
+    background-color: #2563eb;
+    color: var(--white-color);
+}
+.bg-blue-600:hover {
+    background-color: #1d4ed8;
+}
+
+.bg-gray-300 { /* Limpiar Filtros */
+    background-color: #d1d5db;
+    color: #374151;
+}
+.bg-gray-300:hover {
+    background-color: #9ca3af;
+}
+
+.bg-green-600 { /* Exportar CSV */
+    background-color: #10b981;
+    color: var(--white-color);
+    margin-left: auto; /* ml-auto */
+}
+.bg-green-600:hover {
+    background-color: #059669;
+}
+
+
+/* ----------------------------------------------------------------- */
+/* 4. Tabla de Usuarios - #tabla-usuarios */
+/* ----------------------------------------------------------------- */
+
+#tabla-usuarios {
+    background-color: var(--white-color);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+#tabla-usuarios h2 {
+    font-size: var(--fs-title3);
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 16px;
+    font-family: var(--font-title);
+}
+
+.overflow-x-auto {
+    overflow-x: auto;
+}
+
+.min-w-full {
+    min-width: 100%;
+}
+
+.divide-y th {
+    border-bottom: 1px solid #e2e8f0; /* divide-gray-200 */
+}
+.divide-y td {
+    border-top: 1px solid #e2e8f0; /* divide-gray-200 */
+}
+
+.bg-gray-50 {
+    background-color: #f9fafb;
+}
+
+/* Encabezados de tabla (TH) */
+#tabla-usuarios th {
+    padding: 12px 24px; /* px-6 py-3 */
+    text-align: left;
+    font-size: 11px; /* text-xs */
+    font-weight: 500;
+    color: #64748b; /* text-gray-500 */
+    text-transform: uppercase;
+    letter-spacing: 0.05em; /* tracking-wider */
+    font-family: var(--font-text);
+}
+
+/* Celdas de tabla (TD) */
+#tabla-usuarios td {
+    padding: 16px 24px; /* px-6 py-4 */
+    white-space: nowrap; /* whitespace-nowrap */
+    font-size: var(--fs-small); /* text-sm */
+    color: #64748b; /* text-gray-500 */
+    font-family: var(--font-text);
+}
+
+#tabla-usuarios td:first-child {
+    font-weight: 600; /* font-medium */
+    color: var(--dark-color); /* text-gray-900 */
+}
+
+/* --- Badges de estado y rol --- */
+.px-2 { padding-left: 8px; padding-right: 8px; }
+.inline-flex { display: inline-flex; }
+.text-xs { font-size: 11px; }
+.leading-5 { line-height: 1.25; }
+.font-semibold { font-weight: 600; }
+.rounded-full { border-radius: 9999px; }
+
+/* Rol - Proveedor */
+.bg-yellow-100 { background-color: #fef3c7; }
+.text-yellow-800 { color: #92400e; }
+
+/* Rol - Cliente */
+.bg-blue-100 { background-color: #dbeafe; }
+.text-blue-800 { color: #1e40af; }
+
+/* Estado - Activo / Verificado */
+.bg-green-100 { background-color: #d1fae5; }
+.text-green-800 { color: #065f46; }
+
+/* Estado - Bloqueado (Ejemplo de color) */
+.bg-red-100 { background-color: #fee2e2; }
+.text-red-800 { color: #991b1b; }
+
+
+/* --- Botones de Acción de Tabla --- */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: #64748b;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-size: 18px;
+}
+
+.btn-action:hover {
+    color: var(--primary-color);
+    background-color: #f1f5f9;
+}
+
+.btn-view:hover { color: var(--primary-color); }
+.btn-edit:hover { color: #f59e0b; } /* Amarillo para Editar */
+.btn-delete:hover { color: #ef4444; } /* Rojo para Eliminar */
+
+
+/* ----------------------------------------------------------------- */
+/* 5. Adaptación Responsive (Tablet & Mobile) */
+/* ----------------------------------------------------------------- */
+
+/* 9. Responsive Tablet (768px - 1080px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    /* Módulos de 2 columnas */
+    #tarjetas-kpis {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    #filtros-y-acciones .grid {
+        grid-template-columns: repeat(2, 1fr); /* md:grid-cols-2 */
+    }
+
+    #filtros-y-acciones .flex {
+        flex-wrap: wrap;
+    }
+    .bg-green-600 {
+        margin-left: 0; /* Deshacer ml-auto para móvil */
+        width: 100%; /* Ocupar todo el ancho si se envuelve */
+    }
+}
+
+/* 10. Responsive Smartphone (320px - 767px) */
+@media screen and (max-width: 767px) {
+    /* Módulos de 1 columna */
+    #tarjetas-kpis,
+    #filtros-y-acciones .grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Ajuste de título */
+    #titulo-principal h1 {
+        font-size: var(--fs-title2);
+    }
+
+    /* El breadcrumb va centrado o a la izquierda en móvil */
+    #titulo-principal #breadcrumb {
+        justify-content: flex-start;
+        margin-top: 8px;
+    }
+
+    /* Ajuste de filtros */
+    #filtros-y-acciones .flex {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    /* Asegurar que el botón de exportar ocupe el 100% en móvil */
+    #filtros-y-acciones button {
+        width: 100%;
+        margin-left: 0 !important;
+    }
+
+    /* Reducir padding de la tabla */
+    #tabla-usuarios th, #tabla-usuarios td {
+        padding: 10px 12px;
+        font-size: 10px;
+    }
+}

@@ -171,11 +171,49 @@ function actualizarUsuario()
     $ubicacion = $_POST['ubicacion'] ?? '';
     $rol = $_POST['rol'] ?? '';
 
+    // Datos de la foto (campo oculto y archivo subido)
+    $foto_perfil_actual = $_POST['foto_perfil_actual'] ?? ''; // La foto que ya estaba en la DB
+    $archivo_nuevo = $_FILES['foto_perfil'] ?? null;
+
     // Validamos lo campos que son obligatorios
     if (empty($id) || empty($nombres) || empty($apellidos) || empty($documento) || empty($email) || empty($telefono) || empty($ubicacion) || empty($rol)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
         exit();
     }
+
+
+    // 3. LÓGICA DE GESTIÓN DE LA FOTO 📸
+    // ----------------------------------------------------
+    $foto_para_db = $foto_perfil_actual; // Por defecto, usamos el nombre de la foto actual
+
+    // Ruta donde se guardan las imágenes (IMPORTANTE: BASE_PATH debe estar definido)
+    $ruta_destino = BASE_PATH . '/public/uploads/usuarios/'; 
+
+    // Verificar si se subió un nuevo archivo sin errores
+    if ($archivo_nuevo && $archivo_nuevo['error'] === UPLOAD_ERR_OK) {
+        
+        // Generar un nombre único para el nuevo archivo
+        $extension = pathinfo($archivo_nuevo['name'], PATHINFO_EXTENSION);
+        $nombre_archivo_nuevo = uniqid('user_') . '.' . $extension;
+        
+        // Intentar mover el archivo subido
+        if (move_uploaded_file($archivo_nuevo['tmp_name'], $ruta_destino . $nombre_archivo_nuevo)) {
+            
+            // Éxito: asignamos la nueva ruta y eliminamos la antigua
+            $foto_para_db = $nombre_archivo_nuevo; 
+            
+            // Eliminar la foto antigua del servidor (si existe y no es la por defecto/vacía)
+            if (!empty($foto_perfil_actual) && file_exists($ruta_destino . $foto_perfil_actual)) {
+                 unlink($ruta_destino . $foto_perfil_actual);
+            }
+            
+        } else {
+            // Error al mover el archivo
+            mostrarSweetAlert('error', 'Error de Subida', 'Hubo un problema al guardar la nueva foto.');
+            exit();
+        }
+    } 
+    // Si no hay archivo nuevo, $foto_para_db mantiene el valor de $foto_perfil_actual.
 
     $objUsuario = new Usuario();
     $data = [
@@ -186,7 +224,8 @@ function actualizarUsuario()
         'email' => $email,
         'telefono' => $telefono,
         'ubicacion' => $ubicacion,
-        'rol' => $rol
+        'rol' => $rol,
+        'foto_perfil' => $foto_para_db
         // 'id_admin' => $id_admin,
     ];
 
