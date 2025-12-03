@@ -21,7 +21,8 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- CSS de Finanzas -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/finanzas/css/finanzas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardfinanzas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard.css">
 </head>
 
 <body>
@@ -327,7 +328,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- JavaScript de Finanzas -->
-    <script src="<?= BASE_URL ?>/public/assets/finanzas/js/finanzas.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/finanzas.js"></script>
 </body>
 
 </html>
