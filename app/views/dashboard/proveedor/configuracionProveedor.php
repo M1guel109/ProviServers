@@ -4,6 +4,7 @@ $redirect_path = '/login';
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
 require_once BASE_PATH . '/app/models/ProveedorSeguridad.php';
+require_once BASE_PATH . '/app/models/ProveedorDisponibilidad.php';
 
 
 $idUsuario = $_SESSION['user']['id'] ?? null;
@@ -22,6 +23,13 @@ if ($idUsuario) {
 
     if ($seguridadBD) {
         $seguridad = $seguridadBD;
+    }
+
+    // Disponibilidad
+    $modeloDisp = new ProveedorDisponibilidad();
+    $dispBD = $modeloDisp->obtenerPorUsuario($idUsuario);
+    if ($dispBD) {
+        $disponibilidad = $dispBD;
     }
 }
 $correoActual = $_SESSION['user']['email'] ?? '';
@@ -633,15 +641,223 @@ $correoActual = $_SESSION['user']['email'] ?? '';
                 </div>
 
                 <!-- Disponibilidad y zona de servicio -->
+                <!-- Disponibilidad y zona de servicio -->
                 <div class="tab-pane fade" id="disponibilidad" role="tabpanel" aria-labelledby="disponibilidad-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Disponibilidad y zona de servicio</h2>
-                        <p class="text-muted mb-0">
-                            Aquí configurarás tus días y horarios de trabajo, así como las zonas o ciudades donde
-                            prestas servicios.
+                        <p class="text-muted mb-4">
+                            Configura tus días y horarios de trabajo, y define en qué zonas atiendes. Esto nos ayuda
+                            a mostrarte solo solicitudes que realmente puedes cubrir.
                         </p>
+
+                        <?php
+                        // Preparar valores actuales
+                        $diasSeleccionados = [];
+                        if (!empty($disponibilidad['dias_semana'])) {
+                            $diasSeleccionados = explode(',', $disponibilidad['dias_semana']);
+                        }
+                        $horaInicioActual = $disponibilidad['hora_inicio'] ?? '';
+                        $horaFinActual    = $disponibilidad['hora_fin'] ?? '';
+
+                        $atiendeFinesSemanaActual = !empty($disponibilidad['atiende_fines_semana']);
+                        $atiendeFestivosActual    = !empty($disponibilidad['atiende_festivos']);
+                        $atencionUrgenciasActual  = !empty($disponibilidad['atencion_urgencias']);
+
+                        $tipoZonaActual = $disponibilidad['tipo_zona'] ?? 'ciudad';
+                        $radioKmActual  = $disponibilidad['radio_km'] ?? '';
+                        $zonasTextoActual = $disponibilidad['zonas_texto'] ?? '';
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-disponibilidad" method="POST">
+                            <div class="row g-4">
+                                <!-- Columna izquierda: días y horarios -->
+                                <div class="col-lg-7">
+                                    <h5 class="mb-3">Días y horarios de trabajo</h5>
+
+                                    <!-- Días de la semana -->
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Días laborables <span class="text-danger">*</span></label>
+                                        <?php
+                                        $diasSemana = [
+                                            'lun' => 'Lunes',
+                                            'mar' => 'Martes',
+                                            'mie' => 'Miércoles',
+                                            'jue' => 'Jueves',
+                                            'vie' => 'Viernes',
+                                            'sab' => 'Sábado',
+                                            'dom' => 'Domingo',
+                                        ];
+                                        ?>
+                                        <div class="d-flex flex-wrap gap-2 disponibilidad-dias">
+                                            <?php foreach ($diasSemana as $key => $label): ?>
+                                                <div class="form-check form-check-inline disponibilidad-dia">
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="checkbox"
+                                                        name="dias_trabajo[]"
+                                                        id="dia_<?= $key ?>"
+                                                        value="<?= $key ?>"
+                                                        <?= in_array($key, $diasSeleccionados) ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="dia_<?= $key ?>">
+                                                        <?= $label ?>
+                                                    </label>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            Selecciona al menos un día de trabajo.
+                                        </small>
+                                    </div>
+
+                                    <!-- Horario general -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hora de inicio general <span class="text-danger">*</span></label>
+                                            <input
+                                                type="time"
+                                                name="hora_inicio"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($horaInicioActual) ?>">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hora de fin general <span class="text-danger">*</span></label>
+                                            <input
+                                                type="time"
+                                                name="hora_fin"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($horaFinActual) ?>">
+                                        </div>
+                                    </div>
+
+                                    <!-- Fines de semana / festivos / urgencias -->
+                                    <div class="row g-3 mt-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atiende_fines_semana"
+                                                    name="atiende_fines_semana"
+                                                    <?= $atiendeFinesSemanaActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atiende_fines_semana">
+                                                    Atiendo fines de semana
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mt-2">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atiende_festivos"
+                                                    name="atiende_festivos"
+                                                    <?= $atiendeFestivosActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atiende_festivos">
+                                                    Atiendo días festivos
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atencion_urgencias"
+                                                    name="atencion_urgencias"
+                                                    <?= $atencionUrgenciasActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atencion_urgencias">
+                                                    Ofrezco atención de urgencias
+                                                </label>
+                                            </div>
+                                            <small class="text-muted d-block mt-2">
+                                                Por ejemplo: atenciones nocturnas, recargos, tiempo de respuesta estimado, etc.
+                                            </small>
+                                            <textarea
+                                                name="detalle_urgencias"
+                                                class="form-control mt-2"
+                                                rows="2"
+                                                placeholder="Describe cómo manejas las urgencias (horarios, recargos, tiempos de respuesta, etc.)"><?= htmlspecialchars($disponibilidad['detalle_urgencias'] ?? '') ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: zona de servicio -->
+                                <div class="col-lg-5">
+                                    <h5 class="mb-3">Zona de servicio</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Esta configuración nos ayuda a filtrar las solicitudes según tu cobertura. Así evitamos
+                                        que te lleguen servicios que están demasiado lejos o fuera de lo que atiendes.
+                                    </p>
+
+                                    <!-- Tipo de zona -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de zona principal</label>
+                                        <select name="tipo_zona" class="form-select">
+                                            <option value="ciudad" <?= $tipoZonaActual === 'ciudad' ? 'selected' : '' ?>>
+                                                Solo en mi ciudad principal
+                                            </option>
+                                            <option value="radio" <?= $tipoZonaActual === 'radio' ? 'selected' : '' ?>>
+                                                Radio en km alrededor de mi zona
+                                            </option>
+                                            <option value="varias_ciudades" <?= $tipoZonaActual === 'varias_ciudades' ? 'selected' : '' ?>>
+                                                Varias ciudades / municipios
+                                            </option>
+                                            <option value="remoto" <?= $tipoZonaActual === 'remoto' ? 'selected' : '' ?>>
+                                                Servicio remoto / online
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Radio en km -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Radio máximo (km)</label>
+                                        <input
+                                            type="number"
+                                            name="radio_km"
+                                            class="form-control"
+                                            min="1"
+                                            max="500"
+                                            placeholder="Ej: 10, 20, 50"
+                                            value="<?= htmlspecialchars($radioKmActual) ?>">
+                                        <small class="text-muted">
+                                            Útil si atiendes a domicilio en un área cercana (Ej: hasta 15 km a la redonda).
+                                        </small>
+                                    </div>
+
+                                    <!-- Zonas o ciudades específicas -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Zonas o ciudades específicas</label>
+                                        <textarea
+                                            name="zonas_texto"
+                                            class="form-control"
+                                            rows="3"
+                                            placeholder="Ej: Chapinero, Usaquén, Suba. O: Bogotá, Chía, Soacha."><?= htmlspecialchars($zonasTextoActual) ?></textarea>
+                                        <small class="text-muted">
+                                            Puedes escribir barrios, localidades o ciudades donde normalmente trabajas.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    <span class="text-danger">*</span> Campos obligatorios
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar disponibilidad
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Pagos y facturación -->
                 <div class="tab-pane fade" id="pagos" role="tabpanel" aria-labelledby="pagos-tab">
