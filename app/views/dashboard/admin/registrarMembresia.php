@@ -236,7 +236,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script> -->
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/membresias.js"></script>
 </body>

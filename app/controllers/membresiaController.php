@@ -63,6 +63,10 @@ function registrarMembresia()
     // Capturamos los datos del Paso 2 (Configuración de Límites)
     $max_servicios_activos = $_POST['max_servicios_activos'] ?? '';
     $orden_visual = $_POST['orden_visual'] ?? null; // Es opcional, puede ser null
+    // ** CORRECCIÓN INICIADA AQUÍ: Si el campo viene vacío, lo convertimos a NULL. **
+    if ($orden_visual === '') {
+        $orden_visual = 0;
+    }
     $acceso_estadisticas_pro = $_POST['acceso_estadisticas_pro'] ?? 0; // Radio buttons
     $permite_videos = $_POST['permite_videos'] ?? 0; // Radio buttons
     $es_destacado = $_POST['es_destacado'] ?? 0; // Radio buttons
@@ -71,7 +75,7 @@ function registrarMembresia()
 
     // 2. VALIDACIÓN DE CAMPOS OBLIGATORIOS
     // El campo 'orden_visual' es el único opcional (se permite null)
-    if (empty($tipo) || empty($costo) || empty($duracion_dias) || empty($descripcion) || empty($max_servicios_activos) || empty($estado)) {
+    if (empty($tipo) || !isset($_POST['costo']) || trim((string)$_POST['costo']) === '' || empty($duracion_dias) || empty($descripcion) || empty($max_servicios_activos) || empty($estado)) {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios del plan.');
         exit();
     }
@@ -82,14 +86,16 @@ function registrarMembresia()
     $duracion_int = intval($duracion_dias);
     $max_servicios_int = intval($max_servicios_activos);
 
+    $orden_visual_int = intval($orden_visual);
+
     if ($costo_float < 0 || $duracion_int < 1 || $max_servicios_int < 1) {
         mostrarSweetAlert('error', 'Valores Inválidos', 'El costo, la duración y el límite de servicios deben ser valores positivos.');
         exit();
     }
 
     // El campo 'orden_visual' si se proporciona debe ser un entero positivo
-    if (!is_null($orden_visual) && intval($orden_visual) < 1) {
-        mostrarSweetAlert('error', 'Orden Visual Inválida', 'La prioridad visual debe ser un número entero positivo.');
+    if ($orden_visual_int < 0) {
+        mostrarSweetAlert('error', 'Orden Visual Inválida', 'La prioridad visual debe ser un número entero positivo o cero.');
         exit();
     }
 
@@ -136,7 +142,7 @@ function registrarMembresia()
 
 function mostrarMembresias()
 {
-  
+
     // 1. Instanciar el modelo de Membresía, pasándole la conexión.
     $resultado = new Membresia();
 
@@ -147,11 +153,18 @@ function mostrarMembresias()
     return $membresias;
 }
 
-function mostrarMembresiaId($id) {}
+function mostrarMembresiaId($id)
+{
+    $objMembresia = new Membresia();
+    $membresia = $objMembresia->mostrarId($id);
+
+    return $membresia;
+}
 
 function actualizarMembresia() {}
 
-function eliminarMembresia($id) {
+function eliminarMembresia($id)
+{
     $objmembresia = new Membresia();
     $respuesta = $objmembresia->eliminar($id);
 

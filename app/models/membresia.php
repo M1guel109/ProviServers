@@ -107,6 +107,22 @@ class Membresia
         }
     }
 
+    public function mostrarId($id)
+    {
+        try {
+            $consultar = "SELECT * FROM membresias WHERE id = :id";
+
+            $resultado = $this->conexion->prepare($consultar);
+            $resultado->bindParam(':id', $id);
+            $resultado->execute();
+
+            return $resultado->fetch();
+        } catch (PDOException $e) {
+            error_log("Error en Membresia::mostrar->" . $e->getMessage());
+            return [];
+        }
+    }
+
     public function eliminar($id)
     {
         try {
