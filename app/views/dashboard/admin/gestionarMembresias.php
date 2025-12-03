@@ -150,7 +150,7 @@ function toYesNo($value) {
                                                 </a>
 
                                                 <!-- Editar membresía (Podrías querer editar las fechas o el estado) -->
-                                                <a href="#" class="btn-action btn-edit" title="Editar membresía">
+                                                <a href="<?= BASE_URL ?>/admin/editar-membresia?id=<?= $membresia['id'] ?>" class="btn-action btn-edit" title="Editar membresía">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </a>
 
