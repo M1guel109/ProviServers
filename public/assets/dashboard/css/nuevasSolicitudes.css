@@ -1,0 +1,431 @@
+/* === TIPOGRAFÍAS E ICONOS — MISMAS DEL PROYECTO === */
+
+/* 1. Tipografías */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* 2. Iconos */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css');
+
+/* 3. Variables de tipografía — iguales a todo el proyecto */
+:root {
+    --primary-color: #0066FF;
+    --dark-color: #0E1116;
+    --white-color: #FFFFFF;
+
+    --font-title: 'Roboto', sans-serif;
+    --font-text: 'Poppins', sans-serif;
+
+    --fs-title1: 42px;
+    --fs-title2: 32px;
+    --fs-title3: 24px;
+    --fs-title4: 18px;
+    --fs-text: 16px;
+    --fs-small: 14px;
+}
+
+/* 4. Configuración global */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-title);
+}
+
+p, a, button, li, label, input, select, textarea, span {
+    font-family: var(--font-text);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#estadisticas-solicitudes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.tarjeta-estadistica {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.tarjeta-estadistica:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.icono-estadistica {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+}
+
+.icono-estadistica.urgente {
+    color: #ef4444;
+}
+
+.valor-estadistica {
+    font-size: var(--fs-title2);
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+}
+
+.etiqueta-estadistica {
+    font-size: var(--fs-text);
+    color: #64748b;
+}
+
+/* 2. Tabla de Solicitudes */
+#tabla-solicitudes {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+/* 3. Información del Cliente en Tabla */
+.info-cliente {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nombre-cliente {
+    font-weight: 600;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+}
+
+.contacto-cliente {
+    font-size: var(--fs-small);
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.contacto-cliente i {
+    font-size: 0.9rem;
+}
+
+/* 4. Información del Servicio en Tabla */
+.info-servicio {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nombre-servicio {
+    font-weight: 600;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+}
+
+.fecha-registro {
+    font-size: var(--fs-small);
+    color: #64748b;
+}
+
+/* 5. Fecha Preferida */
+.fecha-preferida {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+}
+
+.fecha-preferida i {
+    margin-right: 5px;
+    color: var(--primary-color);
+}
+
+/* 6. Badges de Urgencia */
+.badge-urgencia {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.urgencia-alta {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.urgencia-media {
+    background-color: rgba(249, 115, 22, 0.1);
+    color: #f97316;
+    border: 1px solid rgba(249, 115, 22, 0.3);
+}
+
+.urgencia-baja {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* 7. Badge de Estado */
+.badge-estado {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    text-align: center;
+}
+
+.estado-pendiente {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.estado-aceptada {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.estado-rechazada {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+/* === BOTONES DE ACCIÓN (AGREGADOS) === */
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: #fff;
+    color: #445268;
+    border: 1px solid #dce3eb;
+}
+
+.btn-action:hover {
+    background: #eef2f7;
+    transform: translateY(-1px);
+}
+
+.btn-action i {
+    font-size: 1rem;
+}
+
+/* Contenedor alineado */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+
+/* 9. Modal de Detalle */
+.detalle-solicitud {
+    padding: 10px 0;
+}
+
+.seccion-detalle {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.seccion-detalle:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.titulo-seccion {
+    font-size: var(--fs-title4);
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.titulo-seccion i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.detalle-solicitud p {
+    margin-bottom: 10px;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+}
+
+.detalle-solicitud p strong {
+    font-weight: 600;
+    color: #64748b;
+    min-width: 120px;
+    display: inline-block;
+}
+
+.descripcion-texto {
+    background-color: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-color);
+    line-height: 1.6;
+    color: var(--dark-color);
+}
+
+/* 10. Breadcrumb personalizado */
+#breadcrumb {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+}
+
+#breadcrumb .breadcrumb-item {
+    font-size: var(--fs-small);
+    color: #64748b;
+}
+
+#breadcrumb .breadcrumb-item.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+#breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: #cbd5e1;
+}
+
+/* 11. Responsive Tablet */
+@media screen and (min-width:768px) and (max-width:1080px) {
+    #estadisticas-solicitudes {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #tabla-solicitudes {
+        padding: 20px;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}
+
+/* 12. Responsive Smartphone */
+@media screen and (min-width:320px) and (max-width:767px) {
+    #estadisticas-solicitudes {
+        grid-template-columns: 1fr;
+    }
+
+    #tabla-solicitudes {
+        padding: 15px;
+        overflow-x: auto;
+    }
+
+    .tarjeta-estadistica {
+        padding: 20px;
+    }
+
+    .icono-estadistica {
+        font-size: 2rem;
+    }
+
+    .valor-estadistica {
+        font-size: var(--fs-title3);
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detalle-solicitud p strong {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    #breadcrumb {
+        width: 100%;
+    }
+}
+
+/* 13. Animaciones y transiciones */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tarjeta-estadistica,
+#tabla-solicitudes {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* 14. Estados de hover en filas de tabla */
+#tabla-solicitudes tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+#tabla-solicitudes tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* 15. Scrollbar personalizado para la tabla */
+#tabla-solicitudes::-webkit-scrollbar {
+    height: 8px;
+}
+
+#tabla-solicitudes::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+#tabla-solicitudes::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+#tabla-solicitudes::-webkit-scrollbar-thumb:hover {
+    background: #0052cc;
+}

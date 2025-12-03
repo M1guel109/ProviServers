@@ -17,7 +17,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard.css">
 </head>
 
 <body>
@@ -41,15 +41,18 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         <!--     Secciones -->
         <!-- titulo -->
         <section id="titulo-principal">
-
-                <h1>Panel Principal</h1>
-                <p class="text-muted mb-0">
-                    Bienvenido al panel principal de administración. Aquí puedes gestionar usuarios, proveedores, clientes y las operaciones clave de la plataforma Proviservers.
-
-
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
-            </nav>
+            <div class="row">
+                <div class="col-md-8">
+                    <h1>Panel Principal</h1>
+                    <p class="text-muted mb-0">
+                        Bienvenido al panel principal de administración. Aquí puedes gestionar usuarios, proveedores, clientes y las operaciones clave de la plataforma Proviservers.
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <!-- Grafica Principal -->
