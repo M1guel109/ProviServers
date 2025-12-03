@@ -3,17 +3,36 @@
 $redirect_path = '/login';
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
+require_once BASE_PATH . '/app/models/ProveedorSeguridad.php';
+require_once BASE_PATH . '/app/models/ProveedorDisponibilidad.php';
+
 
 $idUsuario = $_SESSION['user']['id'] ?? null;
 $perfil    = [];
 
 if ($idUsuario) {
-    $modeloPerfil = new ProveedorPerfil();
-    $perfilBD = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    $modeloPerfil    = new ProveedorPerfil();
+    $modeloSeguridad = new ProveedorSeguridad();
+
+    $perfilBD    = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    $seguridadBD = $modeloSeguridad->obtenerPorUsuario($idUsuario);
+
     if ($perfilBD) {
         $perfil = $perfilBD;
     }
+
+    if ($seguridadBD) {
+        $seguridad = $seguridadBD;
+    }
+
+    // Disponibilidad
+    $modeloDisp = new ProveedorDisponibilidad();
+    $dispBD = $modeloDisp->obtenerPorUsuario($idUsuario);
+    if ($dispBD) {
+        $disponibilidad = $dispBD;
+    }
 }
+$correoActual = $_SESSION['user']['email'] ?? '';
 
 ?>
 
@@ -368,15 +387,247 @@ if ($idUsuario) {
 
 
                 <!-- Cuenta y seguridad -->
+                <!-- Cuenta y seguridad -->
                 <div class="tab-pane fade" id="cuenta" role="tabpanel" aria-labelledby="cuenta-tab">
-                    <div class="tarjeta p-4">
-                        <h2 class="mb-3">Cuenta y seguridad</h2>
-                        <p class="text-muted mb-0">
-                            Aquí irá el formulario para actualizar tu correo, contraseña, seguridad de la cuenta y
-                            opciones avanzadas (como cierre de sesión en todos los dispositivos).
-                        </p>
+                    <div class="tarjeta p-4 tarjeta-config">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                            <div>
+                                <h2 class="mb-1">Cuenta y seguridad</h2>
+                                <p class="text-muted mb-0">
+                                    Administra tu correo de acceso, contraseña y preferencias de seguridad de tu cuenta.
+                                </p>
+                            </div>
+                            <span class="badge bg-light text-dark" style="font-size: 0.8rem;">
+                                Última actualización:
+                                <?= isset($seguridad['updated_at']) ? htmlspecialchars($seguridad['updated_at']) : 'Sin registros aún' ?>
+                            </span>
+                        </div>
+
+                        <div class="row g-4">
+                            <!-- Columna izquierda: datos de acceso -->
+                            <div class="col-lg-6">
+                                <!-- Actualizar correo -->
+                                <div class="tarjeta-config-inner mb-4">
+                                    <h5 class="mb-2">Correo de acceso</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Este es el correo con el que inicias sesión en Proviservers.
+                                        No se mostrará a los clientes.
+                                    </p>
+
+                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-correo" method="POST" class="mt-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Correo actual</label>
+                                            <input
+                                                type="email"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($correoActual) ?>"
+                                                readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Nuevo correo <span class="text-danger">*</span></label>
+                                            <input
+                                                type="email"
+                                                name="nuevo_correo"
+                                                class="form-control"
+                                                placeholder="Ej: proveedor@miempresa.com"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirmar nuevo correo <span class="text-danger">*</span></label>
+                                            <input
+                                                type="email"
+                                                name="confirmar_correo"
+                                                class="form-control"
+                                                placeholder="Vuelve a escribir el nuevo correo"
+                                                required>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-envelope-check"></i> Actualizar correo
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Cambiar contraseña -->
+                                <div class="tarjeta-config-inner">
+                                    <h5 class="mb-2">Contraseña</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Te recomendamos usar una contraseña segura, con combinación de letras, números y símbolos.
+                                    </p>
+
+                                    <form action="<?= BASE_URL ?>/proveedor/cambiar-contrasena" method="POST" class="mt-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Contraseña actual <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="clave_actual"
+                                                class="form-control"
+                                                placeholder="Escribe tu contraseña actual"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Nueva contraseña <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="nueva_clave"
+                                                class="form-control"
+                                                placeholder="Mínimo 8 caracteres"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirmar nueva contraseña <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="confirmar_clave"
+                                                class="form-control"
+                                                placeholder="Vuelve a escribir la nueva contraseña"
+                                                required>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <small class="text-muted">
+                                                Si detectamos actividad inusual, podríamos pedirte que cambies tu contraseña.
+                                            </small>
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-shield-lock"></i> Cambiar contraseña
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Columna derecha: preferencias de seguridad -->
+                            <div class="col-lg-6">
+                                <div class="tarjeta-config-inner mb-4">
+                                    <h5 class="mb-2">Alertas y notificaciones</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Elige sobre qué eventos quieres recibir alertas como proveedor.
+                                    </p>
+
+                                    <?php
+                                    $alertaSolicitudes = !empty($seguridad['alerta_solicitudes']);
+                                    $alertaResenas     = !empty($seguridad['alerta_resenas']);
+                                    $alertaPagos       = !empty($seguridad['alerta_pagos']);
+                                    $canalSeleccionado = $seguridad['canal_notificaciones'] ?? 'ambos';
+                                    $tiempoSesion      = isset($seguridad['tiempo_sesion']) ? (int) $seguridad['tiempo_sesion'] : 60;
+                                    ?>
+
+                                    <form action="<?= BASE_URL ?>/proveedor/guardar-preferencias-seguridad" method="POST">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block">Alertas que quiero recibir</label>
+
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_solicitudes"
+                                                    name="alerta_solicitudes"
+                                                    value="1"
+                                                    <?= $alertaSolicitudes ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_solicitudes">
+                                                    Nuevas solicitudes y cambios de estado de servicios
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_resenas"
+                                                    name="alerta_resenas"
+                                                    value="1"
+                                                    <?= $alertaResenas ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_resenas">
+                                                    Nuevas reseñas y calificaciones de clientes
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_pagos"
+                                                    name="alerta_pagos"
+                                                    value="1"
+                                                    <?= $alertaPagos ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_pagos">
+                                                    Pagos, abonos y temas de facturación
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Canal principal de notificaciones</label>
+                                            <select name="canal_notificaciones" class="form-select">
+                                                <option value="ambos" <?= $canalSeleccionado === 'ambos' ? 'selected' : '' ?>>Correo y plataforma</option>
+                                                <option value="correo" <?= $canalSeleccionado === 'correo' ? 'selected' : '' ?>>Solo correo</option>
+                                                <option value="plataforma" <?= $canalSeleccionado === 'plataforma' ? 'selected' : '' ?>>Solo dentro de la plataforma</option>
+                                            </select>
+                                            <small class="text-muted">
+                                                En el futuro podrás configurar esto también desde la app móvil.
+                                            </small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Tiempo de cierre de sesión por inactividad</label>
+                                            <select name="tiempo_sesion" class="form-select">
+                                                <option value="30" <?= $tiempoSesion === 30  ? 'selected' : '' ?>>30 minutos</option>
+                                                <option value="60" <?= $tiempoSesion === 60  ? 'selected' : '' ?>>1 hora</option>
+                                                <option value="120" <?= $tiempoSesion === 120 ? 'selected' : '' ?>>2 horas</option>
+                                            </select>
+                                            <small class="text-muted">
+                                                Si no detectamos actividad en ese tiempo, cerraremos tu sesión por seguridad.
+                                            </small>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <small class="text-muted" style="font-size: 0.85rem;">
+                                                Puedes ajustar estas preferencias en cualquier momento.
+                                            </small>
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-save"></i> Guardar preferencias
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Opciones avanzadas -->
+                                <div class="tarjeta-config-inner tarjeta-config-avanzada">
+                                    <h5 class="mb-2">Opciones avanzadas</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Herramientas para mantener tu cuenta protegida.
+                                    </p>
+
+                                    <!-- Nota: esta acción requiere que luego implementes el controlador /proveedor/cerrar-sesiones -->
+                                    <form action="<?= BASE_URL ?>/proveedor/cerrar-sesiones" method="POST"
+                                        onsubmit="return confirm('Esto cerrará tu sesión en todos los dispositivos. ¿Quieres continuar?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            Cerrar sesión en todos los dispositivos
+                                        </button>
+                                    </form>
+
+                                    <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+                                        Úsalo si has iniciado sesión en un equipo compartido o sospechas de actividad no autorizada.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+
+
 
                 <!-- Notificaciones -->
                 <div class="tab-pane fade" id="notificaciones" role="tabpanel" aria-labelledby="notificaciones-tab">
@@ -390,15 +641,223 @@ if ($idUsuario) {
                 </div>
 
                 <!-- Disponibilidad y zona de servicio -->
+                <!-- Disponibilidad y zona de servicio -->
                 <div class="tab-pane fade" id="disponibilidad" role="tabpanel" aria-labelledby="disponibilidad-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Disponibilidad y zona de servicio</h2>
-                        <p class="text-muted mb-0">
-                            Aquí configurarás tus días y horarios de trabajo, así como las zonas o ciudades donde
-                            prestas servicios.
+                        <p class="text-muted mb-4">
+                            Configura tus días y horarios de trabajo, y define en qué zonas atiendes. Esto nos ayuda
+                            a mostrarte solo solicitudes que realmente puedes cubrir.
                         </p>
+
+                        <?php
+                        // Preparar valores actuales
+                        $diasSeleccionados = [];
+                        if (!empty($disponibilidad['dias_semana'])) {
+                            $diasSeleccionados = explode(',', $disponibilidad['dias_semana']);
+                        }
+                        $horaInicioActual = $disponibilidad['hora_inicio'] ?? '';
+                        $horaFinActual    = $disponibilidad['hora_fin'] ?? '';
+
+                        $atiendeFinesSemanaActual = !empty($disponibilidad['atiende_fines_semana']);
+                        $atiendeFestivosActual    = !empty($disponibilidad['atiende_festivos']);
+                        $atencionUrgenciasActual  = !empty($disponibilidad['atencion_urgencias']);
+
+                        $tipoZonaActual = $disponibilidad['tipo_zona'] ?? 'ciudad';
+                        $radioKmActual  = $disponibilidad['radio_km'] ?? '';
+                        $zonasTextoActual = $disponibilidad['zonas_texto'] ?? '';
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-disponibilidad" method="POST">
+                            <div class="row g-4">
+                                <!-- Columna izquierda: días y horarios -->
+                                <div class="col-lg-7">
+                                    <h5 class="mb-3">Días y horarios de trabajo</h5>
+
+                                    <!-- Días de la semana -->
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Días laborables <span class="text-danger">*</span></label>
+                                        <?php
+                                        $diasSemana = [
+                                            'lun' => 'Lunes',
+                                            'mar' => 'Martes',
+                                            'mie' => 'Miércoles',
+                                            'jue' => 'Jueves',
+                                            'vie' => 'Viernes',
+                                            'sab' => 'Sábado',
+                                            'dom' => 'Domingo',
+                                        ];
+                                        ?>
+                                        <div class="d-flex flex-wrap gap-2 disponibilidad-dias">
+                                            <?php foreach ($diasSemana as $key => $label): ?>
+                                                <div class="form-check form-check-inline disponibilidad-dia">
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="checkbox"
+                                                        name="dias_trabajo[]"
+                                                        id="dia_<?= $key ?>"
+                                                        value="<?= $key ?>"
+                                                        <?= in_array($key, $diasSeleccionados) ? 'checked' : '' ?>>
+                                                    <label class="form-check-label" for="dia_<?= $key ?>">
+                                                        <?= $label ?>
+                                                    </label>
+                                                </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            Selecciona al menos un día de trabajo.
+                                        </small>
+                                    </div>
+
+                                    <!-- Horario general -->
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hora de inicio general <span class="text-danger">*</span></label>
+                                            <input
+                                                type="time"
+                                                name="hora_inicio"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($horaInicioActual) ?>">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Hora de fin general <span class="text-danger">*</span></label>
+                                            <input
+                                                type="time"
+                                                name="hora_fin"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($horaFinActual) ?>">
+                                        </div>
+                                    </div>
+
+                                    <!-- Fines de semana / festivos / urgencias -->
+                                    <div class="row g-3 mt-3">
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atiende_fines_semana"
+                                                    name="atiende_fines_semana"
+                                                    <?= $atiendeFinesSemanaActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atiende_fines_semana">
+                                                    Atiendo fines de semana
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-switch mt-2">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atiende_festivos"
+                                                    name="atiende_festivos"
+                                                    <?= $atiendeFestivosActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atiende_festivos">
+                                                    Atiendo días festivos
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-check form-switch">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="atencion_urgencias"
+                                                    name="atencion_urgencias"
+                                                    <?= $atencionUrgenciasActual ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="atencion_urgencias">
+                                                    Ofrezco atención de urgencias
+                                                </label>
+                                            </div>
+                                            <small class="text-muted d-block mt-2">
+                                                Por ejemplo: atenciones nocturnas, recargos, tiempo de respuesta estimado, etc.
+                                            </small>
+                                            <textarea
+                                                name="detalle_urgencias"
+                                                class="form-control mt-2"
+                                                rows="2"
+                                                placeholder="Describe cómo manejas las urgencias (horarios, recargos, tiempos de respuesta, etc.)"><?= htmlspecialchars($disponibilidad['detalle_urgencias'] ?? '') ?></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: zona de servicio -->
+                                <div class="col-lg-5">
+                                    <h5 class="mb-3">Zona de servicio</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Esta configuración nos ayuda a filtrar las solicitudes según tu cobertura. Así evitamos
+                                        que te lleguen servicios que están demasiado lejos o fuera de lo que atiendes.
+                                    </p>
+
+                                    <!-- Tipo de zona -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo de zona principal</label>
+                                        <select name="tipo_zona" class="form-select">
+                                            <option value="ciudad" <?= $tipoZonaActual === 'ciudad' ? 'selected' : '' ?>>
+                                                Solo en mi ciudad principal
+                                            </option>
+                                            <option value="radio" <?= $tipoZonaActual === 'radio' ? 'selected' : '' ?>>
+                                                Radio en km alrededor de mi zona
+                                            </option>
+                                            <option value="varias_ciudades" <?= $tipoZonaActual === 'varias_ciudades' ? 'selected' : '' ?>>
+                                                Varias ciudades / municipios
+                                            </option>
+                                            <option value="remoto" <?= $tipoZonaActual === 'remoto' ? 'selected' : '' ?>>
+                                                Servicio remoto / online
+                                            </option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Radio en km -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Radio máximo (km)</label>
+                                        <input
+                                            type="number"
+                                            name="radio_km"
+                                            class="form-control"
+                                            min="1"
+                                            max="500"
+                                            placeholder="Ej: 10, 20, 50"
+                                            value="<?= htmlspecialchars($radioKmActual) ?>">
+                                        <small class="text-muted">
+                                            Útil si atiendes a domicilio en un área cercana (Ej: hasta 15 km a la redonda).
+                                        </small>
+                                    </div>
+
+                                    <!-- Zonas o ciudades específicas -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Zonas o ciudades específicas</label>
+                                        <textarea
+                                            name="zonas_texto"
+                                            class="form-control"
+                                            rows="3"
+                                            placeholder="Ej: Chapinero, Usaquén, Suba. O: Bogotá, Chía, Soacha."><?= htmlspecialchars($zonasTextoActual) ?></textarea>
+                                        <small class="text-muted">
+                                            Puedes escribir barrios, localidades o ciudades donde normalmente trabajas.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    <span class="text-danger">*</span> Campos obligatorios
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar disponibilidad
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Pagos y facturación -->
                 <div class="tab-pane fade" id="pagos" role="tabpanel" aria-labelledby="pagos-tab">
