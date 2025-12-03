@@ -557,18 +557,32 @@ body {
     border-color: var(--primary-color);
 }
 
+.service-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+
 .service-image {
-    width: 100%;
-    height: 180px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0052cc 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
+  width: 100%;
+  max-height: 300px;   /* límite de altura */
+  overflow: hidden;    /* recorta lo que se salga */
+}
+
+.service-image img {
+  width: 100%;
+  height: auto;        /* se adapta proporcionalmente */
+  display: block;
 }
 
 .service-content {
-    padding: 25px;
+  padding: 20px 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
 }
 
 .service-content h3 {
@@ -881,3 +895,5 @@ section {
         font-size: var(--fs-title2);
     }
 }
+
+

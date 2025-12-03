@@ -23,7 +23,7 @@
     <main class="contenido">
     <section id="historial-servicios">
         <div class="section-hero">
-        <h1>Historial de Servicios 📜</h1>
+        <h1>Historial de Servicios </h1>
         <p>Consulta todos los servicios que has contratado y completado en el pasado.</p>
         </div>
 
