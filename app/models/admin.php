@@ -227,7 +227,7 @@ class Usuario
             $this->conexion->commit();
             return true;
         } catch (PDOException $e) {
-            error_log("Error en Usuario::actualizar->" . $e->getMessage());
+            error_log("Error en Usuario::eliminar->" . $e->getMessage());
             return false;
         }
     }

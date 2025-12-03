@@ -134,10 +134,42 @@ function registrarMembresia()
     exit();
 }
 
-function mostrarMembresias() {}
+function mostrarMembresias()
+{
+  
+    // 1. Instanciar el modelo de Membresía, pasándole la conexión.
+    $resultado = new Membresia();
 
-function mostrarMembresiaId() {}
+    // 2. Llamar al método del modelo que contiene la lógica SQL.
+    $membresias = $resultado->mostrar();
+
+    // 3. Devolver el resultado (la lista de membresías).
+    return $membresias;
+}
+
+function mostrarMembresiaId($id) {}
 
 function actualizarMembresia() {}
 
-function eliminarMembresia() {}
+function eliminarMembresia($id) {
+    $objmembresia = new Membresia();
+    $respuesta = $objmembresia->eliminar($id);
+
+
+    if ($respuesta === true) {
+        // Mostrar alerta de éxito y redirigir a la página de membresías
+        mostrarSweetAlert(
+            'success',
+            'Eliminación exitosa',
+            'Se ha eliminado la membresía correctamente',
+            '/ProviServers/admin/consultar-membresias' // ruta a la lista de membresías
+        );
+    } else {
+        // Mostrar alerta de error
+        mostrarSweetAlert(
+            'error',
+            'Error al eliminar',
+            'No se pudo eliminar la membresía. Intenta nuevamente'
+        );
+    }
+}

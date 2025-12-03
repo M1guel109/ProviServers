@@ -97,6 +97,7 @@ switch ($request) {
     case '/admin/reporte':
         require BASE_PATH . '/app/controllers/reportesPdfController.php';
         reportesPdfController();
+        reporteMembresiasPDF();
         break;
 
     case '/admin/registrar-categoria':
@@ -131,6 +132,14 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/membresiaController.php';
         break;
 
+    case '/admin/consultar-membresias':
+        require BASE_PATH . '/app/views/dashboard/admin/gestionarMembresias.php';
+        break;
+
+    case '/admin/eliminar-membresia':
+        require BASE_PATH . '/app/controllers/membresiaController.php';
+        break;
+
     case '/admin/reportes-usuarios':
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
         break;
@@ -140,7 +149,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
         break;
 
-    // Fin de rutas login
+    // Fin de rutas admin
 
     // Rutas del proveedor
     case '/proveedor/dashboard':

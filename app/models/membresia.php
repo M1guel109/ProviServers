@@ -86,4 +86,39 @@ class Membresia
             return false;
         }
     }
+
+    public function mostrar()
+    {
+        try {
+            // VARIABLE QUE ALMACENA LA SENTENCIA DE SQL A EJECUTAR
+            $consultar = "SELECT * FROM membresias";
+
+            // PREPARAR LO NECESARIO PARA EJECUTAR LA CONSULTA 
+            $resultado = $this->conexion->prepare($consultar);
+            // EJECUTAR LA CONSULTA
+            $resultado->execute();
+
+            return $resultado->fetchAll(); // Usamos FETCH_ASSOC para devolver un array asociativo
+        } catch (PDOException $e) {
+            // Registrar el error en el log del sistema
+            error_log("Error en MembresiaModel::mostrarMembresias -> " . $e->getMessage());
+            // Devolver un array vacío para manejo seguro en la aplicación
+            return [];
+        }
+    }
+
+    public function eliminar($id)
+    {
+        try {
+            $eliminar = "DELETE FROM membresias WHERE id = :id";
+            $resultado = $this->conexion->prepare($eliminar);
+            $resultado->bindParam(':id', $id);
+            $resultado->execute();
+
+            return true;
+        } catch (PDOException $e) {
+            error_log("Error en Membresia::eliminar->" . $e->getMessage());
+            return false;
+        }
+    }
 }
