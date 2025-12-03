@@ -75,11 +75,12 @@ if ($id) {
                 </li>
 
                 <li>
-                    <a class="dropdown-item d-flex align-items-center" href="#">
+                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/proveedor/configuracion">
                         <i class="bi bi-gear"></i>
                         <span>Configuración</span>
                     </a>
                 </li>
+
 
                 <li>
                     <hr class="dropdown-divider">
