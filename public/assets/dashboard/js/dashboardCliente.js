@@ -29,3 +29,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+    // Filtro en tiempo real
+document.getElementById('buscadorServicios').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll('.service-card').forEach(card => {
+    const text = card.innerText.toLowerCase();
+    card.parentElement.style.display = text.includes(query) ? '' : 'none';
+    });
+});
+
+// Animación de todas las barras de progreso
+document.addEventListener("DOMContentLoaded", () => {
+  const barras = document.querySelectorAll(".progress-bar[data-progreso]");
+
+  barras.forEach(barra => {
+    const porcentajeFinal = parseInt(barra.getAttribute("data-progreso"), 10);
+    let progreso = 0;
+
+    const intervalo = setInterval(() => {
+      if (progreso >= porcentajeFinal) {
+        clearInterval(intervalo);
+      } else {
+        progreso++;
+        barra.style.width = progreso + "%";
+        barra.setAttribute("aria-valuenow", progreso);
+        barra.textContent = progreso + "%";
+      }
+    }, 30); // velocidad: cada 30ms sube 1%
+  });
+});

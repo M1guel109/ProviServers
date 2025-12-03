@@ -382,6 +382,90 @@ body {
     margin-bottom: 20px;
 }
 
+/* Tarjetas base */
+.service-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+/* Imagen */
+.service-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Contenido */
+.service-card .card-body {
+  padding: 1rem;
+}
+
+.service-card .card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: .5rem;
+}
+
+.service-card .card-subtitle {
+  font-size: .9rem;
+  color: #6c757d;
+  margin-bottom: .5rem;
+}
+
+.service-card .card-text {
+  font-size: .95rem;
+  margin-bottom: .5rem;
+}
+
+/* Estados visuales */
+.estado-curso {
+  border-left: 6px solid #6c757d; /* gris */
+  background-color: #f8f9fa;}
+
+.estado-programado {
+  border-left: 6px solid #ffc107; /* amarillo */
+  background-color: #fffbea;
+}
+
+.estado-completado {
+  border-left: 6px solid #28a745; /* verde */
+  background-color: #e9f7ef;}
+
+.estado-cancelado {
+  border-left: 6px solid #dc3545; /* rojo */
+  background-color: #fdecea;
+}
+
+/* Badges */
+.badge {
+  font-size: .8rem;
+  padding: .4em .6em;
+  border-radius: 6px;
+}
+
+/* Botones dentro de la tarjeta */
+.service-card .btn {
+  margin-top: .5rem;
+}
+
+.progress {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+
+
 /* ========================================
    ESTADÍSTICAS VISUALES
    ======================================== */
