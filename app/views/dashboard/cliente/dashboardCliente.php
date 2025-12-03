@@ -8,7 +8,6 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
@@ -19,14 +18,13 @@
     <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
-
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-
+        
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
@@ -71,18 +69,16 @@
                 <div class="mt-5">
                     <h2 class="mb-4">¿Qué necesitas hoy?</h2>
                     <div class="d-flex gap-3 flex-wrap">
-                        <a href="#explorar" class="btn-modern">
-                            <i class="bi bi-search"></i>
-                            Buscar Servicio
+                        <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern">
+                            <i class="bi bi-search"></i> Buscar Servicio
                         </a>
-                        <a href="#mis-servicios" class="btn-modern-outline">
-                            <i class="bi bi-briefcase"></i>
-                            Ver Mis Servicios
+                        <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                            <i class="bi bi-briefcase"></i> Ver Mis Servicios
                         </a>
                     </div>
                 </div>
 
-                <!-- Servicios recientes -->
+                <!-- Servicios en curso -->
                 <div class="mt-5">
                     <h2 class="mb-4">Servicios en Curso</h2>
                     <ul class="modern-list">
@@ -94,8 +90,9 @@
                                     <p class="mb-0 text-muted">Con Miguel Torres · Progreso: 65%</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
+
                         <li class="modern-list-item">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="bi bi-wrench" style="font-size: 2rem; color: var(--primary-color);"></i>
@@ -104,7 +101,7 @@
                                     <p class="mb-0 text-muted">Con Carlos Ruiz · Cita: 28 Nov 10:00 AM</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
                     </ul>
                 </div>
@@ -345,7 +342,6 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- JS propio -->
   <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
 
