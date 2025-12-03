@@ -1,3 +1,9 @@
+<?php
+require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 

@@ -1,6 +1,6 @@
 // JavaScript para el formulario de Mis Servicios
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Elementos del DOM
     const formServicio = document.getElementById('form-servicio');
     const descripcionTextarea = document.getElementById('descripcion');
@@ -26,16 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (descripcionTextarea) {
             descripcionTextarea.addEventListener('input', actualizarContador);
         }
-        
+
         // Botones
         if (btnCancelar) {
             btnCancelar.addEventListener('click', manejarCancelar);
         }
-        
+
         if (btnVerLista) {
             btnVerLista.addEventListener('click', manejarVerLista);
         }
-        
+
         // Formulario
         if (formServicio) {
             formServicio.addEventListener('submit', manejarEnvioFormulario);
@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function inicializarSidebar() {
         // Toggle del menú lateral
         if (btnToggleMenu) {
-            btnToggleMenu.addEventListener('click', function() {
+            btnToggleMenu.addEventListener('click', function () {
                 const sidebar = document.querySelector('.sidebar');
                 if (sidebar) {
                     sidebar.classList.toggle('plegado');
@@ -59,14 +59,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function inicializarSubmenus() {
         const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-        
+
         toggleSubmenuButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const submenu = this.parentElement.querySelector('.submenu');
                 const hasSubmenu = this.parentElement;
-                
+
                 hasSubmenu.classList.toggle('active');
-                
+
                 if (hasSubmenu.classList.contains('active')) {
                     submenu.style.maxHeight = submenu.scrollHeight + 'px';
                 } else {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function cargarServiciosIniciales() {
         // Simular carga de servicios existentes desde localStorage o API
         const serviciosGuardados = localStorage.getItem('serviciosProveedor');
-        
+
         if (serviciosGuardados) {
             servicios = JSON.parse(serviciosGuardados);
         } else {
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ];
             guardarServiciosEnLocalStorage();
         }
-        
+
         renderizarServicios();
     }
 
@@ -128,10 +128,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function actualizarContador() {
         if (!descripcionTextarea || !contadorDescripcion) return;
-        
+
         const longitud = descripcionTextarea.value.length;
         contadorDescripcion.textContent = longitud;
-        
+
         // Cambiar color según la longitud
         if (longitud > 450) {
             contadorDescripcion.style.color = '#ef4444';
@@ -145,11 +145,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function manejarCancelar() {
         const nombre = document.getElementById('nombre').value;
         const descripcion = document.getElementById('descripcion').value;
-        
+
         if ((nombre || descripcion) && !confirm('¿Estás seguro de que quieres cancelar? Los cambios no guardados se perderán.')) {
             return;
         }
-        
+
         limpiarFormulario();
         mostrarMensaje('Formulario cancelado', 'info');
     }
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Scroll suave a la lista de servicios
         const listaServicios = document.getElementById('lista-servicios');
         if (listaServicios) {
-            listaServicios.scrollIntoView({ 
+            listaServicios.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
@@ -169,11 +169,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (formServicio) {
             formServicio.reset();
         }
-        
+
         document.getElementById('servicio_id').value = '';
         servicioEditando = null;
         actualizarContador();
-        
+
         // Restaurar texto del botón
         if (btnGuardar) {
             btnGuardar.innerHTML = '<i class="bi bi-check-circle"></i> Guardar Servicio';
@@ -182,65 +182,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function manejarEnvioFormulario(event) {
-        event.preventDefault();
-        
+        // Validar antes de enviar
         if (!validarFormulario()) {
+            // Si hay errores, evitamos el envío
+            event.preventDefault();
             return;
         }
 
-        const formData = new FormData(formServicio);
-        const servicioId = document.getElementById('servicio_id').value;
-        
-        // Mostrar estado de carga
-        const textoOriginal = btnGuardar.innerHTML;
-        btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
-        btnGuardar.disabled = true;
+        // Si todo está bien, dejamos que el formulario se envíe normalmente
+        // (NO usamos preventDefault aquí)
 
-        // Simular envío al servidor con timeout
-        setTimeout(() => {
-            try {
-                const servicio = {
-                    id: servicioId ? parseInt(servicioId) : Date.now(),
-                    nombre: formData.get('nombre').trim(),
-                    descripcion: formData.get('descripcion').trim(),
-                    precio: formData.get('precio'),
-                    categoria: formData.get('categoria'),
-                    disponibilidad: parseInt(formData.get('disponibilidad')),
-                    promocion_id: formData.get('promocion_id') || null,
-                    created_at: servicioId && servicioEditando ? servicioEditando.created_at : new Date().toISOString()
-                };
-
-                if (servicioId) {
-                    // Actualizar servicio existente
-                    const index = servicios.findIndex(s => s.id == servicioId);
-                    if (index !== -1) {
-                        servicios[index] = servicio;
-                        mostrarMensaje('Servicio actualizado correctamente', 'success');
-                    }
-                } else {
-                    // Agregar nuevo servicio
-                    servicio.id = generarNuevoId();
-                    servicios.push(servicio);
-                    mostrarMensaje('Servicio creado correctamente', 'success');
-                }
-
-                // Guardar en localStorage
-                guardarServiciosEnLocalStorage();
-                
-                renderizarServicios();
-                limpiarFormulario();
-
-            } catch (error) {
-                console.error('Error guardando servicio:', error);
-                mostrarMensaje('Error al guardar el servicio. Por favor, intenta nuevamente.', 'error');
-            } finally {
-                // Restaurar estado normal
-                if (btnGuardar) {
-                    btnGuardar.innerHTML = textoOriginal;
-                    btnGuardar.disabled = false;
-                }
-            }
-        }, 1500);
+        if (btnGuardar) {
+            btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+            btnGuardar.disabled = true;
+        }
     }
 
     function generarNuevoId() {
@@ -248,52 +203,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function validarFormulario() {
-        const nombre = document.getElementById('nombre').value.trim();
-        const categoria = document.getElementById('categoria').value;
-        const precio = document.getElementById('precio').value;
-        
+        const inputNombre = document.getElementById('nombre');
+        const selectCategoria = document.getElementById('id_categoria');
+
+        const nombre = inputNombre ? inputNombre.value.trim() : '';
+        const categoria = selectCategoria ? selectCategoria.value : '';
+
         // Validar nombre
         if (!nombre) {
             mostrarMensaje('El nombre del servicio es requerido', 'error');
-            document.getElementById('nombre').focus();
+            if (inputNombre) inputNombre.focus();
             return false;
         }
-        
+
         if (nombre.length > 100) {
             mostrarMensaje('El nombre no puede exceder los 100 caracteres', 'error');
-            document.getElementById('nombre').focus();
+            if (inputNombre) inputNombre.focus();
             return false;
         }
-        
+
         // Validar categoría
         if (!categoria) {
             mostrarMensaje('La categoría es requerida', 'error');
-            document.getElementById('categoria').focus();
+            if (selectCategoria) selectCategoria.focus();
             return false;
         }
-        
-        // Validar precio si está presente
-        if (precio) {
-            const precioNum = parseFloat(precio);
-            if (isNaN(precioNum) || precioNum < 0) {
-                mostrarMensaje('El precio debe ser un número válido mayor o igual a 0', 'error');
-                document.getElementById('precio').focus();
-                return false;
-            }
-            
-            if (precioNum > 99999999.99) {
-                mostrarMensaje('El precio no puede exceder $99,999,999.99', 'error');
-                document.getElementById('precio').focus();
-                return false;
-            }
-        }
-        
+
+        // Aquí podrías agregar más validaciones si luego agregas más campos
+
         return true;
     }
 
     function renderizarServicios() {
         if (!serviciosGrid) return;
-        
+
         if (servicios.length === 0) {
             serviciosGrid.innerHTML = `
                 <div class="col-12 text-center py-5">
@@ -326,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     <div class="servicio-info">
                         <div class="servicio-precio">
-                            ${servicio.precio ? `$${parseFloat(servicio.precio).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Precio a consultar'}
+                            ${servicio.precio ? `$${parseFloat(servicio.precio).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Precio a consultar'}
                         </div>
                         <div class="servicio-estado ${servicio.disponibilidad === 1 ? 'estado-disponible' : 'estado-no-disponible'}">
                             <i class="bi ${servicio.disponibilidad === 1 ? 'bi-check-circle' : 'bi-x-circle'}"></i>
@@ -339,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Funciones globales para los botones de editar/eliminar
-    window.editarServicio = function(id) {
+    window.editarServicio = function (id) {
         servicioEditando = servicios.find(s => s.id === id);
         if (servicioEditando) {
             // Llenar el formulario con los datos del servicio
@@ -348,67 +291,67 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('descripcion').value = servicioEditando.descripcion || '';
             document.getElementById('precio').value = servicioEditando.precio || '';
             document.getElementById('categoria').value = servicioEditando.categoria;
-            
+
             // Configurar disponibilidad
             const radioDisponibilidad = document.querySelector(`input[name="disponibilidad"][value="${servicioEditando.disponibilidad}"]`);
             if (radioDisponibilidad) {
                 radioDisponibilidad.checked = true;
             }
-            
+
             document.getElementById('promocion_id').value = servicioEditando.promocion_id || '';
-            
+
             actualizarContador();
-            
+
             // Actualizar texto del botón
             if (btnGuardar) {
                 btnGuardar.innerHTML = '<i class="bi bi-check-circle"></i> Actualizar Servicio';
             }
-            
+
             // Scroll al formulario
             const formularioSection = document.getElementById('formulario');
             if (formularioSection) {
-                formularioSection.scrollIntoView({ 
+                formularioSection.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
             }
-            
+
             mostrarMensaje(`Editando servicio: "${servicioEditando.nombre}"`, 'info');
         }
     };
 
-    window.eliminarServicio = function(id) {
+    window.eliminarServicio = function (id) {
         const servicio = servicios.find(s => s.id === id);
         if (!servicio) return;
-        
+
         if (confirm(`¿Estás seguro de que quieres eliminar el servicio "${servicio.nombre}"? Esta acción no se puede deshacer.`)) {
             servicios = servicios.filter(s => s.id !== id);
-            
+
             // Guardar cambios en localStorage
             guardarServiciosEnLocalStorage();
-            
+
             renderizarServicios();
-            
+
             // Si estábamos editando el servicio eliminado, limpiar formulario
             if (servicioEditando && servicioEditando.id === id) {
                 limpiarFormulario();
             }
-            
+
             mostrarMensaje('Servicio eliminado correctamente', 'success');
         }
     };
 
     // Función para cambiar disponibilidad rápida
-    window.cambiarDisponibilidad = function(id) {
+    window.cambiarDisponibilidad = function (id) {
         const servicio = servicios.find(s => s.id === id);
         if (servicio) {
             servicio.disponibilidad = servicio.disponibilidad === 1 ? 0 : 1;
-            
+
             // Guardar cambios en localStorage
             guardarServiciosEnLocalStorage();
-            
+
             renderizarServicios();
-            
+
             const estado = servicio.disponibilidad === 1 ? 'disponible' : 'no disponible';
             mostrarMensaje(`Servicio marcado como ${estado}`, 'success');
         }
@@ -480,13 +423,13 @@ document.addEventListener('DOMContentLoaded', function() {
             renderizarServicios();
             return;
         }
-        
+
         const serviciosFiltrados = servicios.filter(servicio =>
             servicio.nombre.toLowerCase().includes(termino.toLowerCase()) ||
             servicio.descripcion.toLowerCase().includes(termino.toLowerCase()) ||
             obtenerNombreCategoria(servicio.categoria).toLowerCase().includes(termino.toLowerCase())
         );
-        
+
         if (serviciosFiltrados.length === 0) {
             serviciosGrid.innerHTML = `
                 <div class="col-12 text-center py-5">
@@ -517,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         <div class="servicio-info">
                             <div class="servicio-precio">
-                                ${servicio.precio ? `$${parseFloat(servicio.precio).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 'Precio a consultar'}
+                                ${servicio.precio ? `$${parseFloat(servicio.precio).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Precio a consultar'}
                             </div>
                             <div class="servicio-estado ${servicio.disponibilidad === 1 ? 'estado-disponible' : 'estado-no-disponible'}">
                                 <i class="bi ${servicio.disponibilidad === 1 ? 'bi-check-circle' : 'bi-x-circle'}"></i>
@@ -533,19 +476,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar buscador si existe
     const inputBusqueda = document.querySelector('.buscador input');
     if (inputBusqueda) {
-        inputBusqueda.addEventListener('input', function(e) {
+        inputBusqueda.addEventListener('input', function (e) {
             buscarServicios(e.target.value);
         });
     }
 
     // Función para exportar servicios
-    window.exportarServicios = function() {
+    window.exportarServicios = function () {
         const datosExportar = {
             fecha: new Date().toISOString(),
             totalServicios: servicios.length,
             servicios: servicios
         };
-        
+
         const blob = new Blob([JSON.stringify(datosExportar, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -555,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         mostrarMensaje('Servicios exportados correctamente', 'success');
     };
 });
