@@ -3,17 +3,28 @@
 $redirect_path = '/login';
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
+require_once BASE_PATH . '/app/models/ProveedorSeguridad.php';
+
 
 $idUsuario = $_SESSION['user']['id'] ?? null;
 $perfil    = [];
 
 if ($idUsuario) {
-    $modeloPerfil = new ProveedorPerfil();
-    $perfilBD = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    $modeloPerfil    = new ProveedorPerfil();
+    $modeloSeguridad = new ProveedorSeguridad();
+
+    $perfilBD    = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    $seguridadBD = $modeloSeguridad->obtenerPorUsuario($idUsuario);
+
     if ($perfilBD) {
         $perfil = $perfilBD;
     }
+
+    if ($seguridadBD) {
+        $seguridad = $seguridadBD;
+    }
 }
+$correoActual = $_SESSION['user']['email'] ?? '';
 
 ?>
 
@@ -370,169 +381,244 @@ if ($idUsuario) {
                 <!-- Cuenta y seguridad -->
                 <!-- Cuenta y seguridad -->
                 <div class="tab-pane fade" id="cuenta" role="tabpanel" aria-labelledby="cuenta-tab">
-                    <div class="tarjeta p-4">
-                        <h2 class="mb-3">Cuenta y seguridad</h2>
-                        <p class="text-muted mb-4">
-                            Administra el correo con el que ingresas, tu contraseña y algunas opciones avanzadas de seguridad.
-                        </p>
+                    <div class="tarjeta p-4 tarjeta-config">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                            <div>
+                                <h2 class="mb-1">Cuenta y seguridad</h2>
+                                <p class="text-muted mb-0">
+                                    Administra tu correo de acceso, contraseña y preferencias de seguridad de tu cuenta.
+                                </p>
+                            </div>
+                            <span class="badge bg-light text-dark" style="font-size: 0.8rem;">
+                                Última actualización:
+                                <?= isset($seguridad['updated_at']) ? htmlspecialchars($seguridad['updated_at']) : 'Sin registros aún' ?>
+                            </span>
+                        </div>
 
-                        <!-- ========== BLOQUE 1: DATOS DE ACCESO (CORREO Y CONTRASEÑA) ========== -->
-                        <form action="<?= BASE_URL ?>/proveedor/actualizar-credenciales" method="POST" class="mb-4">
-                            <h5 class="mb-3">Datos de acceso</h5>
+                        <div class="row g-4">
+                            <!-- Columna izquierda: datos de acceso -->
+                            <div class="col-lg-6">
+                                <!-- Actualizar correo -->
+                                <div class="tarjeta-config-inner mb-4">
+                                    <h5 class="mb-2">Correo de acceso</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Este es el correo con el que inicias sesión en Proviservers.
+                                        No se mostrará a los clientes.
+                                    </p>
 
-                            <div class="row g-3">
-                                <!-- Correo actual -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Correo actual</label>
-                                    <input
-                                        type="email"
-                                        class="form-control"
-                                        value="<?= htmlspecialchars($_SESSION['user']['email'] ?? '') ?>"
-                                        readonly>
-                                    <small class="text-muted">
-                                        Este es el correo con el que actualmente inicias sesión.
-                                    </small>
+                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-correo" method="POST" class="mt-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Correo actual</label>
+                                            <input
+                                                type="email"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($correoActual) ?>"
+                                                readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Nuevo correo <span class="text-danger">*</span></label>
+                                            <input
+                                                type="email"
+                                                name="nuevo_correo"
+                                                class="form-control"
+                                                placeholder="Ej: proveedor@miempresa.com"
+                                                required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirmar nuevo correo <span class="text-danger">*</span></label>
+                                            <input
+                                                type="email"
+                                                name="confirmar_correo"
+                                                class="form-control"
+                                                placeholder="Vuelve a escribir el nuevo correo"
+                                                required>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-envelope-check"></i> Actualizar correo
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
 
-                                <!-- Nuevo correo -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Nuevo correo electrónico</label>
-                                    <input
-                                        type="email"
-                                        name="nuevo_correo"
-                                        class="form-control"
-                                        placeholder="Ej: proveedor@miempresa.com">
-                                    <small class="text-muted">
-                                        Déjalo vacío si no quieres cambiar tu correo.
-                                    </small>
-                                </div>
+                                <!-- Cambiar contraseña -->
+                                <div class="tarjeta-config-inner">
+                                    <h5 class="mb-2">Contraseña</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Te recomendamos usar una contraseña segura, con combinación de letras, números y símbolos.
+                                    </p>
 
-                                <!-- Confirmar nuevo correo -->
-                                <div class="col-md-6">
-                                    <label class="form-label">Confirmar nuevo correo</label>
-                                    <input
-                                        type="email"
-                                        name="confirmar_correo"
-                                        class="form-control"
-                                        placeholder="Vuelve a escribir el nuevo correo">
-                                </div>
+                                    <form action="<?= BASE_URL ?>/proveedor/cambiar-contrasena" method="POST" class="mt-3">
+                                        <div class="mb-3">
+                                            <label class="form-label">Contraseña actual <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="clave_actual"
+                                                class="form-control"
+                                                placeholder="Escribe tu contraseña actual"
+                                                required>
+                                        </div>
 
-                                <div class="col-12">
-                                    <hr class="my-3">
-                                </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Nueva contraseña <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="nueva_clave"
+                                                class="form-control"
+                                                placeholder="Mínimo 8 caracteres"
+                                                required>
+                                        </div>
 
-                                <!-- Contraseña actual -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Contraseña actual <span class="text-danger">*</span></label>
-                                    <input
-                                        type="password"
-                                        name="contrasena_actual"
-                                        class="form-control"
-                                        placeholder="********"
-                                        required>
-                                    <small class="text-muted">
-                                        La necesitamos para confirmar cualquier cambio de correo o contraseña.
-                                    </small>
-                                </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Confirmar nueva contraseña <span class="text-danger">*</span></label>
+                                            <input
+                                                type="password"
+                                                name="confirmar_clave"
+                                                class="form-control"
+                                                placeholder="Vuelve a escribir la nueva contraseña"
+                                                required>
+                                        </div>
 
-                                <!-- Nueva contraseña -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Nueva contraseña</label>
-                                    <input
-                                        type="password"
-                                        name="nueva_contrasena"
-                                        class="form-control"
-                                        placeholder="Mínimo 8 caracteres">
-                                </div>
-
-                                <!-- Confirmar nueva contraseña -->
-                                <div class="col-md-4">
-                                    <label class="form-label">Confirmar nueva contraseña</label>
-                                    <input
-                                        type="password"
-                                        name="confirmar_contrasena"
-                                        class="form-control"
-                                        placeholder="Repite la nueva contraseña">
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <small class="text-muted">
+                                                Si detectamos actividad inusual, podríamos pedirte que cambies tu contraseña.
+                                            </small>
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-shield-lock"></i> Cambiar contraseña
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-end gap-2 mt-4">
-                                <button type="reset" class="btn-modern-outline">
-                                    <i class="bi bi-arrow-counterclockwise"></i> Restablecer
-                                </button>
-                                <button type="submit" class="btn-modern">
-                                    <i class="bi bi-shield-check"></i> Guardar cambios de acceso
-                                </button>
-                            </div>
-                        </form>
+                            <!-- Columna derecha: preferencias de seguridad -->
+                            <div class="col-lg-6">
+                                <div class="tarjeta-config-inner mb-4">
+                                    <h5 class="mb-2">Alertas y notificaciones</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Elige sobre qué eventos quieres recibir alertas como proveedor.
+                                    </p>
 
-                        <hr class="my-4">
+                                    <?php
+                                    $alertaSolicitudes = !empty($seguridad['alerta_solicitudes']);
+                                    $alertaResenas     = !empty($seguridad['alerta_resenas']);
+                                    $alertaPagos       = !empty($seguridad['alerta_pagos']);
+                                    $canalSeleccionado = $seguridad['canal_notificaciones'] ?? 'ambos';
+                                    $tiempoSesion      = isset($seguridad['tiempo_sesion']) ? (int) $seguridad['tiempo_sesion'] : 60;
+                                    ?>
 
-                        <!-- ========== BLOQUE 2: PREFERENCIAS DE SEGURIDAD ========== -->
-                        <form action="<?= BASE_URL ?>/proveedor/actualizar-seguridad" method="POST" class="mb-4">
-                            <h5 class="mb-3">Preferencias de seguridad</h5>
+                                    <form action="<?= BASE_URL ?>/proveedor/guardar-preferencias-seguridad" method="POST">
+                                        <div class="mb-3">
+                                            <label class="form-label d-block">Alertas que quiero recibir</label>
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="form-check mb-2">
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            id="alerta_inicio_sesion"
-                                            name="alerta_inicio_sesion"
-                                            value="1"
-                                            <?= !empty($perfil['alerta_inicio_sesion']) ? 'checked' : '' ?>>
-                                        <label class="form-check-label" for="alerta_inicio_sesion">
-                                            Enviarme alerta cuando haya un inicio de sesión desde un nuevo dispositivo
-                                        </label>
-                                    </div>
-                                    <small class="text-muted">
-                                        Te notificaremos cuando detectemos un dispositivo o ubicación poco usual.
-                                    </small>
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_solicitudes"
+                                                    name="alerta_solicitudes"
+                                                    value="1"
+                                                    <?= $alertaSolicitudes ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_solicitudes">
+                                                    Nuevas solicitudes y cambios de estado de servicios
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_resenas"
+                                                    name="alerta_resenas"
+                                                    value="1"
+                                                    <?= $alertaResenas ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_resenas">
+                                                    Nuevas reseñas y calificaciones de clientes
+                                                </label>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <input
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    id="alerta_pagos"
+                                                    name="alerta_pagos"
+                                                    value="1"
+                                                    <?= $alertaPagos ? 'checked' : '' ?>>
+                                                <label class="form-check-label" for="alerta_pagos">
+                                                    Pagos, abonos y temas de facturación
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Canal principal de notificaciones</label>
+                                            <select name="canal_notificaciones" class="form-select">
+                                                <option value="ambos" <?= $canalSeleccionado === 'ambos' ? 'selected' : '' ?>>Correo y plataforma</option>
+                                                <option value="correo" <?= $canalSeleccionado === 'correo' ? 'selected' : '' ?>>Solo correo</option>
+                                                <option value="plataforma" <?= $canalSeleccionado === 'plataforma' ? 'selected' : '' ?>>Solo dentro de la plataforma</option>
+                                            </select>
+                                            <small class="text-muted">
+                                                En el futuro podrás configurar esto también desde la app móvil.
+                                            </small>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Tiempo de cierre de sesión por inactividad</label>
+                                            <select name="tiempo_sesion" class="form-select">
+                                                <option value="30" <?= $tiempoSesion === 30  ? 'selected' : '' ?>>30 minutos</option>
+                                                <option value="60" <?= $tiempoSesion === 60  ? 'selected' : '' ?>>1 hora</option>
+                                                <option value="120" <?= $tiempoSesion === 120 ? 'selected' : '' ?>>2 horas</option>
+                                            </select>
+                                            <small class="text-muted">
+                                                Si no detectamos actividad en ese tiempo, cerraremos tu sesión por seguridad.
+                                            </small>
+                                        </div>
+
+                                        <hr>
+
+                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                            <small class="text-muted" style="font-size: 0.85rem;">
+                                                Puedes ajustar estas preferencias en cualquier momento.
+                                            </small>
+                                            <button type="submit" class="btn-modern btn-sm">
+                                                <i class="bi bi-save"></i> Guardar preferencias
+                                            </button>
+                                        </div>
+                                    </form>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label class="form-label">Cierre automático de sesión</label>
-                                    <select name="tiempo_sesion" class="form-select">
-                                        <?php
-                                        $tiempoSesion = $perfil['tiempo_sesion'] ?? '30';
-                                        ?>
-                                        <option value="15" <?= $tiempoSesion == '15' ? 'selected' : '' ?>>15 minutos sin actividad</option>
-                                        <option value="30" <?= $tiempoSesion == '30' ? 'selected' : '' ?>>30 minutos sin actividad</option>
-                                        <option value="60" <?= $tiempoSesion == '60' ? 'selected' : '' ?>>60 minutos sin actividad</option>
-                                        <option value="0" <?= $tiempoSesion == '0'  ? 'selected' : '' ?>>No cerrar automáticamente</option>
-                                    </select>
-                                    <small class="text-muted">
-                                        Por seguridad recomendamos no desactivar el cierre automático.
+                                <!-- Opciones avanzadas -->
+                                <div class="tarjeta-config-inner tarjeta-config-avanzada">
+                                    <h5 class="mb-2">Opciones avanzadas</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Herramientas para mantener tu cuenta protegida.
+                                    </p>
+
+                                    <!-- Nota: esta acción requiere que luego implementes el controlador /proveedor/cerrar-sesiones -->
+                                    <form action="<?= BASE_URL ?>/proveedor/cerrar-sesiones" method="POST"
+                                        onsubmit="return confirm('Esto cerrará tu sesión en todos los dispositivos. ¿Quieres continuar?');">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-box-arrow-right"></i>
+                                            Cerrar sesión en todos los dispositivos
+                                        </button>
+                                    </form>
+
+                                    <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
+                                        Úsalo si has iniciado sesión en un equipo compartido o sospechas de actividad no autorizada.
                                     </small>
                                 </div>
                             </div>
-
-                            <div class="d-flex justify-content-end gap-2 mt-4">
-                                <button type="submit" class="btn-modern">
-                                    <i class="bi bi-save"></i> Guardar preferencias de seguridad
-                                </button>
-                            </div>
-                        </form>
-
-                        <hr class="my-4">
-
-                        <!-- ========== BLOQUE 3: CONTROL DE SESIONES ========== -->
-                        <div>
-                            <h5 class="mb-3 text-danger">Control de sesiones</h5>
-                            <p class="text-muted mb-3" style="font-size: 0.9rem;">
-                                Si sospechas que alguien ha ingresado a tu cuenta o has usado computadoras públicas,
-                                puedes cerrar sesión en todos los dispositivos. Se te pedirá iniciar sesión nuevamente.
-                            </p>
-
-                            <form action="<?= BASE_URL ?>/proveedor/cerrar-sesiones" method="POST">
-                                <button type="submit" class="btn-modern-outline">
-                                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión en todos los dispositivos
-                                </button>
-                            </form>
                         </div>
                     </div>
                 </div>
+
+
 
 
                 <!-- Notificaciones -->
