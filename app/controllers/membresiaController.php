@@ -134,7 +134,18 @@ function registrarMembresia()
     exit();
 }
 
-function mostrarMembresias() {}
+function mostrarMembresias()
+{
+  
+    // 1. Instanciar el modelo de Membresía, pasándole la conexión.
+    $resultado = new Membresia();
+
+    // 2. Llamar al método del modelo que contiene la lógica SQL.
+    $membresias = $resultado->mostrar();
+
+    // 3. Devolver el resultado (la lista de membresías).
+    return $membresias;
+}
 
 function mostrarMembresiaId() {}
 
