@@ -344,21 +344,21 @@ body {
 .section-hero {
     background: linear-gradient(135deg, var(--primary-color) 0%, #0052cc 100%);
     color: var(--white-color);
-    padding: 40px 30px;
+    padding: 20px 30px;
     border-radius: 12px;
     margin-bottom: 30px;
     box-shadow: 0 4px 12px rgba(0, 102, 255, 0.2);
 }
 
 .section-hero h1 {
-    font-size: var(--fs-title1);
+    font-size: var(--fs-title2);
     font-weight: 700;
     margin-bottom: 12px;
     font-family: var(--font-title);
 }
 
 .section-hero p {
-    font-size: var(--fs-text);
+    font-size: var(--fs-small);
     opacity: 0.95;
     margin-bottom: 0;
     font-weight: 400;
@@ -567,7 +567,7 @@ body {
 
 .service-image {
   width: 100%;
-  max-height: 300px;   /* límite de altura */
+  max-height: 200px;   /* límite de altura */
   overflow: hidden;    /* recorta lo que se salga */
 }
 

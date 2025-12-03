@@ -24,6 +24,7 @@
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
+        
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 

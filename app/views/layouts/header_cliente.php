@@ -25,7 +25,7 @@ $usuarioC = [
     <!-- Buscador -->
     <div class="buscador">
         <i class="bi bi-search"></i>
-        <input type="text" placeholder="Buscar servicios, proveedores...">
+        <input type="text" placeholder="Buscar">
     </div>
 
     <div class="acciones-barra">
