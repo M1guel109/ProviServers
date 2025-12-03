@@ -28,3 +28,4 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('sidebar-open');
     });
 });
+

@@ -18,7 +18,10 @@
 </head>
 <body>
     <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
+    <?php 
+    $currentPage = 'explorar';
+    include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
+    ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">

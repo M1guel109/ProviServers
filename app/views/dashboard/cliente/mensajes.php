@@ -17,8 +17,10 @@
 </head>
 <body>
     <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
-
+    <?php 
+    $currentPage = 'mensajes';
+    include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
+    ?>
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
     <section id="mensajes">
