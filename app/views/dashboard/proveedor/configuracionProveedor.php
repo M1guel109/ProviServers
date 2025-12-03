@@ -368,15 +368,172 @@ if ($idUsuario) {
 
 
                 <!-- Cuenta y seguridad -->
+                <!-- Cuenta y seguridad -->
                 <div class="tab-pane fade" id="cuenta" role="tabpanel" aria-labelledby="cuenta-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Cuenta y seguridad</h2>
-                        <p class="text-muted mb-0">
-                            Aquí irá el formulario para actualizar tu correo, contraseña, seguridad de la cuenta y
-                            opciones avanzadas (como cierre de sesión en todos los dispositivos).
+                        <p class="text-muted mb-4">
+                            Administra el correo con el que ingresas, tu contraseña y algunas opciones avanzadas de seguridad.
                         </p>
+
+                        <!-- ========== BLOQUE 1: DATOS DE ACCESO (CORREO Y CONTRASEÑA) ========== -->
+                        <form action="<?= BASE_URL ?>/proveedor/actualizar-credenciales" method="POST" class="mb-4">
+                            <h5 class="mb-3">Datos de acceso</h5>
+
+                            <div class="row g-3">
+                                <!-- Correo actual -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Correo actual</label>
+                                    <input
+                                        type="email"
+                                        class="form-control"
+                                        value="<?= htmlspecialchars($_SESSION['user']['email'] ?? '') ?>"
+                                        readonly>
+                                    <small class="text-muted">
+                                        Este es el correo con el que actualmente inicias sesión.
+                                    </small>
+                                </div>
+
+                                <!-- Nuevo correo -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Nuevo correo electrónico</label>
+                                    <input
+                                        type="email"
+                                        name="nuevo_correo"
+                                        class="form-control"
+                                        placeholder="Ej: proveedor@miempresa.com">
+                                    <small class="text-muted">
+                                        Déjalo vacío si no quieres cambiar tu correo.
+                                    </small>
+                                </div>
+
+                                <!-- Confirmar nuevo correo -->
+                                <div class="col-md-6">
+                                    <label class="form-label">Confirmar nuevo correo</label>
+                                    <input
+                                        type="email"
+                                        name="confirmar_correo"
+                                        class="form-control"
+                                        placeholder="Vuelve a escribir el nuevo correo">
+                                </div>
+
+                                <div class="col-12">
+                                    <hr class="my-3">
+                                </div>
+
+                                <!-- Contraseña actual -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Contraseña actual <span class="text-danger">*</span></label>
+                                    <input
+                                        type="password"
+                                        name="contrasena_actual"
+                                        class="form-control"
+                                        placeholder="********"
+                                        required>
+                                    <small class="text-muted">
+                                        La necesitamos para confirmar cualquier cambio de correo o contraseña.
+                                    </small>
+                                </div>
+
+                                <!-- Nueva contraseña -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Nueva contraseña</label>
+                                    <input
+                                        type="password"
+                                        name="nueva_contrasena"
+                                        class="form-control"
+                                        placeholder="Mínimo 8 caracteres">
+                                </div>
+
+                                <!-- Confirmar nueva contraseña -->
+                                <div class="col-md-4">
+                                    <label class="form-label">Confirmar nueva contraseña</label>
+                                    <input
+                                        type="password"
+                                        name="confirmar_contrasena"
+                                        class="form-control"
+                                        placeholder="Repite la nueva contraseña">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <button type="reset" class="btn-modern-outline">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Restablecer
+                                </button>
+                                <button type="submit" class="btn-modern">
+                                    <i class="bi bi-shield-check"></i> Guardar cambios de acceso
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <!-- ========== BLOQUE 2: PREFERENCIAS DE SEGURIDAD ========== -->
+                        <form action="<?= BASE_URL ?>/proveedor/actualizar-seguridad" method="POST" class="mb-4">
+                            <h5 class="mb-3">Preferencias de seguridad</h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            id="alerta_inicio_sesion"
+                                            name="alerta_inicio_sesion"
+                                            value="1"
+                                            <?= !empty($perfil['alerta_inicio_sesion']) ? 'checked' : '' ?>>
+                                        <label class="form-check-label" for="alerta_inicio_sesion">
+                                            Enviarme alerta cuando haya un inicio de sesión desde un nuevo dispositivo
+                                        </label>
+                                    </div>
+                                    <small class="text-muted">
+                                        Te notificaremos cuando detectemos un dispositivo o ubicación poco usual.
+                                    </small>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">Cierre automático de sesión</label>
+                                    <select name="tiempo_sesion" class="form-select">
+                                        <?php
+                                        $tiempoSesion = $perfil['tiempo_sesion'] ?? '30';
+                                        ?>
+                                        <option value="15" <?= $tiempoSesion == '15' ? 'selected' : '' ?>>15 minutos sin actividad</option>
+                                        <option value="30" <?= $tiempoSesion == '30' ? 'selected' : '' ?>>30 minutos sin actividad</option>
+                                        <option value="60" <?= $tiempoSesion == '60' ? 'selected' : '' ?>>60 minutos sin actividad</option>
+                                        <option value="0" <?= $tiempoSesion == '0'  ? 'selected' : '' ?>>No cerrar automáticamente</option>
+                                    </select>
+                                    <small class="text-muted">
+                                        Por seguridad recomendamos no desactivar el cierre automático.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 mt-4">
+                                <button type="submit" class="btn-modern">
+                                    <i class="bi bi-save"></i> Guardar preferencias de seguridad
+                                </button>
+                            </div>
+                        </form>
+
+                        <hr class="my-4">
+
+                        <!-- ========== BLOQUE 3: CONTROL DE SESIONES ========== -->
+                        <div>
+                            <h5 class="mb-3 text-danger">Control de sesiones</h5>
+                            <p class="text-muted mb-3" style="font-size: 0.9rem;">
+                                Si sospechas que alguien ha ingresado a tu cuenta o has usado computadoras públicas,
+                                puedes cerrar sesión en todos los dispositivos. Se te pedirá iniciar sesión nuevamente.
+                            </p>
+
+                            <form action="<?= BASE_URL ?>/proveedor/cerrar-sesiones" method="POST">
+                                <button type="submit" class="btn-modern-outline">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión en todos los dispositivos
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
+
 
                 <!-- Notificaciones -->
                 <div class="tab-pane fade" id="notificaciones" role="tabpanel" aria-labelledby="notificaciones-tab">

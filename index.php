@@ -174,7 +174,12 @@ switch ($request) {
     case '/proveedor/guardar-perfil-profesional':
         require BASE_PATH . '/app/controllers/proveedorPerfilController.php';
         break;
-
+    // ✅ Endpoints de Cuenta y Seguridad
+    case '/proveedor/actualizar-credenciales':
+    case '/proveedor/actualizar-seguridad':
+    case '/proveedor/cerrar-sesiones':
+        require BASE_PATH . '/app/controllers/proveedorCuentaController.php';
+        break;
 
 
     case '/proveedor/nuevas_solicitudes':
