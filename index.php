@@ -97,6 +97,7 @@ switch ($request) {
     case '/admin/reporte':
         require BASE_PATH . '/app/controllers/reportesPdfController.php';
         reportesPdfController();
+        reporteMembresiasPDF();
         break;
 
     case '/admin/registrar-categoria':
@@ -144,7 +145,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
         break;
 
-    // Fin de rutas login
+    // Fin de rutas admin
 
     // Rutas del proveedor
     case '/proveedor/dashboard':

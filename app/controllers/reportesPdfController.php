@@ -1,6 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/helpers/pdf_helper.php';
 require_once BASE_PATH . '/app/controllers/adminController.php';
+require_once BASE_PATH . '/app/controllers/membresiaController.php';
 // NUEVO: para usar mostrarServicios()
 require_once BASE_PATH . '/app/controllers/proveedorController.php';
 // NUEVO: para mapear categorías
@@ -31,6 +32,9 @@ function reportesPdfController()
             reporteServiciosProveedorPDF();
             break;
 
+        case 'membresias': // 👈 NUEVO: Caso para el reporte de Membresías
+            reporteMembresiasPDF();
+            break;
         default:
             echo 'Tipo de reporte no válido';
             exit();
@@ -81,4 +85,19 @@ function reporteServiciosProveedorPDF()
 
     // 4. Generar el PDF con tu helper
     generarPDF($html, 'reporte_servicios_proveedor.pdf', false);
+}
+
+function reporteMembresiasPDF()
+{
+
+    // Cargar la vista y obtenerla como HTML
+    ob_start();
+    // Asignamos los datos de la funcion en el controlador enlazado a una variable que podamos manipular en la vista pdf
+    $membresias = mostrarMembresias();
+
+    // Archivo que tiene la interfaz diseñada en htlm
+    require BASE_PATH . '/app/views/pdf/membresias_pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_membresias.pdf', false);
 }
