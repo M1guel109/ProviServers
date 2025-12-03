@@ -155,7 +155,7 @@ function toYesNo($value) {
                                                 </a>
 
                                                 <!-- Eliminar membresía -->
-                                                <a href="#" class="btn-action btn-delete" title="Eliminar membresía" onclick="return confirm('¿Está seguro de eliminar esta membresía?')">
+                                                <a href="<?= BASE_URL ?>/admin/eliminar-membresia?accion=eliminar&id=<?= $membresia['id'] ?>" class="btn-action btn-delete" title="Eliminar membresía">
                                                     <i class="bi bi-trash3"></i>
                                                 </a>
                                             </div>

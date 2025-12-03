@@ -147,8 +147,29 @@ function mostrarMembresias()
     return $membresias;
 }
 
-function mostrarMembresiaId() {}
+function mostrarMembresiaId($id) {}
 
 function actualizarMembresia() {}
 
-function eliminarMembresia() {}
+function eliminarMembresia($id) {
+    $objmembresia = new Membresia();
+    $respuesta = $objmembresia->eliminar($id);
+
+
+    if ($respuesta === true) {
+        // Mostrar alerta de éxito y redirigir a la página de membresías
+        mostrarSweetAlert(
+            'success',
+            'Eliminación exitosa',
+            'Se ha eliminado la membresía correctamente',
+            '/ProviServers/admin/consultar-membresias' // ruta a la lista de membresías
+        );
+    } else {
+        // Mostrar alerta de error
+        mostrarSweetAlert(
+            'error',
+            'Error al eliminar',
+            'No se pudo eliminar la membresía. Intenta nuevamente'
+        );
+    }
+}
