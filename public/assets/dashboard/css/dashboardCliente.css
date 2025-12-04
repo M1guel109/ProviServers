@@ -465,7 +465,6 @@ body {
 
 
 /* Sección Favoritos */
-/* Sección Favoritos */
 #favoritos {
   background-color: #f8f9fa;
 }
@@ -507,7 +506,6 @@ body {
   transform: scale(0.95);
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
-
 
 
 /* ========================================

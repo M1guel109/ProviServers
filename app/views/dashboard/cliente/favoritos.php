@@ -24,7 +24,11 @@
 
   <!-- CONTENIDO PRINCIPAL -->
   <main class="contenido">
-    <section id="favoritos" class="py-5">
+
+    <!-- HEADER -->
+    <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
+
+    <section id="favoritos">
       <div class="container">
       <div class="section-hero mb-4">
         <p class="breadcrumb">Inicio > Favoritos</p>
