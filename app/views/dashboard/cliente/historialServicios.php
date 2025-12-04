@@ -23,43 +23,67 @@
     ?>
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-    <section id="historial-servicios">
-        <div class="section-hero">
-        <h1>Historial de Servicios </h1>
-        <p>Consulta todos los servicios que has contratado y completado en el pasado.</p>
-        </div>
 
-        <div class="section-content">
-        <div class="services-grid">
-            <!-- Ejemplo de servicio completado -->
-            <div class="service-item">
-            <div class="service-content">
-                <span class="badge bg-success mb-2">Completado</span>
-                <h3>Limpieza Residencial</h3>
-                <p><strong>Proveedor:</strong> Ana Gómez</p>
-                <p><strong>Fecha:</strong> 12 Nov 2024</p>
-                <div class="d-flex gap-2">
-                <a href="#" class="btn-modern-outline flex-fill">Ver detalles</a>
-                <a href="#" class="btn-modern flex-fill">Contratar de nuevo</a>
+    <!-- HEADER -->
+    <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
+
+        <section id="historial-servicios">
+        <div class="container">
+            <div class="section-hero mb-4">
+            <p class="breadcrumb">Inicio > Historial</p>
+            <h1><i class="bi text-primary"></i>Historial de Servicios</h1>
+            <p>Consulta todos los servicios que has contratado y completado en el pasado.</p>
+            </div>
+
+            <div class="row gy-4">
+            <!-- Servicio completado -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-item shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body">
+                    <h5 class="fw-semibold">Limpieza Residencial</h5>
+                    <p class="text-muted mb-1"><strong>Prov.</strong> Ana Gómez</p>
+                    <p class="text-muted mb-3"><i class="bi bi-calendar-check"></i> 12 Nov 2024</p>
+                    <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Ver detalles</a>
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Contratar de nuevo</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Servicio completado -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-item shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body">
+                    <h5 class="fw-semibold">Electricidad</h5>
+                    <p class="text-muted mb-1"><strong>Prov.</strong> Luis Martínez</p>
+                    <p class="text-muted mb-3"><i class="bi bi-calendar-check"></i> 5 Oct 2024</p>
+                    <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Ver detalles</a>
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Contratar de nuevo</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo adicional -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card service-item shadow-sm border-0 rounded-3 h-100">
+                <div class="card-body">
+                    <h5 class="fw-semibold">Transporte Local</h5>
+                    <p class="text-muted mb-1"><strong>Prov.</strong> Juan Pérez</p>
+                    <p class="text-muted mb-3"><i class="bi bi-calendar-x"></i> 20 Sep 2024</p>
+                    <div class="d-flex gap-2">
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Ver detalles</a>
+                    <a href="#" class="btn btn-outline-primary flex-fill btn-sm">Contratar de nuevo</a>
+                    </div>
+                </div>
                 </div>
             </div>
             </div>
+        </div>
+        </section>
 
-            <div class="service-item">
-            <div class="service-content">
-                <span class="badge bg-success mb-2">Completado</span>
-                <h3>Electricidad</h3>
-                <p><strong>Proveedor:</strong> Luis Martínez</p>
-                <p><strong>Fecha:</strong> 5 Oct 2024</p>
-                <div class="d-flex gap-2">
-                <a href="#" class="btn-modern-outline flex-fill">Ver detalles</a>
-                <a href="#" class="btn-modern flex-fill">Contratar de nuevo</a>
-                </div>
-            </div>
-            </div>
-        </div>
-        </div>
-    </section>
     </main>
 
     <!-- Bootstrap JS -->

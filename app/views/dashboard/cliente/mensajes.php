@@ -31,7 +31,7 @@
         <div class="container">
             <div class="section-hero mb-4">
             <p class="breadcrumb">Inicio > Mensajes</p>
-            <h1><i class=" bi text-primary"></i>Mensajes</h1>
+            <h1><i class="bi text-primary"></i>Mensajes</h1>
             <p>Comunícate directamente con tus proveedores. Revisa tus conversaciones y responde cuando lo necesites.</p>
             </div>
 

@@ -72,6 +72,23 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Ejemplo: acción al contratar de nuevo
+  document.querySelectorAll("#historial-servicios .btn-primary").forEach(btn => {
+    btn.addEventListener("click", () => {
+      alert("Función de contratar de nuevo en construcción...");
+    });
+  });
+
+  // Ejemplo: acción al ver detalles
+  document.querySelectorAll("#historial-servicios .btn-outline-primary").forEach(btn => {
+    btn.addEventListener("click", () => {
+      alert("Función de ver detalles en construcción...");
+    });
+  });
+});
+
+
 
 
 
