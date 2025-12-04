@@ -44,13 +44,13 @@ span {
     --fs-title3: 24px;
     --fs-title4: 18px;
     --fs-text: 16px;
-    --fs-small: 14px; 
+    --fs-small: 14px;
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 
@@ -66,27 +66,31 @@ span {
     cursor: pointer;
     transition: background-color 0.25s ease, transform 0.25s ease;
 }
+
 .btn-primary-proviservers:hover {
-  background-color: #0052cc; 
-  transform: translateY(-1px);
+    background-color: #0052cc;
+    transform: translateY(-1px);
 }
-.btn-secondary-proviservers{
-      background-color: var(--white-color);
-  color: var(--primary-color);
-  font-family: var(--font-text);
-  font-size: var(--fs-text);
-  font-weight: 600;
-  border: 2px solid var(--primary-color);
-  border-radius: 8px;
-  padding: 12px 24px;
-  cursor: pointer;
-  transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
+
+.btn-secondary-proviservers {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+    font-family: var(--font-text);
+    font-size: var(--fs-text);
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 12px 24px;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
 }
+
 .btn-secondary-proviservers:hover {
-  background-color: var(--primary-color);
-  color: var(--white-color);
-  transform: translateY(-1px);
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    transform: translateY(-1px);
 }
+
 /* 5.Desktop */
 
 /* =======================================
@@ -96,14 +100,16 @@ span {
 /* 1. Icono de Notificación (la campana) */
 .nav-link.nav-icon {
     position: relative;
-    color: #444444; /* Color oscuro para el icono */
+    color: #444444;
+    /* Color oscuro para el icono */
     padding: 0 8px;
     font-size: 24px;
     transition: color 0.3s ease;
 }
 
 .nav-link.nav-icon:hover {
-    color: #3b82f6; /* Cambio de color al pasar el mouse */
+    color: #3b82f6;
+    /* Cambio de color al pasar el mouse */
 }
 
 /* 2. El Indicador de Número (Badge) */
@@ -114,17 +120,22 @@ span {
     padding: 3px 6px;
     border-radius: 50%;
     font-size: 10px;
-    background-color: #ff5722 !important; /* Un color más llamativo (Naranja/Rojo) */
-    border: 2px solid #ffffff; /* Borde blanco para destacarlo sobre el fondo */
+    background-color: #ff5722 !important;
+    /* Un color más llamativo (Naranja/Rojo) */
+    border: 2px solid #ffffff;
+    /* Borde blanco para destacarlo sobre el fondo */
 }
 
 /* 3. Contenedor Desplegable (Dropdown Menu) */
 .notifications {
-    --bs-dropdown-min-width: 350px; /* Anchura adecuada para notificaciones */
+    --bs-dropdown-min-width: 350px;
+    /* Anchura adecuada para notificaciones */
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra suave */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    /* Sombra suave */
     border: 1px solid #e0e0e0;
-    padding: 0; /* Quitamos padding externo */
+    padding: 0;
+    /* Quitamos padding externo */
 }
 
 /* 4. Encabezado del Desplegable */
@@ -135,7 +146,8 @@ span {
     padding: 15px 20px;
     border-bottom: 1px solid #f0f0f0;
     font-weight: 600;
-    color: #3b82f6; /* Color primario para el título */
+    color: #3b82f6;
+    /* Color primario para el título */
 }
 
 .notifications .dropdown-header a {
@@ -151,18 +163,22 @@ span {
     padding: 15px 20px;
     cursor: pointer;
     transition: background-color 0.2s;
-    border-left: 3px solid transparent; /* Indicador de estado/hover */
+    border-left: 3px solid transparent;
+    /* Indicador de estado/hover */
 }
 
 .notification-item:hover {
-    background-color: #f8f9fa; /* Fondo gris claro al pasar el mouse */
-    border-left: 3px solid #3b82f6; /* Borde de color para destacar el elemento */
+    background-color: #f8f9fa;
+    /* Fondo gris claro al pasar el mouse */
+    border-left: 3px solid #3b82f6;
+    /* Borde de color para destacar el elemento */
 }
 
 .notification-item i {
     font-size: 22px;
     margin-right: 15px;
-    flex-shrink: 0; /* Previene que el icono se comprima */
+    flex-shrink: 0;
+    /* Previene que el icono se comprima */
 }
 
 .notification-item div {
@@ -184,7 +200,8 @@ span {
 
 .notification-item p:last-child {
     font-size: 12px;
-    color: #999; /* Para la marca de tiempo (hace 30 min.) */
+    color: #999;
+    /* Para la marca de tiempo (hace 30 min.) */
 }
 
 /* 6. Pie de Página del Desplegable */
@@ -203,8 +220,8 @@ span {
 
 .badge {
     /* position: absolute; */
-    top: -5px;
-    right: -5px;
+    /* top: -5px; */
+    /* right: -5px; */
     background-color: #ef4444;
     color: white;
     border-radius: 50%;
@@ -216,6 +233,49 @@ span {
     justify-content: center;
     font-weight: 600;
 }
+
+.sidebar.plegado .toggle-icon {
+    display: none !important;
+}
+
+/* ======== SIDEBAR PLEGABLE ======== */
+.sidebar {
+    width: 260px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+.sidebar.plegado {
+    width: 80px;
+}
+
+/* Oculta textos cuando está plegado */
+.sidebar.plegado .menu-principal a,
+.sidebar.plegado a,
+.sidebar.plegado .menu-footer a {
+    text-align: center;
+}
+
+.sidebar.plegado .menu-principal a::after,
+.sidebar.plegado a::after {
+    display: none;
+}
+
+/* Oculta los textos, deja los íconos */
+.sidebar.plegado a span {
+    display: none;
+}
+
+/* íconos opcionales, si los agregas luego */
+.sidebar a i {
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.sidebar.plegado a i {
+    margin: 0;
+}
+
 /* 6.Responsive Tablet */
 @media screen and (min-width:768px) and (max-width:1080px) {}
 
