@@ -161,7 +161,65 @@ function mostrarMembresiaId($id)
     return $membresia;
 }
 
-function actualizarMembresia() {}
+function actualizarMembresia()
+{
+    // ====== 1. Captura de datos ======
+    $id = $_POST['id'] ?? '';
+    $tipo = $_POST['tipo'] ?? '';
+    $costo = $_POST['costo'] ?? '';
+    $duracion = $_POST['duracion_dias'] ?? '';
+    $descripcion = $_POST['descripcion'] ?? '';
+    $max_servicios = $_POST['max_servicios_activos'] ?? '';
+    $orden_visual = $_POST['orden_visual'] ?? '';
+    $acceso = $_POST['acceso_estadisticas_pro'] ?? 0;
+    $videos = $_POST['permite_videos'] ?? 0;
+    $destacado = $_POST['es_destacado'] ?? 0;
+    $estado = $_POST['estado'] ?? '';
+
+    // ====== 2. Validación mínima como Usuarios ======
+    if (
+        empty($id) || empty($tipo) || empty($costo) || empty($duracion) ||
+        empty($descripcion) || empty($max_servicios) || empty($estado)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
+        exit();
+    }
+
+    // (lo mismo que usuarios: validación simple de formato)
+    if (!is_numeric($costo) || !is_numeric($duracion) || !is_numeric($max_servicios)) {
+        mostrarSweetAlert('error', 'Formato inválido', 'Costo, duración y servicios deben ser numéricos.');
+        exit();
+    }
+
+    $orden_visual = ($orden_visual === '' ? 0 : intval($orden_visual));
+
+    // ====== 3. Crear data igual que en usuarios ======
+    $data = [
+        'id' => $id,
+        'tipo' => $tipo,
+        'costo' => floatval($costo),
+        'duracion_dias' => intval($duracion),
+        'descripcion' => $descripcion,
+        'max_servicios_activos' => intval($max_servicios),
+        'orden_visual' => $orden_visual,
+        'acceso_estadisticas_pro' => intval($acceso),
+        'permite_videos' => intval($videos),
+        'es_destacado' => intval($destacado),
+        'estado' => $estado
+    ];
+
+    // ====== 4. Ejecutar modelo ======
+    $obj = new Membresia();
+    $resultado = $obj->actualizar($data);
+
+    if ($resultado === true) {
+        mostrarSweetAlert('success', 'Membresía actualizada', 'Cambios guardados correctamente.', '/ProviServers/admin/consultar-membresias');
+    } else {
+        mostrarSweetAlert('error', 'Error', $resultado ?: 'No se pudo actualizar.');
+    }
+    exit();
+}
+
 
 function eliminarMembresia($id)
 {

@@ -144,6 +144,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/editarMembresia.php';
         break;
 
+    case '/admin/actualizar-membresia':
+        require BASE_PATH . '/app/controllers/membresiaController.php';
+        break;
+
     case '/admin/reportes-usuarios':
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
         break;
