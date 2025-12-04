@@ -426,21 +426,20 @@ body {
 /* Estados visuales */
 .estado-curso {
   border-left: 6px solid #6c757d; /* gris */
-  background-color: #f8f9fa;}
+}
 
 .estado-programado {
   border-left: 6px solid #ffc107; /* amarillo */
-  background-color: #fffbea;
 }
 
 .estado-completado {
   border-left: 6px solid #28a745; /* verde */
-  background-color: #e9f7ef;}
+}
 
 .estado-cancelado {
   border-left: 6px solid #dc3545; /* rojo */
-  background-color: #fdecea;
 }
+
 
 /* Badges */
 .badge {
@@ -463,6 +462,56 @@ body {
   font-weight: 600;
   font-size: 0.85rem;
 }
+
+
+/* Sección Favoritos */
+/* Sección Favoritos */
+#favoritos {
+  background-color: #f8f9fa;
+}
+
+.img-servicio {
+  height: 180px;   /* o 200px según tu diseño */
+  width: 100%;
+  object-fit: cover;
+}
+
+.card-body h5 {
+  font-size: 1.1rem;
+}
+
+.btn-fav {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  color: #dc3545;
+  transition: transform 0.2s ease;
+}
+
+.btn-fav:hover {
+  transform: scale(1.1);
+  background-color: #fff;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+
+
+
+
 
 
 

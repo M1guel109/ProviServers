@@ -58,3 +58,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 30); // velocidad: cada 30ms sube 1%
   });
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  // Animación al quitar favoritos (demo)
+  document.querySelectorAll(".btn-fav").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const card = btn.closest(".col-lg-4, .col-md-6");
+      card.classList.add("fade-out");
+      setTimeout(() => card.remove(), 400);
+    });
+  });
+});
+
+
+
+
+
+
