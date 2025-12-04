@@ -1,4 +1,3 @@
-// dashboardCliente.js
 document.addEventListener('DOMContentLoaded', () => {
     const btnToggleMenu = document.getElementById('btn-toggle-menu');
     const sidebar = document.querySelector('.sidebar');
@@ -7,6 +6,22 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('No se encontró #btn-toggle-menu o .sidebar');
         return;
     }
+
+    // Restaurar estado guardado
+    const estadoGuardado = localStorage.getItem('sidebarPlegado');
+    if (estadoGuardado === 'true') {
+        sidebar.classList.add('plegado');
+    }
+
+    // Evento para plegar/desplegar
+    btnToggleMenu.addEventListener('click', () => {
+        sidebar.classList.toggle('plegado');
+        const estaPlegado = sidebar.classList.contains('plegado');
+        localStorage.setItem('sidebarPlegado', estaPlegado);
+    });
+});
+
+
 
     // Media query para distinguir móvil vs escritorio
     const mqMobile = window.matchMedia('(max-width: 767px)');
@@ -27,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     mqMobile.addEventListener('change', () => {
         sidebar.classList.remove('sidebar-open');
     });
-});
+
 
     // Filtro en tiempo real
 document.getElementById('buscadorServicios').addEventListener('input', function () {

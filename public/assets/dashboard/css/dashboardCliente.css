@@ -124,7 +124,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: var(--fs-text);
+    font-size: var(--fs-small);
     font-weight: 500;
     color: var(--dark-color);
 }
@@ -240,7 +240,7 @@ body {
     background-color: #f8fafc;
     border-radius: 30px;
     padding: 10px 20px;
-    width: 400px;
+    width: 380px;
     border: 1px solid #e2e8f0;
     transition: all 0.25s ease;
 }
@@ -315,8 +315,8 @@ body {
 }
 
 .usuario img {
-    width: 40px;
-    height: 40px;
+    width: 37px;
+    height: 37px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e2e8f0;
@@ -351,7 +351,7 @@ body {
 }
 
 .section-hero h1 {
-    font-size: var(--fs-title2);
+    font-size: var(--fs-title3);
     font-weight: 700;
     margin-bottom: 12px;
     font-family: var(--font-title);
@@ -510,11 +510,6 @@ body {
 
 
 
-
-
-
-
-
 /* ========================================
    ESTADÍSTICAS VISUALES
    ======================================== */
@@ -541,13 +536,13 @@ body {
 }
 
 .stat-visual-item i {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--primary-color);
     margin-bottom: 15px;
 }
 
 .stat-visual-item h3 {
-    font-size: var(--fs-title1);
+    font-size: var(--fs-title2);
     font-weight: 700;
     color: var(--dark-color);
     margin-bottom: 8px;
@@ -567,8 +562,8 @@ body {
 .btn-modern {
     background-color: var(--primary-color);
     color: var(--white-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
+    font-family: var(--font-small);
+    font-size: var(--fs-small);
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -596,8 +591,8 @@ body {
 .btn-modern-outline {
     background-color: var(--white-color);
     color: var(--primary-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
+    font-family: var(--font-small);
+    font-size: var(--fs-small);
     font-weight: 600;
     border: 2px solid var(--primary-color);
     border-radius: 8px;
@@ -655,7 +650,7 @@ body {
 .modern-list-item h5 {
     font-family: var(--font-title);
     font-weight: 600;
-    font-size: var(--fs-title4);
+    font-size: var(--fs-text);
     margin-bottom: 5px;
     color: var(--dark-color);
 }
