@@ -5,33 +5,65 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
 require_once BASE_PATH . '/app/models/ProveedorSeguridad.php';
 require_once BASE_PATH . '/app/models/ProveedorDisponibilidad.php';
+require_once BASE_PATH . '/app/models/ProveedorNotificaciones.php';
+require_once BASE_PATH . '/app/models/ProveedorPagosFacturacion.php';
+require_once BASE_PATH . '/app/models/ProveedorPoliticasServicio.php';
 
 
-$idUsuario = $_SESSION['user']['id'] ?? null;
-$perfil    = [];
+
+
+
+
+$idUsuario      = $_SESSION['user']['id'] ?? null;
+$perfil         = [];
+$seguridad      = [];
+$disponibilidad = [];
+$notificaciones = [];
+$pagosFacturacion = [];
 
 if ($idUsuario) {
     $modeloPerfil    = new ProveedorPerfil();
     $modeloSeguridad = new ProveedorSeguridad();
+    $modeloDisp      = new ProveedorDisponibilidad();
+    $modeloNotif     = new ProveedorNotificaciones();
+    $modeloPagos     = new ProveedorPagosFacturacion();
 
-    $perfilBD    = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
-    $seguridadBD = $modeloSeguridad->obtenerPorUsuario($idUsuario);
+    $perfilBD        = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+    $seguridadBD     = $modeloSeguridad->obtenerPorUsuario($idUsuario);
+    $dispBD          = $modeloDisp->obtenerPorUsuario($idUsuario);
+    $notifBD         = $modeloNotif->obtenerPorUsuario($idUsuario);
+    $pagosBD         = $modeloPagos->obtenerPorUsuario($idUsuario);
+    $modeloPoliticas = new ProveedorPoliticasServicio();
+
+    // ... ya tienes los otros:
+    $pagosBD         = $modeloPagos->obtenerPorUsuario($idUsuario);
+    $politicasBD     = $modeloPoliticas->obtenerPorUsuario($idUsuario);
+
+    if ($pagosBD) {
+        $pagosFacturacion = $pagosBD;
+    }
+    if ($politicasBD) {
+        $politicas        = $politicasBD;
+    }
+
 
     if ($perfilBD) {
-        $perfil = $perfilBD;
+        $perfil           = $perfilBD;
     }
-
     if ($seguridadBD) {
-        $seguridad = $seguridadBD;
+        $seguridad        = $seguridadBD;
     }
-
-    // Disponibilidad
-    $modeloDisp = new ProveedorDisponibilidad();
-    $dispBD = $modeloDisp->obtenerPorUsuario($idUsuario);
     if ($dispBD) {
-        $disponibilidad = $dispBD;
+        $disponibilidad   = $dispBD;
+    }
+    if ($notifBD) {
+        $notificaciones   = $notifBD;
+    }
+    if ($pagosBD) {
+        $pagosFacturacion = $pagosBD;
     }
 }
+
 $correoActual = $_SESSION['user']['email'] ?? '';
 
 ?>
@@ -56,6 +88,7 @@ $correoActual = $_SESSION['user']['email'] ?? '';
 
     <!-- Estilos específicos del dashboard proveedor -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/configuracion-Proveedor.css">
 </head>
 
 <body>
@@ -629,16 +662,220 @@ $correoActual = $_SESSION['user']['email'] ?? '';
 
 
 
-                <!-- Notificaciones -->
                 <div class="tab-pane fade" id="notificaciones" role="tabpanel" aria-labelledby="notificaciones-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Notificaciones</h2>
-                        <p class="text-muted mb-0">
-                            Aquí podrás elegir qué notificaciones deseas recibir (solicitudes, reseñas, pagos, etc.) y
-                            por qué canales (correo, notificaciones internas, etc.).
+                        <p class="text-muted mb-4">
+                            Elige sobre qué quieres recibir avisos y por qué canal. Así te aseguramos que no pierdas
+                            solicitudes importantes ni actualizaciones de tus servicios.
                         </p>
+
+                        <?php
+                        // Defaults si no hay registro aún
+                        $tieneNotif = !empty($notificaciones);
+
+                        $notiSolicitudesNuevas = $tieneNotif ? !empty($notificaciones['noti_solicitudes_nuevas']) : true;
+                        $notiCambiosEstado     = $tieneNotif ? !empty($notificaciones['noti_cambios_estado'])     : true;
+                        $notiResenas           = $tieneNotif ? !empty($notificaciones['noti_resenas'])            : true;
+                        $notiPagos             = $tieneNotif ? !empty($notificaciones['noti_pagos'])              : true;
+
+                        $canalEmail    = $tieneNotif ? !empty($notificaciones['canal_email'])    : true;
+                        $canalInterna  = $tieneNotif ? !empty($notificaciones['canal_interna'])  : true;
+                        $canalWhatsapp = $tieneNotif ? !empty($notificaciones['canal_whatsapp']) : false;
+
+                        $resumenDiario  = $tieneNotif ? !empty($notificaciones['resumen_diario'])  : false;
+                        $resumenSemanal = $tieneNotif ? !empty($notificaciones['resumen_semanal']) : false;
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-notificaciones" method="POST">
+                            <div class="row g-4">
+                                <!-- Columna izquierda: tipos de notificación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">¿Sobre qué quieres recibir notificaciones?</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="noti_solicitudes_nuevas"
+                                                name="noti_solicitudes_nuevas"
+                                                <?= $notiSolicitudesNuevas ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_solicitudes_nuevas">
+                                                Nuevas solicitudes de servicio
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Cuando un cliente te envíe una nueva solicitud desde la plataforma.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="noti_cambios_estado"
+                                                name="noti_cambios_estado"
+                                                <?= $notiCambiosEstado ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_cambios_estado">
+                                                Cambios en el estado de las solicitudes
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Cuando una solicitud pase a aceptada, en proceso, completada o cancelada.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="noti_resenas"
+                                                name="noti_resenas"
+                                                <?= $notiResenas ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_resenas">
+                                                Nuevas reseñas o calificaciones
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Cuando un cliente deje una reseña sobre tu servicio.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="noti_pagos"
+                                                name="noti_pagos"
+                                                <?= $notiPagos ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_pagos">
+                                                Pagos, liquidaciones y movimientos
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Avisos sobre pagos generados, liquidaciones y movimientos relevantes.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: canales y resúmenes -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">¿Por dónde quieres recibirlos?</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="canal_email"
+                                                name="canal_email"
+                                                <?= $canalEmail ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_email">
+                                                Correo electrónico
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Te enviaremos notificaciones al correo asociado a tu cuenta.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="canal_interna"
+                                                name="canal_interna"
+                                                <?= $canalInterna ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_interna">
+                                                Notificaciones internas del panel
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                Verás avisos dentro de tu panel de Proviservers.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="canal_whatsapp"
+                                                name="canal_whatsapp"
+                                                <?= $canalWhatsapp ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_whatsapp">
+                                                WhatsApp (cuando esté disponible)
+                                            </label>
+                                            <small class="text-muted d-block">
+                                                En el futuro podrás recibir algunas notificaciones por WhatsApp.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3">Resúmenes de actividad</h5>
+                                    <p class="text-muted" style="font-size: 0.9rem;">
+                                        Además de las notificaciones en tiempo real, puedes recibir un resumen con los
+                                        puntos más importantes.
+                                    </p>
+
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="resumen_diario"
+                                                name="resumen_diario"
+                                                <?= $resumenDiario ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_diario">
+                                                Resumen diario
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-2">
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="resumen_semanal"
+                                                name="resumen_semanal"
+                                                <?= $resumenSemanal ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_semanal">
+                                                Resumen semanal
+                                            </label>
+                                        </div>
+                                        <small class="text-muted d-block">
+                                            Elige solo una de las dos opciones (diario o semanal). El sistema lo validará.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    Puedes ajustar estas opciones en cualquier momento.
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar preferencias
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Disponibilidad y zona de servicio -->
                 <!-- Disponibilidad y zona de servicio -->
@@ -863,23 +1100,502 @@ $correoActual = $_SESSION['user']['email'] ?? '';
                 <div class="tab-pane fade" id="pagos" role="tabpanel" aria-labelledby="pagos-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Pagos y facturación</h2>
-                        <p class="text-muted mb-0">
-                            Aquí irá el formulario para definir tus datos bancarios, información fiscal y preferencias de
-                            liquidación de pagos.
+                        <p class="text-muted mb-4">
+                            Diligencia tus datos de facturación y la forma en que quieres recibir tus pagos. Esta información
+                            no será visible para los clientes, solo para el equipo de Proviservers.
                         </p>
+
+                        <?php
+                        $tienePagos = !empty($pagosFacturacion);
+
+                        $tipoDocumento        = $tienePagos ? ($pagosFacturacion['tipo_documento']        ?? '') : '';
+                        $numeroDocumento      = $tienePagos ? ($pagosFacturacion['numero_documento']      ?? '') : '';
+                        $razonSocial          = $tienePagos ? ($pagosFacturacion['razon_social']          ?? '') : '';
+                        $regimenFiscal        = $tienePagos ? ($pagosFacturacion['regimen_fiscal']        ?? '') : '';
+                        $direccionFacturacion = $tienePagos ? ($pagosFacturacion['direccion_facturacion'] ?? '') : '';
+                        $ciudadFacturacion    = $tienePagos ? ($pagosFacturacion['ciudad_facturacion']    ?? '') : '';
+                        $paisFacturacion      = $tienePagos ? ($pagosFacturacion['pais_facturacion']      ?? 'Colombia') : 'Colombia';
+                        $correoFacturacion    = $tienePagos ? ($pagosFacturacion['correo_facturacion']    ?? '') : '';
+                        $telefonoFacturacion  = $tienePagos ? ($pagosFacturacion['telefono_facturacion']  ?? '') : '';
+
+                        $banco                = $tienePagos ? ($pagosFacturacion['banco']                 ?? '') : '';
+                        $tipoCuenta           = $tienePagos ? ($pagosFacturacion['tipo_cuenta']           ?? '') : '';
+                        $numeroCuenta         = $tienePagos ? ($pagosFacturacion['numero_cuenta']         ?? '') : '';
+                        $titularCuenta        = $tienePagos ? ($pagosFacturacion['titular_cuenta']        ?? '') : '';
+                        $identificacionTitular = $tienePagos ? ($pagosFacturacion['identificacion_titular'] ?? '') : '';
+                        $metodoPagoPreferido  = $tienePagos ? ($pagosFacturacion['metodo_pago_preferido'] ?? '') : '';
+                        $notaMetodoPago       = $tienePagos ? ($pagosFacturacion['nota_metodo_pago']      ?? '') : '';
+
+                        $frecuenciaLiquidacion = $tienePagos ? ($pagosFacturacion['frecuencia_liquidacion'] ?? '') : '';
+                        $montoMinimoRetiro    = $tienePagos ? ($pagosFacturacion['monto_minimo_retiro']   ?? '') : '';
+                        $aceptaFacturaElectronica = $tienePagos ? !empty($pagosFacturacion['acepta_factura_electronica']) : false;
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-pagos" method="POST">
+                            <div class="row g-4">
+                                <!-- Columna izquierda: datos fiscales y de facturación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Datos fiscales / de facturación</h5>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Tipo de documento <span class="text-danger">*</span></label>
+                                            <select name="tipo_documento" class="form-select">
+                                                <option value="">Selecciona una opción</option>
+                                                <option value="CC" <?= $tipoDocumento === 'CC'  ? 'selected' : '' ?>>Cédula de ciudadanía</option>
+                                                <option value="CE" <?= $tipoDocumento === 'CE'  ? 'selected' : '' ?>>Cédula de extranjería</option>
+                                                <option value="NIT" <?= $tipoDocumento === 'NIT' ? 'selected' : '' ?>>NIT</option>
+                                                <option value="PASAPORTE" <?= $tipoDocumento === 'PASAPORTE' ? 'selected' : '' ?>>Pasaporte</option>
+                                                <option value="OTRO" <?= $tipoDocumento === 'OTRO' ? 'selected' : '' ?>>Otro</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Número de documento <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="numero_documento"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($numeroDocumento) ?>">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label">Nombre o razón social <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="razon_social"
+                                                class="form-control"
+                                                placeholder="Ej: Juan Pérez / Servicios Eléctricos S.A.S."
+                                                value="<?= htmlspecialchars($razonSocial) ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Régimen fiscal</label>
+                                            <select name="regimen_fiscal" class="form-select">
+                                                <option value="">No especificar</option>
+                                                <option value="simplificado" <?= $regimenFiscal === 'simplificado' ? 'selected' : '' ?>>Régimen simplificado</option>
+                                                <option value="comun" <?= $regimenFiscal === 'comun'        ? 'selected' : '' ?>>Régimen común</option>
+                                                <option value="auto" <?= $regimenFiscal === 'auto'         ? 'selected' : '' ?>>Autorretenedor / responsable</option>
+                                                <option value="otro" <?= $regimenFiscal === 'otro'         ? 'selected' : '' ?>>Otro</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Correo de facturación <span class="text-danger">*</span></label>
+                                            <input
+                                                type="email"
+                                                name="correo_facturacion"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($correoFacturacion) ?>">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label class="form-label">Dirección de facturación <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="direccion_facturacion"
+                                                class="form-control"
+                                                placeholder="Ej: Calle 123 #45-67"
+                                                value="<?= htmlspecialchars($direccionFacturacion) ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Ciudad de facturación <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="ciudad_facturacion"
+                                                class="form-control"
+                                                placeholder="Ej: Bogotá"
+                                                value="<?= htmlspecialchars($ciudadFacturacion) ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">País <span class="text-danger">*</span></label>
+                                            <input
+                                                type="text"
+                                                name="pais_facturacion"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($paisFacturacion) ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Teléfono de facturación</label>
+                                            <input
+                                                type="text"
+                                                name="telefono_facturacion"
+                                                class="form-control"
+                                                placeholder="Ej: +57 300 000 0000"
+                                                value="<?= htmlspecialchars($telefonoFacturacion) ?>">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: pagos y liquidación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Datos para pagos y liquidación</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Banco</label>
+                                        <input
+                                            type="text"
+                                            name="banco"
+                                            class="form-control"
+                                            placeholder="Ej: Bancolombia, Davivienda, Nequi, etc."
+                                            value="<?= htmlspecialchars($banco) ?>">
+                                    </div>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Tipo de cuenta</label>
+                                            <select name="tipo_cuenta" class="form-select">
+                                                <option value="">Selecciona una opción</option>
+                                                <option value="ahorros" <?= $tipoCuenta === 'ahorros'    ? 'selected' : '' ?>>Cuenta de ahorros</option>
+                                                <option value="corriente" <?= $tipoCuenta === 'corriente'  ? 'selected' : '' ?>>Cuenta corriente</option>
+                                                <option value="nequi" <?= $tipoCuenta === 'nequi'      ? 'selected' : '' ?>>Nequi</option>
+                                                <option value="daviplata" <?= $tipoCuenta === 'daviplata'  ? 'selected' : '' ?>>Daviplata</option>
+                                                <option value="otro" <?= $tipoCuenta === 'otro'       ? 'selected' : '' ?>>Otro</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Número de cuenta</label>
+                                            <input
+                                                type="text"
+                                                name="numero_cuenta"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($numeroCuenta) ?>">
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mt-1">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Titular de la cuenta</label>
+                                            <input
+                                                type="text"
+                                                name="titular_cuenta"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($titularCuenta) ?>">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Identificación del titular</label>
+                                            <input
+                                                type="text"
+                                                name="identificacion_titular"
+                                                class="form-control"
+                                                value="<?= htmlspecialchars($identificacionTitular) ?>">
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3 mb-3">
+                                        <label class="form-label">Método de pago preferido</label>
+                                        <select name="metodo_pago_preferido" class="form-select">
+                                            <option value="">Selecciona una opción</option>
+                                            <option value="transferencia" <?= $metodoPagoPreferido === 'transferencia' ? 'selected' : '' ?>>Transferencia bancaria</option>
+                                            <option value="billetera" <?= $metodoPagoPreferido === 'billetera'     ? 'selected' : '' ?>>Billetera digital</option>
+                                            <option value="efectivo" <?= $metodoPagoPreferido === 'efectivo'      ? 'selected' : '' ?>>Efectivo (no recomendado)</option>
+                                            <option value="otro" <?= $metodoPagoPreferido === 'otro'          ? 'selected' : '' ?>>Otro</option>
+                                        </select>
+                                        <textarea
+                                            name="nota_metodo_pago"
+                                            class="form-control mt-2"
+                                            rows="2"
+                                            placeholder="Notas adicionales sobre cómo prefieres recibir tus pagos (ej: solo Nequi, horario para confirmar pagos, etc.)"><?= htmlspecialchars($notaMetodoPago) ?></textarea>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-4">Preferencias de liquidación</h5>
+
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Frecuencia de liquidación</label>
+                                            <select name="frecuencia_liquidacion" class="form-select">
+                                                <option value="">A definir por la plataforma</option>
+                                                <option value="semanal" <?= $frecuenciaLiquidacion === 'semanal'   ? 'selected' : '' ?>>Semanal</option>
+                                                <option value="quincenal" <?= $frecuenciaLiquidacion === 'quincenal' ? 'selected' : '' ?>>Quincenal</option>
+                                                <option value="mensual" <?= $frecuenciaLiquidacion === 'mensual'   ? 'selected' : '' ?>>Mensual</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Monto mínimo de retiro</label>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                name="monto_minimo_retiro"
+                                                class="form-control"
+                                                placeholder="Ej: 50000"
+                                                value="<?= htmlspecialchars($montoMinimoRetiro) ?>">
+                                            <small class="text-muted">
+                                                Puedes dejarlo vacío si no tienes un mínimo definido.
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-check form-switch mt-3">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            id="acepta_factura_electronica"
+                                            name="acepta_factura_electronica"
+                                            <?= $aceptaFacturaElectronica ? 'checked' : '' ?>>
+                                        <label class="form-check-label" for="acepta_factura_electronica">
+                                            Acepto recibir y emitir facturación electrónica cuando aplique
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    <span class="text-danger">*</span> Algunos datos son obligatorios para poder liquidarte correctamente.
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar configuración
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Políticas de servicio -->
                 <div class="tab-pane fade" id="politicas" role="tabpanel" aria-labelledby="politicas-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Políticas de servicio</h2>
-                        <p class="text-muted mb-0">
-                            Aquí podrás definir tus políticas de cancelación, garantías, tiempos de respuesta y otras
-                            condiciones que verán tus clientes antes de contratar.
+                        <p class="text-muted mb-4">
+                            Define cómo manejas cancelaciones, reprogramaciones, garantías y condiciones generales.
+                            Estas políticas se mostrarán al cliente antes de contratarte y nos ayudan a mantener todo
+                            dentro de la plataforma.
                         </p>
+
+                        <?php
+                        $tienePoliticas = !empty($politicas);
+
+                        $tipoCancelacion        = $tienePoliticas ? ($politicas['tipo_cancelacion']        ?? 'moderada') : 'moderada';
+                        $descripcionCancelacion = $tienePoliticas ? ($politicas['descripcion_cancelacion'] ?? '') : '';
+
+                        $permiteReprogramarActual   = $tienePoliticas ? !empty($politicas['permite_reprogramar']) : true;
+                        $horasMinReprogramacionActual = $tienePoliticas ? ($politicas['horas_min_reprogramacion'] ?? '') : '';
+
+                        $cobraVisitaActual      = $tienePoliticas ? !empty($politicas['cobra_visita']) : false;
+                        $valorVisitaActual      = $tienePoliticas ? ($politicas['valor_visita'] ?? '') : '';
+
+                        $ofreceGarantiaActual   = $tienePoliticas ? !empty($politicas['ofrece_garantia']) : false;
+                        $diasGarantiaActual     = $tienePoliticas ? ($politicas['dias_garantia'] ?? '') : '';
+                        $detallesGarantiaActual = $tienePoliticas ? ($politicas['detalles_garantia'] ?? '') : '';
+
+                        // Por defecto, queremos que use la plataforma para el contacto
+                        if ($tienePoliticas) {
+                            $soloContactoPorPlataformaActual = !empty($politicas['solo_contacto_por_plataforma']);
+                        } else {
+                            $soloContactoPorPlataformaActual = true;
+                        }
+
+                        $tiempoRespuestaActual   = $tienePoliticas ? ($politicas['tiempo_respuesta_promedio'] ?? '') : '';
+                        $otrasCondicionesActual  = $tienePoliticas ? ($politicas['otras_condiciones'] ?? '') : '';
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-politicas" method="POST">
+                            <div class="row g-4">
+                                <!-- Columna izquierda: cancelaciones y reprogramación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Cancelaciones y reprogramación</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Política de cancelación <span class="text-danger">*</span></label>
+                                        <select name="tipo_cancelacion" class="form-select">
+                                            <option value="flexible" <?= $tipoCancelacion === 'flexible' ? 'selected' : '' ?>>
+                                                Flexible (se puede cancelar/reprogramar con poco tiempo de anticipación)
+                                            </option>
+                                            <option value="moderada" <?= $tipoCancelacion === 'moderada' ? 'selected' : '' ?>>
+                                                Moderada (requiere algo de anticipación)
+                                            </option>
+                                            <option value="estricta" <?= $tipoCancelacion === 'estricta' ? 'selected' : '' ?>>
+                                                Estricta (cancelaciones con mucha anticipación o con cargo)
+                                            </option>
+                                        </select>
+                                        <small class="text-muted">
+                                            Esta etiqueta se mostrará al cliente para que entienda el tipo de política que manejas.
+                                        </small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Detalle de cancelaciones</label>
+                                        <textarea
+                                            name="descripcion_cancelacion"
+                                            class="form-control"
+                                            rows="3"
+                                            placeholder="Ej: Puedes cancelar hasta 24 horas antes sin costo. Menos de 24 horas se cobra el 50% del servicio."><?= htmlspecialchars($descripcionCancelacion) ?></textarea>
+                                        <small class="text-muted">
+                                            Explica con tus palabras qué pasa si el cliente cancela tarde o no se presenta.
+                                        </small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="permite_reprogramar"
+                                                name="permite_reprogramar"
+                                                <?= $permiteReprogramarActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="permite_reprogramar">
+                                                Permito reprogramar el servicio
+                                            </label>
+                                        </div>
+                                        <div class="row g-2 mt-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Horas mínimas de anticipación</label>
+                                                <input
+                                                    type="number"
+                                                    name="horas_min_reprogramacion"
+                                                    class="form-control"
+                                                    min="0"
+                                                    placeholder="Ej: 24"
+                                                    value="<?= htmlspecialchars($horasMinReprogramacionActual) ?>">
+                                                <small class="text-muted">
+                                                    Cuántas horas antes se puede reprogramar sin problema.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-4">Contacto y tiempos de respuesta</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="solo_contacto_por_plataforma"
+                                                name="solo_contacto_por_plataforma"
+                                                <?= $soloContactoPorPlataformaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="solo_contacto_por_plataforma">
+                                                Acepto que la comunicación con el cliente sea solo por la plataforma
+                                            </label>
+                                        </div>
+                                        <small class="text-muted d-block mt-1">
+                                            Esto ayuda a que todo quede registrado y evita que el cliente se vaya por fuera
+                                            del sistema.
+                                        </small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Tiempo de respuesta promedio</label>
+                                        <input
+                                            type="text"
+                                            name="tiempo_respuesta_promedio"
+                                            class="form-control"
+                                            placeholder="Ej: Respondo normalmente en menos de 2 horas"
+                                            value="<?= htmlspecialchars($tiempoRespuestaActual) ?>">
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: garantías, visita y otras condiciones -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Visita y desplazamiento</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="cobra_visita"
+                                                name="cobra_visita"
+                                                <?= $cobraVisitaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="cobra_visita">
+                                                Cobro visita / diagnóstico aunque no se realice el servicio
+                                            </label>
+                                        </div>
+                                        <div class="row g-2 mt-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Valor de la visita</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    name="valor_visita"
+                                                    class="form-control"
+                                                    placeholder="Ej: 30000"
+                                                    value="<?= htmlspecialchars($valorVisitaActual) ?>">
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">
+                                            Si no aplicas cobro de visita, deja el valor vacío.
+                                        </small>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-4">Garantía del trabajo</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                id="ofrece_garantia"
+                                                name="ofrece_garantia"
+                                                <?= $ofreceGarantiaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="ofrece_garantia">
+                                                Ofrezco garantía sobre mi trabajo
+                                            </label>
+                                        </div>
+                                        <div class="row g-2 mt-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Días de garantía</label>
+                                                <input
+                                                    type="number"
+                                                    name="dias_garantia"
+                                                    class="form-control"
+                                                    min="1"
+                                                    placeholder="Ej: 30"
+                                                    value="<?= htmlspecialchars($diasGarantiaActual) ?>">
+                                            </div>
+                                        </div>
+                                        <textarea
+                                            name="detalles_garantia"
+                                            class="form-control mt-2"
+                                            rows="3"
+                                            placeholder="Ej: La garantía aplica solo sobre la mano de obra, no sobre repuestos."><?= htmlspecialchars($detallesGarantiaActual) ?></textarea>
+                                    </div>
+
+                                    <h5 class="mb-3 mt-4">Otras condiciones</h5>
+                                    <div class="mb-3">
+                                        <textarea
+                                            name="otras_condiciones"
+                                            class="form-control"
+                                            rows="4"
+                                            placeholder="Ej: No realizo trabajos en altura sin las condiciones de seguridad adecuadas, se requiere que haya un adulto responsable en el lugar, etc."><?= htmlspecialchars($otrasCondicionesActual) ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Acciones -->
+                            <div class="d-flex justify-content-between flex-wrap gap-2">
+                                <div class="text-muted" style="font-size: 0.9rem;">
+                                    Define políticas claras para evitar malentendidos con el cliente.
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="reset" class="btn-modern-outline">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
+                                    </button>
+                                    <button type="submit" class="btn-modern">
+                                        <i class="bi bi-save"></i> Guardar políticas
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
+
 
                 <!-- Preferencias del panel -->
                 <div class="tab-pane fade" id="preferencias" role="tabpanel" aria-labelledby="preferencias-tab">

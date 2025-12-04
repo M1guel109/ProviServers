@@ -202,6 +202,16 @@ switch ($request) {
     case '/proveedor/guardar-disponibilidad':
         require BASE_PATH . '/app/controllers/proveedorDisponibilidadController.php';
         break;
+    case '/proveedor/guardar-notificaciones':
+        require BASE_PATH . '/app/controllers/proveedorNotificacionesController.php';
+        break;
+    case '/proveedor/guardar-pagos':
+        require BASE_PATH . '/app/controllers/proveedorPagosController.php';
+        break;
+    case '/proveedor/guardar-politicas':
+        require BASE_PATH . '/app/controllers/proveedorPoliticasController.php';
+        break;
+
 
 
     case '/proveedor/nuevas_solicitudes':
