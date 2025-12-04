@@ -7,6 +7,7 @@ require_once BASE_PATH . '/app/models/ProveedorSeguridad.php';
 require_once BASE_PATH . '/app/models/ProveedorDisponibilidad.php';
 
 
+
 $idUsuario = $_SESSION['user']['id'] ?? null;
 $perfil    = [];
 
@@ -56,6 +57,7 @@ $correoActual = $_SESSION['user']['email'] ?? '';
 
     <!-- Estilos específicos del dashboard proveedor -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/configuracion-Proveedor.css">
 </head>
 
 <body>
