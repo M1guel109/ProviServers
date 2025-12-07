@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,15 +13,14 @@
 
     <!-- Estilos globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
+
     <!-- Estilos específicos de cliente -->
+    <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
 <body>
     <!-- SIDEBAR -->
-    <?php 
-    $currentPage = 'dashboard';
-    include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
-    ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
@@ -29,11 +29,11 @@
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
         <?php
-        // Nombre dinámico del cliente
+        // Si quieres usar el nombre del cliente en el saludo
         $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
         ?>
 
-        <!-- 1) INICIO -->
+        <!-- SECCIÓN: INICIO -->
         <section id="inicio">
             <div class="section-hero">
                 <h1>¡Hola <?= htmlspecialchars($nombreSaludo) ?>! 👋</h1>
@@ -107,11 +107,244 @@
                 </div>
             </div>
         </section>
+
+        <!-- SECCIÓN: EXPLORAR SERVICIOS -->
+        <section id="explorar" style="display: none;">
+            <div class="section-hero">
+                <h1>Explorar Servicios 🔍</h1>
+                <p>Descubre profesionales verificados listos para ayudarte. Más de 1000 proveedores disponibles.</p>
+            </div>
+
+            <div class="section-content">
+                <!-- Buscador adicional -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="¿Qué servicio necesitas?">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select">
+                            <option>Todas las categorías</option>
+                            <option>Jardinería</option>
+                            <option>Plomería</option>
+                            <option>Belleza</option>
+                            <option>Mascotas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" placeholder="Ubicación">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn-modern w-100">Buscar</button>
+                    </div>
+                </div>
+
+                <!-- Grid de servicios -->
+                <h2 class="mb-4">Categorías Populares</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);"></div>
+                        <div class="service-content">
+                            <h3>🌳 Jardinería</h3>
+                            <p>Mantenimiento, diseño de jardines y paisajismo profesional.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></div>
+                        <div class="service-content">
+                            <h3>🔧 Plomería</h3>
+                            <p>Reparaciones, instalaciones y mantenimiento de tuberías.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);"></div>
+                        <div class="service-content">
+                            <h3>✂️ Belleza</h3>
+                            <p>Peluquería, estética y cuidado personal a domicilio.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                        <div class="service-content">
+                            <h3>🐾 Mascotas</h3>
+                            <p>Veterinaria, grooming y cuidado de mascotas.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);"></div>
+                        <div class="service-content">
+                            <h3>⚡ Electricidad</h3>
+                            <p>Instalaciones eléctricas y reparaciones seguras.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-image" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);"></div>
+                        <div class="service-content">
+                            <h3>🏠 Limpieza</h3>
+                            <p>Limpieza profunda y mantenimiento de espacios.</p>
+                            <a href="#" class="btn-modern-outline">Ver proveedores</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: MIS SERVICIOS -->
+        <section id="mis-servicios" style="display: none;">
+            <div class="section-hero">
+                <h1>Mis Servicios 💼</h1>
+                <p>Gestiona todos tus servicios contratados y programados desde aquí.</p>
+            </div>
+
+            <div class="section-content">
+                <h2 class="mb-4">En Curso</h2>
+                <div class="services-grid">
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-primary">En Progreso</span>
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </div>
+                            <h3>Jardinería y Paisajismo</h3>
+                            <p><strong>Proveedor:</strong> Miguel Torres</p>
+                            <p><strong>Inicio:</strong> 20 Nov 2024 · <strong>Estimado:</strong> 3 días</p>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Progreso</small>
+                                    <small class="text-primary fw-bold">65%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" style="width: 65%; background: var(--primary-color);"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn-modern-outline flex-fill">Mensaje</a>
+                                <a href="#" class="btn-modern flex-fill">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge" style="background: #fef3c7; color: #92400e;">Programado</span>
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </div>
+                            <h3>Plomería y Reparaciones</h3>
+                            <p><strong>Proveedor:</strong> Carlos Ruiz</p>
+                            <p><strong>Fecha:</strong> 28 Nov 2024 · <strong>Hora:</strong> 10:00 AM</p>
+                            <div class="alert alert-info p-2 mb-3">
+                                <small><i class="bi bi-calendar3"></i> Tu cita es en 2 días</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="#" class="btn-modern-outline flex-fill">Reprogramar</a>
+                                <a href="#" class="btn-modern flex-fill">Ver Detalles</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: FAVORITOS -->
+        <section id="favoritos" style="display: none;">
+            <div class="section-hero">
+                <h1>Mis Favoritos ❤️</h1>
+                <p>Los proveedores que más te gustan, siempre a un click de distancia.</p>
+            </div>
+
+            <div class="section-content">
+                <p class="text-muted mb-4">Has guardado 8 proveedores como favoritos</p>
+                <div class="services-grid">
+                    <!-- Card ejemplo de proveedor favorito -->
+                    <div class="service-item">
+                        <div class="service-content">
+                            <div class="d-flex justify-content-between mb-3">
+                                <h3>Miguel Torres</h3>
+                                <i class="bi bi-heart-fill" style="color: #ec4899; font-size: 1.5rem;"></i>
+                            </div>
+                            <p>Jardinería y Paisajismo</p>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="text-warning">★★★★★</span>
+                                <span class="text-muted">5.0 (48 reseñas)</span>
+                            </div>
+                            <a href="#" class="btn-modern w-100">Contactar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN: PERFIL -->
+        <section id="perfil" style="display: none;">
+            <div class="section-hero">
+                <h1>Mi Perfil 👤</h1>
+                <p>Administra tu información personal y configuración de cuenta.</p>
+            </div>
+
+            <div class="section-content">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="service-item text-center">
+                            <div class="service-content">
+                                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/Foto-usuario.png"
+                                     alt="Perfil"
+                                     style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
+                                <h3><?= htmlspecialchars($nombreSaludo) ?></h3>
+                                <p class="text-muted">cliente@correo.com</p>
+                                <button class="btn-modern-outline w-100">Cambiar foto</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="service-item">
+                            <div class="service-content">
+                                <h3 class="mb-4">Información Personal</h3>
+                                <form class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Nombre completo</label>
+                                        <input type="text" class="form-control" value="<?= htmlspecialchars($nombreSaludo) ?>">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Correo electrónico</label>
+                                        <input type="email" class="form-control" value="cliente@correo.com">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Teléfono</label>
+                                        <input type="text" class="form-control" value="+57 300 000 0000">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Ubicación</label>
+                                        <input type="text" class="form-control" value="Bogotá, Colombia">
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="button" class="btn-modern">Guardar cambios</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JS propio -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+
+
 </body>
 </html>

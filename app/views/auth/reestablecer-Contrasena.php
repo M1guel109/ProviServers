@@ -29,16 +29,16 @@
                 <div class="reset-steps">
                     <h3>Proceso de recuperación:</h3>
                     <ol>
-                        <li>Ingresa tu correo electrónico registrado</li>
-                        <li>Recibirás un enlace de restablecimiento</li>
-                        <li>Sigue las instrucciones en el correo</li>
-                        <li>Crea una nueva contraseña</li>
+                        <li>Ingresa tu correo electrónico registrado.</li>
+                        <li>Haz clic en **Enviar**.</li>
+                        <li>**Recibirás tu nueva clave temporal** en ese correo electrónico.</li>
+                        <li>Usa esa clave para iniciar sesión y luego cámbiala.</li>
                     </ol>
                 </div>
 
-                <div class="success-message" id="successMessage">
+                <div class="success-message" id="successMessage" style="display: none;">
                     <i class="fas fa-check-circle"></i>
-                    ¡Enlace de restablecimiento enviado! Revisa tu correo electrónico.
+                    ¡Nueva contraseña temporal enviada! Revisa tu correo electrónico.
                 </div>
 
                 <form action="<?= BASE_URL ?>/generar-clave" id="resetPasswordForm" method="post" enctype="multipart/form-data">
@@ -47,23 +47,14 @@
                         <input type="email" name="correo" id="reset-email" placeholder="usuario@ejemplo.com" required>
                     </div>
 
-                    <!-- <div class="form-group">
-                        <label for="asunto">Asunto</label>
-                        <input type="text" name="asunto" id="asunto" placeholder="Asunto del mensaje" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="mensaje">Mensaje</label>
-                        <textarea name="mensaje" id="mensaje" placeholder="Escribe tu mensaje aquí..." required></textarea>
-                    </div> -->
-
-                    <button type="submit" class="btn-reset">Enviar enlace de restablecimiento</button>
+                    <button type="submit" class="btn-reset">Enviar</button>
                 </form>
-                
+
                 <div class="back-to-login">
                     <p><a href="<?= BASE_URL ?>/login">← Volver al inicio de sesión</a></p>
                 </div>
             </section>
+
             <section class="info-section">
                 <div class="info-card">
                     <h2>Recupera tu <br> cuenta para <br> seguir <br> conectado con <br> oportunidades</h2>
@@ -74,6 +65,10 @@
             </section>
         </div>
     </main>
+
+
+
+
 
     <footer>
         <!-- Enlaces / Información -->

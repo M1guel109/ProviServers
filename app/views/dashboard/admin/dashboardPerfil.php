@@ -324,7 +324,8 @@ $usuario = mostrarPerfilAdmin($id);
 
                                 <div class="tab-pane fade pt-3" id="profile-change-password" role="tabpanel">
                                     <!-- Formulario de Cambio de Contraseña -->
-                                    <form id="formCambioClave" action="<?= BASE_URL ?>/admin/perfil/cambiar-clave" method="POST" enctype="multipart/form-data">
+                                    <!-- 1. Agregamos el action apuntando a la ruta que crearemos -->
+                                    <form action="<?= BASE_URL ?>/admin/perfil/cambiar-clave" method="POST">
 
                                         <div class="row mb-3">
                                             <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">Contraseña Actual</label>
@@ -348,11 +349,9 @@ $usuario = mostrarPerfilAdmin($id);
                                         </div>
 
                                         <div class="text-center">
-                                            <button type="submit" name="cambiar_clave" class="btn btn-primary">Cambiar Contraseña</button>
+                                            <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
                                         </div>
                                     </form>
-                                    <!-- Fin Formulario de Cambio de Contraseña -->
-
                                 </div>
 
 

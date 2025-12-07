@@ -1,0 +1,569 @@
+/* ==================== FINANZAS - PROVISERVERS ==================== */
+/* Este archivo complementa los estilos globales de style.css */
+/* Solo incluye estilos específicos del módulo de Finanzas */
+
+/* ==================== LAYOUT PRINCIPAL ==================== */
+.contenido {
+    background-color: #F5F7FA;
+    min-height: 100vh;
+}
+
+/* ==================== SECCIÓN TÍTULO PRINCIPAL ==================== */
+#titulo-principal {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+}
+
+#titulo-principal h1 {
+    
+    font-size: var(--fs-title2);
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+#titulo-principal p {
+
+    font-size: var(--fs-text);
+    color: #6B7280;
+    margin-bottom: 12px;
+}
+
+#titulo-principal .breadcrumb {
+    font-size: var(--fs-small);
+    background: transparent;
+    padding: 0;
+}
+
+#titulo-principal .breadcrumb-item + .breadcrumb-item::before {
+    color: #9CA3AF;
+}
+
+#titulo-principal .breadcrumb-item a {
+    color: var(--primary-color);
+    /* text-decoration ya está en none en estilos globales */
+    transition: color 0.2s ease;
+}
+
+#titulo-principal .breadcrumb-item a:hover {
+    color: #0052cc;
+    text-decoration: underline;
+}
+
+titulo-principal .breadcrumb-item.active {
+    color: #6B7280;
+}
+
+/* ==================== CARDS DE RESUMEN FINANCIERO ==================== */
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.finance-card {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.finance-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    border-color: #E5E7EB;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    transition: transform 0.3s ease;
+}
+
+.finance-card:hover .card-icon {
+    transform: scale(1.1);
+}
+
+.icon-blue {
+    background-color: #EBF4FF;
+    color: var(--primary-color);
+}
+
+.icon-green {
+    background-color: #ECFDF5;
+    color: #10B981;
+}
+
+.icon-orange {
+    background-color: #FFF7ED;
+    color: #F59E0B;
+}
+
+.icon-purple {
+    background-color: #F3E8FF;
+    color: #9333EA;
+}
+
+.card-value {
+    font-family: var(--font-title);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+
+.card-label {
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
+    color: #6B7280;
+    font-weight: 500;
+    margin-bottom: 12px;
+}
+
+.card-trend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #F3F4F6;
+}
+
+.card-trend i {
+    font-size: 16px;
+}
+
+.trend-positive {
+    color: #10B981;
+}
+
+.trend-negative {
+    color: #EF4444;
+}
+/* ==================== SECCIÓN DE GRÁFICOS ==================== */
+.charts-section {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.chart-container {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #F3F4F6;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.chart-title {
+    /* Ya usa h2 de estilos globales */
+    font-family: var(--font-title);
+    font-size: var(--fs-title4);
+    font-weight: 600;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.chart-select {
+    padding: 8px 16px;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    font-family: var(--font-text);
+    font-size: var(--fs-small);
+    color: var(--dark-color);
+    cursor: pointer;
+    background-color: var(--white-color);
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.chart-select:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.chart-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.2);
+}
+
+.chart-canvas {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* ==================== SECCIÓN DE TRANSACCIONES ==================== */
+.transactions-section {
+    background: var(--white-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 32px;
+    border: 1px solid #F3F4F6;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.section-header .chart-title {
+    margin: 0;
+}
+
+/* ==================== BOTONES (Extienden los globales) ==================== */
+.btn-primary-proviservers {
+    /* Ya definido en estilos globales, solo ajustes específicos */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 102, 255, 0.2);
+}
+
+.btn-primary-proviservers:hover {
+    /* Ya definido en estilos globales */
+    box-shadow: 0 4px 8px rgba(0, 102, 255, 0.3);
+}
+
+.btn-primary-proviservers:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 102, 255, 0.2);
+}
+
+.btn-primary-proviservers i {
+    font-size: 18px;
+}
+
+/* Botones pequeños para la tabla */
+.btn-action {
+    padding: 6px 12px;
+    font-size: var(--fs-small);
+    border-radius: 6px;
+    border: 1px solid #E5E7EB;
+    background: var(--white-color);
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #F9FAFB;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-action.btn-success:hover {
+    border-color: #10B981;
+    color: #10B981;
+}
+
+.btn-action.btn-danger:hover {
+    border-color: #EF4444;
+    color: #EF4444;
+    }
+    
+
+/* ==================== TABLA DE TRANSACCIONES ==================== */
+.transactions-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-text);
+}
+
+.transactions-table thead {
+    background-color: #F9FAFB;
+    border-radius: 8px;
+}
+
+.transactions-table thead tr th:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.transactions-table thead tr th:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.transactions-table th {
+    padding: 16px;
+    text-align: left;
+    font-family: var(--font-title);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #E5E7EB;
+}
+
+.transactions-table td {
+    padding: 16px;
+    border-bottom: 1px solid #F3F4F6;
+    font-size: var(--fs-text);
+    color: var(--dark-color);
+    vertical-align: middle;
+}
+
+.transactions-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.transactions-table tbody tr:hover {
+    background-color: #F9FAFB;
+    cursor: pointer;
+}
+
+.transactions-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ==================== BADGES DE ESTADO ==================== */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    display: inline-block;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.status-completado {
+    background-color: #ECFDF5;
+    color: #10B981;
+    border: 1px solid #D1FAE5;
+}
+
+.status-pendiente {
+    background-color: #FFF7ED;
+    color: #F59E0B;
+    border: 1px solid #FED7AA;
+}
+
+.status-cancelado {
+    background-color: #FEF2F2;
+    color: #EF4444;
+    border: 1px solid #FECACA;
+}
+
+/* ==================== MONTOS ==================== */
+.amount-positive {
+    color: #10B981;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+.amount-negative {
+    color: #EF4444;
+    font-weight: 700;
+    font-family: var(--font-title);
+}
+
+/* ==================== ANIMACIONES ==================== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.finance-card,
+.chart-container,
+.transactions-section {
+    animation: fadeIn 0.5s ease-out;
+}
+
+.finance-card:nth-child(1) { animation-delay: 0.1s; }
+.finance-card:nth-child(2) { animation-delay: 0.2s; }
+.finance-card:nth-child(3) { animation-delay: 0.3s; }
+.finance-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* ==================== RESPONSIVE TABLET ==================== */
+@media screen and (min-width:768px) and (max-width:1080px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .chart-canvas {
+        height: 280px;
+    }
+}
+
+/* ==================== RESPONSIVE SMARTPHONE ==================== */
+@media screen and (min-width:320px) and (max-width:767px) {
+    /* Cards */
+    .cards-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .finance-card {
+        padding: 20px;
+    }
+
+    .card-value {
+        font-size: 28px;
+    }
+
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
+    }
+
+    /* Gráficos */
+    .charts-section {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .chart-container {
+        padding: 16px;
+    }
+
+    .chart-canvas {
+        height: 250px;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .chart-select {
+        width: 100%;
+    }
+
+    /* Título */
+    #titulo-principal h1 {
+        font-size: 24px;
+    }
+
+    #titulo-principal p {
+        font-size: var(--fs-small);
+    }
+
+    /* Tabla */
+    .transactions-section {
+        padding: 16px;
+        overflow-x: auto;
+    }
+
+    .transactions-table {
+        font-size: var(--fs-small);
+        min-width: 600px;
+    }
+
+    .transactions-table th,
+    .transactions-table td {
+        padding: 12px 8px;
+    }
+
+    .transactions-table th {
+        font-size: 12px;
+    }
+
+    /* Header de sección */
+    .section-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .btn-primary-proviservers {
+        width: 100%;
+        justify-content: center;
+        font-size: 15px;
+        padding: 10px 20px;
+    }
+
+    /* Badges más pequeños */
+    .status-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+    }
+}
+
+/* ==================== ACCESIBILIDAD ==================== */
+/* Mejora de enfoque para teclado */
+.chart-select:focus-visible,
+.btn-primary-proviservers:focus-visible,
+.transactions-table tbody tr:focus-visible {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Reducir movimiento para usuarios con preferencias de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================== IMPRESIÓN ==================== */
+@media print {
+    .btn-primary-proviservers,
+    .chart-select,
+    .btn-action {
+        display: none;
+    }
+
+    .finance-card,
+    .chart-container,
+    .transactions-section {
+        box-shadow: none;
+        border: 1px solid #E5E7EB;
+        page-break-inside: avoid;
+    }
+
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+}

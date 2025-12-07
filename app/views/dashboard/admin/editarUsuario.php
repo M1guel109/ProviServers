@@ -74,15 +74,16 @@ $usuario = mostrarUsuarioId($id);
                             <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['foto'] ?>" alt="Foto de perfil" id="foto-preview">
                         </div>
                         <label for="foto-input" class="btn-agregar-foto">Agregar foto</label>
-                        <input type="file" id="foto-input" accept="image/*" style="display: none;">
+                        <input type="file" name="foto_perfil" id="foto-input" accept="image/*" style="display: none;">
                     </div>
                 </div>
 
                 <!-- Formulario -->
-                <form action="<?= BASE_URL ?>/admin/actualizar-usuario" method="post" class="formulario-usuario">
+                <form action="<?= BASE_URL ?>/admin/actualizar-usuario" method="post" class="formulario-usuario" enctype="multipart/form-data">
                     <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
                     <input type="hidden" name="accion" value="actualizar">
 
+                    <input type="hidden" name="foto_perfil_actual" value="<?= $usuario['foto'] ?? '' ?>">
                     <div class="row g-3">
 
                         <!-- Nombre -->

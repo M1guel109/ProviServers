@@ -1,3 +1,13 @@
+<?php
+require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+
+// Cargar modelos
+require_once BASE_PATH . '/app/models/servicio.php';
+require_once BASE_PATH . '/app/models/categoria.php';
+
+$categoriaModel = new Categoria();
+$categorias = $categoriaModel->mostrar();
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -28,12 +38,12 @@
             <div>
                 <h1 class="mb-1">Registrar Servicio</h1>
                 <p class="text-muted mb-0">
-                    Registra tu nuevo servicio para que sea visible en la plataforma.
+                    Registra tu nuevo servicio para que sea visible en la plataforma bueno.
                 </p>
             </div>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol> 
+                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
             </nav>
         </section>
 
@@ -66,20 +76,16 @@
                                 placeholder="Ej: Reparación de tuberías residenciales" required maxlength="100">
                             <div class="form-text">Máximo 100 caracteres</div>
                         </div>
-                        
+
                         <div class="col-md-6">
                             <label for="id_categoria" class="form-label">Categoría *</label>
                             <select class="form-select" id="id_categoria" name="id_categoria" required>
                                 <option value="">Seleccionar categoría...</option>
-                                <option value="plomeria">Plomería</option>
-                                <option value="electricidad">Electricidad</option>
-                                <option value="pintura">Pintura</option>
-                                <option value="carpinteria">Carpintería</option>
-                                <option value="limpieza">Limpieza</option>
-                                <option value="jardineria">Jardinería</option>
-                                <option value="mecanica">Mecánica</option>
-                                <option value="tecnologia">Tecnología</option>
-                                <option value="otros">Otros</option>
+                                <?php foreach ($categorias as $categoria): ?>
+                                    <option value="<?= htmlspecialchars($categoria['id']) ?>">
+                                        <?= htmlspecialchars($categoria['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
                             </select>
                         </div>
 
@@ -89,13 +95,13 @@
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="disponibilidad" id="disponible" value="1" checked>
                                     <label class="form-check-label" for="disponible">
-                                        <i class="bi bi-check-circle-fill text-success"></i> Disponible
+                                        <i> Disponible
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="disponibilidad" id="no-disponible" value="0">
                                     <label class="form-check-label" for="no-disponible">
-                                        <i class="bi bi-x-circle-fill text-danger"></i> No disponible
+                                        <i> No disponible
                                     </label>
                                 </div>
                             </div>
@@ -125,7 +131,7 @@
                 </form>
             </div>
         </section>
-        
+
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"

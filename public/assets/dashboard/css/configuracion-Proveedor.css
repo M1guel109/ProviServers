@@ -1,0 +1,284 @@
+/* ==========================================
+   configuracion-Proveedor.css
+   Estilos específicos para /proveedor/configuracion
+   ========================================== */
+
+/* 1. Contenedor general de configuración */
+#configuracion-proveedor {
+    margin-top: 10px;
+}
+
+/* Afinar el título principal en esta vista */
+#titulo-principal {
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title2);
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+#titulo-principal p {
+    font-size: var(--fs-text);
+    color: #64748b;
+}
+
+/* ==========================================
+   2. Tabs de configuración
+   ========================================== */
+
+#configuracion-proveedor .nav-tabs {
+    border-bottom: 1px solid #e2e8f0;
+    gap: 8px;
+    padding-bottom: 4px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+/* Scrollbar sutil para navegadores WebKit */
+#configuracion-proveedor .nav-tabs::-webkit-scrollbar {
+    height: 6px;
+}
+
+#configuracion-proveedor .nav-tabs::-webkit-scrollbar-thumb {
+    background-color: rgba(148, 163, 184, 0.6);
+    border-radius: 999px;
+}
+
+#configuracion-proveedor .nav-tabs::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+#configuracion-proveedor .nav-tabs .nav-link {
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: #64748b;
+    background-color: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+#configuracion-proveedor .nav-tabs .nav-link i {
+    font-size: 1rem;
+}
+
+#configuracion-proveedor .nav-tabs .nav-link:hover {
+    background-color: #e5edff;
+    color: var(--primary-color);
+}
+
+#configuracion-proveedor .nav-tabs .nav-link.active {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0052cc 100%);
+    color: var(--white-color);
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+}
+
+/* ==========================================
+   3. Contenido de tabs / tarjetas
+   ========================================== */
+
+#configuracion-proveedor .tab-content {
+    margin-top: 24px;
+}
+
+#configuracion-proveedor .tarjeta {
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    background-color: var(--white-color);
+    box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+}
+
+#configuracion-proveedor .tarjeta h2 {
+    font-size: var(--fs-title3);
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark-color);
+}
+
+#configuracion-proveedor .tarjeta p.text-muted {
+    font-size: var(--fs-small);
+}
+
+/* ==========================================
+   4. Formulario: Perfil profesional
+   ========================================== */
+
+#configuracion-proveedor h5 {
+    font-size: var(--fs-title4);
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+/* Inputs configurados solo dentro de configuración */
+#configuracion-proveedor .form-label {
+    font-family: var(--font-text);
+    font-size: var(--fs-text);
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 6px;
+}
+
+#configuracion-proveedor .form-control,
+#configuracion-proveedor .form-select {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: var(--fs-text);
+    font-family: var(--font-text);
+    color: var(--dark-color);
+    background-color: var(--white-color);
+    transition: all 0.2s ease;
+}
+
+#configuracion-proveedor .form-control::placeholder {
+    color: #94a3b8;
+}
+
+#configuracion-proveedor .form-control:focus,
+#configuracion-proveedor .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+    outline: none;
+}
+
+/* Textarea */
+#configuracion-proveedor textarea.form-control {
+    min-height: 140px;
+    resize: vertical;
+}
+
+/* Select múltiples (idiomas, categorías) */
+#configuracion-proveedor select[multiple] {
+    min-height: 120px;
+}
+
+/* Hints / textos pequeños bajo campos */
+#configuracion-proveedor small.text-muted {
+    font-size: 0.8rem;
+}
+
+/* Columna derecha: foto / logotipo */
+#configuracion-proveedor .d-flex.flex-column.align-items-center img {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+/* Campo file más limpio */
+#configuracion-proveedor input[type="file"].form-control {
+    padding: 8px 10px;
+    font-size: var(--fs-small);
+}
+
+/* ==========================================
+   5. Botones de acción (ya los usas en la vista)
+   ========================================== */
+
+.btn-modern {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    font-family: var(--font-text);
+    font-size: var(--fs-text);
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-modern:hover {
+    background-color: #0052cc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.25);
+    color: var(--white-color);
+}
+
+.btn-modern-outline {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+    font-family: var(--font-text);
+    font-size: var(--fs-text);
+    font-weight: 600;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 10px 22px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-modern-outline:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.18);
+}
+
+/* ==========================================
+   6. Microajustes de layout
+   ========================================== */
+
+#configuracion-proveedor .row.g-4 > [class*="col-"] {
+    /* Un poco de separación vertical */
+    margin-bottom: 4px;
+}
+
+/* Separador inferior antes de acciones */
+#configuracion-proveedor hr.my-4 {
+    border-color: #e2e8f0;
+}
+
+/* Texto "Campos obligatorios" */
+#configuracion-proveedor .text-muted span.text-danger {
+    font-weight: 700;
+}
+
+/* ==========================================
+   7. Responsive
+   ========================================== */
+
+@media screen and (max-width: 991px) {
+    #configuracion-proveedor .row.g-4 {
+        row-gap: 20px;
+    }
+
+    #configuracion-proveedor .col-lg-8,
+    #configuracion-proveedor .col-lg-4 {
+        margin-bottom: 10px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    #configuracion-proveedor .nav-tabs {
+        padding-bottom: 6px;
+    }
+
+    #configuracion-proveedor .nav-tabs .nav-link {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+
+    #configuracion-proveedor .tarjeta {
+        padding: 20px !important;
+    }
+}
