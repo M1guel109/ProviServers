@@ -124,7 +124,7 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: var(--fs-text);
+    font-size: var(--fs-small);
     font-weight: 500;
     color: var(--dark-color);
 }
@@ -240,7 +240,7 @@ body {
     background-color: #f8fafc;
     border-radius: 30px;
     padding: 10px 20px;
-    width: 400px;
+    width: 380px;
     border: 1px solid #e2e8f0;
     transition: all 0.25s ease;
 }
@@ -315,8 +315,8 @@ body {
 }
 
 .usuario img {
-    width: 40px;
-    height: 40px;
+    width: 37px;
+    height: 37px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e2e8f0;
@@ -351,7 +351,7 @@ body {
 }
 
 .section-hero h1 {
-    font-size: var(--fs-title2);
+    font-size: var(--fs-title3);
     font-weight: 700;
     margin-bottom: 12px;
     font-family: var(--font-title);
@@ -426,21 +426,20 @@ body {
 /* Estados visuales */
 .estado-curso {
   border-left: 6px solid #6c757d; /* gris */
-  background-color: #f8f9fa;}
+}
 
 .estado-programado {
   border-left: 6px solid #ffc107; /* amarillo */
-  background-color: #fffbea;
 }
 
 .estado-completado {
   border-left: 6px solid #28a745; /* verde */
-  background-color: #e9f7ef;}
+}
 
 .estado-cancelado {
   border-left: 6px solid #dc3545; /* rojo */
-  background-color: #fdecea;
 }
+
 
 /* Badges */
 .badge {
@@ -464,6 +463,144 @@ body {
   font-size: 0.85rem;
 }
 
+
+/* Sección Favoritos */
+#favoritos {
+  background-color: #f8f9fa;
+}
+
+.img-servicio {
+  height: 180px;   /* o 200px según tu diseño */
+  width: 100%;
+  object-fit: cover;
+}
+
+.card-body h5 {
+  font-size: 1.1rem;
+}
+
+.btn-fav {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  color: #dc3545;
+  transition: transform 0.2s ease;
+}
+
+.btn-fav:hover {
+  transform: scale(1.1);
+  background-color: #fff;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Historial de Servicios */
+#historial-servicios {
+background-color: #f8f9fa;
+}
+
+#historial-servicios .section-hero {
+border-top: 4px solid #0d6efd;
+padding-top: 1rem;
+}
+
+.service-item {
+transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-item:hover {
+transform: translateY(-2px);
+box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.service-item h5 {
+color: #212529;
+}
+
+.service-item .badge {
+font-size: 0.75rem;
+padding: 4px 8px;
+border-radius: 6px;
+}
+
+
+/* Perfil */
+#perfil {
+  background-color: #f8f9fa;
+}
+
+#perfil .section-hero,
+#titulo-principal {
+  border-top: 4px solid #0d6efd;
+  padding-top: 1rem;
+}
+
+.profile-card img {
+  border: 3px solid #dee2e6;
+  transition: transform 0.2s ease;
+}
+
+.profile-card img:hover {
+  transform: scale(1.05);
+}
+
+.profile-card h2 {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.profile-card h3 {
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+.nav-tabs-bordered .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  color: #495057;
+}
+
+.nav-tabs-bordered .nav-link.active {
+  color: #0d6efd;
+  border-bottom: 2px solid #0d6efd;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.form-label i {
+  margin-right: 6px;
+}
+
+.btn-primary {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  border-radius: 6px;
+  font-weight: 500;
+}
 
 
 /* ========================================
@@ -492,13 +629,13 @@ body {
 }
 
 .stat-visual-item i {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--primary-color);
     margin-bottom: 15px;
 }
 
 .stat-visual-item h3 {
-    font-size: var(--fs-title1);
+    font-size: var(--fs-title2);
     font-weight: 700;
     color: var(--dark-color);
     margin-bottom: 8px;
@@ -512,14 +649,102 @@ body {
     font-weight: 500;
 }
 
+/* ====== Sección de Ayuda ====== */
+.section-servicios {
+  padding: 60px 0;
+  background-color: #f9fafb;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: var(--fs-title1);
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.section-block {
+  margin-bottom: 40px;
+}
+
+.block-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--dark-color);
+}
+
+/* ====== Contacto rápido ====== */
+.contact-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 20px 0;
+}
+
+.contact-item {
+  font-size: 1rem;
+  color: #2c3e50;
+  white-space: nowrap;
+}
+
+.contact-item i {
+  margin-right: 6px;
+  color: #0d6efd;
+}
+
+.section-block .btn {
+  display: inline-block;
+  margin: 15px auto 0;
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
+.section-block .btn:hover {
+  background-color: #084298;
+}
+
+/* ====== Acordeón de FAQ ====== */
+.accordion-button {
+  font-weight: 500;
+  color: #2c3e50;
+  background-color: #ffffff;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e9f2ff;
+  color: #0d6efd;
+}
+
+.accordion-body {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+
 /* ========================================
    BOTONES
    ======================================== */
 .btn-modern {
     background-color: var(--primary-color);
     color: var(--white-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
+    font-family: var(--font-small);
+    font-size: var(--fs-small);
     font-weight: 600;
     border: none;
     border-radius: 8px;
@@ -547,8 +772,8 @@ body {
 .btn-modern-outline {
     background-color: var(--white-color);
     color: var(--primary-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
+    font-family: var(--font-small);
+    font-size: var(--fs-small);
     font-weight: 600;
     border: 2px solid var(--primary-color);
     border-radius: 8px;
@@ -606,7 +831,7 @@ body {
 .modern-list-item h5 {
     font-family: var(--font-title);
     font-weight: 600;
-    font-size: var(--fs-title4);
+    font-size: var(--fs-text);
     margin-bottom: 5px;
     color: var(--dark-color);
 }

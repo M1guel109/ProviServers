@@ -23,41 +23,53 @@
     ?>
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-    <section id="mensajes">
-        <div class="section-hero">
-        <h1>Mensajes 📩</h1>
-        <p>Comunícate directamente con tus proveedores. Revisa tus conversaciones y responde cuando lo necesites.</p>
-        </div>
 
-        <div class="section-content">
-        <div class="messages-list">
-            <!-- Ejemplo de conversación -->
-            <div class="message-item">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="mb-0">Miguel Torres</h5>
+    <!-- HEADER -->
+    <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
+
+        <section id="mensajes">
+        <div class="container">
+            <div class="section-hero mb-4">
+            <p class="breadcrumb">Inicio > Mensajes</p>
+            <h1><i class="bi text-primary"></i>Mensajes</h1>
+            <p>Comunícate directamente con tus proveedores. Revisa tus conversaciones y responde cuando lo necesites.</p>
+            </div>
+
+            <div class="messages-list">
+            <!-- Conversación 1 -->
+            <div class="card message-item mb-4 shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-semibold mb-0">Prov. Miguel Torres</h5>
                 <small class="text-muted">Hace 2 horas</small>
-            </div>
-            <p class="text-muted">Hola Karen, ya estoy en camino para el servicio de jardinería.</p>
-            <div class="d-flex gap-2 mt-2">
-                <button class="btn-modern-outline btn-sm">Responder</button>
-                <button class="btn-modern-outline btn-sm">Ver perfil</button>
+                </div>
+                <p class="text-muted mb-2">Hola Karen, ya estoy en camino para el servicio de jardinería.</p>
+                <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm">Responder</button>
+                <button class="btn btn-outline-secondary btn-sm">Ver perfil</button>
+                </div>
             </div>
             </div>
 
-            <div class="message-item">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <h5 class="mb-0">Carlos Ruiz</h5>
+            <!-- Conversación 2 -->
+            <div class="card message-item mb-4 shadow-sm border-0 rounded-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="fw-semibold mb-0">Prov. Carlos Ruiz</h5>
                 <small class="text-muted">Ayer</small>
+                </div>
+                <p class="text-muted mb-2">Confirmo la cita de plomería para el jueves a las 10 AM.</p>
+                <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm">Responder</button>
+                <button class="btn btn-outline-secondary btn-sm">Ver perfil</button>
+                </div>
             </div>
-            <p class="text-muted">Confirmo la cita de plomería para el jueves a las 10 AM.</p>
-            <div class="d-flex gap-2 mt-2">
-                <button class="btn-modern-outline btn-sm">Responder</button>
-                <button class="btn-modern-outline btn-sm">Ver perfil</button>
             </div>
+
             </div>
         </div>
-        </div>
-    </section>
+        </section>
+
     </main>
 
 

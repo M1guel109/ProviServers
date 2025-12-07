@@ -29,10 +29,9 @@
     <!-- HEADER -->
     <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
-    <section id="servicios-contratados">
       <div class="section-hero mb-4">
         <p class="breadcrumb">Inicio > Servicios Contratados</p>
-        <h1><i class="bi bi-briefcase-fill me-2 text-primary"></i>Servicios Contratados</h1>
+        <h1><i class=" bi text-primary"></i>Servicios Contratados</h1>
         <p>Gestiona todos tus servicios contratados y programados desde aquí.</p>
       </div>
 
