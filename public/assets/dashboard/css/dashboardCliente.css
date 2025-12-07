@@ -537,6 +537,72 @@ border-radius: 6px;
 }
 
 
+/* Perfil */
+#perfil {
+  background-color: #f8f9fa;
+}
+
+#perfil .section-hero,
+#titulo-principal {
+  border-top: 4px solid #0d6efd;
+  padding-top: 1rem;
+}
+
+.profile-card img {
+  border: 3px solid #dee2e6;
+  transition: transform 0.2s ease;
+}
+
+.profile-card img:hover {
+  transform: scale(1.05);
+}
+
+.profile-card h2 {
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.profile-card h3 {
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+.nav-tabs-bordered .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-weight: 500;
+  color: #495057;
+}
+
+.nav-tabs-bordered .nav-link.active {
+  color: #0d6efd;
+  border-bottom: 2px solid #0d6efd;
+}
+
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.form-label i {
+  margin-right: 6px;
+}
+
+.btn-primary {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+
 /* ========================================
    ESTADÍSTICAS VISUALES
    ======================================== */

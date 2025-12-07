@@ -88,6 +88,42 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  // Cambiar foto de perfil (demo)
+  const changePhotoBtn = document.querySelector(".profile-card .btn-outline-primary");
+  if (changePhotoBtn) {
+    changePhotoBtn.addEventListener("click", () => {
+      alert("Función de cambiar foto en construcción...");
+    });
+  }
+
+  // Guardar cambios en perfil
+  const editForm = document.querySelector("#profile-edit form");
+  if (editForm) {
+    editForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Cambios de perfil guardados (demo). Aquí conectarías con tu backend.");
+    });
+  }
+
+  // Guardar configuración
+  const settingsForm = document.querySelector("#profile-settings form");
+  if (settingsForm) {
+    settingsForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Configuración guardada (demo).");
+    });
+  }
+
+  // Cambiar contraseña
+  const passwordForm = document.querySelector("#profile-change-password form");
+  if (passwordForm) {
+    passwordForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      alert("Contraseña actualizada (demo).");
+    });
+  }
+});
 
 
 

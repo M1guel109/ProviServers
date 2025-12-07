@@ -58,7 +58,7 @@ $usuarioC = [
                 </li>
 
                 <li>
-                    <a class="dropdown-item d-flex align-items-center" href="#perfil">
+                    <a class="dropdown-item d-flex align-items-center" href="<?= BASE_URL ?>/cliente/perfil">
                         <i class="bi bi-person"></i>
                         <span>Mi Perfil</span>
                     </a>
