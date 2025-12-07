@@ -153,6 +153,13 @@ switch ($request) {
     case '/cliente/perfil':
         require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
         break;
+    case '/cliente/ayuda':
+        require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
+        break;
+
+
+
+
 
     default:
         http_response_code(404);

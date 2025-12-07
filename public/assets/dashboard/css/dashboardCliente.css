@@ -649,6 +649,94 @@ border-radius: 6px;
     font-weight: 500;
 }
 
+/* ====== Sección de Ayuda ====== */
+.section-servicios {
+  padding: 60px 0;
+  background-color: #f9fafb;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: var(--fs-title1);
+  font-weight: 700;
+  color: var(--dark-color);
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: #6c757d;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.section-block {
+  margin-bottom: 40px;
+}
+
+.block-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--dark-color);
+}
+
+/* ====== Contacto rápido ====== */
+.contact-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 20px 0;
+}
+
+.contact-item {
+  font-size: 1rem;
+  color: #2c3e50;
+  white-space: nowrap;
+}
+
+.contact-item i {
+  margin-right: 6px;
+  color: #0d6efd;
+}
+
+.section-block .btn {
+  display: inline-block;
+  margin: 15px auto 0;
+  background-color: #0d6efd;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
+.section-block .btn:hover {
+  background-color: #084298;
+}
+
+/* ====== Acordeón de FAQ ====== */
+.accordion-button {
+  font-weight: 500;
+  color: #2c3e50;
+  background-color: #ffffff;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e9f2ff;
+  color: #0d6efd;
+}
+
+.accordion-body {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+
 /* ========================================
    BOTONES
    ======================================== */
