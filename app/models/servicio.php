@@ -36,7 +36,7 @@ class Servicio
             $stmt->bindParam(':descripcion',   $data['descripcion']);
             $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
             $stmt->bindParam(':imagen',        $data['imagen']);
-            $stmt->bindParam(':disponibilidad',$data['disponibilidad'], PDO::PARAM_INT);
+            $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
 
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -107,7 +107,7 @@ class Servicio
             $stmt->bindParam(':nombre',        $data['nombre']);
             $stmt->bindParam(':descripcion',   $data['descripcion']);
             $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
-            $stmt->bindParam(':disponibilidad',$data['disponibilidad'], PDO::PARAM_INT);
+            $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
 
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -131,5 +131,9 @@ class Servicio
             error_log("Error en Servicio::eliminar -> " . $e->getMessage());
             return false;
         }
+    }
+    public function getUltimoIdInsertado(): int
+    {
+        return (int) $this->conexion->lastInsertId();
     }
 }
