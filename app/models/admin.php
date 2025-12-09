@@ -74,23 +74,31 @@ class Usuario
         try {
             // VARIABLE QUE ALMAECENA LA SENTENCIA DE SQL A EJECUTAR
             $consultar = "SELECT 
-                    u.id, u.email, u.documento, u.rol, u.estado, u.created_at,
-                    CASE u.estado WHEN 1 THEN 'Activo' ELSE 'Inactivo' END AS estado,
-                    -- COALESCE selecciona el primer valor NO NULO para cada campo
-                    COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
-                    COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
-                    COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
-                    COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
-                    COALESCE(c.foto, p.foto, a.foto) AS foto
-                FROM usuarios u
-                -- JOIN a Clientes (solo si u.rol es 'cliente')
-                LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
-                -- JOIN a Proveedores (solo si u.rol es 'proveedor')
-                LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
-                -- JOIN a Admins (solo si u.rol es 'admin')
-                LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
-                ORDER BY u.created_at DESC
-            ";
+                        u.id,
+                        u.email,
+                        u.documento,
+                        u.rol,
+                        u.estado_id,
+                        e.nombre AS estado,
+                        u.created_at,
+
+                        -- Datos del detalle según el rol
+                        COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
+                        COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
+                        COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
+                        COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
+                        COALESCE(c.foto, p.foto, a.foto) AS foto
+
+                    FROM usuarios u
+                    LEFT JOIN usuario_estados e ON e.id = u.estado_id
+
+                    LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
+                    LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
+                    LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
+
+                    ORDER BY u.created_at DESC
+                ";
+
 
             // PREPARAR LO NECESARIO PARA EJECUTAR LA FUNCION 
             $resultado = $this->conexion->prepare($consultar);
