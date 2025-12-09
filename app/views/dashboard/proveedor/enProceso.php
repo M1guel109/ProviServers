@@ -18,10 +18,12 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <!-- CSS específico para en proceso -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/enProcesos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+
 </head>
 
 <body>
-    <!-- SIDEBAR (lateral izquierdo) -->
+      <!-- SIDEBAR (lateral izquierdo) -->
     <?php
     include_once __DIR__ . '/../../layouts/sidebar_proveedor.php';
     ?>

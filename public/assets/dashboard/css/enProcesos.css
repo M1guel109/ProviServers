@@ -1,413 +1,372 @@
 /* ============================================================
-   enProcesos.css - Estilos específicos para Servicios en Proceso
-   Estructura basada en el estilo general del dashboard
-   Proyecto: Proviservers
+   enProcesos.css - Estilos SOLO para Servicios en Proceso
+   NO incluye sidebar ni header (están en style.css global)
 =============================================================== */
 
-/* 1. Tipografías */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-
-/* 2. Iconos */
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
-
-/* 3. Variables */
-:root {
-    --primary-color: #0066FF;
-    --dark-color: #0E1116;
-    --white-color: #FFFFFF;
-    --gray-light: #f3f4f6;
-    --gray-medium: #e5e7eb;
-    --gray-dark: #64748b;
-
-    --font-title: 'Roboto', sans-serif;
-    --font-text: 'Poppins', sans-serif;
-
-    --fs-title1: 32px;
-    --fs-title2: 24px;
-    --fs-title3: 20px;
-    --fs-text: 16px;
-    --fs-small: 14px;
-}
-
 /* ============================================================
-   4. SIDEBAR COMPLETO
-=============================================================== */
-
-.sidebar {
-    width: 260px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    background: #FFFFFF;
-    border-right: 1px solid var(--gray-medium);
-    padding: 20px 15px;
-    overflow-y: auto;
-    z-index: 1000;
-}
-
-.sidebar ul,
-.sidebar li,
-.sidebar a {
-    list-style: none;
-    text-decoration: none;
-    color: var(--dark-color);
-    font-family: var(--font-text);
-    font-size: 15px;
-}
-
-.sidebar .logo {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.sidebar .logo img {
-    display: block;
-    margin: 0 auto;
-}
-
-.sidebar .logo-completo {
-    width: 160px;
-    height: auto;
-}
-
-.sidebar .logo-favicon {
-    width: 55px;
-    height: auto;
-    display: none;
-}
-
-/* Submenús */
-.menu-principal .has-submenu {
-    position: relative;
-}
-
-.menu-principal .toggle-submenu {
-    background: none;
-    border: none;
-    cursor: pointer;
-    position: absolute;
-    top: 12px;
-    right: 5px;
-    font-size: 16px;
-    color: var(--gray-dark);
-}
-
-.submenu {
-    margin-top: 8px;
-    margin-left: 10px;
-    display: none;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.has-submenu.open .submenu {
-    display: flex;
-}
-
-.submenu-link {
-    font-size: 14px;
-    color: #4b5563;
-}
-
-/* Contenido principal */
-main,
-.contenido,
-.main-content,
-#content,
-.wrapper,
-.page-content {
-    margin-left: 260px !important;
-    padding: 25px;
-    min-height: 100vh;
-    background: #f9fafb;
-}
-
-/* Responsive sidebar */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 200px;
-    }
-
-    main,
-    .contenido,
-    .main-content,
-    #content {
-        margin-left: 200px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .sidebar {
-        position: absolute;
-        left: -260px;
-        transition: .3s;
-    }
-
-    .sidebar.open {
-        left: 0;
-    }
-
-    main,
-    .contenido,
-    .main-content,
-    #content {
-        margin-left: 0 !important;
-    }
-}
-
-/* ============================================================
-   5. Título Principal
+   1. Título Principal
 =============================================================== */
 
 #titulo-principal {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 #titulo-principal h1 {
-    font-size: var(--fs-title1);
-    font-family: var(--font-title);
+    font-size: var(--fs-title1, 32px);
+    font-family: var(--font-title, 'Roboto', sans-serif);
     font-weight: 700;
-    color: var(--dark-color);
+    color: var(--dark-color, #0E1116);
+    margin-bottom: 8px;
 }
 
-#titulo-principal .subtitulo {
-    font-size: var(--fs-text);
-    font-family: var(--font-text);
-    color: var(--gray-dark);
-    margin-top: 4px;
+.subtitulo {
+    font-size: var(--fs-text, 16px);
+    font-family: var(--font-text, 'Poppins', sans-serif);
+    color: #64748b;
+    margin-top: 8px;
+    font-weight: 400;
+    line-height: 1.5;
 }
 
 /* ============================================================
-   6. Estadísticas rápidas
+   2. Estadísticas Rápidas
 =============================================================== */
 
 #estadisticas-proceso {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 22px;
-    margin-bottom: 35px;
+    gap: 25px;
+    margin-bottom: 40px;
 }
 
 .tarjeta-stat {
-    background-color: var(--white-color);
-    padding: 22px;
+    background-color: #FFFFFF;
+    padding: 25px 20px;
     border-radius: 14px;
     display: flex;
     align-items: center;
     gap: 18px;
-    border: 1px solid var(--gray-medium);
+    border: 1px solid #e2e8f0;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    min-height: 120px;
+}
+
+.tarjeta-stat:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 102, 255, 0.15);
 }
 
 .icono-stat {
-    font-size: 30px;
-    color: var(--primary-color);
+    font-size: 36px;
+    color: var(--primary-color, #0066FF);
+    background-color: rgba(0, 102, 255, 0.1);
+    padding: 16px;
+    border-radius: 12px;
+    flex-shrink: 0;
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
+    gap: 4px;
 }
 
 .stat-numero {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 700;
-    font-family: var(--font-title);
+    font-family: var(--font-title, 'Roboto', sans-serif);
+    color: var(--dark-color, #0E1116);
+    line-height: 1;
 }
 
 .stat-label {
-    font-size: var(--fs-small);
-    color: var(--gray-dark);
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
 }
 
 /* ============================================================
-   7. Filtros
+   3. Filtros
 =============================================================== */
 
 #filtros-proceso {
-    background: var(--white-color);
-    padding: 20px 25px;
+    background: #FFFFFF;
+    padding: 28px;
     border-radius: 14px;
-    margin-bottom: 35px;
-    border: 1px solid var(--gray-medium);
+    margin-bottom: 40px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
 }
 
 .contenedor-filtros {
-    display: flex;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr;
+    gap: 24px;
+    align-items: end;
 }
 
 .grupo-filtro {
     display: flex;
     flex-direction: column;
-    flex: 1;
+    gap: 8px;
 }
 
 .grupo-filtro label {
-    font-size: var(--fs-small);
-    color: var(--gray-dark);
-    margin-bottom: 6px;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+    margin-bottom: 4px;
 }
 
 .grupo-filtro select,
 .grupo-filtro input {
-    padding: 10px 12px;
+    padding: 12px 16px;
     border-radius: 10px;
-    border: 1px solid var(--gray-medium);
-    font-size: var(--fs-text);
-    font-family: var(--font-text);
+    border: 1px solid #e2e8f0;
+    font-size: 15px;
+    font-family: var(--font-text, 'Poppins', sans-serif);
     outline: none;
-    transition: all .25s ease;
+    transition: all 0.25s ease;
+    background-color: #f8fafc;
 }
 
 .grupo-filtro select:focus,
 .grupo-filtro input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.15);
+    border-color: var(--primary-color, #0066FF);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: #FFFFFF;
+}
+
+.grupo-filtro input::placeholder {
+    color: #94a3b8;
 }
 
 /* ============================================================
-   8. Lista de servicios
+   4. Lista de Servicios en Proceso
 =============================================================== */
 
 #lista-procesos {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 30px;
+    margin-bottom: 50px;
 }
 
-/* Tarjeta */
+/* ============================================================
+   5. Tarjeta de Proceso Individual
+=============================================================== */
+
 .tarjeta-proceso {
-    background-color: var(--white-color);
+    background-color: #FFFFFF;
     border-radius: 16px;
-    padding: 25px;
-    border: 1px solid var(--gray-medium);
+    padding: 32px;
+    border: 1px solid #e2e8f0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
 }
 
-/* Encabezado */
+.tarjeta-proceso:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================================================
+   6. Header del Proceso
+=============================================================== */
+
 .proceso-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 18px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #f1f5f9;
+    gap: 20px;
+}
+
+.proceso-info-principal {
+    flex: 1;
 }
 
 .proceso-titulo {
-    font-size: var(--fs-title3);
-    font-family: var(--font-title);
-    margin-bottom: 4px;
+    font-size: 22px;
+    font-family: var(--font-title, 'Roboto', sans-serif);
+    font-weight: 600;
+    color: var(--dark-color, #0E1116);
+    margin-bottom: 12px;
+    line-height: 1.3;
 }
 
 .proceso-meta {
     display: flex;
-    gap: 15px;
-    margin-top: 4px;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 10px;
 }
 
-/* Categorías */
+/* Badges de Categoría */
 .badge-categoria {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: var(--fs-small);
-    color: var(--white-color);
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #FFFFFF;
     font-weight: 600;
+}
+
+.badge-categoria i {
+    font-size: 14px;
 }
 
 .electricidad { background-color: #f59e0b; }
 .limpieza { background-color: #0ea5e9; }
 .plomeria { background-color: #10b981; }
 .pintura { background-color: #a855f7; }
+.jardineria { background-color: #22c55e; }
 
-/* Prioridad */
-.badge-prioridad {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: var(--fs-small);
-    font-weight: 600;
-    color: var(--white-color);
+/* Fecha */
+.proceso-fecha {
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
 }
 
-.alta { background-color: #ef4444; }
-.media { background-color: #f59e0b; }
-.baja { background-color: #22c55e; }
+.proceso-fecha i {
+    font-size: 14px;
+}
+
+/* Badges de Prioridad */
+.badge-prioridad {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.alta {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+.media {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.baja {
+    background-color: #dbeafe;
+    color: #2563eb;
+}
 
 /* ============================================================
-   9. Información del cliente
+   7. Información del Cliente
 =============================================================== */
 
 .proceso-cliente {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 0;
+    gap: 16px;
+    padding: 18px;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 28px;
 }
 
 .cliente-avatar {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color, #0066FF);
+    flex-shrink: 0;
 }
 
 .cliente-info {
-    display: flex;
-    flex-direction: column;
+    flex: 1;
 }
 
 .cliente-nombre {
+    font-size: 16px;
     font-weight: 600;
-    font-size: var(--fs-text);
+    color: var(--dark-color, #0E1116);
+    margin-bottom: 6px;
+    line-height: 1.4;
 }
 
 .cliente-contacto {
-    color: var(--gray-dark);
-    font-size: var(--fs-small);
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.cliente-contacto i {
+    font-size: 14px;
+    color: var(--primary-color, #0066FF);
 }
 
 /* ============================================================
-   10. Progreso del servicio
+   8. Progreso del Servicio
 =============================================================== */
 
 .proceso-progreso {
-    margin-top: 10px;
+    margin-bottom: 28px;
 }
 
 .progreso-header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    align-items: center;
+    margin-bottom: 12px;
 }
 
 .progreso-label {
-    color: var(--gray-dark);
-    font-size: var(--fs-small);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dark-color, #0E1116);
+    font-family: var(--font-title, 'Roboto', sans-serif);
 }
 
 .progreso-porcentaje {
-    font-size: var(--fs-text);
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary-color, #0066FF);
+    font-family: var(--font-title, 'Roboto', sans-serif);
 }
 
-/* Barra de progreso */
+/* Barra de Progreso */
 .barra-progreso {
-    background: var(--gray-light);
-    height: 10px;
-    border-radius: 6px;
-    margin-bottom: 10px;
+    width: 100%;
+    height: 14px;
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .barra-progreso-fill {
     height: 100%;
-    background-color: var(--primary-color);
-    border-radius: 6px;
-    transition: width .5s ease;
+    background: linear-gradient(90deg, #0066FF, #60a5fa);
+    border-radius: 10px;
+    transition: width 0.6s ease;
 }
 
-/* Etapas */
+/* Etapas del Proceso */
 .proceso-etapas {
     display: flex;
     gap: 12px;
@@ -415,82 +374,275 @@ main,
 }
 
 .etapa {
-    font-size: var(--fs-small);
-    padding: 6px 10px;
-    border-radius: 8px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    border: 2px solid transparent;
 }
 
-.completada { background-color: #d1fae5; color: #047857; }
-.activa { background-color: #dbeafe; color: #1e40af; }
-.pendiente { background-color: #f3f4f6; color: #374151; }
+.etapa i {
+    font-size: 14px;
+}
+
+.etapa.completada {
+    background-color: #d1fae5;
+    color: #065f46;
+    border-color: #10b981;
+}
+
+.etapa.activa {
+    background-color: #dbeafe;
+    color: #1e40af;
+    font-weight: 700;
+    border-color: var(--primary-color, #0066FF);
+    animation: pulse 2s infinite;
+}
+
+.etapa.pendiente {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border-color: #cbd5e1;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(0, 102, 255, 0);
+    }
+}
 
 /* ============================================================
-   11. Acciones (botones)
+   9. Acciones (Botones)
 =============================================================== */
 
 .proceso-acciones {
     display: flex;
     gap: 14px;
-    margin-top: 18px;
+    flex-wrap: wrap;
+    padding-top: 24px;
+    border-top: 2px solid #f1f5f9;
 }
 
 .btn-accion {
-    padding: 10px 18px;
-    font-size: var(--fs-small);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border: 2px solid transparent;
     border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    transition: all .25s ease;
+    font-size: 15px;
     font-weight: 600;
+    font-family: var(--font-text, 'Poppins', sans-serif);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 180px;
+}
+
+.btn-accion i {
+    font-size: 16px;
 }
 
 .btn-actualizar {
-    background-color: #e0e7ff;
-    color: #3730a3;
+    background-color: #eff6ff;
+    color: #1e40af;
+    border-color: #bfdbfe;
 }
+
 .btn-actualizar:hover {
-    background-color: #c7d2fe;
+    background-color: #1e40af;
+    color: #FFFFFF;
+    border-color: #1e40af;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
 }
 
 .btn-contactar {
-    background-color: #cffafe;
-    color: #0e7490;
+    background-color: #f0fdf4;
+    color: #15803d;
+    border-color: #bbf7d0;
 }
+
 .btn-contactar:hover {
-    background-color: #a5f3fc;
+    background-color: #15803d;
+    color: #FFFFFF;
+    border-color: #15803d;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(21, 128, 61, 0.3);
 }
 
 .btn-completar {
-    background-color: #dcfce7;
-    color: #166534;
+    background-color: var(--primary-color, #0066FF);
+    color: #FFFFFF;
+    border-color: var(--primary-color, #0066FF);
 }
+
 .btn-completar:hover {
-    background-color: #bbf7d0;
+    background-color: #0052cc;
+    border-color: #0052cc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 102, 255, 0.4);
 }
 
 /* ============================================================
-   12. Responsivo
+   10. Responsive Design
 =============================================================== */
 
-@media (max-width: 992px) {
+/* Tablet */
+@media screen and (min-width: 768px) and (max-width: 1080px) {
     #estadisticas-proceso {
         grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 576px) {
-    #estadisticas-proceso {
-        grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     .contenedor-filtros {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .proceso-header {
         flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
     }
 
     .proceso-acciones {
         flex-direction: column;
+    }
+
+    .btn-accion {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .tarjeta-proceso {
+        padding: 25px;
+    }
+}
+
+/* Smartphone */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+    #titulo-principal {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+    }
+
+    #titulo-principal h1 {
+        font-size: 24px;
+    }
+
+    .subtitulo {
+        font-size: 14px;
+    }
+
+    #estadisticas-proceso {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .tarjeta-stat {
+        padding: 18px 15px;
+        gap: 15px;
+        min-height: auto;
+    }
+
+    .icono-stat {
+        font-size: 28px;
+        padding: 14px;
+    }
+
+    .stat-numero {
+        font-size: 24px;
+    }
+
+    #filtros-proceso {
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .contenedor-filtros {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    #lista-procesos {
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .tarjeta-proceso {
+        padding: 20px;
+    }
+
+    .proceso-header {
+        flex-direction: column;
+        gap: 15px;
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
+
+    .proceso-titulo {
+        font-size: 18px;
+    }
+
+    .proceso-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .proceso-cliente {
+        padding: 15px;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .cliente-avatar {
+        width: 48px;
+        height: 48px;
+    }
+
+    .proceso-progreso {
+        margin-bottom: 24px;
+    }
+
+    .progreso-porcentaje {
+        font-size: 18px;
+    }
+
+    .barra-progreso {
+        height: 12px;
+    }
+
+    .proceso-etapas {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .etapa {
+        width: 100%;
+        justify-content: flex-start;
+        padding: 10px 14px;
+    }
+
+    .proceso-acciones {
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 20px;
+    }
+
+    .btn-accion {
+        width: 100%;
+        min-width: auto;
+        padding: 12px 18px;
     }
 }
