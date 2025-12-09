@@ -217,10 +217,18 @@ switch ($request) {
     case '/proveedor/nuevas_solicitudes':
         require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
         break;
+    case '/proveedor/en-proceso':
+        require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
+        break;  
+     case '/proveedor/completadas':
+        require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
+        break;     
 
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
         break;
+
+
 
 
     // Rutas del cliente

@@ -1,0 +1,304 @@
+/* ============================
+   CONTENEDOR GENERAL
+=============================== */
+.contenido {
+    margin-left: 270px; /* Sidebar fijo */
+    margin-top: 85px;   /* Header fijo */
+    padding: 25px;
+    background: #f5f6fa;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Contenedor que sí hace scroll */
+.contenido-completados {
+    height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scroll elegante */
+.contenido-completados::-webkit-scrollbar {
+    width: 8px;
+}
+.contenido-completados::-webkit-scrollbar-thumb {
+    background: #b8b8b8;
+    border-radius: 50px;
+}
+
+/* ============================
+   TÍTULO PRINCIPAL
+=============================== */
+#titulo-principal h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #333;
+}
+
+#titulo-principal .subtitulo {
+    margin-top: -8px;
+    font-size: 16px;
+    color: #666;
+}
+
+/* ============================
+   ESTADÍSTICAS
+=============================== */
+#estadisticas-completadas {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.tarjeta-stat {
+    background: white;
+    padding: 18px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    transition: .3s;
+}
+
+.tarjeta-stat:hover {
+    transform: translateY(-4px);
+}
+
+.icono-stat {
+    font-size: 38px;
+    color: #6f42c1;
+}
+
+.stat-info .stat-numero {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ============================
+   FILTROS
+=============================== */
+#filtros-completadas {
+    margin-top: 25px;
+}
+
+.contenedor-filtros {
+    background: white;
+    padding: 20px;
+    border-radius: 14px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+.grupo-filtro label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+}
+
+.grupo-filtro select,
+.grupo-filtro input {
+    width: 180px;
+    padding: 8px 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+}
+
+.busqueda-filtro input {
+    width: 250px;
+}
+
+/* ============================
+   LISTA GRID
+=============================== */
+.grid-completadas {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+    gap: 22px;
+}
+
+/* ============================
+   TARJETA COMPLETADA
+=============================== */
+.tarjeta-completada {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    transition: all .3s ease;
+}
+
+.tarjeta-completada:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* HEADER */
+.completada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.completada-titulo {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.completada-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+/* Categoría */
+.badge-categoria {
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.electricidad { background: #f7b731; }
+.plomeria { background: #0984e3; }
+.limpieza { background: #2ecc71; }
+.pintura { background: #d63031; }
+.jardineria { background: #27ae60; }
+
+/* Estado */
+.badge-completado {
+    background: #4cd137;
+    color: white;
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 50px;
+    font-weight: bold;
+}
+
+/* ============================
+   CLIENTE
+=============================== */
+.completada-cliente {
+    margin-top: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cliente-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+}
+
+.cliente-nombre {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.cliente-contacto {
+    font-size: 14px;
+    color: #666;
+}
+
+/* ============================
+   DETALLES
+=============================== */
+.completada-detalles {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.detalle-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.detalle-item i {
+    font-size: 20px;
+    color: #6f42c1;
+}
+
+.detalle-label {
+    font-size: 13px;
+    color: #777;
+}
+
+.detalle-valor {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* ============================
+   CALIFICACIÓN
+=============================== */
+.completada-calificacion {
+    margin-top: 22px;
+    padding: 15px;
+    background: #fafafa;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.estrellas i {
+    color: #f1c40f;
+}
+
+.calificacion-numero {
+    margin-left: 6px;
+    font-weight: bold;
+}
+
+/* ============================
+   ACCIONES
+=============================== */
+.completada-acciones {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-accion {
+    padding: 9px 15px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .3s;
+    background: #6f42c1;
+    color: white;
+}
+
+.btn-accion:hover {
+    background: #5934a0;
+}
+
+.btn-descargar {
+    background: #0984e3;
+}
+.btn-descargar:hover {
+    background: #076bb6;
+}
+
+.btn-contactar {
+    background: #2ecc71;
+}
+.btn-contactar:hover {
+    background: #28b765;
+}
