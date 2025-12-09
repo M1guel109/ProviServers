@@ -17,7 +17,7 @@ $datos = mostrarservicios();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Moderación de Publicaciones</title>
+    <title>Proviservers | Moderación de Servicios</title>
 
     <!-- Css DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css">
@@ -31,7 +31,7 @@ $datos = mostrarservicios();
 
     <!-- tu css -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
-    
+
     <!-- Iconos de Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -57,7 +57,7 @@ $datos = mostrarservicios();
                 <div class="col-md-8 d-flex flex-column">
 
                     <div>
-                        <h1 class="mb-1">Moderación de Publicaciones</h1>
+                        <h1 class="mb-1">Moderación de Servicios</h1>
                         <p class="text-muted mb-0">
                             Revisa y aprueba los servicios creados por los proveedores antes de su publicación.
                         </p>
@@ -104,40 +104,43 @@ $datos = mostrarservicios();
                                 <tr>
                                     <td><?= htmlspecialchars($servicio['id']) ?></td>
                                     <td><?= htmlspecialchars($servicio['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['proveedor']) ?></td>
+                                    <td><?= htmlspecialchars($servicio['proveedor_id']) ?></td>
                                     <td><?= htmlspecialchars($servicio['id_categoria']) ?></td>
                                     <td><?= htmlspecialchars($servicio['created_at']) ?></td>
                                     <td>
                                         <span class="badge bg-warning text-dark">
-                                            <i>Disponible</i> <?= htmlspecialchars($servicio['disponibilidad']) ?>
+                                            <!-- NOTA: 'disponibilidad' aquí probablemente se refiere al estado pendiente -->
+                                            <i class="bi bi-clock"></i> Pendiente
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="d-flex gap-2">
-                                            <!-- Botón para ver detalle del servicio (CRUCIAL para la moderación) -->
-                                            <a href="<?= BASE_URL ?>/admin/revisar-servicio?id=<?= $servicio['id_servicio'] ?>" class="btn btn-sm btn-info text-white" title="Revisar detalles">
-                                                <i class="bi bi-eye"></i> Revisar
+                                        <div class="action-buttons">
+                                            <!-- Enlace para ver detalle del servicio -->
+                                            <a href="#"
+                                                class="btn-action btn-view"
+                                                title="Revisar detalles">
+                                                <i class="bi bi-eye"></i>
                                             </a>
 
-                                            <!-- Botón de Aprobar (Desencadenará una acción de APROBACIÓN) -->
-                                            <button type="button" class="btn btn-sm btn-success" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#confirmApproveModal" 
-                                                    data-id="<?= htmlspecialchars($servicio['id_servicio']) ?>" 
-                                                    title="Aprobar Servicio">
-                                                <i class="bi bi-check-circle"></i> Aprobar
-                                            </button>
+                                            <!-- Enlace para Aprobar (abre modal) -->
+                                            <a href="#"
+                                                class="btn-action btn-approve"
 
-                                            <!-- Botón de Rechazar (Desencadenará una acción de RECHAZO con comentarios) -->
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#confirmRejectModal" 
-                                                    data-id="<?= htmlspecialchars($servicio['id_servicio']) ?>" 
-                                                    title="Rechazar Servicio">
-                                                <i class="bi bi-x-circle"></i> Rechazar
-                                            </button>
+                                                title="Aprobar Servicio">
+                                                <i class="bi bi-check-circle"></i>
+                                            </a>
+
+                                            <!-- Enlace para Rechazar (abre modal) -->
+                                            <a href="#"
+                                                class="btn-action btn-reject"
+
+            
+                                                title="Rechazar Servicio">
+                                                <i class="bi bi-x-circle"></i>
+                                            </a>
                                         </div>
                                     </td>
+
                                 </tr>
                             <?php endforeach; ?>
                         <?php else : ?>
@@ -176,7 +179,7 @@ $datos = mostrarservicios();
             </div>
         </div>
     </div>
-    
+
     <!-- Modal de Confirmación de Rechazo -->
     <div class="modal fade" id="confirmRejectModal" tabindex="-1" aria-labelledby="confirmRejectModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -216,68 +219,8 @@ $datos = mostrarservicios();
         xintegrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!-- Script de Inicialización y Modals -->
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Inicialización de DataTables
-            $('#tabla').DataTable({
-                // Configuración básica
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json',
-                },
-                responsive: true,
-                order: [[4, 'desc']] // Ordenar por fecha de creación descendente
-            });
 
-            // --- Lógica para el Modal de Aprobación ---
-            const approveModal = document.getElementById('confirmApproveModal');
-            if (approveModal) {
-                approveModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const servicioId = button.getAttribute('data-id');
 
-                    // Construir el enlace de aprobación (Asume ruta /admin/moderar/aprobar/ID)
-                    const approveUrl = `<?= BASE_URL ?>/admin/moderar-servicio/aprobar/${servicioId}`;
-
-                    const modalConfirmApproveButton = document.getElementById('modalConfirmApproveButton');
-                    modalConfirmApproveButton.href = approveUrl;
-                });
-            }
-
-            // --- Lógica para el Modal de Rechazo ---
-            const rejectModal = document.getElementById('confirmRejectModal');
-            if (rejectModal) {
-                const motivoTextarea = document.getElementById('motivoRechazo');
-                const rejectButton = document.getElementById('modalConfirmRejectButton');
-
-                // Habilitar/Deshabilitar el botón de rechazo basado en el contenido del textarea
-                motivoTextarea.addEventListener('input', function() {
-                    rejectButton.disabled = motivoTextarea.value.trim().length < 10; // Mínimo 10 caracteres
-                });
-
-                rejectModal.addEventListener('show.bs.modal', function (event) {
-                    const button = event.relatedTarget;
-                    const servicioId = button.getAttribute('data-id');
-
-                    // Restablecer el estado del modal cada vez que se abre
-                    motivoTextarea.value = '';
-                    rejectButton.disabled = true;
-
-                    // Manejar la acción de rechazo (requiere capturar el motivo)
-                    rejectButton.onclick = function() {
-                        const motivo = motivoTextarea.value.trim();
-                        if (motivo.length >= 10) {
-                            // Construir el enlace de rechazo (Asume ruta /admin/moderar/rechazar/ID?motivo=...)
-                            const rejectUrl = `<?= BASE_URL ?>/admin/moderar-servicio/rechazar/${servicioId}?motivo=${encodeURIComponent(motivo)}`;
-                            // En una aplicación real, probablemente harías un fetch POST aquí
-                            window.location.href = rejectUrl;
-                        }
-                    };
-                });
-            }
-        });
-    </script> -->
-    
     <!-- tu javaScript (asumiendo que estos archivos existen) -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
