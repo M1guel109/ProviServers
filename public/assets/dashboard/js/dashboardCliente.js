@@ -29,6 +29,122 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
+//Explorar servicios
+document.addEventListener("DOMContentLoaded", () => {
+  const searchInput = document.querySelector("input.form-control");
+  const searchForm = document.querySelector("form.d-flex");
+  const serviceCols = document.querySelectorAll("#contenedor-servicios .col-md-4");
+  const categoryButtons = document.querySelectorAll(".category-filters button");
+  const exitBtn = document.getElementById("exitCategory");
+
+  // Función para normalizar texto (quita acentos y pasa a minúsculas)
+  function normalizeText(text) {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  // Función para mostrar todas las tarjetas
+  function resetCards() {
+    serviceCols.forEach(col => {
+      col.style.display = "block";
+    });
+  }
+
+  // --- FILTRO POR NOMBRE/PROVEEDOR EN TIEMPO REAL ---
+  let timeout;
+  searchInput.addEventListener("input", () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      const query = normalizeText(searchInput.value);
+
+      if (query === "") {
+        resetCards(); // si está vacío, mostrar todo
+        return;
+      }
+
+      serviceCols.forEach(col => {
+        const title = normalizeText(col.querySelector(".card-title").textContent);
+        const provider = normalizeText(col.querySelector(".card-subtitle").textContent);
+
+        col.style.display =
+          (title.includes(query) || provider.includes(query)) ? "block" : "none";
+      });
+    }, 300); // espera 300ms antes de ejecutar
+  });
+
+  // --- FILTRO POR CATEGORÍA ---
+  categoryButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const category = normalizeText(button.textContent.trim());
+
+      if (category === "" || category === "todos") {
+        resetCards();
+        return;
+      }
+
+      serviceCols.forEach(col => {
+        const description = normalizeText(col.querySelector(".card-text").textContent);
+        const title = normalizeText(col.querySelector(".card-title").textContent);
+
+        col.style.display =
+          (description.includes(category) || title.includes(category)) ? "block" : "none";
+      });
+    });
+  });
+
+  // --- FILTRO POR UBICACIÓN ---
+  function filterByLocation(location) {
+    if (!location) {
+      resetCards();
+      return;
+    }
+    const locQuery = normalizeText(location);
+    serviceCols.forEach(col => {
+      const loc = normalizeText(col.querySelector(".card-location")?.textContent || "");
+      col.style.display = loc.includes(locQuery) ? "block" : "none";
+    });
+  }
+
+  // --- FILTRO POR PRECIO ---
+  function filterByPrice(maxPrice) {
+    if (!maxPrice) {
+      resetCards();
+      return;
+    }
+    serviceCols.forEach(col => {
+      const priceText = col.querySelector(".card-price")?.textContent.replace(/\D/g, "");
+      const price = parseInt(priceText, 10);
+      col.style.display = price <= maxPrice ? "block" : "none";
+    });
+  }
+
+  // --- FILTRO POR CALIFICACIÓN ---
+  function filterByRating(minRating) {
+    if (!minRating) {
+      resetCards();
+      return;
+    }
+    serviceCols.forEach(col => {
+      const ratingText = col.querySelector(".card-rating")?.textContent;
+      const rating = parseFloat(ratingText?.match(/([0-9]\.\d)/)?.[0] || 0);
+      col.style.display = rating >= minRating ? "block" : "none";
+    });
+  }
+
+  // --- BOTÓN SALIR DE CATEGORÍA ---
+  if (exitBtn) {
+    exitBtn.addEventListener("click", () => {
+      searchInput.value = ""; // limpiar buscador
+      resetCards();           // restaurar todas las tarjetas
+    });
+  }
+});
+
+
+
     // Filtro en tiempo real
 document.getElementById('buscadorServicios').addEventListener('input', function () {
     const query = this.value.toLowerCase();
