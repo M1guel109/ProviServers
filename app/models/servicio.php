@@ -36,7 +36,7 @@ class Servicio
             $stmt->bindParam(':descripcion',   $data['descripcion']);
             $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
             $stmt->bindParam(':imagen',        $data['imagen']);
-            $stmt->bindParam(':disponibilidad',$data['disponibilidad'], PDO::PARAM_INT);
+            $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
 
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -51,7 +51,18 @@ class Servicio
     public function mostrar()
     {
         try {
-            $sql = "SELECT * FROM servicios ORDER BY created_at DESC";
+            $sql = "SELECT 
+                    s.*,
+                    c.nombre AS categoria_nombre,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                    pub.estado AS publicacion_estado
+                FROM servicios s
+                INNER JOIN categorias c ON c.id = s.id_categoria
+                LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
+                LEFT JOIN proveedores p ON p.id = pub.proveedor_id
+                ORDER BY s.created_at DESC"
+            ;
+
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute();
 
@@ -107,7 +118,7 @@ class Servicio
             $stmt->bindParam(':nombre',        $data['nombre']);
             $stmt->bindParam(':descripcion',   $data['descripcion']);
             $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
-            $stmt->bindParam(':disponibilidad',$data['disponibilidad'], PDO::PARAM_INT);
+            $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
 
             return $stmt->execute();
         } catch (PDOException $e) {
@@ -131,5 +142,9 @@ class Servicio
             error_log("Error en Servicio::eliminar -> " . $e->getMessage());
             return false;
         }
+    }
+    public function getUltimoIdInsertado(): int
+    {
+        return (int) $this->conexion->lastInsertId();
     }
 }

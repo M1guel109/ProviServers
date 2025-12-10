@@ -152,13 +152,19 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
         break;
 
-
     case '/admin/finanzas':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
         break;
 
     case '/admin/consultar-servicios':
-        require BASE_PATH . '/app/views/dashboard/admin/moderacionServicios.php';
+        require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
+        break;
+
+       case '/admin/calendario':
+        require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
+        break;    
+    case '/admin/moderacion-actualizar':
+        require BASE_PATH . '/app/controllers/moderacionController.php';
         break;
 
     // Fin de rutas admin
@@ -177,6 +183,9 @@ switch ($request) {
         break;
     case '/proveedor/listar-servicio':
         require BASE_PATH . '/app/views/dashboard/proveedor/misServicios.php';
+        break;
+    case '/proveedor/publicaciones':
+        require BASE_PATH . '/app/views/dashboard/proveedor/misPublicaciones.php';
         break;
     case '/proveedor/editar-servicio':
         require BASE_PATH . '/app/views/dashboard/proveedor/editarServicio.php';
@@ -219,8 +228,8 @@ switch ($request) {
         break;
     case '/proveedor/en-proceso':
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
-        break;  
-     case '/proveedor/completadas':
+        break;
+    case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
     case '/proveedor/resenas':
