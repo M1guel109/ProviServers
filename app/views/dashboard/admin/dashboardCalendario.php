@@ -60,6 +60,114 @@ html
     <!-- Layout Principal -->
     <div class="calendar-layout">
 
-       
+        <!-- Calendario -->
+        <div class="calendar-main">
+            <div class="calendar-header">
+                <div class="calendar-navigation">
+                    <button class="btn-nav" id="prevMonth">
+                        <i class="bi bi-chevron-left"></i>
+                    </button>
+                    <h2 class="calendar-month" id="currentMonth">Diciembre 2025</h2>
+                    <button class="btn-nav" id="nextMonth">
+                        <i class="bi bi-chevron-right"></i>
+                    </button>
+                </div>
+
+                <button class="btn-primary-proviservers" id="todayBtn">
+                    <i class="bi bi-calendar-day"></i> Hoy
+                </button>
+            </div>
+
+            <div class="calendar-filters">
+                <div class="filter-item active" data-filter="all">
+                    <span class="filter-dot bg-all"></span> Todos
+                </div>
+                <div class="filter-item" data-filter="membresia">
+                    <span class="filter-dot bg-membresia"></span> Membresías
+                </div>
+                <div class="filter-item" data-filter="servicio">
+                    <span class="filter-dot bg-servicio"></span> Servicios
+                </div>
+                <div class="filter-item" data-filter="verificacion">
+                    <span class="filter-dot bg-verificacion"></span> Verificaciones
+                </div>
+                <div class="filter-item" data-filter="evento">
+                    <span class="filter-dot bg-evento"></span> Eventos
+                </div>
+            </div>
+
+            <div class="calendar-grid">
+                <div class="calendar-day-header">Dom</div>
+                <div class="calendar-day-header">Lun</div>
+                <div class="calendar-day-header">Mar</div>
+                <div class="calendar-day-header">Mié</div>
+                <div class="calendar-day-header">Jue</div>
+                <div class="calendar-day-header">Vie</div>
+                <div class="calendar-day-header">Sáb</div>
+            </div>
+
+            <div class="calendar-days-grid" id="calendarDays"></div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="calendar-sidebar">
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="bi bi-calendar-event"></i> Eventos del Día
+                </h3>
+                <p class="sidebar-date" id="selectedDate">Martes, 10 de Diciembre 2025</p>
+
+                <div class="events-list" id="eventsList"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="bi bi-alarm"></i> Próximos Vencimientos
+                </h3>
+
+                <div class="upcoming-list">
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon bg-orange">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <div class="upcoming-info">
+                            <p class="upcoming-title">Membresía Premium</p>
+                            <p class="upcoming-subtitle">Roberto Sánchez - 5 días</p>
+                        </div>
+                    </div>
+
+                    <div class="upcoming-item">
+                        <div class="upcoming-icon bg-orange">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <div class="upcoming-info">
+                            <p class="upcoming-title">Membresía Basic</p>
+                            <p class="upcoming-subtitle">Sandra López - 12 días</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="bi bi-graph-up"></i> Este Mes
+                </h3>
+
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-value">156</span><span class="stat-label">Total Eventos</span></div>
+                    <div class="stat-item"><span class="stat-value">89</span><span class="stat-label">Servicios</span></div>
+                    <div class="stat-item"><span class="stat-value">32</span><span class="stat-label">Vencimientos</span></div>
+                    <div class="stat-item"><span class="stat-value">18</span><span class="stat-label">Verificaciones</span></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- JS externo -->
+    <script src="app.js"></script>
+
 </body>
 </html>
