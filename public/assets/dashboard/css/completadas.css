@@ -2,8 +2,8 @@
    CONTENEDOR GENERAL
 =============================== */
 .contenido {
-    margin-left: 270px; /* Sidebar fijo */
-    margin-top: 85px;   /* Header fijo */
+    /* margin-left: 270px; /* Sidebar fijo */
+    /* margin-top: 85px;   Header fijo */ 
     padding: 25px;
     background: #f5f6fa;
     min-height: 100vh;
@@ -68,7 +68,7 @@
 
 .icono-stat {
     font-size: 38px;
-    color: #6f42c1;
+    color: #0066FF;
 }
 
 .stat-info .stat-numero {
@@ -286,7 +286,7 @@
 }
 
 .btn-accion:hover {
-    background: #5934a0;
+    background: #0066FF;
 }
 
 .btn-descargar {
