@@ -35,48 +35,54 @@
 
         <!-- SECCIÓN: INICIO -->
         <section id="inicio">
-            <div class="section-hero">
-                <h1>¡Hola <?= htmlspecialchars($nombreSaludo) ?>! 👋</h1>
-                <p>Bienvenido a tu espacio personal. Encuentra los mejores profesionales para cualquier servicio que necesites.</p>
+            <div class="section-hero text-center">
+                <h1>¡Hola, <?= htmlspecialchars($nombreSaludo) ?>! 👋</h1>
+                <p class="lead">Este es tu espacio para gestionar servicios, publicar necesidades y conectar con profesionales confiables.</p>
             </div>
+
 
             <div class="section-content">
                 <!-- Estadísticas visuales -->
-                <div class="stats-visual">
-                    <div class="stat-visual-item">
-                        <i class="bi bi-clock-history"></i>
-                        <h3>3</h3>
-                        <p>Servicios Activos</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-check-circle"></i>
-                        <h3>12</h3>
-                        <p>Completados</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-heart"></i>
-                        <h3>8</h3>
-                        <p>Favoritos</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-star"></i>
-                        <h3>4.8</h3>
-                        <p>Calificación</p>
-                    </div>
+                <div class="stats-visual row text-center">
+                <div class="col stat-visual-item">
+                    <i class="bi bi-clock-history"></i>
+                    <h3>3</h3>
+                    <p>Servicios Activos</p>
                 </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-check-circle"></i>
+                    <h3>1</h3>
+                    <p>Completados</p>
+                </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-heart"></i>
+                    <h3>3</h3>
+                    <p>Favoritos</p>
+                </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-star"></i>
+                    <h3>4.8</h3>
+                    <p>Calificación</p>
+                </div>
+                </div>
+
 
                 <!-- Acciones rápidas -->
                 <div class="mt-5">
-                    <h2 class="mb-4">¿Qué necesitas hoy?</h2>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern">
-                            <i class="bi bi-search"></i> Buscar Servicio
-                        </a>
-                        <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
-                            <i class="bi bi-briefcase"></i> Ver Mis Servicios
-                        </a>
-                    </div>
+                <h2 class="mb-4">¿Qué necesitas hoy?</h2>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
+                    <i class="bi bi-search"></i> Buscar Servicio
+                    </a>
+                    <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                    <i class="bi bi-briefcase"></i> Ver Mis Servicios
+                    </a>
+                    <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
+                    <i class="bi bi-plus-circle"></i> Publicar Necesidad
+                    </button>
                 </div>
+                </div>
+
 
                 <!-- Servicios en curso -->
                 <div class="mt-5">
@@ -340,10 +346,95 @@
 
     </main>
 
+    <!-- Modal -->
+    <div class="modal fade" id="modalNecesidad" tabindex="-1" aria-labelledby="modalNecesidadLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        
+        <!-- Encabezado -->
+        <div class="modal-header">
+            <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <!-- Cuerpo con formulario -->
+        <div class="modal-body">
+            <form id="formNecesidad" novalidate>
+            <!-- Categoría -->
+            <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría del servicio</label>
+            <select class="form-select" id="categoria" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="Salud">Salud</option>
+                <option value="Educación">Educación</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Hogar">Hogar</option>
+                <option value="Otros">Otros</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona una categoría.</div>
+            </div>
+
+            <!-- Campo cuando eligen "Otros" -->
+            <div class="mb-3 d-none" id="categoriaOtroWrapper">
+            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
+            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
+            <div class="invalid-feedback">Por favor especifica la categoría.</div>
+            </div>
+
+
+            <!-- Descripción -->
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción detallada</label>
+                <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+                <div class="invalid-feedback">La descripción es obligatoria.</div>
+            </div>
+
+            <!-- Presupuesto -->
+            <div class="mb-3">
+                <label for="presupuesto" class="form-label">Presupuesto estimado (COP)</label>
+                <input type="number" class="form-control" id="presupuesto" min="0" required>
+                <div class="invalid-feedback">Ingresa un presupuesto válido.</div>
+            </div>
+
+            <!-- Fecha y hora -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                <label for="fecha" class="form-label">Fecha deseada</label>
+                <input type="date" class="form-control" id="fecha" required>
+                <div class="invalid-feedback">Selecciona una fecha.</div>
+                </div>
+                <div class="col-md-6">
+                <label for="hora" class="form-label">Hora deseada</label>
+                <input type="time" class="form-control" id="hora" required>
+                <div class="invalid-feedback">Selecciona una hora.</div>
+                </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="mb-3">
+                <label for="ubicacion" class="form-label">Ubicación</label>
+                <input type="text" class="form-control" id="ubicacion" required>
+                <div class="invalid-feedback">La ubicación es obligatoria.</div>
+            </div>
+            </form>
+        </div>
+        
+        <!-- Footer con botones -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" form="formNecesidad" class="btn btn-outline-primary">
+            <i class="bi bi-send"></i> Publicar
+            </button>
+        </div>
+        </div>
+    </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JS propio -->
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+
 
 
 </body>
