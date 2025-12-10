@@ -160,6 +160,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
         break;
 
+       case '/admin/calendario':
+        require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
+        break;    
+
     // Fin de rutas admin
 
     // Rutas del proveedor
