@@ -1,27 +1,18 @@
 <?php
-// (Opcional) validar sesión de proveedor, similar a session_admin.php
+// Validar sesión de proveedor
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
+// Modelo de publicaciones
+require_once BASE_PATH . '/app/models/Publicacion.php';
 
-// Enlazamos el controlador que tiene la función mostrarServicios()
-require_once BASE_PATH . '/app/controllers/proveedorController.php';
+$usuarioId = $_SESSION['user']['id'] ?? null;
+$datos = [];
 
-// Modelo de categorías para mostrar el nombre en vez del id
-require_once BASE_PATH . '/app/models/categoria.php';
-
-// Llamamos la función del controlador (igual que con mostrarUsuarios())
-$datos = mostrarServicios();
-
-// Mapeo de id_categoria -> nombre categoría
-$categoriaModel = new Categoria();
-$categorias = $categoriaModel->mostrar();
-
-$mapCategorias = [];
-foreach ($categorias as $categoria) {
-    $mapCategorias[$categoria['id']] = $categoria['nombre'];
+if ($usuarioId) {
+    $pubModel = new Publicacion();
+    $datos = $pubModel->listarPorProveedorUsuario((int)$usuarioId);
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -41,9 +32,59 @@ foreach ($categorias as $categoria) {
     <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
-    <!-- tu css (puedes usar el mismo de tablas del admin) -->
+    <!-- css de tablas / dashboard -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css">
+
+    <style>
+        /* Estados de publicación */
+        .estado-publicacion {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .estado-pendiente {
+            background-color: #fff7e6;
+            color: #b45309;
+        }
+
+        .estado-activa {
+            background-color: #e6fffa;
+            color: #047857;
+        }
+
+        .estado-rechazada {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .estado-pausada {
+            background-color: #e5e7eb;
+            color: #4b5563;
+        }
+
+        /* Disponibilidad del servicio */
+        .badge-disponibilidad {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        .badge-disponible {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-no-disponible {
+            background-color: #fee2e2;
+            color: #b91c1c;
+        }
+    </style>
 </head>
 
 <body>
@@ -57,33 +98,25 @@ foreach ($categorias as $categoria) {
         include_once __DIR__ . '/../../layouts/header_proveedor.php';
         ?>
 
-        <!-- Secciones -->
-        <!-- titulo -->
+        <!-- Sección título -->
         <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
             <div>
                 <h1 class="mb-1">Mis Servicios</h1>
                 <p class="text-muted mb-0">
-                    Aquí puedes ver todos los servicios que has registrado. Usa las acciones disponibles para gestionarlos.
+                    Aquí puedes ver tus servicios publicados, su estado y gestionar sus acciones.
                 </p>
             </div>
 
-            <!-- Si luego quieres generar reportes PDF, aquí puedes añadir un botón similar al de usuarios -->
-            <!--
-            <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=servicios" target="_blank" class="btn btn-primary mt-3">
-                <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
-            </a>
-            -->
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
             </nav>
+
             <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor" target="_blank" class="btn btn-primary mt-3">
                 <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
             </a>
-
-
         </section>
 
-        <!-- Tabla de servicios -->
+        <!-- Tabla de servicios / publicaciones -->
         <section id="tabla-arriba" class="mt-3">
             <table id="tabla-1" class="display nowrap">
                 <thead>
@@ -93,17 +126,45 @@ foreach ($categorias as $categoria) {
                         <th>Categoría</th>
                         <th>Descripción</th>
                         <th>Disponibilidad</th>
-                        <th>Fecha de creación</th>
+                        <th>Estado publicación</th>
+                        <th>Fecha de publicación</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tabla-servicios">
                     <?php if (!empty($datos)) : ?>
-                        <?php foreach ($datos as $servicio) : ?>
+                        <?php foreach ($datos as $fila) : ?>
+                            <?php
+                            $estado = $fila['estado_publicacion'] ?? 'pendiente';
+
+                            // Texto y estilos por estado
+                            switch ($estado) {
+                                case 'activa':
+                                    $textoEstado = 'Publicado';
+                                    $claseEstado = 'estado-publicacion estado-activa';
+                                    break;
+                                case 'rechazada':
+                                    $textoEstado = 'Rechazado';
+                                    $claseEstado = 'estado-publicacion estado-rechazada';
+                                    break;
+                                case 'pausada':
+                                    $textoEstado = 'Pausado';
+                                    $claseEstado = 'estado-publicacion estado-pausada';
+                                    break;
+                                case 'pendiente':
+                                default:
+                                    $textoEstado = 'Pendiente de aprobación';
+                                    $claseEstado = 'estado-publicacion estado-pendiente';
+                                    break;
+                            }
+
+                            $disponible = (int)($fila['servicio_disponible'] ?? 0) === 1;
+                            ?>
                             <tr>
+                                <!-- Imagen -->
                                 <td>
-                                    <?php if (!empty($servicio['imagen'])): ?>
-                                        <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($servicio['imagen']) ?>"
+                                    <?php if (!empty($fila['servicio_imagen'])): ?>
+                                        <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($fila['servicio_imagen']) ?>"
                                             alt="Imagen del servicio" width="60" height="60"
                                             style="object-fit: cover; border-radius: 8px;">
                                     <?php else: ?>
@@ -111,58 +172,81 @@ foreach ($categorias as $categoria) {
                                     <?php endif; ?>
                                 </td>
 
-                                <td><?= htmlspecialchars($servicio['nombre']) ?></td>
+                                <!-- Nombre -->
+                                <td><?= htmlspecialchars($fila['servicio_nombre'] ?? '') ?></td>
 
-                                <td>
-                                    <?php
-                                    $nombreCategoria = $mapCategorias[$servicio['id_categoria']] ?? 'Sin categoría';
-                                    echo htmlspecialchars($nombreCategoria);
-                                    ?>
-                                </td>
+                                <!-- Categoría -->
+                                <td><?= htmlspecialchars($fila['categoria_nombre'] ?? 'Sin categoría') ?></td>
 
-                                <td>
-                                    <?= htmlspecialchars($servicio['descripcion'] ?? 'Sin descripción') ?>
-                                </td>
+                                <!-- Descripción -->
+                                <td><?= htmlspecialchars($fila['servicio_descripcion'] ?? 'Sin descripción') ?></td>
 
+                                <!-- Disponibilidad (on/off del servicio) -->
                                 <td>
-                                    <?php if ($servicio['disponibilidad']) : ?>
-                                        <span>Disponible</span>
+                                    <?php if ($disponible): ?>
+                                        <span class="badge-disponibilidad badge-disponible">
+                                            Disponible
+                                        </span>
                                     <?php else: ?>
-                                        <span>No disponible</span>
+                                        <span class="badge-disponibilidad badge-no-disponible">
+                                            No disponible
+                                        </span>
                                     <?php endif; ?>
                                 </td>
 
-                                <td><?= htmlspecialchars($servicio['created_at']) ?></td>
+                                <!-- Estado publicación -->
+                                <td>
+                                    <span class="<?= $claseEstado ?>">
+                                        <?= $textoEstado ?>
+                                    </span>
+                                </td>
 
+                                <!-- Fecha publicación -->
+                                <td><?= htmlspecialchars($fila['publicacion_created_at'] ?? '') ?></td>
+
+                                <!-- Acciones -->
                                 <td>
                                     <div class="action-buttons">
-                                        <!-- Ver detalle (por ahora placeholder) -->
-                                        <a href="#" class="btn-action btn-view" title="Ver detalle">
+                                        <!-- Ver detalle (luego puedes conectarlo a un modal o ficha) -->
+                                        <a href="#"
+                                            class="btn-action btn-view"
+                                            title="Ver detalle">
                                             <i class="bi bi-eye"></i>
                                         </a>
 
-                                        <!-- Editar servicio (cuando tengas vista/route de edición) -->
-                                        <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicio['id'] ?>"
-                                            class="btn-action btn-edit"
-                                            title="Editar servicio">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                                        <!-- Editar servicio:
+                                             Permitimos editar si está PENDIENTE o RECHAZADO -->
+                                        <?php if (in_array($estado, ['pendiente', 'rechazada'], true)) : ?>
+                                            <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $fila['servicio_id'] ?>"
+                                                class="btn-action btn-edit"
+                                                title="<?= $estado === 'rechazada' ? 'Editar y reenviar a revisión' : 'Editar servicio' ?>">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                        <?php endif; ?>
 
-
-                                        <!-- Eliminar servicio: reutilizamos proveedorController (GET, accion=eliminar) -->
-                                        <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicio['id'] ?>"
+                                        <!-- Eliminar servicio (reutilizando controlador actual) -->
+                                        <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $fila['servicio_id'] ?>"
                                             class="btn-action btn-delete"
                                             title="Eliminar servicio">
                                             <i class="bi bi-trash3"></i>
                                         </a>
+
+                                        <!-- Opcional: Pausar / reactivar si está publicado (placeholder) -->
+                                        <?php if ($estado === 'activa'): ?>
+                                            <button type="button"
+                                                class="btn-action btn-pause"
+                                                title="Pausar publicación (dejar de mostrar temporalmente)">
+                                                <i class="bi bi-pause-circle"></i>
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <h5 class="text-muted mb-0">No hay servicios registrados</h5>
+                            <td colspan="8" class="text-center py-4">
+                                <h5 class="text-muted mb-0">No tienes servicios publicados aún</h5>
                             </td>
                         </tr>
                     <?php endif; ?>
@@ -192,12 +276,23 @@ foreach ($categorias as $categoria) {
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!-- tu JavaScript (si ya inicializas DataTables ahí, no necesitas más) -->
+    <!-- JS del dashboard -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 
     <script>
+        // Inicializar DataTable
+        $(document).ready(function() {
+            $('#tabla-1').DataTable({
+                responsive: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
+            });
+        });
+
+        // Submenús del sidebar (si no lo tienes ya centralizado)
         document.addEventListener('DOMContentLoaded', function() {
             const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
 
