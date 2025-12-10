@@ -29,6 +29,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// Formulario con validación y campo "Otros"
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formNecesidad");
+  const modalEl = document.getElementById("modalNecesidad");
+
+  // Campo "Otros"
+  const selectCategoria = document.getElementById("categoria");
+  const otroWrapper = document.getElementById("categoriaOtroWrapper");
+  const inputOtro = document.getElementById("categoriaOtro");
+
+  if (!form) return;
+
+  // Mostrar/ocultar campo "Otros"
+  selectCategoria.addEventListener("change", () => {
+    const esOtros = selectCategoria.value === "Otros";
+    otroWrapper.classList.toggle("d-none", !esOtros);
+    inputOtro.required = esOtros;
+
+    if (!esOtros) {
+      inputOtro.value = "";
+      inputOtro.classList.remove("is-invalid", "is-valid");
+    }
+  });
+
+  // Validación y envío simulado
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (form.checkValidity()) {
+      alert("Tu necesidad fue publicada correctamente (simulado).");
+      form.reset();
+      form.classList.remove("was-validated");
+
+      // Cerrar modal si existe
+      if (modalEl) {
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+      }
+    } else {
+      form.classList.add("was-validated");
+      alert("Por favor completa todos los campos obligatorios antes de enviar.");
+    }
+  });
+});
+
+
+
+
+
 
 //Explorar servicios
 document.addEventListener("DOMContentLoaded", () => {
@@ -108,18 +158,28 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- FILTRO POR PRECIO ---
-  function filterByPrice(maxPrice) {
-    if (!maxPrice) {
-      resetCards();
-      return;
-    }
-    serviceCols.forEach(col => {
-      const priceText = col.querySelector(".card-price")?.textContent.replace(/\D/g, "");
-      const price = parseInt(priceText, 10);
-      col.style.display = price <= maxPrice ? "block" : "none";
-    });
+// --- FILTRO POR CATEGORÍA ---
+function filterByCategory(category) {
+  if (!category) {
+    resetCards(); // si no hay categoría, mostrar todo
+    return;
   }
+  const catQuery = normalizeText(category);
+
+  serviceCols.forEach(col => {
+    const cardCategory = normalizeText(col.querySelector(".card-category")?.textContent || "");
+    const cardTitle = normalizeText(col.querySelector(".card-title")?.textContent || "");
+    const cardDescription = normalizeText(col.querySelector(".card-text")?.textContent || "");
+
+    // Mostrar si la categoría coincide con alguno de los campos
+    col.style.display =
+      (cardCategory.includes(catQuery) ||
+       cardTitle.includes(catQuery) ||
+       cardDescription.includes(catQuery))
+        ? "block"
+        : "none";
+  });
+}
 
   // --- FILTRO POR CALIFICACIÓN ---
   function filterByRating(minRating) {

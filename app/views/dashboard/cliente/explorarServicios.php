@@ -71,7 +71,7 @@
               <p class="card-subtitle">Proveedor: Miguel Torres</p>
               <p class="card-text">Diseño y mantenimiento de jardines para tu hogar o empresa.</p>
               <p class="card-location">Ubicación: Bogotá</p>
-              <p class="card-price">Precio: 120000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.8/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
@@ -89,7 +89,7 @@
               <p class="card-subtitle">Proveedor: Carlos Ruiz</p>
               <p class="card-text">Instalaciones y reparaciones rápidas para tu hogar.</p>
               <p class="card-location">Ubicación: Medellín</p>
-              <p class="card-price">Precio: 90000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.5/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
@@ -107,7 +107,7 @@
               <p class="card-subtitle">Proveedor: Luis Martínez</p>
               <p class="card-text">Instalaciones eléctricas seguras y mantenimiento preventivo.</p>
               <p class="card-location">Ubicación: Cali</p>
-              <p class="card-price">Precio: 150000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.7/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
@@ -125,7 +125,7 @@
               <p class="card-subtitle">Proveedor: Ana Gómez</p>
               <p class="card-text">Servicios de limpieza profunda y mantenimiento del hogar.</p>
               <p class="card-location">Ubicación: Bogotá</p>
-              <p class="card-price">Precio: 80000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.9/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
@@ -143,7 +143,7 @@
               <p class="card-subtitle">Proveedor: José Hernández</p>
               <p class="card-text">Pintura interior y exterior con acabados profesionales.</p>
               <p class="card-location">Ubicación: Barranquilla</p>
-              <p class="card-price">Precio: 110000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.6/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
@@ -161,7 +161,7 @@
               <p class="card-subtitle">Proveedor: María López</p>
               <p class="card-text">Muebles a medida y reparaciones en madera.</p>
               <p class="card-location">Ubicación: Cartagena</p>
-              <p class="card-price">Precio: 130000</p>
+              <p class="card-category">Categoría: </p>
               <p class="card-rating">⭐ 4.4/5</p>
               <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
