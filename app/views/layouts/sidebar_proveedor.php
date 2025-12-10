@@ -37,7 +37,7 @@
                 </ul>
             </li>
 
-            <li><a href="#" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
+            <li><a href="<?= BASE_URL?>/proveedor/resenas" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
             <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
             <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
             <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>

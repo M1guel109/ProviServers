@@ -222,7 +222,10 @@ switch ($request) {
         break;  
      case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
-        break;     
+        break;
+    case '/proveedor/resenas':
+        require BASE_PATH . '/app/views/dashboard/proveedor/resenas.php';
+        break;         
 
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
