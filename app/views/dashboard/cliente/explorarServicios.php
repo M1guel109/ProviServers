@@ -47,6 +47,7 @@
       <!-- Filtros de categorías -->
       <div class="mb-4 category-filters">
         <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-outline-primary" id="exitCategory"><i class="bi bi-columns-gap"></i> Todas</button> 
           <button class="btn btn-outline-primary"><i class="bi bi-house"></i> Hogar</button>
           <button class="btn btn-outline-primary"><i class="bi bi-laptop"></i> Tecnología</button>
           <button class="btn btn-outline-primary"><i class="bi bi-heart"></i> Mascotas</button>
@@ -57,105 +58,118 @@
 
 
       <!-- Tarjetas de servicios -->
-      <div class="section-content">
-        <div class="row">
-          <!-- Tarjeta 1 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/jardinero.jpg" alt="Jardinería">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Jardinería y Paisajismo</h5>
-                <p class="card-subtitle">Proveedor: Miguel Torres</p>
-                <p class="card-text">Diseño y mantenimiento de jardines para tu hogar o empresa.</p>
-                <p class="card-rating">⭐ 4.8/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
-            </div>
-          </div>
+      <div class="row g-4" id="contenedor-servicios">
 
-          <!-- Tarjeta 2 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/fontanero.jpg" alt="Plomería">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Plomería</h5>
-                <p class="card-subtitle">Proveedor: Carlos Ruiz</p>
-                <p class="card-text">Instalaciones y reparaciones rápidas para tu hogar.</p>
-                <p class="card-rating">⭐ 4.5/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
+        <!-- Tarjeta 1 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/jardinero.jpg" alt="Jardinería">
             </div>
-          </div>
-
-          <!-- Tarjeta 3 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/electricista.jpg" alt="Electricidad">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Electricidad</h5>
-                <p class="card-subtitle">Proveedor: Luis Martínez</p>
-                <p class="card-text">Instalaciones eléctricas seguras y mantenimiento preventivo.</p>
-                <p class="card-rating">⭐ 4.7/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tarjeta 4 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/limpiezaResidencial.jpg" alt="Limpieza">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Limpieza Residencial</h5>
-                <p class="card-subtitle">Proveedor: Ana Gómez</p>
-                <p class="card-text">Servicios de limpieza profunda y mantenimiento del hogar.</p>
-                <p class="card-rating">⭐ 4.9/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tarjeta 5 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/pintor.jpg" alt="Pintura">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Pintura</h5>
-                <p class="card-subtitle">Proveedor: José Hernández</p>
-                <p class="card-text">Pintura interior y exterior con acabados profesionales.</p>
-                <p class="card-rating">⭐ 4.6/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Tarjeta 6 -->
-          <div class="col-md-4 mb-4">
-            <div class="card service-card">
-              <div class="service-image">
-                <img src="<?= BASE_URL ?>/public/uploads/proveedores/carpinteria.jpg" alt="Carpintería">
-              </div>
-              <div class="card-body service-content">
-                <h5 class="card-title">Carpintería</h5>
-                <p class="card-subtitle">Proveedor: María López</p>
-                <p class="card-text">Muebles a medida y reparaciones en madera.</p>
-                <p class="card-rating">⭐ 4.4/5</p>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
-              </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Jardinería y Paisajismo</h5>
+              <p class="card-subtitle">Proveedor: Miguel Torres</p>
+              <p class="card-text">Diseño y mantenimiento de jardines para tu hogar o empresa.</p>
+              <p class="card-location">Ubicación: Bogotá</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.8/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
             </div>
           </div>
         </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/fontanero.jpg" alt="Plomería">
+            </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Plomería</h5>
+              <p class="card-subtitle">Proveedor: Carlos Ruiz</p>
+              <p class="card-text">Instalaciones y reparaciones rápidas para tu hogar.</p>
+              <p class="card-location">Ubicación: Medellín</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.5/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/electricista.jpg" alt="Electricidad">
+            </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Electricidad</h5>
+              <p class="card-subtitle">Proveedor: Luis Martínez</p>
+              <p class="card-text">Instalaciones eléctricas seguras y mantenimiento preventivo.</p>
+              <p class="card-location">Ubicación: Cali</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.7/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/limpiezaResidencial.jpg" alt="Limpieza">
+            </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Limpieza Residencial</h5>
+              <p class="card-subtitle">Proveedor: Ana Gómez</p>
+              <p class="card-text">Servicios de limpieza profunda y mantenimiento del hogar.</p>
+              <p class="card-location">Ubicación: Bogotá</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.9/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 5 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/pintor.jpg" alt="Pintura">
+            </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Pintura</h5>
+              <p class="card-subtitle">Proveedor: José Hernández</p>
+              <p class="card-text">Pintura interior y exterior con acabados profesionales.</p>
+              <p class="card-location">Ubicación: Barranquilla</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.6/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tarjeta 6 -->
+        <div class="col-md-4">
+          <div class="card service-card">
+            <div class="service-image">
+              <img src="<?= BASE_URL ?>/public/uploads/proveedores/carpinteria.jpg" alt="Carpintería">
+            </div>
+            <div class="card-body service-content">
+              <h5 class="card-title">Carpintería</h5>
+              <p class="card-subtitle">Proveedor: María López</p>
+              <p class="card-text">Muebles a medida y reparaciones en madera.</p>
+              <p class="card-location">Ubicación: Cartagena</p>
+              <p class="card-category">Categoría: </p>
+              <p class="card-rating">⭐ 4.4/5</p>
+              <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary w-100">Contratar Servicio</a>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </section>
   </main>
 

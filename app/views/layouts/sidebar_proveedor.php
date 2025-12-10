@@ -23,6 +23,20 @@
                     <li><a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/listar-servicio">
+                    <i class="bi bi-gear"></i>
+                    <span>Mis servicios</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/publicaciones">
+                    <i class="bi bi-broadcast-pin"></i>
+                    <span>Mis publicaciones</span>
+                </a>
+            </li>
+
             <li class="has-submenu">
                 <a href="#" data-title="Solicitudes" class="menu-link">
                     <i class="bi bi-envelope"></i><span>Solicitudes</span>
@@ -31,7 +45,7 @@
                     <i class="bi bi-chevron-down toggle-icon"></i>
                 </button>
                 <ul class="submenu">
-                    <li><a href="<?= BASE_URL?>/proveedor/nuevas_solicitudes" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
+                    <li><a href="<?= BASE_URL ?>/proveedor/nuevas_solicitudes" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
                     <li><a href="<?= BASE_URL ?>/proveedor/en-proceso" class="submenu-link"><i class="bi bi-clock-history"></i>En proceso</a></li>
                     <li><a href="<?= BASE_URL ?>/proveedor/completadas" class="submenu-link"><i class="bi bi-check-circle"></i>Completadas</a></li>
                 </ul>

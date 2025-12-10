@@ -12,49 +12,49 @@
     <nav class="menu-principal">
         <ul>
             <li>
-                <a href="#inicio" class="active" data-title="Inicio">
+                <a href="<?= BASE_URL ?>/cliente/dashboard" class="active" data-title="Inicio">
                     <i class="bi bi-house-door"></i>
                     <span>Inicio</span>
                 </a>
             </li>
 
             <li>
-                <a href="#explorar" data-title="Explorar Servicios">
+                <a href="<?= BASE_URL ?>/cliente/explorar" data-title="Explorar Servicios">
                     <i class="bi bi-compass"></i>
                     <span>Explorar Servicios</span>
                 </a>
             </li>
 
             <li>
-                <a href="#mis-servicios" data-title="Mis Servicios">
+                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" data-title="Mis Servicios">
                     <i class="bi bi-briefcase"></i>
                     <span>Mis Servicios</span>
                 </a>
             </li>
 
             <li>
-                <a href="#favoritos" data-title="Favoritos">
+                <a href="<?= BASE_URL ?>/cliente/favoritos" data-title="Favoritos">
                     <i class="bi bi-heart"></i>
                     <span>Favoritos</span>
                 </a>
             </li>
 
             <li>
-                <a href="#mensajes" data-title="Mensajes">
+                <a href="<?= BASE_URL ?>/cliente/mensajes" data-title="Mensajes">
                     <i class="bi bi-chat-dots"></i>
                     <span>Mensajes</span>
                 </a>
             </li>
 
             <li>
-                <a href="#historial" data-title="Historial">
+                <a href="<?= BASE_URL ?>/cliente/historial" data-title="Historial">
                     <i class="bi bi-clock-history"></i>
                     <span>Historial</span>
                 </a>
             </li>
 
             <li>
-                <a href="#perfil" data-title="Mi Perfil">
+                <a href="<?= BASE_URL ?>/cliente/perfil" data-title="Mi Perfil">
                     <i class="bi bi-person-circle"></i>
                     <span>Mi Perfil</span>
                 </a>
@@ -67,7 +67,7 @@
         <p>Más</p>
         <ul>
             <li>
-                <a href="#ayuda" data-title="Ayuda">
+                <a href="<?= BASE_URL ?>/cliente/ayuda" data-title="Ayuda">
                     <i class="bi bi-question-circle"></i>
                     <span>Ayuda</span>
                 </a>

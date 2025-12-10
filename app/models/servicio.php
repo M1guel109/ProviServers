@@ -51,7 +51,18 @@ class Servicio
     public function mostrar()
     {
         try {
-            $sql = "SELECT * FROM servicios ORDER BY created_at DESC";
+            $sql = "SELECT 
+                    s.*,
+                    c.nombre AS categoria_nombre,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                    pub.estado AS publicacion_estado
+                FROM servicios s
+                INNER JOIN categorias c ON c.id = s.id_categoria
+                LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
+                LEFT JOIN proveedores p ON p.id = pub.proveedor_id
+                ORDER BY s.created_at DESC"
+            ;
+
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute();
 
