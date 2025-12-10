@@ -160,6 +160,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
         break;
 
+    case '/admin/moderacion-actualizar':
+        require BASE_PATH . '/app/controllers/moderacionController.php';
+        break;
+
     // Fin de rutas admin
 
     // Rutas del proveedor
