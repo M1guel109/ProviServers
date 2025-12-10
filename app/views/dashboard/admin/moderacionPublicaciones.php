@@ -104,8 +104,8 @@ $datos = mostrarservicios();
                                 <tr>
                                     <td><?= htmlspecialchars($servicio['id']) ?></td>
                                     <td><?= htmlspecialchars($servicio['nombre']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['proveedor_id']) ?></td>
-                                    <td><?= htmlspecialchars($servicio['id_categoria']) ?></td>
+                                    <td><?= htmlspecialchars($servicio['proveedor_nombre']) ?></td>
+                                    <td><?= htmlspecialchars($servicio['categoria_nombre']) ?></td>
                                     <td><?= htmlspecialchars($servicio['created_at']) ?></td>
                                     <td>
                                         <span class="badge bg-warning text-dark">
