@@ -136,3 +136,164 @@
     min-width: 200px;
     text-align: center;
 }
+
+/* ==================== FILTROS ==================== */
+.calendar-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #E5E7EB;
+    background: var(--white-color);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: #6B7280;
+}
+
+.filter-item:hover {
+    background: #F9FAFB;
+    border-color: var(--primary-color);
+}
+
+.filter-item.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.filter-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.bg-all { background: #6B7280; }
+.bg-membresia { background: #F59E0B; }
+.bg-servicio { background: #0066FF; }
+.bg-verificacion { background: #EF4444; }
+.bg-evento { background: #9333EA; }
+
+/* ==================== GRID DEL CALENDARIO ==================== */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #E5E7EB;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.calendar-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1px;
+    background: #E5E7EB;
+    border: 1px solid #E5E7EB;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B7280;
+    padding: 12px;
+    text-transform: uppercase;
+    background: #F9FAFB;
+    border-bottom: 2px solid #E5E7EB;
+}
+
+.calendar-day {
+    min-height: 100px;
+    border: none;
+    border-radius: 0;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    background: var(--white-color);
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: #F9FAFB;
+    z-index: 1;
+}
+
+.calendar-day.other-month {
+    background: #F9FAFB;
+    opacity: 0.5;
+}
+
+.calendar-day.other-month .day-number {
+    color: #9CA3AF;
+}
+
+.calendar-day.today {
+    background: #EBF4FF;
+}
+
+.calendar-day.today .day-number {
+    background: var(--primary-color);
+    color: var(--white-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-day.selected {
+    background: #F0F7FF;
+    box-shadow: inset 0 0 0 2px var(--primary-color);
+}
+
+.calendar-day.selected .day-number {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.day-number {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-align: left;
+}
+
+.day-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    flex: 1;
+    align-content: flex-start;
+}
+
+.event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin: 2px;
+    display: inline-block;
+}
+
+.event-dot.membresia { background: #F59E0B; }
+.event-dot.servicio { background: #0066FF; }
+.event-dot.verificacion { background: #EF4444; }
+.event-dot.evento { background: #9333EA; }
+
