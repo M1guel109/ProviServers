@@ -160,6 +160,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
         break;
 
+    case '/admin/moderacion-actualizar':
+        require BASE_PATH . '/app/controllers/moderacionController.php';
+        break;
+
     // Fin de rutas admin
 
     // Rutas del proveedor
@@ -218,10 +222,10 @@ switch ($request) {
         break;
     case '/proveedor/en-proceso':
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
-        break;  
-     case '/proveedor/completadas':
+        break;
+    case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
-        break;     
+        break;
 
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
