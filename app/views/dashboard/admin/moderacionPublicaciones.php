@@ -17,7 +17,7 @@ $datos = mostrarservicios();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Moderación de Servicios</title>
+    <title>Proviservers | Moderación de Publicaciones</title>
 
     <!-- Css DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css">
@@ -57,7 +57,7 @@ $datos = mostrarservicios();
                 <div class="col-md-8 d-flex flex-column">
 
                     <div>
-                        <h1 class="mb-1">Moderación de Servicios</h1>
+                        <h1 class="mb-1">Moderación de Publicaciones</h1>
                         <p class="text-muted mb-0">
                             Revisa y aprueba los servicios creados por los proveedores antes de su publicación.
                         </p>

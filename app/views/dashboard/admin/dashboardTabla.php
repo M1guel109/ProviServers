@@ -147,27 +147,17 @@ $datos = mostrarUsuarios();
                                             <!-- Uso de las clases personalizadas para los botones -->
                                             <div class="action-buttons">
                                                 <!-- Botón para ver detalle del servicio (Revisar) -->
-                                                <a href="<?= BASE_URL ?>/admin/revisar-servicio?id=<?= $servicio['id_servicio'] ?>" class="btn-action btn-view" title="Revisar detalles">
+                                                <a href="<?= BASE_URL ?>/admin/revisar-servicio?id=<?= $usuario['id_servicio'] ?>" class="btn-action btn-view" title="Revisar detalles">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
 
-                                                <!-- Botón de Aprobar -->
-                                                <button type="button" class="btn-action btn-approve"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#confirmApproveModal"
-                                                    data-id="<?= htmlspecialchars($servicio['id_servicio']) ?>"
-                                                    title="Aprobar Servicio">
-                                                    <i class="bi bi-check-circle"></i>
-                                                </button>
+                                                <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id'] ?>" class="btn-action btn-edit" title="Editar usuario">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
 
-                                                <!-- Botón de Rechazar -->
-                                                <button type="button" class="btn-action btn-reject"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#confirmRejectModal"
-                                                    data-id="<?= htmlspecialchars($servicio['id_servicio']) ?>"
-                                                    title="Rechazar Servicio">
-                                                    <i class="bi bi-x-circle"></i>
-                                                </button>
+                                                <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id'] ?>" class="btn-action btn-delete" title="Eliminar usuario">
+                                                    <i class="bi bi-trash3"></i>
+                                                </a>
                                             </div>
                                         </td>
                                     </tr>
