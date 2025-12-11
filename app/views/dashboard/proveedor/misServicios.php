@@ -139,7 +139,7 @@ if ($usuarioId) {
 
                             // Texto y estilos por estado
                             switch ($estado) {
-                                case 'activa':
+                                case 'aprobado':
                                     $textoEstado = 'Publicado';
                                     $claseEstado = 'estado-publicacion estado-activa';
                                     break;

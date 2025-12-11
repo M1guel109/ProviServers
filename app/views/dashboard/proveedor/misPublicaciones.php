@@ -83,7 +83,7 @@ if ($usuarioId) {
                     <?php if (!empty($publicaciones)) : ?>
                         <?php foreach ($publicaciones as $pub) : ?>
                             <?php
-                            $estado = $pub['estado'] ?? '';
+                            $estado = $pub['estado_publicacion'] ?? '';
                             $badgeClass = 'bg-secondary';
                             $estadoTexto = ucfirst($estado);
 
@@ -118,7 +118,7 @@ if ($usuarioId) {
                                         <?= $estadoTexto ?>
                                     </span>
                                 </td>
-                                <td><?= htmlspecialchars($pub['created_at'] ?? '') ?></td>
+                                <td><?= htmlspecialchars($pub['publicacion_created_at'] ?? '') ?></td>
                                 <td>
                                     <div class="action-buttons">
                                         <!-- Ver detalle (placeholder, luego lo conectas) -->
@@ -197,9 +197,9 @@ if ($usuarioId) {
         document.addEventListener('DOMContentLoaded', function() {
             $('#tabla-publicaciones').DataTable({
                 responsive: true,
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                }
+                // language: {
+                //     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                // }
             });
 
             // Submenús del sidebar (si los usas)
