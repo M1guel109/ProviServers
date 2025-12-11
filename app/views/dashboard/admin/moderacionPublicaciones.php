@@ -193,6 +193,9 @@ $datos = mostrarservicios();
         <!-- Enlaces / Información -->
     </footer>
 
+        <!-- apexcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <!-- Datatables -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
