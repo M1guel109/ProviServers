@@ -26,9 +26,9 @@
             </li>
 
             <li>
-                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" data-title="Mis Servicios">
+                <a href="<?= BASE_URL ?>/cliente/servicios-contratados" data-title="Servicios Contratados">
                     <i class="bi bi-briefcase"></i>
-                    <span>Mis Servicios</span>
+                    <span>Servicios Contratados</span>
                 </a>
             </li>
 

@@ -1,3 +1,22 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const current = window.location.href;
+  const links = document.querySelectorAll(".sidebar a");
+
+  // Quitar cualquier active previo
+  links.forEach(link => link.classList.remove("active"));
+
+  // Intentar coincidencia simple por "contiene"
+  links.forEach(link => {
+    const href = link.href;
+
+    // Si la URL actual contiene el href del link (o parte significativa)
+    if (current.includes(href)) {
+      link.classList.add("active");
+    }
+  });
+});
+
+
 // dashboardCliente.js
 document.addEventListener('DOMContentLoaded', () => {
     const btnToggleMenu = document.getElementById('btn-toggle-menu');
