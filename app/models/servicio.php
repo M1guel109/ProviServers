@@ -130,19 +130,36 @@ class Servicio
     /**
      * Eliminar un servicio por ID
      */
-    public function eliminar($id)
-    {
-        try {
-            $sql = "DELETE FROM servicios WHERE id = :id";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+public function eliminar($id)
+{
+    try {
+        // Iniciamos transacción por seguridad
+        $this->conexion->beginTransaction();
 
-            return $stmt->execute();
-        } catch (PDOException $e) {
-            error_log("Error en Servicio::eliminar -> " . $e->getMessage());
-            return false;
-        }
+        // 1. Eliminar publicaciones asociadas a este servicio
+        $sqlPublicaciones = "DELETE FROM publicaciones WHERE servicio_id = :id";
+        $stmtPub = $this->conexion->prepare($sqlPublicaciones);
+        $stmtPub->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmtPub->execute();
+
+        // 2. Eliminar el servicio
+        $sqlServicio = "DELETE FROM servicios WHERE id = :id";
+        $stmtServ = $this->conexion->prepare($sqlServicio);
+        $stmtServ->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmtServ->execute();
+
+        // 3. Confirmamos
+        $this->conexion->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        // Revertimos todo si algo falla
+        $this->conexion->rollBack();
+        error_log("Error en Servicio::eliminar -> " . $e->getMessage());
+        return false;
     }
+}
+
     public function getUltimoIdInsertado(): int
     {
         return (int) $this->conexion->lastInsertId();
