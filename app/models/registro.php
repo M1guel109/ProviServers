@@ -56,7 +56,7 @@ class Registro
             $stmtUsuario->bindParam(':clave', $claveHash);
             $stmtUsuario->bindParam(':documento', $data['documento']);
             $stmtUsuario->bindParam(':rol', $data['rol']);
-            $stmtUsuario->bindParam(':estado', $estadoId);
+            $stmtUsuario->bindParam(':estado_id', $estadoId);
 
             $stmtUsuario->execute();
 
