@@ -86,9 +86,7 @@
 
     <!-- CABECERA: LOGO y TÍTULO -->
     <div class="logo-container">
-        <!-- NOTA CRÍTICA: En dompdf, la ruta DEBE SER ABSOLUTA en el servidor, 
-             o debes configurar la opción 'chroot' y 'isRemoteEnabled' para cargarla. 
-             Asegúrate de que esta ruta sea accesible por PHP. -->
+        <!-- Usamos BASE_URL para el logo. Asumimos que esta ruta funciona. -->
         <img class="logo" src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers">
     </div>
 
@@ -116,16 +114,31 @@
         <tbody>
             <?php if (!empty($usuarios)) : ?>
 
-                <?php foreach ($usuarios as $usuario) : ?>
+                <?php foreach ($usuarios as $usuario) : 
+                    
+                    $foto_nombre = htmlspecialchars($usuario['foto']);
+                    
+                    // LÓGICA CLAVE: Si la foto es distinta a la por defecto, usa la URL HTTP.
+                    if ($foto_nombre !== 'default_user.png') {
+                        $src_imagen = BASE_URL . '/public/uploads/usuarios/' . $foto_nombre;
+                    } else {
+                        // Si es la por defecto, usa la Base64 (incrustada). 
+                        // El ?? es un fallback por si Base64 falló en el controlador, aunque esto no debería pasar.
+                        $src_imagen = $foto_default_base64 ?? (BASE_URL . '/public/uploads/usuarios/' . $foto_nombre);
+                    }
+                    
+                    // Manejar nombres compuestos
+                    $nombre_completo = $usuario['nombres'] . ' ' . $usuario['apellidos'];
+
+                ?>
                     <tr>
                         <td class="center-cell">
-                            <!-- De nuevo, esta ruta debe ser accesible para dompdf -->
                             <img class="user-photo" 
-                                src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($usuario['foto']) ?>" 
+                                src="<?= $src_imagen ?>" 
                                 alt="Foto"
                             >
                         </td>
-                        <td><?= htmlspecialchars($usuario['nombres'] . ' ' . $usuario['apellidos']) ?></td>
+                        <td><?= htmlspecialchars($nombre_completo) ?></td>
                         <td><?= htmlspecialchars($usuario['email']) ?></td>
                         <td><?= htmlspecialchars($usuario['telefono']) ?></td>
                         <td><?= htmlspecialchars($usuario['ubicacion']) ?></td>
@@ -136,7 +149,7 @@
 
             <?php else: ?>
                 <tr>
-                    <td colspan="6" style="text-align: center;">
+                    <td colspan="7" style="text-align: center;">
                         <h4 style="color: #0066ff;">No hay usuarios registrados para generar el reporte.</h4>
                     </td>
                 </tr>
