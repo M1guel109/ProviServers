@@ -6,6 +6,7 @@ require_once BASE_PATH . '/app/controllers/adminController.php';
 // llamamos la funcion especifica que exite en dicho controlador
 $datos = mostrarUsuarios();
 
+
 ?>
 
 <!DOCTYPE html>
@@ -147,7 +148,7 @@ $datos = mostrarUsuarios();
                                             <!-- Uso de las clases personalizadas para los botones -->
                                             <div class="action-buttons">
                                                 <!-- Botón para ver detalle del servicio (Revisar) -->
-                                                <a href="<?= BASE_URL ?>/admin/revisar-servicio?id=<?= $usuario['id_servicio'] ?>" class="btn-action btn-view" title="Revisar detalles">
+                                                <a href="#" class="btn-action btn-view" title="Revisar detalles">
                                                     <i class="bi bi-eye"></i>
                                                 </a>
 
