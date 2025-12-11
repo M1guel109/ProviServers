@@ -23,6 +23,20 @@
                     <li><a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/listar-servicio">
+                    <i class="bi bi-gear"></i>
+                    <span>Mis servicios</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/publicaciones">
+                    <i class="bi bi-broadcast-pin"></i>
+                    <span>Mis publicaciones</span>
+                </a>
+            </li>
+
             <li class="has-submenu">
                 <a href="#" data-title="Solicitudes" class="menu-link">
                     <i class="bi bi-envelope"></i><span>Solicitudes</span>
@@ -31,13 +45,13 @@
                     <i class="bi bi-chevron-down toggle-icon"></i>
                 </button>
                 <ul class="submenu">
-                    <li><a href="<?= BASE_URL?>/proveedor/nuevas_solicitudes" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
+                    <li><a href="<?= BASE_URL ?>/proveedor/nuevas_solicitudes" class="submenu-link"><i class="bi bi-plus-circle"></i>Nuevas solicitudes</a></li>
                     <li><a href="<?= BASE_URL ?>/proveedor/en-proceso" class="submenu-link"><i class="bi bi-clock-history"></i>En proceso</a></li>
                     <li><a href="<?= BASE_URL ?>/proveedor/completadas" class="submenu-link"><i class="bi bi-check-circle"></i>Completadas</a></li>
                 </ul>
             </li>
 
-            <li><a href="#" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
+            <li><a href="<?= BASE_URL?>/proveedor/resenas" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
             <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
             <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
             <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>

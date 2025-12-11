@@ -52,15 +52,17 @@ class Servicio
     {
         try {
             $sql = "SELECT 
-                s.*,
-                c.nombre AS categoria_nombre,
-                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre
-            FROM servicios s
-            INNER JOIN categorias c ON c.id = s.id_categoria
-            LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
-            LEFT JOIN proveedores p ON p.id = pub.proveedor_id
-            ORDER BY s.created_at DESC
-        ";
+                    s.*,
+                    c.nombre AS categoria_nombre,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                    pub.estado AS publicacion_estado
+                FROM servicios s
+                INNER JOIN categorias c ON c.id = s.id_categoria
+                LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
+                LEFT JOIN proveedores p ON p.id = pub.proveedor_id
+                ORDER BY s.created_at DESC"
+            ;
+
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute();
 

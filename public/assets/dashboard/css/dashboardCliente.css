@@ -56,7 +56,7 @@ body {
    SIDEBAR
    ======================================== */
 .sidebar {
-    width: 280px;
+    width: 285px;
     background: var(--white-color);
     display: flex;
     flex-direction: column;
@@ -99,6 +99,13 @@ body {
     width: 40px;
     margin: 0 auto;
 }
+
+.sidebar a.active {
+    color: #007bff;
+    background: rgba(0, 123, 255, 0.15);
+    font-weight: bold;
+}
+
 
 /* MENÚS */
 .menu-principal,

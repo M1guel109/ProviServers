@@ -18,10 +18,11 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- Estilos Globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
 
     <!-- CSS Específico -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/completadas.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+   
 </head>
 
 <body>
