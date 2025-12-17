@@ -11,7 +11,11 @@ class Login {
     }
     public function autenticar ($correo, $clave ){
         try{
-            $consultar = "SELECT * FROM usuarios WHERE email = :correo LIMIT 1";
+            $consultar = "SELECT u.*, e.nombre AS estado_nombre 
+                          FROM usuarios u 
+                          INNER JOIN usuario_estados e ON u.estado_id = e.id 
+                          WHERE u.email = :correo LIMIT 1";
+
             $resultado= $this->conexion->prepare ($consultar);
             $resultado->bindParam(':correo' , $correo);
             $resultado->execute();
@@ -31,7 +35,8 @@ class Login {
             return[
                 'id' => $user ['id'],
                 'rol' => $user ['rol'],
-                'email' => $user ['email']
+                'email' => $user ['email'],
+                'estado' => $user['estado_nombre']
             ];
             
         }catch(PDOException $e){
