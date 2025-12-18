@@ -95,6 +95,23 @@ class Registro
 
             $detalle_id = $this->conexion->lastInsertId();
 
+            // 3. ASIGNACIÓN DE MEMBRESÍA (Solo para Proveedores)
+            if ($rol === 'proveedor') {
+                /**
+                 * Gracias al cambio en tu DB, ahora insertamos la membresía como 'inactiva'
+                 * y con fechas NULL. Esto permite que el administrador la active manualmente
+                 * o el sistema la active al primer login exitoso.
+                 */
+                $sqlMembresia = "INSERT INTO proveedor_membresia 
+                                (proveedor_id, membresia_id, fecha_inicio, fecha_fin, estado) 
+                                 VALUES (:proveedor_id, :membresia_id, NULL, NULL, 'inactiva')";
+
+                $stmtMembresia = $this->conexion->prepare($sqlMembresia);
+                $stmtMembresia->execute([
+                    ':proveedor_id'  => $detalle_id,
+                    ':membresia_id'  => $data['id_membresia_defecto'] ?? 4
+                ]);
+            }
 
             // 5. TERCERA INSERCIÓN (CONDICIONAL): TABLA 'documentos_proveedor'
             if ($rol === 'proveedor' && !empty($data['documentos'])) {
