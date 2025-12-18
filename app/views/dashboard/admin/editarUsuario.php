@@ -90,19 +90,19 @@ $usuario = mostrarUsuarioId($id);
                         <div class="col-md-6">
                             <label for="nombre" class="form-label">Nombres</label>
                             <input type="text" class="form-control" id="nombre" name="nombres"
-                                placeholder="Ej: Juan Pérez" required value="<?= $usuario['nombres']?>">
+                                placeholder="Ej: Juan Pérez" required value="<?= $usuario['nombres'] ?>">
                         </div>
 
                         <div class="col-md-6">
                             <label for="apellidos" class="form-label">Apellidos</label>
                             <input type="text" class="form-control" id="apellidos" name="apellidos"
-                                placeholder="Ej: Gómez Rojas" required value="<?= $usuario['apellidos']?>">
+                                placeholder="Ej: Gómez Rojas" required value="<?= $usuario['apellidos'] ?>">
                         </div>
 
                         <div class="col-md-6">
                             <label for="documento" class="form-label">Documento</label>
                             <input type="text" class="form-control" id="documento" name="documento"
-                                placeholder="Ej: 1023456789" required value="<?= $usuario['documento']?>">
+                                placeholder="Ej: 1023456789" required value="<?= $usuario['documento'] ?>">
                         </div>
 
                         <!-- Email -->
@@ -138,10 +138,22 @@ $usuario = mostrarUsuarioId($id);
                         <div class="col-md-6">
                             <label for="rol" class="form-label">Rol</label>
                             <select class="form-select" id="rol" name="rol" required>
-                                <option value="<?= $usuario['rol'] ?>"><?= $usuario['rol']?? '' ?></option>
+                                <option value="<?= $usuario['rol'] ?>"><?= $usuario['rol'] ?? '' ?></option>
                                 <option value="admin">Administrador</option>
                                 <option value="proveedor">Proveedor</option>
                                 <option value="cliente">Cliente</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="<?= $usuario['estado_nombre'] ?>"><?= $usuario['estado_nombre'] ?? '' ?></option>
+                                <option value="1">Pendiente</option>
+                                <option value="2">Activo</option>
+                                <option value="3">Suspendido</option>
+                                <option value="4">Inactivo</option>
+                                <option value="5">Bloqueado</option>
                             </select>
                         </div>
 

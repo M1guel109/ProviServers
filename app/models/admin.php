@@ -153,13 +153,14 @@ class Usuario
     {
         try {
             $consultar = "SELECT 
-                u.id, u.email, u.documento, u.rol, u.estado_id,
+                u.id, u.email, u.documento, u.rol, u.estado_id, es.nombre AS estado_nombre,
                 COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
                 COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
                 COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
                 COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
                 COALESCE(c.foto, p.foto, a.foto) AS foto
             FROM usuarios u
+            LEFT JOIN usuario_estados es ON u.estado_id = es.id
             LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
             LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
             LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
