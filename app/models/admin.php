@@ -206,7 +206,8 @@ class Usuario
             $actualizar = "UPDATE usuarios 
                              SET email = :email,
                              documento = :documento,
-                              rol = :rol 
+                              rol = :rol,
+                              estado_id = :estado_id 
                              WHERE id = :id";
 
             $resultado = $this->conexion->prepare($actualizar);
@@ -214,6 +215,7 @@ class Usuario
             $resultado->bindParam(':email', $data['email']);
             $resultado->bindParam(':documento', $data['documento']);
             $resultado->bindParam(':rol', $data['rol']);
+            $resultado->bindParam(':estado_id', $data['estado']);
 
             $resultado->execute();
 
