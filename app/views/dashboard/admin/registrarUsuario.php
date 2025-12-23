@@ -8,16 +8,22 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Plataforma de servicios locales</title>
+    <title>Proviservers | Registrar Usuario</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        xintegrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <!-- <style>
+        /* Estilos básicos para la sección de documentación, si es necesario, aunque se usa Bootstrap d-none */
+        #documentos-proveedor-admin {
+            transition: all 0.3s ease-in-out;
+        }
+    </style> -->
 </head>
 
 <body>
@@ -35,20 +41,26 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
         <!-- Secciones -->
         <!-- titulo -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Registrar Usuario</h1>
-                <p class="text-muted mb-0">
-                    Registra nuevos servicios para que los usuarios puedan contratarlos dentro de la plataforma.
-                </p>
-            </div>
+        <section id="titulo-principal">
+            <div class="row">
 
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
-            </nav>
+                <div class="col-md-8">
+                    <h1 class="mb-1">Registrar Usuario</h1>
+                    <p class="text-muted mb-0">
+                        Registra nuevos usuarios (Administrador, Proveedor o Cliente) en la plataforma.
+                    </p>
+                </div>
+
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
+                    </nav>
+                </div>
+
+            </div>
         </section>
 
-        <!-- Formualior admin -->
+        <!-- Formulario admin -->
         <section id="formulario-usuarios">
             <div class="contenedor-formulario">
                 <!-- Formulario -->
@@ -74,8 +86,8 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
                         <!-- Apellidos -->
                         <div class="col-md-6">
-                            <label for="nombre" class="form-label">Apellidos</label>
-                            <input type="text" class="form-control" id="nombre" name="apellidos"
+                            <label for="apellidos" class="form-label">Apellidos</label>
+                            <input type="text" class="form-control" id="apellidos" name="apellidos"
                                 placeholder="Ej:Lozano Pérez" required>
                         </div>
 
@@ -124,6 +136,34 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                             </select>
                         </div>
 
+                        <!-- DOCUMENTACIÓN DEL PROVEEDOR (Se muestra condicionalmente) -->
+                        <div id="documentos-proveedor-admin" class="col-12 d-none">
+                            <h5 class="mt-4 mb-3">Documentación del Proveedor <span class="text-muted">(Requerida para verificación de cuenta)</span></h5>
+                            <div class="row g-3">
+                                
+                                <div class="col-md-6">
+                                    <label for="doc-cedula" class="form-label">Cédula (PDF o imagen) <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control file-doc-proveedor" id="doc-cedula" name="doc-cedula" accept="image/*,.pdf">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="doc-selfie" class="form-label">Selfie de verificación <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control file-doc-proveedor" id="doc-selfie" name="doc-foto" accept="image/*">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="doc-antecedentes" class="form-label">Antecedentes judiciales (PDF) <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control file-doc-proveedor" id="doc-antecedentes" name="doc-antecedentes" accept=".pdf">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="doc-certificado" class="form-label">Certificado de habilidades (Opcional)</label>
+                                    <input type="file" class="form-control" id="doc-certificado" name="doc-certificado" accept="image/*,.pdf">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- FIN DOCUMENTACIÓN DEL PROVEEDOR -->
+
                         <!-- Botón -->
                         <div class="text-center mt-3">
                             <button type="submit" class="btn btn-primary px-4">Agregar Usuario</button>
@@ -147,12 +187,14 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        xintegrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/registroUsuario.js"></script>
+    
 </body>
 
 </html>

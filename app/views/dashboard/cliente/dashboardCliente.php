@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,180 +8,83 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <!-- Estilos globales -->
-    <link rel="stylesheet" href="public/assets/estilosGenerales/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- Estilos específicos de cliente -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardCliente.css">
+    <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
-
 <body>
     <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="logo">
-            <a href="#">
-                <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers" class="logo-completo">
-                <img src="public/assets/img/logos/FAVICON.png" alt="Logo Proviservers" class="logo-favicon">
-            </a>
-        </div>
-
-        <!-- Menú principal -->
-        <nav class="menu-principal">
-            <ul>
-                <li>
-                    <a href="#inicio" class="active" data-title="Inicio">
-                        <i class="bi bi-house-door"></i>
-                        <span>Inicio</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#explorar" data-title="Explorar Servicios">
-                        <i class="bi bi-compass"></i>
-                        <span>Explorar Servicios</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#mis-servicios" data-title="Mis Servicios">
-                        <i class="bi bi-briefcase"></i>
-                        <span>Mis Servicios</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#favoritos" data-title="Favoritos">
-                        <i class="bi bi-heart"></i>
-                        <span>Favoritos</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#mensajes" data-title="Mensajes">
-                        <i class="bi bi-chat-dots"></i>
-                        <span>Mensajes</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#historial" data-title="Historial">
-                        <i class="bi bi-clock-history"></i>
-                        <span>Historial</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="#perfil" data-title="Mi Perfil">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Mi Perfil</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Menú secundario -->
-        <nav class="menu-secundario">
-            <p>Más</p>
-            <ul>
-                <li>
-                    <a href="#ayuda" data-title="Ayuda">
-                        <i class="bi bi-question-circle"></i>
-                        <span>Ayuda</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="login.html" data-title="Cerrar Sesión">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span>Cerrar Sesión</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </aside>
+    <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-
+        
         <!-- HEADER -->
-        <header class="barra-superior">
-            <button id="btn-toggle-menu" class="btn-toggle">
-                <i class="bi bi-list"></i>
-            </button>
+        <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
-            <div class="buscador">
-                <i class="bi bi-search"></i>
-                <input type="text" placeholder="Buscar servicios, proveedores...">
-            </div>
-
-            <div class="acciones-barra">
-                <div class="notificaciones item-barra">
-                    <i class="bi bi-bell-fill"></i>
-                    <span class="badge">3</span>
-                </div>
-
-                <a href="#perfil" class="usuario item-barra">
-                    <img src="public/assets/dashBoard/img/Foto-usuario.png" alt="Usuario">
-                    <div class="info-usuario">
-                        <span class="nombre">Carlos M.</span>
-                        <span class="rol">Cliente</span>
-                    </div>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-            </div>
-        </header>
+        <?php
+        // Si quieres usar el nombre del cliente en el saludo
+        $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
+        ?>
 
         <!-- SECCIÓN: INICIO -->
         <section id="inicio">
-            <div class="section-hero">
-                <h1>¡Hola Carlos! 👋</h1>
-                <p>Bienvenido a tu espacio personal. Encuentra los mejores profesionales para cualquier servicio que necesites.</p>
+            <div class="section-hero text-center">
+                <h1>¡Hola, <?= htmlspecialchars($nombreSaludo) ?>! 👋</h1>
+                <p class="lead">Este es tu espacio para gestionar servicios, publicar necesidades y conectar con profesionales confiables.</p>
             </div>
+
 
             <div class="section-content">
                 <!-- Estadísticas visuales -->
-                <div class="stats-visual">
-                    <div class="stat-visual-item">
-                        <i class="bi bi-clock-history"></i>
-                        <h3>3</h3>
-                        <p>Servicios Activos</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-check-circle"></i>
-                        <h3>12</h3>
-                        <p>Completados</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-heart"></i>
-                        <h3>8</h3>
-                        <p>Favoritos</p>
-                    </div>
-                    <div class="stat-visual-item">
-                        <i class="bi bi-star"></i>
-                        <h3>4.8</h3>
-                        <p>Calificación</p>
-                    </div>
+                <div class="stats-visual row text-center">
+                <div class="col stat-visual-item">
+                    <i class="bi bi-clock-history"></i>
+                    <h3>3</h3>
+                    <p>Servicios Activos</p>
                 </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-check-circle"></i>
+                    <h3>1</h3>
+                    <p>Completados</p>
+                </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-heart"></i>
+                    <h3>3</h3>
+                    <p>Favoritos</p>
+                </div>
+                <div class="col stat-visual-item">
+                    <i class="bi bi-star"></i>
+                    <h3>4.8</h3>
+                    <p>Calificación</p>
+                </div>
+                </div>
+
 
                 <!-- Acciones rápidas -->
                 <div class="mt-5">
-                    <h2 class="mb-4">¿Qué necesitas hoy?</h2>
-                    <div class="d-flex gap-3 flex-wrap">
-                        <a href="#explorar" class="btn-modern">
-                            <i class="bi bi-search"></i>
-                            Buscar Servicio
-                        </a>
-                        <a href="#mis-servicios" class="btn-modern-outline">
-                            <i class="bi bi-briefcase"></i>
-                            Ver Mis Servicios
-                        </a>
-                    </div>
+                <h2 class="mb-4">¿Qué necesitas hoy?</h2>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
+                    <i class="bi bi-search"></i> Buscar Servicio
+                    </a>
+                    <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                    <i class="bi bi-briefcase"></i> Ver Mis Servicios
+                    </a>
+                    <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
+                    <i class="bi bi-plus-circle"></i> Publicar Necesidad
+                    </button>
+                </div>
                 </div>
 
-                <!-- Servicios recientes -->
+
+                <!-- Servicios en curso -->
                 <div class="mt-5">
                     <h2 class="mb-4">Servicios en Curso</h2>
                     <ul class="modern-list">
@@ -192,8 +96,9 @@
                                     <p class="mb-0 text-muted">Con Miguel Torres · Progreso: 65%</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
+
                         <li class="modern-list-item">
                             <div class="d-flex align-items-center gap-3">
                                 <i class="bi bi-wrench" style="font-size: 2rem; color: var(--primary-color);"></i>
@@ -202,7 +107,7 @@
                                     <p class="mb-0 text-muted">Con Carlos Ruiz · Cita: 28 Nov 10:00 AM</p>
                                 </div>
                             </div>
-                            <a href="#mis-servicios" class="btn-modern-outline btn-sm">Ver detalles</a>
+                            <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline btn-sm">Ver detalles</a>
                         </li>
                     </ul>
                 </div>
@@ -366,7 +271,7 @@
             <div class="section-content">
                 <p class="text-muted mb-4">Has guardado 8 proveedores como favoritos</p>
                 <div class="services-grid">
-                    <!-- Aquí irían las cards de proveedores favoritos -->
+                    <!-- Card ejemplo de proveedor favorito -->
                     <div class="service-item">
                         <div class="service-content">
                             <div class="d-flex justify-content-between mb-3">
@@ -397,9 +302,10 @@
                     <div class="col-md-4">
                         <div class="service-item text-center">
                             <div class="service-content">
-                                <img src="public/assets/dashBoard/img/Foto-usuario.png" alt="Perfil" 
+                                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/Foto-usuario.png"
+                                     alt="Perfil"
                                      style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
-                                <h3>Carlos M.</h3>
+                                <h3><?= htmlspecialchars($nombreSaludo) ?></h3>
                                 <p class="text-muted">cliente@correo.com</p>
                                 <button class="btn-modern-outline w-100">Cambiar foto</button>
                             </div>
@@ -413,7 +319,7 @@
                                 <form class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label">Nombre completo</label>
-                                        <input type="text" class="form-control" value="Carlos M.">
+                                        <input type="text" class="form-control" value="<?= htmlspecialchars($nombreSaludo) ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Correo electrónico</label>
@@ -440,10 +346,96 @@
 
     </main>
 
+    <!-- Modal -->
+    <div class="modal fade" id="modalNecesidad" tabindex="-1" aria-labelledby="modalNecesidadLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+        
+        <!-- Encabezado -->
+        <div class="modal-header">
+            <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        
+        <!-- Cuerpo con formulario -->
+        <div class="modal-body">
+            <form id="formNecesidad" novalidate>
+            <!-- Categoría -->
+            <div class="mb-3">
+            <label for="categoria" class="form-label">Categoría del servicio</label>
+            <select class="form-select" id="categoria" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="Salud">Salud</option>
+                <option value="Educación">Educación</option>
+                <option value="Tecnología">Tecnología</option>
+                <option value="Hogar">Hogar</option>
+                <option value="Otros">Otros</option>
+            </select>
+            <div class="invalid-feedback">Por favor selecciona una categoría.</div>
+            </div>
+
+            <!-- Campo cuando eligen "Otros" -->
+            <div class="mb-3 d-none" id="categoriaOtroWrapper">
+            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
+            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
+            <div class="invalid-feedback">Por favor especifica la categoría.</div>
+            </div>
+
+
+            <!-- Descripción -->
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción detallada</label>
+                <textarea class="form-control" id="descripcion" rows="3" required></textarea>
+                <div class="invalid-feedback">La descripción es obligatoria.</div>
+            </div>
+
+            <!-- Presupuesto -->
+            <div class="mb-3">
+                <label for="presupuesto" class="form-label">Presupuesto estimado (COP)</label>
+                <input type="number" class="form-control" id="presupuesto" min="0" required>
+                <div class="invalid-feedback">Ingresa un presupuesto válido.</div>
+            </div>
+
+            <!-- Fecha y hora -->
+            <div class="row mb-3">
+                <div class="col-md-6">
+                <label for="fecha" class="form-label">Fecha deseada</label>
+                <input type="date" class="form-control" id="fecha" required>
+                <div class="invalid-feedback">Selecciona una fecha.</div>
+                </div>
+                <div class="col-md-6">
+                <label for="hora" class="form-label">Hora deseada</label>
+                <input type="time" class="form-control" id="hora" required>
+                <div class="invalid-feedback">Selecciona una hora.</div>
+                </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="mb-3">
+                <label for="ubicacion" class="form-label">Ubicación</label>
+                <input type="text" class="form-control" id="ubicacion" required>
+                <div class="invalid-feedback">La ubicación es obligatoria.</div>
+            </div>
+            </form>
+        </div>
+        
+        <!-- Footer con botones -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" form="formNecesidad" class="btn btn-outline-primary">
+            <i class="bi bi-send"></i> Publicar
+            </button>
+        </div>
+        </div>
+    </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-
     <!-- JS propio -->
-    <script src="public/assets/dashBoard/js/dashboardCliente.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+
+
+
 </body>
 </html>

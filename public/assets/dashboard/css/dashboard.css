@@ -127,20 +127,19 @@ body {
     height: auto;
 }
 
-.menu-principal,
-.menu-secundario {
+.menu-principal
+ {
     padding: 0 25px;
     margin-bottom: 25px;
 }
 
-.menu-principal ul,
-.menu-secundario ul {
+.menu-principal ul
+ {
     list-style: none;
     padding: 0;
 }
 
-.menu-principal a,
-.menu-secundario a {
+.menu-principal a{
     text-decoration: none;
     padding: 14px 18px;
     margin-bottom: 6px;
@@ -154,16 +153,15 @@ body {
     color: var(--dark-color);
 }
 
-.menu-principal a:hover,
-.menu-secundario a:hover {
+.menu-principal a:hover
+{
     background-color: var(--primary-color);
     transform: translateX(5px);
     color: var(--white-color);
 }
 
 
-.menu-principal li,
-.menu-secundario li {
+.menu-principal li{
     margin-bottom: 6px;
     border-radius: 8px;
     cursor: pointer;
@@ -175,8 +173,7 @@ body {
 }
 
 /* Estado activo del menú principal */
-.menu-principal a.active,
-.menu-secundario a.active {
+.menu-principal a.active{
     background-color: var(--primary-color);
     color: var(--white-color);
     font-weight: 600;
@@ -185,8 +182,7 @@ body {
 }
 
 /* --- Barra izquierda decorativa solo en estado activo --- */
-.menu-principal a.active::before,
-.menu-secundario a.active::before {
+.menu-principal a.active::before{
   content: "";
   position: absolute;
   left: -32px;
@@ -198,18 +194,7 @@ body {
   border-radius: 4px;
 }
 
-.menu-secundario p {
-    font-size: var(--fs-small);
-    opacity: 0.8;
-    margin-bottom: 12px;
-    padding-left: 18px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--dark-color);
-    border-top: 1px solid #0000004f;
-    padding-top: 12px;
-}
+
 
 .menu-footer {
     margin-top: auto;
@@ -319,7 +304,7 @@ body {
     position: relative;
 }
 
-.badge {
+/* .badge {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -333,7 +318,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-}
+} */
 
 .idioma img {
     width: 24px;
@@ -601,7 +586,7 @@ body {
 .has-submenu > .menu-link {
   display: flex;
   align-items: center;
-  padding: 10px 15px;
+  padding: 10px 20px;
   gap: 10px;
   color: var(--dark-color);
   text-decoration: none;
@@ -668,47 +653,7 @@ body {
 }
 
 
-.sidebar.plegado .menu-secundario p {
-  display: none;
-}
 
-/* ======== SIDEBAR PLEGABLE ======== */
-.sidebar {
-  width: 260px;
-  transition: width 0.3s ease;
-  overflow: hidden;
-}
-
-.sidebar.plegado {
-  width: 80px;
-}
-
-/* Oculta textos cuando está plegado */
-.sidebar.plegado .menu-principal a,
-.sidebar.plegado .menu-secundario a,
-.sidebar.plegado .menu-footer a {
-  text-align: center;
-}
-
-.sidebar.plegado .menu-principal a::after,
-.sidebar.plegado .menu-secundario a::after {
-  display: none;
-}
-
-/* Oculta los textos, deja los íconos */
-.sidebar.plegado a span {
-  display: none;
-}
-
-/* íconos opcionales, si los agregas luego */
-.sidebar a i {
-  margin-right: 10px;
-  transition: all 0.3s ease;
-}
-
-.sidebar.plegado a i {
-  margin: 0;
-}
 
 /* ======== BOTÓN DE TOGGLE ======== */
 .btn-toggle {
@@ -747,21 +692,21 @@ body {
 
 /* ===== CENTRADO DE ICONOS EN MODO PLEGADO ===== */
 .sidebar.plegado .menu-principal a,
-.sidebar.plegado .menu-secundario a,
+.sidebar.plegado  a,
 .sidebar.plegado .menu-footer a {
   justify-content: center;
   padding: 12px 0;
 }
 
 .sidebar.plegado .menu-principal a i,
-.sidebar.plegado .menu-secundario a i,
+.sidebar.plegado  a i,
 .sidebar.plegado .menu-footer a i {
   margin: 0;
   font-size: 1.4rem;
 }
 
 .sidebar.plegado .menu-principal a:hover,
-.sidebar.plegado .menu-secundario a:hover,
+.sidebar.plegado  a:hover,
 .sidebar.plegado .menu-footer a:hover {
   background-color: var(--primary-color);
   color: var(--white-color);

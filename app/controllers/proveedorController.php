@@ -2,6 +2,15 @@
 // Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helper.php';
 require_once __DIR__ . '/../models/servicio.php';
+require_once __DIR__ . '/../models/Publicacion.php';
+
+// Iniciar sesión para poder leer $_SESSION
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Capturamos en una variable el método o solicitud hecha al servidor
+$method = $_SERVER['REQUEST_METHOD'];
 
 // Capturamos en una variable el método o solicitud hecha al servidor
 $method = $_SERVER['REQUEST_METHOD'];
@@ -46,82 +55,103 @@ switch ($method) {
 
 function registrarServicio()
 {
-    // Capturamos los datos desde el formulario
+    // 0. Validar que haya sesión y que sea proveedor
+    if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
+        header('Location: ' . BASE_URL . '/login');
+        exit();
+    }
+
+    $usuarioId = (int) ($_SESSION['user']['id'] ?? 0);
+    if ($usuarioId <= 0) {
+        mostrarSweetAlert('error', 'Sesión inválida', 'No se encontró el usuario en sesión.');
+        exit();
+    }
+
+    // 1. Capturamos los datos desde el formulario
     $nombre         = $_POST['nombre']        ?? '';
     $id_categoria   = $_POST['id_categoria']  ?? '';
     $disponibilidad = $_POST['disponibilidad']?? '';
     $descripcion    = $_POST['descripcion']   ?? '';
 
-    // Validamos los campos obligatorios
+    // 2. Validamos los campos obligatorios
     if (empty($nombre) || empty($id_categoria) || $disponibilidad === '') {
         mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
         exit();
     }
 
-    // Aquí podrías capturar el id del proveedor logueado si lo manejas en sesión
-    // session_start();
-    // $id_proveedor = $_SESSION['user']['id'];
-
-    // Lógica para cargar imagen
+    // 3. Lógica para cargar imagen
     $ruta_img = null;
 
-    // Validamos si se envió o no la imagen desde el formulario
     if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['imagen'];
 
-        // Obtenemos la extensión del archivo
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-
-        // Definimos las extensiones permitidas
         $permitidas = ['png', 'jpg', 'jpeg'];
 
-        // Validamos que la extensión esté dentro de las permitidas
         if (!in_array($extension, $permitidas)) {
             mostrarSweetAlert('error', 'Extensión no permitida', 'Por favor, carga una imagen PNG, JPG o JPEG.');
             exit();
         }
 
-        // Validamos el tamaño máximo 2MB
         if ($file['size'] > 2 * 1024 * 1024) {
             mostrarSweetAlert('error', 'Error al cargar la imagen', 'El peso de la imagen supera el límite de 2MB.');
             exit();
         }
 
-        // Definimos el nombre del archivo
         $ruta_img = uniqid('servicio_') . '.' . $extension;
-
-        // Definimos el destino donde moveremos el archivo
         $destino = BASE_PATH . "/public/uploads/servicios/" . $ruta_img;
 
-        // Movemos el archivo al destino
         move_uploaded_file($file['tmp_name'], $destino);
-
     } else {
-        // Imagen por defecto para el servicio
         $ruta_img = "default_service.png";
     }
 
-    // Instanciamos la clase Servicio (modelo)
+    // 4. Instanciamos la clase Servicio (modelo)
     $objServicio = new Servicio();
 
-    $data = [
+    $dataServicio = [
         'nombre'         => $nombre,
         'id_categoria'   => $id_categoria,
         'disponibilidad' => $disponibilidad,
         'descripcion'    => $descripcion,
         'imagen'         => $ruta_img,
-        // 'id_proveedor' => $id_proveedor,
+        // Ojo: aquí NO guardamos proveedor_id en servicios, lo ligaremos vía publicaciones
     ];
 
-    // Enviamos la data al método "registrar()" del modelo
-    $resultado = $objServicio->registrar($data);
+    // 5. Enviamos la data al método "registrar()" del modelo
+    $resultado = $objServicio->registrar($dataServicio);
 
-    // Si la respuesta del modelo es verdadera, confirmamos
     if ($resultado === true) {
+        // 5.1. Obtenemos el ID del servicio recién creado
+        $servicioId = $objServicio->getUltimoIdInsertado();
+
+        // 5.2. Creamos la publicación ligada a este servicio y a este proveedor
+        try {
+            $publicacionModel = new Publicacion();
+
+            $publicacionModel->crearParaServicioDeProveedor(
+                $usuarioId,
+                $servicioId,
+                [
+                    'nombre'      => $nombre,
+                    'descripcion' => $descripcion,
+                    // Más adelante puedes agregar un campo "precio" en el formulario
+                    // y pasarlo aquí:
+                    // 'precio'   => $_POST['precio'] ?? 0,
+                    // 'ubicacion'=> '...' (si quieres usar ciudad/zona del proveedor)
+                    // 'estado'   => 'pendiente' // si usas el nuevo enum con moderación
+                ]
+            );
+        } catch (Exception $e) {
+            // No rompemos el flujo del alta de servicio, solo dejamos log del error
+            error_log("Error al crear publicación para el servicio {$servicioId}: " . $e->getMessage());
+        }
+
+        // 5.3. Respuesta al usuario
         mostrarSweetAlert(
             'success',
             'Servicio registrado con éxito',
-            'Se ha creado un nuevo servicio.',
+            'Se ha creado un nuevo servicio y su publicación. Quedará visible cuando el administrador lo apruebe (según el flujo que definan).',
             '/ProviServers/proveedor/registrar-servicio'
         );
     } else {
@@ -134,6 +164,7 @@ function registrarServicio()
 
     exit();
 }
+
 
 function mostrarServicios()
 {

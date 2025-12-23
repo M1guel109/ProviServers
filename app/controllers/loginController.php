@@ -30,6 +30,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+
+    /**
+     * 2. VERIFICACIÓN DE ESTADOS
+     * Validamos el estado que viene del modelo antes de iniciar sesión
+     */
+    switch ($resultado['estado']) {
+        case 'bloqueado':
+            mostrarSweetAlert('error', 'Acceso Denegado', 'Tu cuenta ha sido bloqueada. Contacta al soporte.');
+            exit();
+
+        case 'pendiente':
+            mostrarSweetAlert('info', 'En Revisión', 'Tu perfil de proveedor está siendo evaluado por un administrador. Te enviaremos un correo pronto.');
+            exit();
+
+        case 'inactivo':
+            mostrarSweetAlert('warning', 'Cuenta Inactiva', 'Tu cuenta está desactivada.');
+            exit();
+
+        case 'activo':
+            // Si está activo, permitimos que continúe el flujo de sesión
+            break;
+
+        default:
+            mostrarSweetAlert('error', 'Estado desconocido', 'Hubo un problema con tu cuenta.');
+            exit();
+    }
+    
     //SI PASA ESTA LINEA, EL USUARIO ES VALIDO
 
     session_start();
@@ -58,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
     }
 
-    mostrarSweetAlert('success', 'Ingreso Exitoso', $mensaje , $redirectUrl);
+    mostrarSweetAlert('success', 'Ingreso Exitoso', $mensaje, $redirectUrl);
     exit();
 } else {
     http_response_code(405);

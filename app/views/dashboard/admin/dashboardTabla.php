@@ -6,6 +6,7 @@ require_once BASE_PATH . '/app/controllers/adminController.php';
 // llamamos la funcion especifica que exite en dicho controlador
 $datos = mostrarUsuarios();
 
+
 ?>
 
 <!DOCTYPE html>
@@ -46,85 +47,197 @@ $datos = mostrarUsuarios();
 
         <!--     Secciones -->
         <!-- titulo -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Usuarios</h1>
-                <p class="text-muted mb-0">
-                    Aquí puedes ver todos los usuarios registrados. Usa las acciones disponibles para editar, eliminar o
-                    revisar información de cada usuario.
-                </p>
-            </div>
-            <!-- Desde la vista en el btn(hipervinculo) que creo para generar el reporte pdf dejo una ruta generica por rol   -->
-            <!--  y le agrego la variable tipo para definir el reporte que quiero generar ejplo el el siguiente a   -->
-            <!-- <a href="<?= BASE_URL ?>/admin/reporte?tipo=usuarios" target="_blank" class="btn btn-primary mt-3">
+        <!-- Desde la vista en el btn(hipervinculo) que creo para generar el reporte pdf dejo una ruta generica por rol   -->
+        <!--  y le agrego la variable tipo para definir el reporte que quiero generar ejplo el el siguiente a   -->
+        <!-- <a href="<?= BASE_URL ?>/admin/reporte?tipo=usuarios" target="_blank" class="btn btn-primary mt-3">
                 <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
             </a> -->
-            <a href="<?= BASE_URL ?>/admin/reporte?tipo=usuarios" target="_blank" class="btn btn-primary mt-3">
-                <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
-            </a>
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
-            </nav>
+        <section id="titulo-principal">
+            <div class="row align-items-start">
+
+                <div class="col-md-8 d-flex flex-column">
+
+                    <div>
+                        <h1 class="mb-1">Usuarios</h1>
+                        <p class="text-muted mb-0">
+                            Aquí puedes ver todos los usuarios registrados. Usa las acciones disponibles para editar, eliminar o
+                            revisar información de cada usuario.
+                        </p>
+                    </div>
+
+                    <a href="<?= BASE_URL ?>/admin/reporte?tipo=usuarios" target="_blank" class="btn btn-primary mt-3 w-auto" style="width: fit-content;">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
+                    </a>
+
+                </div>
+
+                <div class="col-md-4 d-flex justify-content-end align-items-start">
+
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 mt-2"></ol>
+                    </nav>
+
+                </div>
+
+            </div>
         </section>
 
 
         <!-- Tabla arriba -->
         <section id="tabla-arriba">
-            <table id="tabla-1" class="display nowrap">
-                <thead>
-                    <tr>
-                        <th>Foto</th>
-                        <th>Nombre completo</th>
-                        <th>Correo electrónico</th>
-                        <th>Teléfono</th>
-                        <th>Ubicación</th>
-                        <th>Rol</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-servicios">
-                    <?php if (!empty($datos)) : ?>
 
-                        <?php foreach ($datos as $usuario) : ?>
+            <ul class="nav nav-tabs mb-3" id="tablaTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="tabla-tab" data-bs-toggle="tab" data-bs-target="#tabla-pane" type="button" role="tab" aria-controls="tabla-pane" aria-selected="true">
+                        <i class="bi bi-table"></i> Datos y Acciones
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones-pane" type="button" role="tab" aria-controls="acciones-pane" aria-selected="false">
+                        <i class="bi bi-box-arrow-in-right"></i> Opciones de Exportación
+                    </button>
+                </li>
+            </ul>
 
+            <div class="tab-content" id="tablaTabsContent">
+
+                <div class="tab-pane fade show active" id="tabla-pane" role="tabpanel" aria-labelledby="tabla-tab">
+
+                    <table id="tabla" class="display nowrap">
+                        <thead>
                             <tr>
-                                <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['foto'] ?>" alt="Foto del usuario" width="50" height="50" style="border-radius: 50%;"></td>
-                                <td><?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?></td>
-                                <td><?= $usuario['email'] ?></td>
-                                <td><?= $usuario['telefono'] ?></td>
-                                <td><?= $usuario['ubicacion'] ?></td>
-                                <td><?= $usuario['rol'] ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="#" class="btn-action btn-view" title="Ver detalle">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-
-                                        <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id'] ?>" class="btn-action btn-edit" title="Editar usuario">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-
-                                        <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id'] ?>" class="btn-action btn-delete" title="Eliminar usuario">
-                                            <i class="bi bi-trash3"></i>
-                                        </a>
-                                    </div>
-
-                                </td>
+                                <th>Foto</th>
+                                <th>Nombre completo</th>
+                                <th>Correo electrónico</th>
+                                <th>Teléfono</th>
+                                <th>Ubicación</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td>
-                                <h2>No hay usuarios registrados</h2>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+                        </thead>
+                        <tbody id="tabla-servicios">
+                            <?php if (!empty($datos)) : ?>
 
-                </tbody>
-            </table>
+                                <?php foreach ($datos as $usuario) : ?>
+
+                                    <tr>
+                                        <td><img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $usuario['foto'] ?>" alt="Foto del usuario" width="50" height="50" style="border-radius: 50%;"></td>
+                                        <td><?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?></td>
+                                        <td><?= $usuario['email'] ?></td>
+                                        <td><?= $usuario['telefono'] ?></td>
+                                        <td><?= $usuario['ubicacion'] ?></td>
+                                        <td><?= $usuario['rol'] ?></td>
+                                        <td>
+                                            <?php
+                                            // Determina la clase de estilo basada en el valor de 'estado'
+                                            $estado_clase = '';
+                                            if ($usuario['estado'] === 'Activo') {
+                                                $estado_clase = 'status-activo';
+                                            } elseif ($usuario['estado'] === 'Inactivo') {
+                                                $estado_clase = 'status-inactivo';
+                                            }
+                                            // Si quieres usar una clase preexistente para ejemplo:
+                                            // $estado_clase = ($usuario['estado'] === 'Activo') ? 'status-completed' : 'status-pending';
+                                            ?>
+                                            <span class="status-badge <?= $estado_clase ?>">
+                                                <?= $usuario['estado'] ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <!-- Uso de las clases personalizadas para los botones -->
+                                            <div class="action-buttons">
+                                                <!-- Botón para ver detalle del servicio (Revisar) -->
+                                                <a href="#" class="btn-action btn-view" title="Revisar detalles">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+
+                                                <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id'] ?>" class="btn-action btn-edit" title="Editar usuario">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+
+                                                <a href="<?= BASE_URL ?>/admin/eliminar-usuario?accion=eliminar&id=<?= $usuario['id'] ?>" class="btn-action btn-delete" title="Eliminar usuario">
+                                                    <i class="bi bi-trash3"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td>
+                                        <h2>No hay usuarios registrados</h2>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="tab-pane fade" id="acciones-pane" role="tabpanel" aria-labelledby="acciones-tab">
+                    <div id="botones-exportacion-container" class="p-3">
+                        <p class="text-muted">Use las opciones a continuación para copiar, imprimir o exportar los datos de la tabla.</p>
+
+                        <table id="tabla-1" class="display nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Nombre completo</th>
+                                    <th>Correo electrónico</th>
+                                    <th>Teléfono</th>
+                                    <th>Ubicación</th>
+                                    <th>Rol</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-servicios">
+                                <?php if (!empty($datos)) : ?>
+
+                                    <?php foreach ($datos as $usuario) : ?>
+
+                                        <tr>
+                                            <td><?= $usuario['nombres'] . ' ' . $usuario['apellidos'] ?></td>
+                                            <td><?= $usuario['email'] ?></td>
+                                            <td><?= $usuario['telefono'] ?></td>
+                                            <td><?= $usuario['ubicacion'] ?></td>
+                                            <td><?= $usuario['rol'] ?></td>
+                                            <td>
+                                                <?php
+                                                // Determina la clase de estilo basada en el valor de 'estado'
+                                                $estado_clase = '';
+                                                if ($usuario['estado'] === 'Activo') {
+                                                    $estado_clase = 'status-activo';
+                                                } elseif ($usuario['estado'] === 'Inactivo') {
+                                                    $estado_clase = 'status-inactivo';
+                                                }
+                                                // Si quieres usar una clase preexistente para ejemplo:
+                                                // $estado_clase = ($usuario['estado'] === 'Activo') ? 'status-completed' : 'status-pending';
+                                                ?>
+                                                <span class="status-badge <?= $estado_clase ?>">
+                                                    <?= $usuario['estado'] ?>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td>
+                                            <h2>No hay usuarios registrados</h2>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
     </main>
+
 
 
     <footer>

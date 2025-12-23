@@ -121,7 +121,8 @@ function registrarUsuario()
         'ubicacion' => $ubicacion,
         'rol' => $rol,
         'foto' => $ruta_foto_perfil,
-        'documentos' => $archivos_proveedor
+        'documentos' => $archivos_proveedor,
+        'id_membresia_defecto' => 4
     ];
 
     $resultado = $objRegistro->registrar($data);
@@ -129,7 +130,23 @@ function registrarUsuario()
     // 5. RESPUESTA Y REDIRECCIÓN
     // --------------------------
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Registro Exitoso', 'Tu cuenta ha sido creada. ¡Ahora inicia sesión!', BASE_URL . '/login');
+        if ($rol === 'proveedor') {
+            // Mensaje informativo para el proveedor (Pendiente de aprobación)
+            mostrarSweetAlert(
+                'success',
+                'Registro Recibido',
+                'Tus documentos han sido cargados exitosamente. Nuestro equipo los validará en un plazo de 24-48h. Te notificaremos por correo.',
+                BASE_URL . '/login'
+            );
+        } else {
+            // Mensaje directo para el cliente (Acceso inmediato)
+            mostrarSweetAlert(
+                'success',
+                '¡Bienvenido!',
+                'Tu cuenta ha sido creada con éxito. Ya puedes iniciar sesión y explorar.',
+                BASE_URL . '/login'
+            );
+        }
     } elseif ($resultado === 'duplicado') {
         mostrarSweetAlert('error', 'Error de Registro', 'El correo o documento ya están registrados.', BASE_URL . '/registro');
     } else {

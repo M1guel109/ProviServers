@@ -8,7 +8,7 @@ class Registro
 
     public function __construct()
     {
-        $db = new Conexion(); 
+        $db = new Conexion();
         $this->conexion = $db->getConexion();
     }
 
@@ -17,6 +17,19 @@ class Registro
      * @param array $data Contiene: documento, email, clave, rol, nombres, apellidos, telefono, ubicacion, foto, documentos.
      * @return bool|string Retorna true, false o "duplicado".
      */
+
+    private function getEstadoId($nombreEstado)
+    {
+        $sql = "SELECT id FROM usuario_estados WHERE nombre = :nombre LIMIT 1";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':nombre', $nombreEstado);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $row ? $row['id'] : null;
+    }
+
     public function registrar($data)
     {
         try {
@@ -26,28 +39,37 @@ class Registro
             // 1.1. Encriptar la clave
             $claveHash = password_hash($data['clave'], PASSWORD_DEFAULT);
 
+            // Obtener estado según el rol
+            if ($data['rol'] === 'cliente') {
+                $estadoId = $this->getEstadoId('activo');
+            } else { // proveedor
+                $estadoId = $this->getEstadoId('pendiente');
+            }
+
+
             // 2. PRIMERA INSERCIÓN: TABLA 'usuarios'
-            $sqlUsuario = "INSERT INTO usuarios (email, clave, documento, rol, estado) 
-                           VALUES (:email, :clave, :documento, :rol, 1)";
-            
+            $sqlUsuario = "INSERT INTO usuarios (email, clave, documento, rol, estado_id) 
+                           VALUES (:email, :clave, :documento, :rol, :estado_id)";
+
             $stmtUsuario = $this->conexion->prepare($sqlUsuario);
             $stmtUsuario->bindParam(':email', $data['email']);
             $stmtUsuario->bindParam(':clave', $claveHash);
             $stmtUsuario->bindParam(':documento', $data['documento']);
             $stmtUsuario->bindParam(':rol', $data['rol']);
-            
+            $stmtUsuario->bindParam(':estado_id', $estadoId);
+
             $stmtUsuario->execute();
-            
+
             // 3. OBTENER EL ID DEL USUARIO RECIÉN INSERTADO (CRÍTICO)
             $usuario_id = $this->conexion->lastInsertId();
-            
+
             if (!$usuario_id) {
                 throw new Exception("No se pudo obtener el ID del usuario después de la primera inserción.");
             }
 
             // 4. SEGUNDA INSERCIÓN: TABLAS DE DETALLE (clientes, proveedores, o admins)
             $rol = $data['rol'];
-            
+
             // Determinar la tabla de detalle
             if ($rol === 'cliente') {
                 $tablaDetalle = 'clientes';
@@ -56,23 +78,40 @@ class Registro
             } else {
                 throw new Exception("Rol no válido: " . $rol);
             }
-            
+
             // 4.1. Ejecutar la inserción en la tabla de detalle 
             $sqlDetalle = "INSERT INTO {$tablaDetalle} (usuario_id, nombres, apellidos, telefono, ubicacion, foto)
                            VALUES (:usuario_id, :nombres, :apellidos, :telefono, :ubicacion, :foto)";
-            
+
             $stmtDetalle = $this->conexion->prepare($sqlDetalle);
             $stmtDetalle->bindParam(':usuario_id', $usuario_id);
-            $stmtDetalle->bindParam(':nombres', $data['nombres']); 
-            $stmtDetalle->bindParam(':apellidos', $data['apellidos']); 
+            $stmtDetalle->bindParam(':nombres', $data['nombres']);
+            $stmtDetalle->bindParam(':apellidos', $data['apellidos']);
             $stmtDetalle->bindParam(':telefono', $data['telefono']);
             $stmtDetalle->bindParam(':ubicacion', $data['ubicacion']);
             $stmtDetalle->bindParam(':foto', $data['foto']);
-            
+
             $stmtDetalle->execute();
 
             $detalle_id = $this->conexion->lastInsertId();
 
+            // 3. ASIGNACIÓN DE MEMBRESÍA (Solo para Proveedores)
+            if ($rol === 'proveedor') {
+                /**
+                 * Gracias al cambio en tu DB, ahora insertamos la membresía como 'inactiva'
+                 * y con fechas NULL. Esto permite que el administrador la active manualmente
+                 * o el sistema la active al primer login exitoso.
+                 */
+                $sqlMembresia = "INSERT INTO proveedor_membresia 
+                                (proveedor_id, membresia_id, fecha_inicio, fecha_fin, estado) 
+                                 VALUES (:proveedor_id, :membresia_id, NULL, NULL, 'inactiva')";
+
+                $stmtMembresia = $this->conexion->prepare($sqlMembresia);
+                $stmtMembresia->execute([
+                    ':proveedor_id'  => $detalle_id,
+                    ':membresia_id'  => $data['id_membresia_defecto'] ?? 4
+                ]);
+            }
 
             // 5. TERCERA INSERCIÓN (CONDICIONAL): TABLA 'documentos_proveedor'
             if ($rol === 'proveedor' && !empty($data['documentos'])) {
@@ -90,11 +129,11 @@ class Registro
 
                 foreach ($data['documentos'] as $campo_name => $ruta_doc) {
                     $tipo_doc = $documentos_map[$campo_name] ?? $campo_name;
-                    
-                    $stmtDocumento->bindParam(':proveedor_id', $detalle_id); 
+
+                    $stmtDocumento->bindParam(':proveedor_id', $detalle_id);
                     $stmtDocumento->bindParam(':tipo_documento', $tipo_doc);
                     $stmtDocumento->bindParam(':archivo', $ruta_doc);
-                    
+
                     $stmtDocumento->execute();
                 }
             }
@@ -103,7 +142,6 @@ class Registro
             // 6. CONFIRMAR TRANSACCIÓN: Si todo fue bien, guardar los cambios permanentemente.
             $this->conexion->commit();
             return true;
-
         } catch (PDOException $e) {
             // Revertir si algo falló
             if ($this->conexion->inTransaction()) {

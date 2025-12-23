@@ -1,10 +1,15 @@
 <?php
 require_once BASE_PATH . '/app/helpers/pdf_helper.php';
 require_once BASE_PATH . '/app/controllers/adminController.php';
+require_once BASE_PATH . '/app/controllers/membresiaController.php';
 // NUEVO: para usar mostrarServicios()
 require_once BASE_PATH . '/app/controllers/proveedorController.php';
 // NUEVO: para mapear categorías
 require_once BASE_PATH . '/app/models/categoria.php';
+
+// ATENCIÓN: Esta constante debe apuntar a la raíz del proyecto (donde está 'public').
+// Si BASE_PATH apunta a la carpeta principal (ej: /var/www/ProviServers), esto es correcto.
+define('SERVER_ROOT', BASE_PATH . '/');
 
 // En este controlador encontramos la dependencia del helper (configuracion de la generacion de pdfs) 
 // y posteriormente tendremos todos lo controladores que se requieran segun los reportes de pdf que vaya a generar
@@ -31,6 +36,9 @@ function reportesPdfController()
             reporteServiciosProveedorPDF();
             break;
 
+        case 'membresias': // 👈 NUEVO: Caso para el reporte de Membresías
+            reporteMembresiasPDF();
+            break;
         default:
             echo 'Tipo de reporte no válido';
             exit();
@@ -41,11 +49,29 @@ function reportesPdfController()
 
 function reporteUsuariosPDF()
 {
+    // Cargar los datos de los usuarios
+    $usuarios = mostrarUsuarios();
 
+    // --- LÓGICA DE BASE64 PARA LA IMAGEN DEFAULT ---
+    $foto_default_base64 = '';
+
+    // Genera la ruta FÍSICA para file_get_contents()
+    $ruta_fisica_default = SERVER_ROOT . 'public/uploads/usuarios/default_user.png';
+
+    // VErifica que el archivo exista en el disco antes de leerlo
+    if (file_exists($ruta_fisica_default)) {
+        // Lee el archivo y lo codifica en Base64 para incrustarlo directamente en el PDF
+        $data = file_get_contents($ruta_fisica_default);
+        $foto_default_base64 = 'data:image/png;base64,' . base64_encode($data);
+    } else {
+        // Si no existe, se queda como un string vacío, o podrías loguear un error aquí.
+        error_log("CRÍTICO: No se encontró la imagen por defecto en la ruta: " . $ruta_fisica_default);
+    }
+    // --- FIN LÓGICA DE BASE64 ---
     // Cargar la vista y obtenerla como HTML
     ob_start();
     // Asignamos los datos de la funcion en el controlador enlazado a una variable que podamos manipular en la vista pdf
-    $usuarios = mostrarUsuarios();
+    // $usuarios = mostrarUsuarios();
 
     // Archivo que tiene la interfaz diseñada en htlm
     require BASE_PATH . '/app/views/pdf/usuarios_pdf.php';
@@ -81,4 +107,19 @@ function reporteServiciosProveedorPDF()
 
     // 4. Generar el PDF con tu helper
     generarPDF($html, 'reporte_servicios_proveedor.pdf', false);
+}
+
+function reporteMembresiasPDF()
+{
+
+    // Cargar la vista y obtenerla como HTML
+    ob_start();
+    // Asignamos los datos de la funcion en el controlador enlazado a una variable que podamos manipular en la vista pdf
+    $membresias = mostrarMembresias();
+
+    // Archivo que tiene la interfaz diseñada en htlm
+    require BASE_PATH . '/app/views/pdf/membresias_pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_membresias.pdf', false);
 }

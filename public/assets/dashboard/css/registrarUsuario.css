@@ -188,15 +188,15 @@ body {
 /* --- Barra izquierda decorativa solo en estado activo --- */
 .menu-principal a.active::before,
 .menu-secundario a.active::before {
-  content: "";
-  position: absolute;
-  left: -32px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 6px;
-  height: 100%;
-  background-color: #006aff;
-  border-radius: 4px;
+    content: "";
+    position: absolute;
+    left: -32px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 100%;
+    background-color: #006aff;
+    border-radius: 4px;
 }
 
 .menu-secundario p {
@@ -320,15 +320,128 @@ body {
     position: relative;
 }
 
-.badge {
+
+/* =======================================
+   ESTILOS PERSONALIZADOS PARA NOTIFICACIONES
+   ======================================= */
+
+/* 1. Icono de Notificación (la campana) */
+.nav-link.nav-icon {
+    position: relative;
+    color: #444444; /* Color oscuro para el icono */
+    padding: 0 8px;
+    font-size: 24px;
+    transition: color 0.3s ease;
+}
+
+.nav-link.nav-icon:hover {
+    color: #3b82f6; /* Cambio de color al pasar el mouse */
+}
+
+/* 2. El Indicador de Número (Badge) */
+.nav-icon .badge-number {
     position: absolute;
+    top: -5px;
+    right: 0px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    font-size: 10px;
+    background-color: #ff5722 !important; /* Un color más llamativo (Naranja/Rojo) */
+    border: 2px solid #ffffff; /* Borde blanco para destacarlo sobre el fondo */
+}
+
+/* 3. Contenedor Desplegable (Dropdown Menu) */
+.notifications {
+    --bs-dropdown-min-width: 350px; /* Anchura adecuada para notificaciones */
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra suave */
+    border: 1px solid #e0e0e0;
+    padding: 0; /* Quitamos padding externo */
+}
+
+/* 4. Encabezado del Desplegable */
+.notifications .dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    font-weight: 600;
+    color: #3b82f6; /* Color primario para el título */
+}
+
+.notifications .dropdown-header a {
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* 5. Elementos Individuales de Notificación */
+.notification-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-left: 3px solid transparent; /* Indicador de estado/hover */
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa; /* Fondo gris claro al pasar el mouse */
+    border-left: 3px solid #3b82f6; /* Borde de color para destacar el elemento */
+}
+
+.notification-item i {
+    font-size: 22px;
+    margin-right: 15px;
+    flex-shrink: 0; /* Previene que el icono se comprima */
+}
+
+.notification-item div {
+    flex-grow: 1;
+}
+
+.notification-item h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 3px;
+}
+
+.notification-item p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 2px;
+}
+
+.notification-item p:last-child {
+    font-size: 12px;
+    color: #999; /* Para la marca de tiempo (hace 30 min.) */
+}
+
+/* 6. Pie de Página del Desplegable */
+.dropdown-footer {
+    padding: 10px 20px;
+    text-align: center;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dropdown-footer a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.badge {
+    /* position: absolute; */
     top: -5px;
     right: -5px;
     background-color: #ef4444;
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
+    /* width: 20px;
+    height: 20px; */
     font-size: 0.7rem;
     display: flex;
     align-items: center;
@@ -379,31 +492,31 @@ body {
 
 /* 5. Sección Título Principal */
 #titulo-principal {
-  border-bottom: 1px solid #dee2e6;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
 }
 
 #titulo-principal h1 {
-  font-weight: 700;
-  font-size: var(--fs-title2);
+    font-weight: 700;
+    font-size: var(--fs-title2);
 }
 
 #titulo-principal p {
-  max-width: 100%;
-  font-size: var(--fs-text);
+    max-width: 100%;
+    font-size: var(--fs-text);
 }
 
 @media (max-width: 768px) {
-  #titulo-principal {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
+    #titulo-principal {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
 
-  #titulo-principal nav {
-    align-self: flex-start;
-  }
+    #titulo-principal nav {
+        align-self: flex-start;
+    }
 }
 
 /* 1. Estilos generales para la sección del formulario */
@@ -472,14 +585,14 @@ body {
 /* 3. Estilos del formulario */
 #formulario form {
     width: 80%;
-    margin:  0 auto;
+    margin: 0 auto;
 }
 
 .row {
     margin-bottom: 30px;
 }
 
-.row > div {
+.row>div {
     margin-bottom: 15px;
 }
 
@@ -494,7 +607,8 @@ body {
 }
 
 /* 5. Estilos para inputs y selects */
-.form-control, .form-select {
+.form-control,
+.form-select {
     width: 90%;
     padding: 12px 16px;
     border: 1px solid #0000004f;
@@ -506,7 +620,8 @@ body {
     transition: all 0.25s ease;
 }
 
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
@@ -522,7 +637,7 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%) ;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--dark-color) 100%);
     color: var(--white-color);
     border: none;
     padding: 14px 40px;
@@ -537,7 +652,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--dark-color) 0%, var(--primary-color) 100%) ;
+    background: linear-gradient(135deg, var(--dark-color) 0%, var(--primary-color) 100%);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
 }
@@ -553,7 +668,11 @@ body {
 
 /* 8. Efectos hover para la foto */
 .foto-perfil {
+    border: 3px solid #3b82f6;
+    /* Define el grosor y color del borde */
+    padding: 4px;
     transition: all 0.25s ease;
+    display: inline-flex;
 }
 
 .foto-perfil:hover {
@@ -588,11 +707,11 @@ body {
         padding: 30px;
         margin: 0 20px;
     }
-    
+
     .seccion-foto {
         margin-bottom: 30px;
     }
-    
+
     .foto-perfil {
         width: 100px;
         height: 100px;
@@ -605,29 +724,29 @@ body {
         padding: 25px 20px;
         margin: 0 15px;
     }
-    
+
     .seccion-foto {
         margin-bottom: 25px;
         padding-bottom: 20px;
     }
-    
+
     .foto-perfil {
         width: 90px;
         height: 90px;
     }
-    
+
     .btn-agregar-foto {
         padding: 8px 20px;
         font-size: var(--fs-small);
     }
-    
+
     .btn-primary {
         width: 100%;
         padding: 16px;
         min-width: auto;
     }
-    
-    .row > div {
+
+    .row>div {
         margin-bottom: 15px;
     }
 }
@@ -642,6 +761,7 @@ body {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -685,234 +805,237 @@ body {
 }
 
 .sidebar.plegado .menu-secundario p {
-  display: none;
+    display: none;
 }
 
 
 .has-submenu {
-  position: relative;
+    position: relative;
 }
 
-.has-submenu > a {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* junta ícono y texto */
-  gap: 10px;
-  position: relative;
+.has-submenu>a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* junta ícono y texto */
+    gap: 10px;
+    position: relative;
 }
 
-.has-submenu > a .toggle-icon {
-  margin-left: auto;
-  transition: transform 0.3s ease;
-  font-size: 0.8rem;
+.has-submenu>a .toggle-icon {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
 }
 
 .has-submenu.active .toggle-icon {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 /* Submenú cerrado por defecto */
 .submenu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-  background-color: #f5f7fb;
-  border-left: 3px solid var(--primary-color);
-  border-radius: 6px;
-  margin-top: 4px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background-color: #f5f7fb;
+    border-left: 3px solid var(--primary-color);
+    border-radius: 6px;
+    margin-top: 4px;
 }
 
 /* Submenú visible */
 .has-submenu.active .submenu {
-  max-height: 200px;
+    max-height: 200px;
 }
 
 .submenu li a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 15px 10px 45px !important;
-  color: var(--dark-color);
-  font-size: 0.95rem;
-  border-radius: 6px;
-  transition: background 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px 10px 45px !important;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: background 0.25s ease;
 }
 
 .submenu li a:hover {
-  background-color: var(--primary-color);
-  color: var(--white-color);
+    background-color: var(--primary-color);
+    color: var(--white-color);
 }
+
 /* Estructura base del contenedor */
 .has-submenu {
-  position: relative;
+    position: relative;
 }
 
 /* Enlace principal */
-.has-submenu > .menu-link {
-  display: flex;
-  align-items: center;
-  padding: 10px 15px;
-  gap: 10px;
-  color: var(--dark-color);
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background 0.3s ease, color 0.3s ease;
+.has-submenu>.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    gap: 10px;
+    color: var(--dark-color);
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Botón flecha */
 .toggle-submenu {
-  position: absolute;
-  right: 14px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  top: 14px;
+    position: absolute;
+    right: 14px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    top: 14px;
 }
 
 .toggle-icon {
-  font-size: 0.9rem;
-  color: var(--dark-color);
-  transition: transform 0.3s ease, color 0.3s ease;
+    font-size: 0.9rem;
+    color: var(--dark-color);
+    transition: transform 0.3s ease, color 0.3s ease;
 }
 
 .has-submenu.active .toggle-icon {
-  transform: rotate(180deg);
-  color: var(--primary-color);
+    transform: rotate(180deg);
+    color: var(--primary-color);
 }
 
 /* Submenú oculto */
 .submenu {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.35s ease;
-  background-color: #f6f7fb;
-  border-left: 3px solid var(--primary-color);
-  border-radius: 6px;
-  margin: 4px 0 0 10px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    background-color: #f6f7fb;
+    border-left: 3px solid var(--primary-color);
+    border-radius: 6px;
+    margin: 4px 0 0 10px;
 }
 
 /* Submenú visible */
 .has-submenu.active .submenu {
-  max-height: 300px;
+    max-height: 300px;
 }
 
 /* Estilo de los enlaces del submenú */
 .submenu li a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 15px 10px 45px;
-  color: var(--dark-color);
-  font-size: 0.95rem;
-  text-decoration: none;
-  transition: background 0.25s ease, color 0.25s ease;
-  border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px 10px 45px;
+    color: var(--dark-color);
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: background 0.25s ease, color 0.25s ease;
+    border-radius: 6px;
 }
 
 .submenu li a:hover {
-  background-color: var(--primary-color);
-  color: var(--white-color);
+    background-color: var(--primary-color);
+    color: var(--white-color);
 }
 
 
 /* ======== SIDEBAR PLEGABLE ======== */
 .sidebar {
-  width: 260px;
-  transition: width 0.3s ease;
-  overflow: hidden;
+    width: 260px;
+    transition: width 0.3s ease;
+    overflow: hidden;
 }
 
 .sidebar.plegado {
-  width: 80px;
+    width: 80px;
 }
 
 /* Oculta textos cuando está plegado */
 .sidebar.plegado .menu-principal a,
 .sidebar.plegado .menu-secundario a,
 .sidebar.plegado .menu-footer a {
-  text-align: center;
+    text-align: center;
 }
 
 .sidebar.plegado .menu-principal a::after,
 .sidebar.plegado .menu-secundario a::after {
-  display: none;
+    display: none;
 }
 
 /* Oculta los textos, deja los íconos */
 .sidebar.plegado a span {
-  display: none;
+    display: none;
 }
 
 /* íconos opcionales, si los agregas luego */
 .sidebar a i {
-  margin-right: 10px;
-  transition: all 0.3s ease;
+    margin-right: 10px;
+    transition: all 0.3s ease;
 }
 
 .sidebar.plegado a i {
-  margin: 0;
+    margin: 0;
 }
 
 /* ======== BOTÓN DE TOGGLE ======== */
 .btn-toggle {
-  background: transparent;
-  border: none;
-  color: var(--azul-oscuro, #2b2d42);
-  font-size: 1.6rem;
-  margin-right: 15px;
-  cursor: pointer;
-  transition: transform 0.2s ease;
+    background: transparent;
+    border: none;
+    color: var(--azul-oscuro, #2b2d42);
+    font-size: 1.6rem;
+    margin-right: 15px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
 }
 
 .btn-toggle:hover {
-  transform: scale(1.1);
+    transform: scale(1.1);
 }
 
 /* Estado normal (sidebar expandido) */
 .sidebar .logo-favicon {
-  display: none;
+    display: none;
 }
 
 .sidebar .logo-completo {
-  display: block;
+    display: block;
 }
 
 /* Estado plegado */
 .sidebar.plegado .logo-completo {
-  display: none;
+    display: none;
 }
 
 .sidebar.plegado .logo-favicon {
-  display: block;
-  width: 40px; /* o el tamaño que desees */
-  margin: 0 auto;
+    display: block;
+    width: 40px;
+    /* o el tamaño que desees */
+    margin: 0 auto;
 }
 
 /* ===== CENTRADO DE ICONOS EN MODO PLEGADO ===== */
 .sidebar.plegado .menu-principal a,
 .sidebar.plegado .menu-secundario a,
 .sidebar.plegado .menu-footer a {
-  justify-content: center;
-  padding: 12px 0;
+    justify-content: center;
+    padding: 12px 0;
 }
 
 .sidebar.plegado .menu-principal a i,
 .sidebar.plegado .menu-secundario a i,
 .sidebar.plegado .menu-footer a i {
-  margin: 0;
-  font-size: 1.4rem;
+    margin: 0;
+    font-size: 1.4rem;
 }
 
 .sidebar.plegado .menu-principal a:hover,
 .sidebar.plegado .menu-secundario a:hover,
 .sidebar.plegado .menu-footer a:hover {
-  background-color: var(--primary-color);
-  color: var(--white-color);
-  border-radius: 12px;
-  transform: none;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border-radius: 12px;
+    transform: none;
 }
 
 

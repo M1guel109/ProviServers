@@ -37,7 +37,7 @@ main {
     border-radius: 0px;
     overflow: hidden;
     background-color: white;
-    
+    border-radius: 15px;
 }
 
 #login {
@@ -168,6 +168,7 @@ main {
     align-items: center;
     justify-content: center;
     padding: 40px;
+    border-radius: 15px;
 }
 
 #infoCarousel {
@@ -197,28 +198,6 @@ main {
     max-width: 450px;
     box-shadow: 0 10px 30px rgba(119, 21, 21, 0.2);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .text-card {
     background: transparent;
@@ -280,7 +259,7 @@ main {
 
 /* HEADER ESTILOS */
 header {
-    padding: 15px 0;
+    /* padding: 15px 0; */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     position: relative;
     z-index: 100;

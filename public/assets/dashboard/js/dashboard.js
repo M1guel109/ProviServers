@@ -1,5 +1,62 @@
 /*Primera grafica */
 
+document.addEventListener("DOMContentLoaded", () => {
+    const currentUrl = window.location.href;
+    const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+    // 1. Limpiar estados previos
+    sidebarLinks.forEach(link => {
+        link.classList.remove("active");
+    });
+
+    // 2. Identificar el enlace activo
+    sidebarLinks.forEach(link => {
+        const linkHref = link.href;
+
+        // Verificamos si la URL actual termina con el href o es exactamente igual
+        // (Evitamos marcar "/" si estamos en "/admin/dashboard")
+        if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
+            link.classList.add("active");
+
+            // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
+            const parentSubmenu = link.closest(".submenu");
+            if (parentSubmenu) {
+                // Mostramos el submenú (el <ul>)
+                parentSubmenu.style.display = "block";
+                
+                // Marcamos el contenedor padre (el <li> con clase has-submenu)
+                const parentLi = parentSubmenu.closest(".has-submenu");
+                if (parentLi) {
+                    parentLi.classList.add("active"); // Opcional: estilo para el padre
+                    
+                    // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
+                    const icon = parentLi.querySelector(".toggle-icon");
+                    if (icon) {
+                        icon.style.transform = "rotate(180deg)";
+                    }
+                }
+            }
+        }
+    });
+
+    // 4. Lógica de Toggle manual (para que el Admin pueda abrir/cerrar otros menús)
+    const toggleButtons = document.querySelectorAll(".toggle-submenu");
+    toggleButtons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            const parentLi = btn.closest(".has-submenu");
+            const submenu = parentLi.querySelector(".submenu");
+            const icon = btn.querySelector(".toggle-icon");
+
+            const isVisible = submenu.style.display === "block";
+            submenu.style.display = isVisible ? "none" : "block";
+            
+            if (icon) {
+                icon.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
+            }
+        });
+    });
+});
+
 var options = {
     chart: {
         type: 'area',

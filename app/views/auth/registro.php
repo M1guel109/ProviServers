@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro</title>
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
 
@@ -79,25 +81,69 @@
           </div>
         </div>
 
-        <!-- PASO 3 (solo proveedor) -->
+        <!-- PASO 3 (solo proveedor) - CON TOOLTIPS -->
         <div class="wizard-step d-none" id="paso-3">
 
           <h2 class="titulo-paso">Documentación</h2>
-          <p class="text-muted">Esta sección es obligatoria solo para proveedores.</p>
+          <!-- <p class="text-muted">Esta sección es obligatoria solo para proveedores.</p> -->
 
           <div id="docs-proveedor">
 
-            <label>Cédula (PDF o imagen)</label>
-            <input type="file" id="doc-cedula" name="doc-cedula" accept="image/*,.pdf">
+            <!-- Cédula -->
+            <div class="input-group-tooltip">
+              <div class="d-flex align-items-center mb-1">
+                <label class="form-label mb-0 me-2">Cédula (PDF o imagen)</label>
+                <span class="info-icon"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Sube una copia legible de tu documento de identidad por ambos lados.">
+                  <i class="bi bi-question-circle-fill"></i>
+                </span>
+              </div>
+              <input type="file" id="doc-cedula" name="doc-cedula" accept="image/*,.pdf" class="form-control">
+            </div>
 
-            <label>Selfie de verificación</label>
-            <input type="file" id="doc-selfie" name="doc-foto" accept="image/*">
+            <!-- Selfie -->
+            <div class="input-group-tooltip">
+              <div class="d-flex align-items-center mb-1">
+                <label class="form-label mb-0 me-2">Selfie de verificación</label>
+                <span class="info-icon"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Una foto tuya sosteniendo la cédula junto a tu rostro para verificar tu identidad.">
+                  <i class="bi bi-question-circle-fill"></i>
+                </span>
+              </div>
+              <input type="file" id="doc-selfie" name="doc-foto" accept="image/*" class="form-control">
+            </div>
 
-            <label>Antecedentes judiciales (PDF)</label>
-            <input type="file" id="doc-antecedentes" name="doc-antecedentes" accept=".pdf">
+            <!-- Antecedentes -->
+            <div class="input-group-tooltip">
+              <div class="d-flex align-items-center mb-1">
+                <label class="form-label mb-0 me-2">Antecedentes judiciales (PDF)</label>
+                <span class="info-icon"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Certificado de antecedentes penales actualizado (máximo 30 días de antigüedad).">
+                  <i class="bi bi-question-circle-fill"></i>
+                </span>
+              </div>
+              <input type="file" id="doc-antecedentes" name="doc-antecedentes" accept=".pdf" class="form-control">
+            </div>
 
-            <label>Certificado de habilidades (opcional)</label>
-            <input type="file" id="doc-certificado" name="doc-certificado" accept="image/*,.pdf">
+            <!-- Certificado (Opcional) -->
+            <div class="input-group-tooltip">
+              <div class="d-flex align-items-center mb-1">
+                <label class="form-label mb-0 me-2">Certificado de habilidades (opcional)</label>
+                <span class="info-icon"
+                  data-bs-toggle="tooltip"
+                  data-bs-placement="top"
+                  title="Documentos que acrediten tus habilidades o experiencia en el servicio que ofreces.">
+                  <i class="bi bi-question-circle-fill"></i>
+                </span>
+              </div>
+              <input type="file" id="doc-certificado" name="doc-certificado" accept="image/*,.pdf" class="form-control">
+            </div>
           </div>
 
           <div class="wizard-nav">
