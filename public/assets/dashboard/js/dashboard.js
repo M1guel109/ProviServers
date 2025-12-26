@@ -39,22 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // 4. Lógica de Toggle manual (para que el Admin pueda abrir/cerrar otros menús)
-    const toggleButtons = document.querySelectorAll(".toggle-submenu");
-    toggleButtons.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            const parentLi = btn.closest(".has-submenu");
-            const submenu = parentLi.querySelector(".submenu");
-            const icon = btn.querySelector(".toggle-icon");
-
-            const isVisible = submenu.style.display === "block";
-            submenu.style.display = isVisible ? "none" : "block";
-            
-            if (icon) {
-                icon.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
-            }
-        });
-    });
 });
 
 var options = {
@@ -186,13 +170,61 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-    const toggleButtons = document.querySelectorAll(".toggle-submenu");
+    
+    // Seleccionamos TODOS los elementos que pueden abrir el menú:
+    // 1. El enlace de texto (a) directo hijo de .has-submenu
+    // 2. El botón de la flecha (.toggle-submenu)
+    const triggers = document.querySelectorAll(".has-submenu > a, .has-submenu .toggle-submenu");
 
-    toggleButtons.forEach(btn => {
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation(); // evita que el click active el enlace padre
-            const parent = btn.closest(".has-submenu");
-            parent.classList.toggle("active");
+    triggers.forEach(trigger => {
+        trigger.addEventListener("click", (e) => {
+            // Detenemos cualquier comportamiento por defecto (como recargar página)
+            e.preventDefault();
+            // Detenemos la propagación para que no haga burbuja a otros elementos
+            e.stopPropagation();
+
+            // 1. Identificar el contenedor padre y el submenú
+            // Usamos closest para encontrar el LI padre sin importar cuál de los dos se clickeó
+            const parentLi = trigger.closest(".has-submenu");
+            const submenu = parentLi.querySelector(".submenu");
+
+            // Si no hay submenú, no hacemos nada
+            if (!submenu) return;
+
+            // 2. Determinar si vamos a ABRIR o CERRAR
+            // Verificamos si ya tiene la clase active
+            const isOpen = parentLi.classList.contains("active");
+
+            if (isOpen) {
+                // --- CERRAR ---
+                
+                // Paso clave para que la animación no sea brusca:
+                // Antes de colapsar, reasignamos la altura actual en píxeles explícitamente.
+                // Esto permite al navegador saber desde dónde animar hacia 0.
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
+
+                // Forzamos un "reflow" (lectura de propiedad) para que el navegador aplique el estilo de arriba
+                // antes de aplicar el estilo de cierre.
+                submenu.offsetHeight; 
+
+                // Ahora sí, colapsamos
+                parentLi.classList.remove("active");
+                submenu.style.maxHeight = "0"; 
+
+            } else {
+                // --- ABRIR ---
+                
+                // (Opcional) Cerrar otros menús abiertos si quieres efecto acordeón:
+                /* document.querySelectorAll('.has-submenu.active').forEach(activeLi => {
+                    activeLi.classList.remove('active');
+                    activeLi.querySelector('.submenu').style.maxHeight = "0";
+                });
+                */
+
+                parentLi.classList.add("active");
+                // Asignamos la altura real del contenido para que se expanda suavemente
+                submenu.style.maxHeight = submenu.scrollHeight + "px";
+            }
         });
     });
 });
