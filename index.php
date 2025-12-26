@@ -24,6 +24,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/website/index.php';
         break;
 
+    case '/contacto/enviar':
+        require BASE_PATH . '/app/controllers/contactController.php';
+        $controller = new ContactController();
+        $controller->enviar();
+        break;
     // Inicio rutas que sean necesarias para el login
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
@@ -160,9 +165,9 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
         break;
 
-       case '/admin/calendario':
+    case '/admin/calendario':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
-        break;    
+        break;
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacionController.php';
         break;
@@ -234,7 +239,7 @@ switch ($request) {
         break;
     case '/proveedor/resenas':
         require BASE_PATH . '/app/views/dashboard/proveedor/resenas.php';
-        break;         
+        break;
 
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
