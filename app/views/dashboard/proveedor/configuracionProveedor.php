@@ -492,7 +492,7 @@ $correoActual = $_SESSION['user']['email'] ?? '';
                                         Te recomendamos usar una contraseña segura, con combinación de letras, números y símbolos.
                                     </p>
 
-                                    <form action="<?= BASE_URL ?>/proveedor/cambiar-contrasena" method="POST" class="mt-3">
+                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-credenciales" method="POST" class="mt-3">
                                         <div class="mb-3">
                                             <label class="form-label">Contraseña actual <span class="text-danger">*</span></label>
                                             <input
