@@ -8,7 +8,7 @@
   
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="public/assets/auth/css/error404.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/error404.css">
 
 </head>
 
@@ -17,7 +17,7 @@
     <div class="space-scene">
       <div class="big-404">44</div>
 
-      <img src="public/assets/auth/img/astronautaa.png" alt="Astronauta flotando en el espacio - Error 404"
+      <img src="<?= BASE_URL ?>/public/assets/auth/img/astronautaa.png" alt="Astronauta flotando en el espacio - Error 404"
         class="main-illustration">
     </div>
 
@@ -26,13 +26,13 @@
       <p class="message-subtitle">¡HOUSTON, TENEMOS UN PROBLEMA!</p>
 
       <div class="actions">
-        <a href="public/index.php" class="btn primary-btn">VOLVER AL INICIO</a>
+        <a href="<?= BASE_URL ?>/" class="btn primary-btn">VOLVER AL INICIO</a>
         <a href="#" class="btn secondary-btn">EXPLORAR SERVICIOS</a>
       </div>
     </div>
   </div>
 
-  <script src="public/assets/auth/js/error404.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/auth/js/error404.js"></script>
 </body>
 
 </html>
