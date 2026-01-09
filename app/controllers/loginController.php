@@ -2,6 +2,7 @@
 // Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helper.php';
 require_once __DIR__ . '/../models/login.php';
+require_once __DIR__ . '/../models/activarMembresia.php';
 
 // $clave = '123';
 // echo password_hash($clave, PASSWORD_DEFAULT);
@@ -56,7 +57,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             mostrarSweetAlert('error', 'Estado desconocido', 'Hubo un problema con tu cuenta.');
             exit();
     }
-    
+
+    if ($resultado['rol'] === 'proveedor') {
+        $activador = new MembresiaActivador();
+        // Este método solo actuará si la membresía está inactiva y sin fechas.
+        $activador->activarSiEsNecesario($resultado['id']);
+    }
+
     //SI PASA ESTA LINEA, EL USUARIO ES VALIDO
 
     session_start();
