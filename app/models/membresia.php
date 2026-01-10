@@ -175,6 +175,7 @@ class Membresia
             // Si algo falla, hacemos rollback y registramos el error
             $this->conexion->rollBack();
             error_log("Error en Membresia::actualizar -> " . $e->getMessage());
+            return false;
         }
     }
 
