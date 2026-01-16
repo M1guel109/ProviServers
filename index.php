@@ -288,6 +288,22 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
         break;
 
+    
+    case '/cliente/dashboard':
+        require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
+        break;
+
+    case '/cliente/explorar-servicios':
+        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        break;
+
+    case '/cliente/publicacion':
+        require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';
+        break;
+
+    
+
+
 
 
 
