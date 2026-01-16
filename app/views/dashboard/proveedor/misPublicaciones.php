@@ -89,22 +89,27 @@ if ($usuarioId) {
 
                             switch ($estado) {
                                 case 'pendiente':
-                                    $badgeClass = 'bg-warning text-dark';
+                                    $badgeClass  = 'bg-warning text-dark';
                                     $estadoTexto = 'Pendiente de aprobación';
                                     break;
-                                case 'activa':
-                                    $badgeClass = 'bg-success';
+                                case 'aprobado': // 🔹 antes tenías 'activa'
+                                    $badgeClass  = 'bg-success';
                                     $estadoTexto = 'Publicada';
                                     break;
                                 case 'pausada':
-                                    $badgeClass = 'bg-info text-dark';
+                                    $badgeClass  = 'bg-info text-dark';
                                     $estadoTexto = 'Pausada';
                                     break;
                                 case 'rechazada':
-                                    $badgeClass = 'bg-danger';
+                                    $badgeClass  = 'bg-danger';
                                     $estadoTexto = 'Rechazada';
                                     break;
+                                default:
+                                    $badgeClass  = 'bg-secondary';
+                                    $estadoTexto = ucfirst($estado);
+                                    break;
                             }
+
 
                             $precio = isset($pub['precio']) ? number_format((float)$pub['precio'], 2) : '0.00';
                             ?>

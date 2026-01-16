@@ -1,23 +1,8 @@
 <?php
-// Proteger: solo cliente logueado
-require_once BASE_PATH . '/app/helpers/session_cliente.php';
+// Vista: app/views/dashboard/cliente/explorarServicios.php
+// Variables disponibles desde el controlador:
+// $publicaciones, $categorias, $busqueda, $categoriaId
 
-// Modelos necesarios
-require_once BASE_PATH . '/app/models/Publicacion.php';
-require_once BASE_PATH . '/app/models/categoria.php';
-
-// Filtros desde la URL
-$busquedaActual   = trim($_GET['q'] ?? '');
-$categoriaActual  = $_GET['categoria'] ?? '';
-$categoriaId      = $categoriaActual !== '' ? (int)$categoriaActual : null;
-
-// Cargar publicaciones activas para el catálogo
-$publicacionModel = new Publicacion();
-$publicaciones    = $publicacionModel->listarPublicasActivas($busquedaActual, $categoriaId);
-
-// Cargar categorías para los filtros
-$categoriaModel = new Categoria();
-$categorias     = $categoriaModel->mostrar();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -43,7 +28,7 @@ $categorias     = $categoriaModel->mostrar();
     include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
   ?>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO PRINCIAL -->
   <main class="contenido">
 
     <!-- HEADER -->
@@ -51,23 +36,24 @@ $categorias     = $categoriaModel->mostrar();
 
     <section id="explorar">
       <div class="section-hero mb-4">
-        <p class="breadcrumb">Inicio > Explorar Servicios</p>
+        <p class="breadcrumb">Inicio &gt; Explorar Servicios</p>
         <h1>Explorar Servicios</h1>
         <p>Descubre profesionales verificados listos para ayudarte.</p>
       </div>
 
       <!-- Buscador -->
       <div class="mb-4">
-        <form class="d-flex gap-2" method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios">
+        <form class="d-flex gap-2"
+              method="GET"
+              action="<?= BASE_URL ?>/cliente/explorar">
           <input 
-            type="text" 
-            class="form-control" 
-            name="q"
-            placeholder="Buscar servicios, proveedores..." 
-            value="<?= htmlspecialchars($busquedaActual) ?>"
-          >
-          <?php if ($categoriaActual !== ''): ?>
-            <input type="hidden" name="categoria" value="<?= htmlspecialchars($categoriaActual) ?>">
+              type="text" 
+              class="form-control" 
+              name="q"
+              placeholder="Buscar servicios, proveedores..."
+              value="<?= htmlspecialchars($busqueda ?? '') ?>">
+          <?php if (!empty($categoriaId)): ?>
+              <input type="hidden" name="categoria" value="<?= (int)$categoriaId ?>">
           <?php endif; ?>
           <button type="submit" class="btn btn-primary">
             <i class="bi bi-search"></i>
@@ -79,25 +65,26 @@ $categorias     = $categoriaModel->mostrar();
       <div class="mb-4 category-filters">
         <div class="d-flex flex-wrap gap-2">
           <!-- Todas -->
-          <a 
-            href="<?= BASE_URL ?>/cliente/explorar-servicios<?= $busquedaActual !== '' ? '?q=' . urlencode($busquedaActual) : '' ?>" 
-            class="btn btn-outline-primary <?= $categoriaActual === '' ? 'active' : '' ?>"
-          >
+          <a href="<?= BASE_URL ?>/cliente/explorar<?= $busqueda ? ('?q=' . urlencode($busqueda)) : '' ?>"
+             class="btn btn-outline-primary <?= empty($categoriaId) ? 'active' : '' ?>">
             <i class="bi bi-columns-gap"></i> Todas
           </a>
 
           <?php if (!empty($categorias)): ?>
             <?php foreach ($categorias as $cat): ?>
               <?php
-                $url = BASE_URL . '/cliente/explorar-servicios?categoria=' . $cat['id'];
-                if ($busquedaActual !== '') {
-                    $url .= '&q=' . urlencode($busquedaActual);
+                $isActive = (!empty($categoriaId) && (int)$categoriaId === (int)$cat['id']);
+                // Construimos la URL preservando la búsqueda
+                $query = [
+                  'categoria' => $cat['id'],
+                ];
+                if (!empty($busqueda)) {
+                    $query['q'] = $busqueda;
                 }
+                $url = BASE_URL . '/cliente/explorar?' . http_build_query($query);
               ?>
-              <a 
-                href="<?= $url ?>" 
-                class="btn btn-outline-primary <?= ($categoriaActual !== '' && (int)$categoriaActual === (int)$cat['id']) ? 'active' : '' ?>"
-              >
+              <a href="<?= $url ?>"
+                 class="btn btn-outline-primary <?= $isActive ? 'active' : '' ?>">
                 <?= htmlspecialchars($cat['nombre']) ?>
               </a>
             <?php endforeach; ?>
@@ -107,72 +94,85 @@ $categorias     = $categoriaModel->mostrar();
 
       <!-- Tarjetas de servicios -->
       <div class="row g-4" id="contenedor-servicios">
-
         <?php if (!empty($publicaciones)): ?>
           <?php foreach ($publicaciones as $pub): ?>
             <?php
-              // Imagen del servicio
-              $imagenServicio = $pub['servicio_imagen'] ?? 'default_service.png';
+              // Imagen
+              $imagen = !empty($pub['servicio_imagen'])
+                ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($pub['servicio_imagen'])
+                : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+
+              // Título (publicación o servicio)
+              $titulo = !empty($pub['titulo'])
+                ? $pub['titulo']
+                : ($pub['servicio_nombre'] ?? 'Servicio');
+
+              // Proveedor
+              $proveedorNombre = $pub['proveedor_nombre'] ?? 'Proveedor';
 
               // Descripción corta
               $descripcion = $pub['descripcion'] ?? '';
-              if (strlen($descripcion) > 140) {
-                  $descripcion = substr($descripcion, 0, 137) . '...';
+              if (mb_strlen($descripcion) > 120) {
+                  $descripcion = mb_substr($descripcion, 0, 117) . '...';
               }
 
-              // Precio (opcional)
-              $precio = null;
-              if (isset($pub['precio']) && (float)$pub['precio'] > 0) {
-                  $precio = number_format((float)$pub['precio'], 0, ',', '.');
+              // Ubicación
+              $ubicacion = $pub['ciudad'] ?? '';
+              if (!empty($pub['zona'])) {
+                  $ubicacion = trim($ubicacion . ' - ' . $pub['zona']);
               }
+              if ($ubicacion === '') {
+                  $ubicacion = 'Ubicación no especificada';
+              }
+
+              // Categoría
+              $categoriaNombre = $pub['categoria_nombre'] ?? 'Sin categoría';
+
+              // Precio (si lo estás usando)
+              $precio = isset($pub['precio']) ? (float)$pub['precio'] : 0.0;
             ?>
             <div class="col-md-4">
               <div class="card service-card h-100">
                 <div class="service-image">
-                  <img 
-                    src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($imagenServicio) ?>" 
-                    alt="<?= htmlspecialchars($pub['servicio_nombre'] ?? $pub['titulo']) ?>"
-                  >
+                  <img src="<?= $imagen ?>" alt="<?= htmlspecialchars($titulo) ?>">
                 </div>
                 <div class="card-body service-content d-flex flex-column">
-                  <h5 class="card-title">
-                    <?= htmlspecialchars($pub['titulo'] ?? $pub['servicio_nombre'] ?? 'Servicio') ?>
-                  </h5>
-                  <p class="card-subtitle">
-                    Proveedor: <?= htmlspecialchars($pub['proveedor_nombre'] ?? 'No especificado') ?>
+                  <h5 class="card-title"><?= htmlspecialchars($titulo) ?></h5>
+                  <p class="card-subtitle mb-1">
+                    Proveedor: <?= htmlspecialchars($proveedorNombre) ?>
                   </p>
 
-                  <p class="card-text flex-grow-1">
-                    <?= htmlspecialchars($descripcion !== '' ? $descripcion : 'Este proveedor aún no ha agregado una descripción detallada.') ?>
-                  </p>
-
-                  <p class="card-location mb-1">
-                    <strong>Ubicación:</strong>
-                    <?= htmlspecialchars($pub['ubicacion'] ?? 'No especificada') ?>
-                  </p>
-
-                  <p class="card-category mb-1">
-                    <strong>Categoría:</strong>
-                    <?= htmlspecialchars($pub['categoria_nombre'] ?? 'Sin categoría') ?>
-                  </p>
-
-                  <?php if ($precio !== null): ?>
-                    <p class="card-price mb-1">
-                      <strong>Desde:</strong> $ <?= $precio ?>
+                  <?php if ($precio > 0): ?>
+                    <p class="card-text mb-1">
+                      <strong>Desde:</strong> $ <?= number_format($precio, 0, ',', '.') ?>
                     </p>
                   <?php endif; ?>
 
-                  <!-- Por ahora, calificación estática / placeholder -->
-                  <p class="card-rating mb-3">
-                    ⭐ Sin calificaciones aún
+                  <p class="card-text flex-grow-1">
+                    <?= htmlspecialchars($descripcion) ?>
                   </p>
 
-                  <!-- Botón para ir al detalle del servicio/publicación -->
-                  <a 
-                    href="<?= BASE_URL ?>/cliente/detalle-servicio?id=<?= (int)$pub['id'] ?>" 
-                    class="btn btn-primary w-100 mt-auto"
-                  >
-                    Ver detalles y contratar
+                  <p class="card-location mb-1">
+                    <i class="bi bi-geo-alt"></i>
+                    <?= htmlspecialchars($ubicacion) ?>
+                  </p>
+
+                  <p class="card-category mb-1">
+                    <i class="bi bi-tags"></i>
+                    Categoría: <?= htmlspecialchars($categoriaNombre) ?>
+                  </p>
+
+                  <!-- Por ahora sin calificaciones reales -->
+                  <p class="card-rating mb-3">
+                    <i class="bi bi-star-fill text-warning"></i>
+                    Sin calificaciones aún
+                  </p>
+
+                  <!-- Botón para avanzar al detalle / contratación -->
+                  <!-- Más adelante lo cambiamos a la ruta de detalle o creación de solicitud -->
+                  <a href="#"
+                     class="btn btn-primary w-100 mt-auto">
+                    Contratar Servicio
                   </a>
                 </div>
               </div>
@@ -180,15 +180,12 @@ $categorias     = $categoriaModel->mostrar();
           <?php endforeach; ?>
         <?php else: ?>
           <div class="col-12">
-            <div class="alert alert-light border text-center" role="alert">
-              <h5 class="mb-1">No encontramos servicios para tu búsqueda.</h5>
-              <p class="mb-0" style="font-size: 0.9rem;">
-                Intenta con otros términos o quita algunos filtros de categoría.
-              </p>
+            <div class="alert alert-info">
+              No encontramos servicios activos con los filtros actuales.
+              Intenta limpiar la búsqueda o cambiar de categoría.
             </div>
           </div>
         <?php endif; ?>
-
       </div>
 
     </section>

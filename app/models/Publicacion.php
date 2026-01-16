@@ -34,6 +34,13 @@ class Publicacion
 
     /**
      * Crea una publicación para un servicio creado por un proveedor.
+     *
+     * - $usuarioId  -> viene de $_SESSION['user']['id']
+     * - $servicioId -> id de la fila recién creada en servicios
+     * - $data:
+     *      ['nombre']       => título base del servicio
+     *      ['descripcion']  => descripción del servicio
+     *      ['precio']       => (opcional) precio base
      */
     public function crearParaServicioDeProveedor(
         int $usuarioId,
@@ -53,6 +60,7 @@ class Publicacion
         $precio      = isset($data['precio']) ? (float)$data['precio'] : 0.00;
 
         $tipoPublicacion = 'proveedor';
+        // Muy importante: coincidir con tu ENUM real: 'pendiente', 'aprobado', 'rechazada', etc.
         $estado          = 'pendiente'; // para flujo de moderación
 
         // 3. Insert
@@ -90,6 +98,9 @@ class Publicacion
     /**
      * Lista todas las publicaciones asociadas a un proveedor
      * a partir del usuario (tabla usuarios).
+     *
+     * Esta es la que usa tu vista de:
+     *   /proveedor/listar-servicio
      */
     public function listarPorProveedorUsuario(int $usuarioId): array
     {
@@ -101,23 +112,20 @@ class Publicacion
                 return [];
             }
 
-            // 2. Consulta de publicaciones de ese proveedor
+            // 2. Consulta de publicaciones + servicio + categoría
             $sql = "
                 SELECT 
-                    pub.id                AS publicacion_id,
-                    pub.servicio_id       AS servicio_id,
-                    pub.titulo            AS publicacion_titulo,
-                    pub.descripcion       AS publicacion_descripcion,
-                    pub.precio            AS publicacion_precio,
-                    pub.estado            AS estado_publicacion,
-                    pub.created_at        AS publicacion_created_at,
-                    
-                    s.nombre              AS servicio_nombre,
-                    s.descripcion         AS servicio_descripcion,
-                    s.imagen              AS servicio_imagen,
-                    s.disponibilidad      AS servicio_disponible,
+                    pub.id              AS publicacion_id,
+                    pub.servicio_id     AS servicio_id,
+                    pub.estado          AS estado_publicacion,
+                    pub.created_at      AS publicacion_created_at,
 
-                    c.nombre              AS categoria_nombre
+                    s.nombre            AS servicio_nombre,
+                    s.descripcion       AS servicio_descripcion,
+                    s.imagen            AS servicio_imagen,
+                    s.disponibilidad    AS servicio_disponible,
+
+                    c.nombre            AS categoria_nombre
                 FROM publicaciones AS pub
                 INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
                 LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
@@ -137,19 +145,18 @@ class Publicacion
             return [];
         }
     }
-    // app/models/Publicacion.php
-
-// ...clase Publicacion ya existente...
 
     /**
-     * Lista publicaciones activas para el catálogo público de clientes.
-     * Puedes luego agregar filtros (categoría, ciudad, precio, etc.).
+     * Lista publicaciones públicas/visibles para el catálogo del cliente.
+     *
+     * Muestra SOLO las aprobadas (estado = 'aprobado').
+     * Opcionalmente filtra por texto y por categoría.
      */
-    public function listarPublicasActivas(array $filtros = []): array
+    public function listarPublicasActivas(?string $busqueda = null, ?int $idCategoria = null): array
     {
         try {
             $sql = "
-                SELECT 
+                SELECT
                     pub.id,
                     pub.servicio_id,
                     pub.titulo,
@@ -157,28 +164,40 @@ class Publicacion
                     pub.precio,
                     pub.estado,
                     pub.created_at,
-                    s.nombre       AS servicio_nombre,
-                    s.imagen       AS servicio_imagen,
-                    c.nombre       AS categoria_nombre,
-                    prov.nombre_comercial AS proveedor_nombre
+
+                    s.nombre        AS servicio_nombre,
+                    s.descripcion   AS servicio_descripcion,
+                    s.imagen        AS servicio_imagen,
+
+                    c.id            AS categoria_id,
+                    c.nombre        AS categoria_nombre,
+
+                    prov.nombre_comercial,
+                    prov.ciudad,
+                    prov.zona
                 FROM publicaciones AS pub
-                INNER JOIN servicios      AS s    ON pub.servicio_id   = s.id
-                LEFT  JOIN categorias     AS c    ON s.id_categoria    = c.id
-                LEFT  JOIN proveedores    AS prov ON pub.proveedor_id  = prov.id
-                WHERE pub.estado = 'activa'
+                INNER JOIN servicios   AS s    ON pub.servicio_id  = s.id
+                LEFT  JOIN categorias  AS c    ON s.id_categoria   = c.id
+                LEFT  JOIN proveedores AS prov ON pub.proveedor_id = prov.id
+                WHERE pub.estado = 'aprobado'
             ";
 
-            // Ejemplo de filtros simples (opcional, se pueden usar luego)
             $params = [];
 
-            if (!empty($filtros['categoria_id'])) {
-                $sql .= " AND s.id_categoria = :categoria_id";
-                $params[':categoria_id'] = (int)$filtros['categoria_id'];
+            // Búsqueda por texto (opcional)
+            if ($busqueda !== null && $busqueda !== '') {
+                $sql .= " AND (
+                    s.nombre LIKE :busqueda
+                    OR pub.titulo LIKE :busqueda
+                    OR pub.descripcion LIKE :busqueda
+                )";
+                $params[':busqueda'] = '%' . $busqueda . '%';
             }
 
-            if (!empty($filtros['texto'])) {
-                $sql .= " AND (pub.titulo LIKE :texto OR pub.descripcion LIKE :texto)";
-                $params[':texto'] = '%' . $filtros['texto'] . '%';
+            // Filtro por categoría (opcional)
+            if ($idCategoria !== null && $idCategoria > 0) {
+                $sql .= " AND c.id = :categoria_id";
+                $params[':categoria_id'] = $idCategoria;
             }
 
             $sql .= " ORDER BY pub.created_at DESC";
@@ -186,17 +205,21 @@ class Publicacion
             $stmt = $this->conexion->prepare($sql);
 
             foreach ($params as $key => $value) {
-                $stmt->bindValue($key, $value);
+                if ($key === ':categoria_id') {
+                    $stmt->bindValue($key, $value, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($key, $value, PDO::PARAM_STR);
+                }
             }
 
             $stmt->execute();
 
             $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             return $filas ?: [];
         } catch (PDOException $e) {
             error_log("Error en Publicacion::listarPublicasActivas -> " . $e->getMessage());
             return [];
         }
     }
-
 }

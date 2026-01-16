@@ -252,8 +252,11 @@ switch ($request) {
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
         break;
-    case '/cliente/explorar':
+    case '/cliente/explorar-servicios':
         require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
+        break;
+    case '/cliente/explorar':
+        require BASE_PATH . '/app/controllers/catalogoPublicoController.php';
         break;
     case '/cliente/servicios-contratados':
         require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
