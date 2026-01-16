@@ -218,4 +218,49 @@ class Publicacion
             return [];
         }
     }
+    public function obtenerPublicaActivaPorId(int $id): ?array
+    {
+        try {
+            $sql = "
+            SELECT 
+                pub.id,
+                pub.titulo,
+                pub.descripcion       AS publicacion_descripcion,
+                pub.precio,
+                pub.estado,
+                pub.created_at        AS publicacion_created_at,
+
+                s.id                  AS servicio_id,
+                s.nombre              AS servicio_nombre,
+                s.descripcion         AS servicio_descripcion,
+                s.imagen              AS servicio_imagen,
+                s.disponibilidad      AS servicio_disponible,
+
+                c.nombre              AS categoria_nombre,
+
+                p.id                  AS proveedor_id,
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                p.ubicacion           AS proveedor_ubicacion,
+                p.foto                AS proveedor_foto
+            FROM publicaciones AS pub
+            INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
+            LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
+            INNER JOIN proveedores AS p ON pub.proveedor_id = p.id
+            WHERE pub.id = :id
+              AND pub.estado = 'aprobado'
+            LIMIT 1
+        ";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return $fila ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Publicacion::obtenerPublicaActivaPorId -> " . $e->getMessage());
+            return null;
+        }
+    }
 }
