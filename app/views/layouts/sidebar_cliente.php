@@ -19,7 +19,7 @@
             </li>
 
             <li>
-                <a href="<?= BASE_URL ?>/cliente/explorar" data-title="Explorar Servicios">
+                <a href="<?= BASE_URL ?>/cliente/explorar-servicios" data-title="Explorar Servicios">
                     <i class="bi bi-compass"></i>
                     <span>Explorar Servicios</span>
                 </a>

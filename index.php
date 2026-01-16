@@ -247,36 +247,65 @@ switch ($request) {
 
 
 
-
     // Rutas del cliente
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
         break;
-    case '/cliente/explorar':
-        require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
+
+    // Catálogo público de servicios (explorar)
+    case '/cliente/explorar-servicios':
+        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        mostrarCatalogoPublico();
         break;
+
+    // Alias opcional: /cliente/explorar -> redirige al mismo catálogo
+    case '/cliente/explorar':
+        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        mostrarCatalogoPublico();
+        break;
+
     case '/cliente/servicios-contratados':
         require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
         break;
+
+
     case '/cliente/mensajes':
         require BASE_PATH . '/app/views/dashboard/cliente/mensajes.php';
         break;
+
     case '/cliente/favoritos':
         require BASE_PATH . '/app/views/dashboard/cliente/favoritos.php';
         break;
+
     case '/cliente/historial':
         require BASE_PATH . '/app/views/dashboard/cliente/historialServicios.php';
         break;
+
     case '/cliente/perfil':
         require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
         break;
+
     case '/cliente/ayuda':
         require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
         break;
 
 
+    case '/cliente/dashboard':
+        require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
+        break;
 
+    case '/cliente/explorar-servicios':
+        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        break;
 
+    case '/cliente/publicacion':
+        require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';
+        break;
+
+    // Cliente - solicitar servicio (vista formulario)
+    case '/cliente/solicitar-servicio':
+        require BASE_PATH . '/app/views/dashboard/cliente/solicitarServicio.php';
+        break;
 
     default:
         http_response_code(404);
