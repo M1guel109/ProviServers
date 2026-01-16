@@ -268,6 +268,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
         break;
 
+
     case '/cliente/mensajes':
         require BASE_PATH . '/app/views/dashboard/cliente/mensajes.php';
         break;
@@ -288,7 +289,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
         break;
 
-    
+
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
         break;
@@ -301,11 +302,10 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';
         break;
 
-    
-
-
-
-
+    // Cliente - solicitar servicio (vista formulario)
+    case '/cliente/solicitar-servicio':
+        require BASE_PATH . '/app/views/dashboard/cliente/solicitarServicio.php';
+        break;
 
     default:
         http_response_code(404);
