@@ -192,7 +192,7 @@ $solicitudes = [
                                     <?php
                                     $urgenciaClass = '';
                                     $urgenciaTexto = '';
-                                    switch($solicitud['urgencia']) {
+                                    switch ($solicitud['urgencia']) {
                                         case 'alta':
                                             $urgenciaClass = 'urgencia-alta';
                                             $urgenciaTexto = 'Alta';
@@ -218,43 +218,41 @@ $solicitudes = [
                                     </span>
                                 </td>
 
-                               <td>
-    <div class="action-buttons">
-        
-        <!-- Ver detalle completo -->
-        <button 
-            class="btn-action btn-view" 
-            title="Ver detalle"
-            data-bs-toggle="modal" 
-            data-bs-target="#modalDetalle"
-            onclick='mostrarDetalle(<?= json_encode($solicitud) ?>)'>
-            <i class="bi bi-eye"></i>
-        </button>
+                                <td>
+                                    <div class="action-buttons">
 
-        <!-- Aceptar solicitud -->
-        <a href="<?= BASE_URL ?>/proveedor/aceptar-solicitud?id=<?= $solicitud['id'] ?>"
-            class="btn-action btn-accept"
-            title="Aceptar solicitud">
-            <i class="bi bi-check-circle"></i>
-        </a>
+                                        <!-- Ver detalle -->
+                                        <a href="<?= BASE_URL ?>/proveedor/solicitud-detalle?id=<?= $solicitud['id'] ?>"
+                                            class="btn-action btn-view"
+                                            title="Ver detalle">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
 
-        <!-- Rechazar solicitud -->
-        <a href="<?= BASE_URL ?>/proveedor/rechazar-solicitud?id=<?= $solicitud['id'] ?>"
-            class="btn-action btn-reject"
-            title="Rechazar solicitud"
-            onclick="return confirm('¿Estás seguro de rechazar esta solicitud?')">
-            <i class="bi bi-x-circle"></i>
-        </a>
+                                        <!-- Aceptar solicitud -->
+                                        <a href="<?= BASE_URL ?>/proveedor/aceptar-solicitud?id=<?= $solicitud['id'] ?>"
+                                            class="btn-action btn-accept"
+                                            title="Aceptar solicitud">
+                                            <i class="bi bi-check-circle"></i>
+                                        </a>
 
-        <!-- Contactar cliente -->
-        <a href="mailto:<?= htmlspecialchars($solicitud['email_cliente']) ?>"
-            class="btn-action btn-contact"
-            title="Contactar cliente">
-            <i class="bi bi-envelope"></i>
-        </a>
+                                        <!-- Rechazar solicitud -->
+                                        <a href="<?= BASE_URL ?>/proveedor/rechazar-solicitud?id=<?= $solicitud['id'] ?>"
+                                            class="btn-action btn-reject"
+                                            title="Rechazar solicitud"
+                                            onclick="return confirm('¿Estás seguro de rechazar esta solicitud?')">
+                                            <i class="bi bi-x-circle"></i>
+                                        </a>
 
-    </div>
-</td>
+                                        <!-- Contactar -->
+                                        <a href="mailto:<?= htmlspecialchars($solicitud['email_cliente']) ?>"
+                                            class="btn-action btn-contact"
+                                            title="Contactar cliente">
+                                            <i class="bi bi-envelope"></i>
+                                        </a>
+
+                                    </div>
+                                </td>
+
 
                             </tr>
                         <?php endforeach; ?>
