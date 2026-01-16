@@ -137,4 +137,66 @@ class Publicacion
             return [];
         }
     }
+    // app/models/Publicacion.php
+
+// ...clase Publicacion ya existente...
+
+    /**
+     * Lista publicaciones activas para el catálogo público de clientes.
+     * Puedes luego agregar filtros (categoría, ciudad, precio, etc.).
+     */
+    public function listarPublicasActivas(array $filtros = []): array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    pub.id,
+                    pub.servicio_id,
+                    pub.titulo,
+                    pub.descripcion,
+                    pub.precio,
+                    pub.estado,
+                    pub.created_at,
+                    s.nombre       AS servicio_nombre,
+                    s.imagen       AS servicio_imagen,
+                    c.nombre       AS categoria_nombre,
+                    prov.nombre_comercial AS proveedor_nombre
+                FROM publicaciones AS pub
+                INNER JOIN servicios      AS s    ON pub.servicio_id   = s.id
+                LEFT  JOIN categorias     AS c    ON s.id_categoria    = c.id
+                LEFT  JOIN proveedores    AS prov ON pub.proveedor_id  = prov.id
+                WHERE pub.estado = 'activa'
+            ";
+
+            // Ejemplo de filtros simples (opcional, se pueden usar luego)
+            $params = [];
+
+            if (!empty($filtros['categoria_id'])) {
+                $sql .= " AND s.id_categoria = :categoria_id";
+                $params[':categoria_id'] = (int)$filtros['categoria_id'];
+            }
+
+            if (!empty($filtros['texto'])) {
+                $sql .= " AND (pub.titulo LIKE :texto OR pub.descripcion LIKE :texto)";
+                $params[':texto'] = '%' . $filtros['texto'] . '%';
+            }
+
+            $sql .= " ORDER BY pub.created_at DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+
+            foreach ($params as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+
+            $stmt->execute();
+
+            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $filas ?: [];
+        } catch (PDOException $e) {
+            error_log("Error en Publicacion::listarPublicasActivas -> " . $e->getMessage());
+            return [];
+        }
+    }
+
 }
