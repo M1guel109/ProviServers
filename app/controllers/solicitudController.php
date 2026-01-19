@@ -26,11 +26,15 @@ function guardarSolicitud()
 {
     // 🔐 Validar sesión
     if (!isset($_SESSION['user']['id'])) {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para solicitar un servicio');
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Debes iniciar sesión para solicitar un servicio'
+        );
         exit();
     }
 
-    // 📥 Datos
+    // 📥 Datos principales
     $clienteId     = (int) $_SESSION['user']['id'];
     $publicacionId = (int) ($_POST['publicacion_id'] ?? 0);
     $titulo        = trim($_POST['titulo'] ?? '');
@@ -42,29 +46,116 @@ function guardarSolicitud()
     $franja        = trim($_POST['franja_horaria'] ?? '');
     $presupuesto   = $_POST['presupuesto'] ?? null;
 
-    // echo '<pre>';
-    // var_dump($_POST);
-    // exit;
-
-
-    // 🧪 Validaciones
-    if (!$publicacionId || !$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha) {
-        mostrarSweetAlert('error', 'Campos incompletos', 'Completa los campos obligatorios');
+    // 🧪 Validaciones básicas
+    if (
+        !$publicacionId ||
+        !$titulo ||
+        !$descripcion ||
+        !$direccion ||
+        !$ciudad ||
+        !$fecha
+    ) {
+        mostrarSweetAlert(
+            'error',
+            'Campos incompletos',
+            'Completa los campos obligatorios'
+        );
         exit();
     }
 
-    // 🔎 Obtener proveedor desde publicación
+    // 🔎 Obtener publicación y proveedor
     $pubModel = new Publicacion();
     $publicacion = $pubModel->obtenerPublicaActivaPorId($publicacionId);
 
     if (!$publicacion) {
-        mostrarSweetAlert('error', 'Error', 'La publicación no existe');
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'La publicación no existe'
+        );
         exit();
     }
 
     $proveedorId = (int) $publicacion['proveedor_id'];
 
-    // 📦 Data principal
+    // 🛑 Validar solicitud duplicada
+    $solicitudModel = new Solicitud();
+    if ($solicitudModel->tieneSolicitudActiva($clienteId, $publicacionId)) {
+        mostrarSweetAlert(
+            'warning',
+            'Solicitud ya enviada',
+            'Ya tienes una solicitud activa para este servicio'
+        );
+        exit();
+    }
+
+    /* ======================================================
+       📎 PROCESAR ADJUNTOS
+       ====================================================== */
+    $adjuntos_guardados = [];
+
+    if (!empty($_FILES['adjuntos']) && !empty($_FILES['adjuntos']['name'][0])) {
+
+        $ruta_base = BASE_PATH . '/public/uploads/solicitudes/';
+        if (!is_dir($ruta_base)) {
+            mkdir($ruta_base, 0755, true);
+        }
+
+        $permitidas = ['pdf', 'png', 'jpg', 'jpeg'];
+        $max_size   = 5 * 1024 * 1024; // 5MB
+
+        foreach ($_FILES['adjuntos']['name'] as $i => $nombre_original) {
+
+            if ($_FILES['adjuntos']['error'][$i] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            $ext   = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
+            $size  = $_FILES['adjuntos']['size'][$i];
+            $tipo  = $_FILES['adjuntos']['type'][$i];
+            $tmp   = $_FILES['adjuntos']['tmp_name'][$i];
+
+            if (!in_array($ext, $permitidas)) {
+                mostrarSweetAlert(
+                    'error',
+                    'Archivo no permitido',
+                    "Archivo {$nombre_original} no es válido"
+                );
+                exit();
+            }
+
+            if ($size > $max_size) {
+                mostrarSweetAlert(
+                    'error',
+                    'Archivo muy grande',
+                    "El archivo {$nombre_original} supera 5MB"
+                );
+                exit();
+            }
+
+            $nombre_final = uniqid('sol_') . '.' . $ext;
+            $destino = $ruta_base . $nombre_final;
+
+            if (!move_uploaded_file($tmp, $destino)) {
+                mostrarSweetAlert(
+                    'error',
+                    'Error al subir archivo',
+                    "No se pudo guardar {$nombre_original}"
+                );
+                exit();
+            }
+
+            $adjuntos_guardados[] = [
+                'archivo' => $nombre_final,
+                'tipo_archivo'    => $tipo,
+                'tamano'  => $size
+            ];
+        }
+    }
+
+    /* ======================================================
+       📦 DATA FINAL PARA EL MODELO
+       ====================================================== */
     $data = [
         'cliente_id'     => $clienteId,
         'proveedor_id'   => $proveedorId,
@@ -74,38 +165,14 @@ function guardarSolicitud()
         'direccion'      => $direccion,
         'ciudad'         => $ciudad,
         'zona'           => $zona,
-        'fecha_preferida' => $fecha,
+        'fecha_servicio' => $fecha,
         'franja_horaria' => $franja,
         'presupuesto_estimado'    => $presupuesto,
-        'estado'         => 'pendiente'
+        'adjuntos'       => $adjuntos_guardados
     ];
 
-    // 📎 Adjuntos
-    $adjuntos = $_FILES['adjuntos'] ?? null;
-
-    // 🧠 Guardar
-    $solicitud = new Solicitud();
-    $resultado = $solicitud->crear($data);
-
-    // var_dump([
-    //     'cliente_id'   => $clienteId,
-    //     'proveedor_id' => $proveedorId,
-    //     'publicacion'  => $publicacion
-    // ]);
-    // exit;
-
-    $solicitud = new Solicitud();
-
-    if ($solicitud->tieneSolicitudActiva($clienteId, $publicacionId)) {
-        mostrarSweetAlert(
-            'warning',
-            'Solicitud ya enviada',
-            'Ya tienes una solicitud activa para este servicio'
-        );
-        exit;
-    }
-
-
+    // 🧠 Guardar solicitud + adjuntos
+    $resultado = $solicitudModel->crear($data);
 
     if ($resultado === true) {
         mostrarSweetAlert(
