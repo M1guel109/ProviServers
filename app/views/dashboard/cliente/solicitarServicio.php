@@ -2,7 +2,11 @@
 
 
 // id de la publicación que viene desde el catálogo / detalle
-$idPublicacion = isset($_GET['id_publicacion']) ? (int)$_GET['id_publicacion'] : 0;
+$publicacion_id = (int)($_GET['id'] ?? 0);
+
+if ($publicacion_id <= 0) {
+    die('Publicación no válida');
+}
 
 // Opcional: podrías aquí, más adelante, cargar un resumen de la publicación
 // require_once BASE_PATH . '/app/models/Publicacion.php';
@@ -57,9 +61,15 @@ $idPublicacion = isset($_GET['id_publicacion']) ? (int)$_GET['id_publicacion'] :
                     <div class="card p-4">
                         <h5 class="mb-3">Detalles de tu solicitud</h5>
 
+
                         <form action="<?= BASE_URL ?>/cliente/guardar-solicitud" method="POST" enctype="multipart/form-data">
                             <!-- Publicación a la que se asocia la solicitud -->
-                            <input type="hidden" name="publicacion_id" value="<?= $idPublicacion ?>">
+                            
+
+                            <input type="hidden" name="publicacion_id" value="<?= $publicacion_id ?>">
+
+
+
 
                             <!-- Título / asunto de la solicitud -->
                             <div class="mb-3">
@@ -202,8 +212,8 @@ $idPublicacion = isset($_GET['id_publicacion']) ? (int)$_GET['id_publicacion'] :
                         <div class="d-flex align-items-center mb-3">
                             <div class="me-3">
                                 <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png"
-                                     alt="Servicio"
-                                     style="width:64px;height:64px;border-radius:8px;object-fit:cover;">
+                                    alt="Servicio"
+                                    style="width:64px;height:64px;border-radius:8px;object-fit:cover;">
                             </div>
                             <div>
                                 <p class="mb-1 fw-semibold" style="font-size: 0.95rem;">

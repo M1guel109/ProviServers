@@ -307,6 +307,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/solicitarServicio.php';
         break;
 
+    case '/cliente/guardar-solicitud':
+        require BASE_PATH . '/app/controllers/solicitudController.php';
+        break;
+
     default:
         http_response_code(404);
         require BASE_PATH . '/app/views/auth/error404.php';
