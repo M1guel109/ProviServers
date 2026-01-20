@@ -245,6 +245,9 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/logoutController.php';
         break;
 
+    case '/proveedor/solicitudes':
+        require BASE_PATH . '/app/controllers/solicitudController.php';
+        break;
 
 
     // Rutas del cliente

@@ -8,10 +8,39 @@ session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+$accion = $_GET['accion'] ?? null;
+
+
 switch ($method) {
+
+    /* =========================
+       CREAR SOLICITUD
+    ========================= */
     case 'POST':
         guardarSolicitud();
         break;
+
+
+    /* =========================
+       ACCIONES PROVEEDOR
+    ========================= */
+    case 'GET':
+
+        if ($accion === 'aceptar') {
+            aceptarSolicitud($_GET['id'] ?? null);
+        }
+
+        if ($accion === 'rechazar') {
+            rechazarSolicitud($_GET['id'] ?? null);
+        }
+
+        if ($accion === 'detalle') {
+            mostrarDetalle($_GET['id'] ?? null);
+        }
+
+        break;
+
+
     default:
         http_response_code(405);
         echo "Método no permitido";
@@ -80,7 +109,7 @@ function guardarSolicitud()
 
     // 🛑 Validar solicitud duplicada
     $solicitudModel = new Solicitud();
-    if ($solicitudModel->tieneSolicitudActiva($clienteId, $publicacionId)) {
+    if ($solicitudModel->tieneSolicitudActivaPorUsuario($_SESSION['user']['id'], $publicacionId)) {
         mostrarSweetAlert(
             'warning',
             'Solicitud ya enviada',
@@ -157,7 +186,7 @@ function guardarSolicitud()
        📦 DATA FINAL PARA EL MODELO
        ====================================================== */
     $data = [
-        'cliente_id'     => $clienteId,
+        'usuario_id'           => $_SESSION['user']['id'],
         'proveedor_id'   => $proveedorId,
         'publicacion_id' => $publicacionId,
         'titulo'         => $titulo,
@@ -165,7 +194,7 @@ function guardarSolicitud()
         'direccion'      => $direccion,
         'ciudad'         => $ciudad,
         'zona'           => $zona,
-        'fecha_servicio' => $fecha,
+        'fecha_preferida' => $fecha,
         'franja_horaria' => $franja,
         'presupuesto_estimado'    => $presupuesto,
         'adjuntos'       => $adjuntos_guardados
@@ -190,4 +219,74 @@ function guardarSolicitud()
     }
 
     exit();
+}
+
+function aceptarSolicitud($id)
+{
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
+        exit;
+    }
+
+    $proveedorId = $_SESSION['user']['id'];
+
+    $modelo = new Solicitud();
+    $resultado = $modelo->aceptar($id, $proveedorId);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Solicitud aceptada',
+            'La solicitud fue aceptada correctamente',
+            '/ProviServers/proveedor/nuevas_solicitudes'
+        );
+    } else {
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo aceptar la solicitud'
+        );
+    }
+
+    exit;
+}
+
+
+function rechazarSolicitud($id)
+{
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
+        exit;
+    }
+
+    $proveedorId = $_SESSION['proveedor_id'];
+
+    $modelo = new Solicitud();
+    $resultado = $modelo->rechazar($id, $proveedorId);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Solicitud rechazada',
+            'La solicitud fue rechazada',
+            '/ProviServers/proveedor/solicitudes'
+        );
+    } else {
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo rechazar la solicitud'
+        );
+    }
+
+    exit;
+}
+
+
+function mostrarDetalle($id)
+{
+    $modelo = new Solicitud();
+    $detalle = $modelo->obtenerDetalle($id);
+
+    return $detalle;
 }
