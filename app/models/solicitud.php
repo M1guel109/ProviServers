@@ -96,7 +96,7 @@ class Solicitud
                     $stmtAdj->execute([
                         ':solicitud_id' => $solicitudId,
                         ':archivo'      => $adjunto['archivo'],
-                        ':tipo_archivo'         => $adjunto['tipo_archivo'],
+                        ':tipo_archivo' => $adjunto['tipo_archivo'],
                         ':tamano'       => $adjunto['tamano']
                     ]);
                 }
@@ -105,9 +105,18 @@ class Solicitud
             // ✅ Confirmar todo
             $this->conexion->commit();
             return true;
+
         } catch (PDOException $e) {
             error_log("Error SQL Solicitud::crear -> " . $e->getMessage());
-            $this->conexion->rollBack();
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
+            return false;
+        } catch (Exception $e) {
+            error_log("Error Solicitud::crear -> " . $e->getMessage());
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
             return false;
         }
     }
@@ -127,5 +136,54 @@ class Solicitud
         $stmt->execute([$clienteId, $publicacionId]);
 
         return $stmt->fetchColumn() > 0;
+    }
+
+    /* ======================================================
+       LISTAR SOLICITUDES POR CLIENTE (para “Servicios contratados”)
+       ====================================================== */
+    public function listarPorCliente(int $clienteId): array
+    {
+        try {
+            $sql = "
+                SELECT
+                    s.id,
+                    s.titulo,
+                    s.descripcion,
+                    s.estado,
+                    s.fecha_preferida,
+                    s.franja_horaria,
+                    s.ciudad,
+                    s.zona,
+                    s.presupuesto_estimado,
+                    s.publicacion_id,
+
+                    -- Datos del servicio / publicación
+                    p.titulo              AS publicacion_titulo,
+                    sv.nombre             AS servicio_nombre,
+                    sv.imagen             AS servicio_imagen,
+
+                    -- Datos del proveedor
+                    u.nombre              AS proveedor_nombre
+
+                FROM solicitudes s
+                INNER JOIN publicaciones p  ON s.publicacion_id = p.id
+                LEFT JOIN servicios sv      ON p.servicio_id    = sv.id
+                INNER JOIN proveedores pr   ON s.proveedor_id   = pr.id
+                INNER JOIN usuarios u       ON pr.usuario_id    = u.id
+
+                WHERE s.cliente_id = :cliente_id
+                ORDER BY s.fecha_preferida DESC, s.id DESC
+            ";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':cliente_id', $clienteId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $filas ?: [];
+        } catch (PDOException $e) {
+            error_log("Error en Solicitud::listarPorCliente -> " . $e->getMessage());
+            return [];
+        }
     }
 }
