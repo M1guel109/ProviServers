@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../helpers/alert_helper.php';
 require_once __DIR__ . '/../models/servicio.php';
 require_once __DIR__ . '/../models/Publicacion.php';
+require_once __DIR__ . '/../models/solicitud.php';
 
 // Iniciar sesión para poder leer $_SESSION
 if (session_status() === PHP_SESSION_NONE) {
@@ -33,6 +34,12 @@ switch ($method) {
 
         if ($accion === 'eliminar') {
             eliminarServicio($_GET['id']);
+        }
+
+        // Si la URL pide explícitamente solicitudes (puedes ajustar este parámetro según tu router)
+        if ($accion === 'ver_solicitudes') {
+            $listaSolicitudes = obtenerSolicitudesProveedor();
+            // Aquí no hacemos return, usualmente aquí se incluiría la vista o se pasaría la variable
         }
 
         if (isset($_GET['id'])) {
@@ -70,7 +77,7 @@ function registrarServicio()
     // 1. Capturamos los datos desde el formulario
     $nombre         = $_POST['nombre']        ?? '';
     $id_categoria   = $_POST['id_categoria']  ?? '';
-    $disponibilidad = $_POST['disponibilidad']?? '';
+    $disponibilidad = $_POST['disponibilidad'] ?? '';
     $descripcion    = $_POST['descripcion']   ?? '';
 
     // 2. Validamos los campos obligatorios
@@ -188,7 +195,7 @@ function actualizarServicio()
     $id            = $_POST['id']            ?? '';
     $nombre        = $_POST['nombre']        ?? '';
     $id_categoria  = $_POST['id_categoria']  ?? '';
-    $disponibilidad= $_POST['disponibilidad']?? '';
+    $disponibilidad = $_POST['disponibilidad'] ?? '';
     $descripcion   = $_POST['descripcion']   ?? '';
 
     if (empty($id) || empty($nombre) || empty($id_categoria) || $disponibilidad === '') {
@@ -201,7 +208,7 @@ function actualizarServicio()
         'id'            => $id,
         'nombre'        => $nombre,
         'id_categoria'  => $id_categoria,
-        'disponibilidad'=> $disponibilidad,
+        'disponibilidad' => $disponibilidad,
         'descripcion'   => $descripcion,
         // 'imagen'      => ...,  // si luego manejas actualización de imagen
     ];
@@ -236,7 +243,7 @@ function eliminarServicio($id)
             'success',
             'Eliminación exitosa',
             'Se ha eliminado el servicio.',
-           '/ProviServers/proveedor/listar-servicio'
+            '/ProviServers/proveedor/listar-servicio'
         );
     } else {
         mostrarSweetAlert(
@@ -245,4 +252,18 @@ function eliminarServicio($id)
             'No se pudo eliminar el servicio. Intenta nuevamente.'
         );
     }
+}
+
+function obtenerSolicitudesProveedor()
+{
+    // Verificamos sesión
+    if (!isset($_SESSION['user']['id'])) {
+        return [];
+    }
+
+    $usuarioId = (int)$_SESSION['user']['id'];
+    $solicitudModel = new Solicitud();
+
+    // Llamamos al modelo que corregimos anteriormente
+    return $solicitudModel->listarPorProveedor($usuarioId);
 }

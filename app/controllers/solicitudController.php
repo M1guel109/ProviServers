@@ -157,7 +157,7 @@ function guardarSolicitud()
        📦 DATA FINAL PARA EL MODELO
        ====================================================== */
     $data = [
-        'cliente_id'     => $clienteId,
+        'usuario_id'           => $_SESSION['user']['id'],
         'proveedor_id'   => $proveedorId,
         'publicacion_id' => $publicacionId,
         'titulo'         => $titulo,
