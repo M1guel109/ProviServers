@@ -23,13 +23,13 @@ $solicitudes = $solicitudModel->listarPorProveedor($proveedorId);
 $totalNuevas = count($solicitudes);
 
 // Corregimos la lógica de filtros para evitar errores de índices inexistentes
-$totalUrgentes = count(array_filter($solicitudes, function($s) {
+$totalUrgentes = count(array_filter($solicitudes, function ($s) {
     // Si no existe 'urgencia' o 'prioridad', por defecto es 'baja'
     $valor = $s['urgencia'] ?? $s['prioridad'] ?? 'baja';
     return strtolower($valor) === 'alta';
 }));
 
-$totalHoy = count(array_filter($solicitudes, function($s) {
+$totalHoy = count(array_filter($solicitudes, function ($s) {
     if (empty($s['fecha_preferida'])) return false;
     return date('Y-m-d', strtotime($s['fecha_preferida'])) === date('Y-m-d');
 }));
@@ -45,7 +45,7 @@ $totalHoy = count(array_filter($solicitudes, function($s) {
 
     <!-- Css DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.css">
-    
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -132,7 +132,7 @@ $totalHoy = count(array_filter($solicitudes, function($s) {
                                     </td>
                                     <td>
                                         <div class="text-nowrap">
-                                            <i class="bi bi-calendar3"></i> 
+                                            <i class="bi bi-calendar3"></i>
                                             <?= !empty($solicitud['fecha_preferida']) ? date('d/m/Y', strtotime($solicitud['fecha_preferida'])) : 'Sin fecha' ?>
                                             <br>
                                             <small class="text-muted">
@@ -141,9 +141,9 @@ $totalHoy = count(array_filter($solicitudes, function($s) {
                                         </div>
                                     </td>
                                     <td>
-                                        <?php 
-                                            $estado = strtolower($solicitud['estado'] ?? 'pendiente');
-                                            $badgeEstado = ($estado === 'pendiente') ? 'bg-secondary' : 'bg-success';
+                                        <?php
+                                        $estado = strtolower($solicitud['estado'] ?? 'pendiente');
+                                        $badgeEstado = ($estado === 'pendiente') ? 'bg-secondary' : 'bg-success';
                                         ?>
                                         <span class="badge <?= $badgeEstado ?> text-capitalize"><?= $estado ?></span>
                                     </td>
@@ -152,12 +152,17 @@ $totalHoy = count(array_filter($solicitudes, function($s) {
                                             <button class="btn btn-sm btn-outline-primary" title="Ver Detalle" onclick='verDetalle(<?= json_encode($solicitud) ?>)'>
                                                 <i class="bi bi-eye"></i>
                                             </button>
-                                            <a href="<?= BASE_URL ?>/proveedor/aceptar-solicitud?id=<?= $solicitud['id'] ?>" class="btn btn-sm btn-outline-success" title="Aceptar">
+                                            <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar&id=<?= $solicitud['id'] ?>"
+                                                class="btn btn-sm btn-outline-success" title="Aceptar">
                                                 <i class="bi bi-check-lg"></i>
                                             </a>
-                                            <a href="<?= BASE_URL ?>/proveedor/rechazar-solicitud?id=<?= $solicitud['id'] ?>" class="btn btn-sm btn-outline-danger" title="Rechazar" onclick="return confirm('¿Rechazar esta solicitud?')">
+
+                                            <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar&id=<?= $solicitud['id'] ?>"
+                                                class="btn btn-sm btn-outline-danger" title="Rechazar"
+                                                onclick="return confirm('¿Rechazar esta solicitud?')">
                                                 <i class="bi bi-x-lg"></i>
                                             </a>
+
                                         </div>
                                     </td>
                                 </tr>
@@ -190,4 +195,5 @@ $totalHoy = count(array_filter($solicitudes, function($s) {
         }
     </script>
 </body>
+
 </html>

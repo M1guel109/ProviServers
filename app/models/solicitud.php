@@ -87,7 +87,7 @@ class Solicitud
                 ':direccion'            => $data['direccion'],
                 ':ciudad'               => $data['ciudad'],
                 ':zona'                 => $data['zona'],
-                ':fecha_preferida'      => $data['fecha_servicio'],
+                ':fecha_preferida'      => $data['fecha_preferida'],
                 ':franja_horaria'       => $data['franja_horaria'],
                 ':presupuesto_estimado' => $data['presupuesto_estimado']
             ]);
@@ -189,17 +189,89 @@ class Solicitud
         }
     }
 
-    public function tieneSolicitudActiva($clienteId, $publicacionId): bool
+    public function tieneSolicitudActivaPorUsuario(int $usuarioId, int $publicacionId): bool
     {
         $sql = "SELECT COUNT(*) 
-                FROM solicitudes
-                WHERE cliente_id = ?
-                  AND publicacion_id = ?
-                  AND estado IN ('pendiente', 'aceptada')";
+            FROM solicitudes s
+            INNER JOIN clientes c ON s.cliente_id = c.id
+            WHERE c.usuario_id = ?
+              AND s.publicacion_id = ?
+              AND s.estado IN ('pendiente','aceptada')";
 
         $stmt = $this->conexion->prepare($sql);
-        $stmt->execute([$clienteId, $publicacionId]);
+        $stmt->execute([$usuarioId, $publicacionId]);
 
         return $stmt->fetchColumn() > 0;
+    }
+
+
+    public function aceptar(int $solicitudId, int $proveedorUsuarioId): bool
+    {
+        try {
+            $sql = "UPDATE solicitudes s
+                INNER JOIN proveedores p ON s.proveedor_id = p.id
+                SET s.estado = 'aceptada'
+                WHERE s.id = :id
+                  AND p.usuario_id = :usuario
+                  AND s.estado = 'pendiente'";
+
+            $stmt = $this->conexion->prepare($sql);
+            return $stmt->execute([
+                ':id' => $solicitudId,
+                ':usuario' => $proveedorUsuarioId
+            ]);
+        } catch (PDOException $e) {
+            error_log("Solicitud::aceptar -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function rechazar(int $solicitudId, int $proveedorUsuarioId): bool
+    {
+        try {
+            $sql = "UPDATE solicitudes s
+                INNER JOIN proveedores p ON s.proveedor_id = p.id
+                SET s.estado = 'rechazada'
+                WHERE s.id = :id
+                  AND p.usuario_id = :usuario
+                  AND s.estado = 'pendiente'";
+
+            $stmt = $this->conexion->prepare($sql);
+            return $stmt->execute([
+                ':id' => $solicitudId,
+                ':usuario' => $proveedorUsuarioId
+            ]);
+        } catch (PDOException $e) {
+            error_log("Solicitud::rechazar -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function obtenerDetalle(int $id): array
+    {
+        try {
+            $sql = "SELECT 
+                    s.*,
+                    CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
+                    c.telefono,
+                    c.ubicacion,
+                    u.email AS email_cliente,
+                    p.titulo AS publicacion,
+                    p.descripcion AS descripcion_publicacion
+                FROM solicitudes s
+                LEFT JOIN clientes c ON s.cliente_id = c.id
+                LEFT JOIN usuarios u ON c.usuario_id = u.id
+                LEFT JOIN publicaciones p ON s.publicacion_id = p.id
+                WHERE s.id = :id
+                LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':id' => $id]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log("Solicitud::obtenerDetalle -> " . $e->getMessage());
+            return [];
+        }
     }
 }
