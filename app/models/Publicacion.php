@@ -238,10 +238,12 @@ class Publicacion
 
                 c.nombre              AS categoria_nombre,
 
-                p.id                  AS proveedor_id,
+                p.id AS proveedor_id, 
+                p.usuario_id AS proveedor_usuario_id,
                 CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
-                p.ubicacion           AS proveedor_ubicacion,
-                p.foto                AS proveedor_foto
+                p.ubicacion AS proveedor_ubicacion,
+                p.foto AS proveedor_foto
+
             FROM publicaciones AS pub
             INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
             LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
