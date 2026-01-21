@@ -47,9 +47,9 @@ switch ($method) {
         break;
 }
 
-/* ======================================================
-   GUARDAR SOLICITUD (PRE-CONTRATO)
-   ====================================================== */
+    /* ======================================================
+    GUARDAR SOLICITUD (PRE-CONTRATO)
+    ====================================================== */
 
 function guardarSolicitud()
 {
@@ -109,7 +109,7 @@ function guardarSolicitud()
 
     // 🛑 Validar solicitud duplicada
     $solicitudModel = new Solicitud();
-    if ($solicitudModel->tieneSolicitudActivaPorUsuario($_SESSION['user']['id'], $publicacionId)) {
+    if ($solicitudModel->tieneSolicitudActiva($clienteId, $publicacionId)) {
         mostrarSweetAlert(
             'warning',
             'Solicitud ya enviada',
@@ -186,7 +186,7 @@ function guardarSolicitud()
        📦 DATA FINAL PARA EL MODELO
        ====================================================== */
     $data = [
-        'usuario_id'           => $_SESSION['user']['id'],
+        'cliente_id'     => $clienteId,
         'proveedor_id'   => $proveedorId,
         'publicacion_id' => $publicacionId,
         'titulo'         => $titulo,
@@ -194,7 +194,7 @@ function guardarSolicitud()
         'direccion'      => $direccion,
         'ciudad'         => $ciudad,
         'zona'           => $zona,
-        'fecha_preferida' => $fecha,
+        'fecha_servicio' => $fecha,
         'franja_horaria' => $franja,
         'presupuesto_estimado'    => $presupuesto,
         'adjuntos'       => $adjuntos_guardados
