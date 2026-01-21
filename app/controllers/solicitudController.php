@@ -8,19 +8,48 @@ session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+$accion = $_GET['accion'] ?? null;
+
+
 switch ($method) {
+
+    /* =========================
+       CREAR SOLICITUD
+    ========================= */
     case 'POST':
         guardarSolicitud();
         break;
+
+
+    /* =========================
+       ACCIONES PROVEEDOR
+    ========================= */
+    case 'GET':
+
+        if ($accion === 'aceptar') {
+            aceptarSolicitud($_GET['id'] ?? null);
+        }
+
+        if ($accion === 'rechazar') {
+            rechazarSolicitud($_GET['id'] ?? null);
+        }
+
+        if ($accion === 'detalle') {
+            mostrarDetalle($_GET['id'] ?? null);
+        }
+
+        break;
+
+
     default:
         http_response_code(405);
         echo "Método no permitido";
         break;
 }
 
-/* ======================================================
-   GUARDAR SOLICITUD (PRE-CONTRATO)
-   ====================================================== */
+    /* ======================================================
+    GUARDAR SOLICITUD (PRE-CONTRATO)
+    ====================================================== */
 
 function guardarSolicitud()
 {
@@ -190,4 +219,74 @@ function guardarSolicitud()
     }
 
     exit();
+}
+
+function aceptarSolicitud($id)
+{
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
+        exit;
+    }
+
+    $proveedorId = $_SESSION['user']['id'];
+
+    $modelo = new Solicitud();
+    $resultado = $modelo->aceptar($id, $proveedorId);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Solicitud aceptada',
+            'La solicitud fue aceptada correctamente',
+            '/ProviServers/proveedor/nuevas_solicitudes'
+        );
+    } else {
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo aceptar la solicitud'
+        );
+    }
+
+    exit;
+}
+
+
+function rechazarSolicitud($id)
+{
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
+        exit;
+    }
+
+    $proveedorId = $_SESSION['proveedor_id'];
+
+    $modelo = new Solicitud();
+    $resultado = $modelo->rechazar($id, $proveedorId);
+
+    if ($resultado) {
+        mostrarSweetAlert(
+            'success',
+            'Solicitud rechazada',
+            'La solicitud fue rechazada',
+            '/ProviServers/proveedor/solicitudes'
+        );
+    } else {
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo rechazar la solicitud'
+        );
+    }
+
+    exit;
+}
+
+
+function mostrarDetalle($id)
+{
+    $modelo = new Solicitud();
+    $detalle = $modelo->obtenerDetalle($id);
+
+    return $detalle;
 }
