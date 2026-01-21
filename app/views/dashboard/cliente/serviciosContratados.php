@@ -1,6 +1,6 @@
 <?php
 // Proteger: solo cliente logueado
-// require_once BASE_PATH . '/app/helpers/session_cliente.php';
+require_once BASE_PATH . '/app/helpers/session_cliente.php';
 
 // Modelo de solicitudes
 require_once BASE_PATH . '/app/models/Solicitud.php';
