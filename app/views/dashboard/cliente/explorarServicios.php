@@ -155,10 +155,11 @@
                   </p>
 
                   <!-- CTA: contratar / ver detalle -->
-                  <a href="<?= BASE_URL ?>/cliente/publicacion?id=<?= (int)$pub['id'] ?>"
+                  <a href="<?= BASE_URL ?>/cliente/solicitar-servicio?id_publicacion=<?= $pub['id'] ?>"
                     class="btn btn-primary w-100">
-                    Contratar servicio
+                    Contratar Servicio
                   </a>
+
 
                 </div>
               </div>
