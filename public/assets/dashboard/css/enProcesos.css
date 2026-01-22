@@ -218,17 +218,18 @@
     font-size: 13px;
     color: #FFFFFF;
     font-weight: 600;
+    background-color: #6b7280;
 }
 
 .badge-categoria i {
     font-size: 14px;
 }
 
-.electricidad { background-color: #f59e0b; }
+/* .electricidad { background-color: #f59e0b; }
 .limpieza { background-color: #0ea5e9; }
 .plomeria { background-color: #10b981; }
 .pintura { background-color: #a855f7; }
-.jardineria { background-color: #22c55e; }
+.jardineria { background-color: #22c55e; } */
 
 /* Fecha */
 .proceso-fecha {
