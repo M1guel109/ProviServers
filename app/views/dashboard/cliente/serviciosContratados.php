@@ -1,55 +1,3 @@
-<?php
-// Proteger: solo cliente logueado
-require_once BASE_PATH . '/app/helpers/session_cliente.php';
-
-// Modelo de solicitudes
-require_once BASE_PATH . '/app/models/Solicitud.php';
-
-$clienteId = $_SESSION['user']['id'] ?? null;
-
-// Arrays por estado para las pestañas
-$enCurso     = [];
-$programados = [];
-$completados = [];
-$cancelados  = [];
-
-if ($clienteId) {
-    $solicitudModel = new Solicitud();
-    $solicitudes    = $solicitudModel->listarPorCliente((int)$clienteId);
-
-    foreach ($solicitudes as $sol) {
-        $estado = $sol['estado'] ?? 'pendiente';
-
-        // Normalizamos minúsculas
-        $estado = strtolower($estado);
-
-        switch ($estado) {
-            case 'en_progreso':
-            case 'aceptada':
-                $enCurso[] = $sol;
-                break;
-
-            case 'pendiente':
-                $programados[] = $sol;
-                break;
-
-            case 'finalizada':
-                $completados[] = $sol;
-                break;
-
-            case 'cancelada':
-            case 'rechazada':
-                $cancelados[] = $sol;
-                break;
-
-            default:
-                // Si llega algo raro, lo mandamos a programados por defecto
-                $programados[] = $sol;
-                break;
-        }
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -84,253 +32,186 @@ if ($clienteId) {
     <section id="servicios-contratados">
       <div class="section-hero mb-4">
         <p class="breadcrumb">Inicio > Servicios Contratados</p>
-        <h1><i class="bi bi-briefcase text-primary"></i> Servicios Contratados</h1>
-        <p>Gestiona todas tus solicitudes y servicios desde aquí.</p>
+        <h1><i class="bi text-primary"></i>Servicios Contratados</h1>
+        <p>Gestiona todos tus servicios contratados y programados desde aquí.</p>
       </div>
 
       <!-- Pestañas por estado -->
       <ul class="nav nav-tabs mb-4" id="estadoTabs" role="tablist">
         <li class="nav-item">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#curso" type="button" role="tab">
+          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#curso" type="button">
             En curso
           </button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#programado" type="button" role="tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#programado" type="button">
             Programados
           </button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#completado" type="button" role="tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#completado" type="button">
             Completados
           </button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cancelado" type="button" role="tab">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#cancelado" type="button">
             Cancelados
           </button>
         </li>
       </ul>
 
       <div class="tab-content" id="estadoTabsContent">
-        <!-- ========== TAB: EN CURSO ========== -->
-        <div class="tab-pane fade show active" id="curso" role="tabpanel">
+        <!-- En curso -->
+        <div class="tab-pane fade show active" id="curso">
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <?php if (!empty($enCurso)): ?>
-              <?php foreach ($enCurso as $sol): ?>
+            <?php if (!empty($serviciosEnCurso)): ?>
+              <?php foreach ($serviciosEnCurso as $srv): ?>
                 <?php
-                  $tituloServicio = $sol['publicacion_titulo'] 
-                                    ?? $sol['servicio_nombre'] 
-                                    ?? $sol['titulo'];
+                  $imagen = !empty($srv['servicio_imagen'])
+                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $proveedorNombre = $sol['proveedor_nombre'] ?? 'Proveedor sin nombre';
-
-                  $fecha = '';
-                  if (!empty($sol['fecha_preferida'])) {
-                      $timestamp = strtotime($sol['fecha_preferida']);
-                      if ($timestamp) {
-                          $fecha = date('d/m/Y', $timestamp);
-                      } else {
-                          $fecha = htmlspecialchars($sol['fecha_preferida']);
-                      }
-                  }
-
-                  $franja = $sol['franja_horaria'] ?? null;
-
-                  $img = !empty($sol['servicio_imagen'])
-                      ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($sol['servicio_imagen'])
-                      : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
-
-                  // Progreso visual "falso" según estado
-                  $estadoSol = strtolower($sol['estado'] ?? '');
-                  $progreso  = 40;
-                  $colorBar  = 'bg-info';
-                  if ($estadoSol === 'aceptada') {
-                      $progreso = 50;
-                      $colorBar = 'bg-info';
-                  } elseif ($estadoSol === 'en_progreso') {
-                      $progreso = 70;
-                      $colorBar = 'bg-success';
-                  }
+                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
+                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                  $ciudad           = $srv['ciudad']             ?? '';
+                  $zona             = $srv['zona']               ?? '';
                 ?>
                 <div class="col">
-                  <div class="card service-card estado-curso h-100">
-                    <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                    <div class="card-body d-flex flex-column">
+                  <div class="card service-card estado-curso">
+                    <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio">
+                    <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
-                      <p class="card-subtitle text-muted mb-1">
+                      <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
-
-                      <?php if ($fecha): ?>
-                        <p class="card-text mb-1">
+                      <?php if ($fechaTexto): ?>
+                        <p class="card-text">
                           <i class="bi bi-calendar-event"></i>
-                          Fecha: <?= $fecha ?>
-                          <?php if ($franja): ?>
-                            · <?= htmlspecialchars($franja) ?>
-                          <?php endif; ?>
+                          Programado para <?= htmlspecialchars($fechaTexto) ?>
+                        </p>
+                      <?php endif; ?>
+                      <?php if ($ciudad): ?>
+                        <p class="card-text">
+                          <i class="bi bi-geo-alt"></i>
+                          <?= htmlspecialchars($ciudad . ($zona ? ' - ' . $zona : '')) ?>
                         </p>
                       <?php endif; ?>
 
-                      <p class="card-text text-muted mb-3">
-                        <?= htmlspecialchars($sol['ciudad'] ?? '') ?>
-                        <?php if (!empty($sol['zona'])): ?>
-                            · <?= htmlspecialchars($sol['zona']) ?>
-                        <?php endif; ?>
-                      </p>
-
+                      <!-- Barra de progreso placeholder -->
                       <div class="progress mb-3" style="height: 20px;">
-                        <div class="progress-bar <?= $colorBar ?>" role="progressbar"
-                            style="width: <?= $progreso ?>%;"
-                            aria-valuenow="<?= $progreso ?>" aria-valuemin="0" aria-valuemax="100">
-                          <?= $progreso ?>%
+                        <div class="progress-bar bg-success"
+                             role="progressbar"
+                             style="width: 0%;"
+                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                          En curso
                         </div>
                       </div>
 
-                      <a href="#" class="btn btn-primary w-100 mt-auto">Ver detalles</a>
+                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
                     </div>
                   </div>
                 </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <div class="col-12">
+              <div class="col">
                 <div class="alert alert-info">
-                  No tienes servicios en curso por el momento.
+                  No tienes servicios en curso en este momento.
                 </div>
               </div>
             <?php endif; ?>
           </div>
         </div>
 
-        <!-- ========== TAB: PROGRAMADOS ========== -->
-        <div class="tab-pane fade" id="programado" role="tabpanel">
+        <!-- Programados -->
+        <div class="tab-pane fade" id="programado">
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <?php if (!empty($programados)): ?>
-              <?php foreach ($programados as $sol): ?>
+            <?php if (!empty($serviciosProgramados)): ?>
+              <?php foreach ($serviciosProgramados as $srv): ?>
                 <?php
-                  $tituloServicio = $sol['publicacion_titulo'] 
-                                    ?? $sol['servicio_nombre'] 
-                                    ?? $sol['titulo'];
+                  $imagen = !empty($srv['servicio_imagen'])
+                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $proveedorNombre = $sol['proveedor_nombre'] ?? 'Proveedor sin nombre';
-
-                  $fecha = '';
-                  if (!empty($sol['fecha_preferida'])) {
-                      $timestamp = strtotime($sol['fecha_preferida']);
-                      if ($timestamp) {
-                          $fecha = date('d/m/Y', $timestamp);
-                      } else {
-                          $fecha = htmlspecialchars($sol['fecha_preferida']);
-                      }
-                  }
-
-                  $franja = $sol['franja_horaria'] ?? null;
-
-                  $img = !empty($sol['servicio_imagen'])
-                      ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($sol['servicio_imagen'])
-                      : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
+                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                  $ciudad           = $srv['ciudad']             ?? '';
+                  $zona             = $srv['zona']               ?? '';
                 ?>
                 <div class="col">
-                  <div class="card service-card estado-programado h-100">
-                    <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                    <div class="card-body d-flex flex-column">
+                  <div class="card service-card estado-programado">
+                    <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio programado">
+                    <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
-                      <p class="card-subtitle text-muted mb-1">
+                      <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
-
-                      <?php if ($fecha): ?>
-                        <p class="card-text mb-1">
+                      <?php if ($fechaTexto): ?>
+                        <p class="card-text">
                           <i class="bi bi-calendar-event"></i>
-                          Programado para: <?= $fecha ?>
-                          <?php if ($franja): ?>
-                            · <?= htmlspecialchars($franja) ?>
-                          <?php endif; ?>
+                          <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
-
-                      <p class="card-text text-muted mb-3">
-                        <?= htmlspecialchars($sol['ciudad'] ?? '') ?>
-                        <?php if (!empty($sol['zona'])): ?>
-                            · <?= htmlspecialchars($sol['zona']) ?>
-                        <?php endif; ?>
-                      </p>
-
-                      <a href="#" class="btn btn-primary w-100 mt-auto">Ver detalles</a>
+                      <?php if ($ciudad): ?>
+                        <p class="card-text">
+                          <i class="bi bi-geo-alt"></i>
+                          <?= htmlspecialchars($ciudad . ($zona ? ' - ' . $zona : '')) ?>
+                        </p>
+                      <?php endif; ?>
+                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
                     </div>
                   </div>
                 </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <div class="col-12">
+              <div class="col">
                 <div class="alert alert-info">
-                  No tienes servicios programados aún.
+                  No tienes servicios programados por ahora.
                 </div>
               </div>
             <?php endif; ?>
           </div>
         </div>
 
-        <!-- ========== TAB: COMPLETADOS ========== -->
-        <div class="tab-pane fade" id="completado" role="tabpanel">
+        <!-- Completados -->
+        <div class="tab-pane fade" id="completado">
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <?php if (!empty($completados)): ?>
-              <?php foreach ($completados as $sol): ?>
+            <?php if (!empty($serviciosCompletados)): ?>
+              <?php foreach ($serviciosCompletados as $srv): ?>
                 <?php
-                  $tituloServicio = $sol['publicacion_titulo'] 
-                                    ?? $sol['servicio_nombre'] 
-                                    ?? $sol['titulo'];
+                  $imagen = !empty($srv['servicio_imagen'])
+                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $proveedorNombre = $sol['proveedor_nombre'] ?? 'Proveedor sin nombre';
-
-                  $fecha = '';
-                  if (!empty($sol['fecha_preferida'])) {
-                      $timestamp = strtotime($sol['fecha_preferida']);
-                      if ($timestamp) {
-                          $fecha = date('d/m/Y', $timestamp);
-                      } else {
-                          $fecha = htmlspecialchars($sol['fecha_preferida']);
-                      }
-                  }
-
-                  $img = !empty($sol['servicio_imagen'])
-                      ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($sol['servicio_imagen'])
-                      : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
+                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
                 ?>
                 <div class="col">
-                  <div class="card service-card estado-completado h-100">
-                    <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                    <div class="card-body d-flex flex-column">
+                  <div class="card service-card estado-completado">
+                    <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio completado">
+                    <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
-                      <p class="card-subtitle text-muted mb-1">
+                      <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
-
-                      <?php if ($fecha): ?>
-                        <p class="card-text mb-1">
+                      <?php if ($fechaTexto): ?>
+                        <p class="card-text">
                           <i class="bi bi-calendar-check"></i>
-                          Completado el: <?= $fecha ?>
+                          Completado el <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
-
-                      <p class="card-text text-muted mb-3">
-                        <?= htmlspecialchars($sol['ciudad'] ?? '') ?>
-                        <?php if (!empty($sol['zona'])): ?>
-                            · <?= htmlspecialchars($sol['zona']) ?>
-                        <?php endif; ?>
-                      </p>
-
-                      <!-- Aquí más adelante irá el botón de calificar -->
-                      <a href="#" class="btn btn-primary w-100 mt-auto">Ver detalles</a>
+                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
                     </div>
                   </div>
                 </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <div class="col-12">
+              <div class="col">
                 <div class="alert alert-info">
                   Aún no tienes servicios completados.
                 </div>
@@ -339,63 +220,42 @@ if ($clienteId) {
           </div>
         </div>
 
-        <!-- ========== TAB: CANCELADOS ========== -->
-        <div class="tab-pane fade" id="cancelado" role="tabpanel">
+        <!-- Cancelados -->
+        <div class="tab-pane fade" id="cancelado">
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <?php if (!empty($cancelados)): ?>
-              <?php foreach ($cancelados as $sol): ?>
+            <?php if (!empty($serviciosCancelados)): ?>
+              <?php foreach ($serviciosCancelados as $srv): ?>
                 <?php
-                  $tituloServicio = $sol['publicacion_titulo'] 
-                                    ?? $sol['servicio_nombre'] 
-                                    ?? $sol['titulo'];
+                  $imagen = !empty($srv['servicio_imagen'])
+                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $proveedorNombre = $sol['proveedor_nombre'] ?? 'Proveedor sin nombre';
-
-                  $fecha = '';
-                  if (!empty($sol['fecha_preferida'])) {
-                      $timestamp = strtotime($sol['fecha_preferida']);
-                      if ($timestamp) {
-                          $fecha = date('d/m/Y', $timestamp);
-                      } else {
-                          $fecha = htmlspecialchars($sol['fecha_preferida']);
-                      }
-                  }
-
-                  $img = !empty($sol['servicio_imagen'])
-                      ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($sol['servicio_imagen'])
-                      : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
+                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
                 ?>
                 <div class="col">
-                  <div class="card service-card estado-cancelado h-100">
-                    <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                    <div class="card-body d-flex flex-column">
+                  <div class="card service-card estado-cancelado">
+                    <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio cancelado">
+                    <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
-                      <p class="card-subtitle text-muted mb-1">
+                      <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
-
-                      <?php if ($fecha): ?>
-                        <p class="card-text mb-1">
+                      <?php if ($fechaTexto): ?>
+                        <p class="card-text">
                           <i class="bi bi-calendar-x"></i>
-                          Fecha original: <?= $fecha ?>
+                          Cancelado el <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
-
-                      <p class="card-text text-muted mb-3">
-                        <?= htmlspecialchars($sol['ciudad'] ?? '') ?>
-                        <?php if (!empty($sol['zona'])): ?>
-                            · <?= htmlspecialchars($sol['zona']) ?>
-                        <?php endif; ?>
-                      </p>
-
-                      <a href="#" class="btn btn-outline-secondary w-100 mt-auto">Ver detalles</a>
+                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
                     </div>
                   </div>
                 </div>
               <?php endforeach; ?>
             <?php else: ?>
-              <div class="col-12">
+              <div class="col">
                 <div class="alert alert-info">
                   No tienes servicios cancelados.
                 </div>

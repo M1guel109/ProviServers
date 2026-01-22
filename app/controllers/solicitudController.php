@@ -7,19 +7,16 @@ require_once __DIR__ . '/../models/Publicacion.php';
 session_start();
 
 $method = $_SERVER['REQUEST_METHOD'];
-
 $accion = $_GET['accion'] ?? null;
-
 
 switch ($method) {
 
     /* =========================
-       CREAR SOLICITUD
+       CREAR SOLICITUD (CLIENTE)
     ========================= */
     case 'POST':
         guardarSolicitud();
         break;
-
 
     /* =========================
        ACCIONES PROVEEDOR
@@ -40,16 +37,15 @@ switch ($method) {
 
         break;
 
-
     default:
         http_response_code(405);
         echo "Método no permitido";
         break;
 }
 
-    /* ======================================================
-    GUARDAR SOLICITUD (PRE-CONTRATO)
-    ====================================================== */
+/* ======================================================
+   GUARDAR SOLICITUD (PRE-CONTRATO) - CLIENTE
+   ====================================================== */
 
 function guardarSolicitud()
 {
@@ -100,7 +96,7 @@ function guardarSolicitud()
         mostrarSweetAlert(
             'error',
             'Error',
-            'La publicación no existe'
+            'La publicación no existe o no está activa'
         );
         exit();
     }
@@ -148,7 +144,7 @@ function guardarSolicitud()
                 mostrarSweetAlert(
                     'error',
                     'Archivo no permitido',
-                    "Archivo {$nombre_original} no es válido"
+                    "El archivo {$nombre_original} no es válido (solo PDF/JPG/PNG)."
                 );
                 exit();
             }
@@ -175,9 +171,9 @@ function guardarSolicitud()
             }
 
             $adjuntos_guardados[] = [
-                'archivo' => $nombre_final,
-                'tipo_archivo'    => $tipo,
-                'tamano'  => $size
+                'archivo'      => $nombre_final,
+                'tipo_archivo' => $tipo,
+                'tamano'       => $size
             ];
         }
     }
@@ -186,107 +182,168 @@ function guardarSolicitud()
        📦 DATA FINAL PARA EL MODELO
        ====================================================== */
     $data = [
-        'cliente_id'     => $clienteId,
-        'proveedor_id'   => $proveedorId,
-        'publicacion_id' => $publicacionId,
-        'titulo'         => $titulo,
-        'descripcion'    => $descripcion,
-        'direccion'      => $direccion,
-        'ciudad'         => $ciudad,
-        'zona'           => $zona,
-        'fecha_servicio' => $fecha,
-        'franja_horaria' => $franja,
-        'presupuesto_estimado'    => $presupuesto,
-        'adjuntos'       => $adjuntos_guardados
+        'cliente_id'           => $clienteId,
+        'proveedor_id'         => $proveedorId,
+        'publicacion_id'       => $publicacionId,
+        'titulo'               => $titulo,
+        'descripcion'          => $descripcion,
+        'direccion'            => $direccion,
+        'ciudad'               => $ciudad,
+        'zona'                 => $zona,
+        'fecha_servicio'       => $fecha,
+        'franja_horaria'       => $franja,
+        'presupuesto_estimado' => $presupuesto,
+        'adjuntos'             => $adjuntos_guardados
     ];
 
     // 🧠 Guardar solicitud + adjuntos
-    $resultado = $solicitudModel->crear($data);
+    try {
+        $resultado = $solicitudModel->crear($data);
 
-    if ($resultado === true) {
-        mostrarSweetAlert(
-            'success',
-            'Solicitud enviada',
-            'El proveedor recibirá tu solicitud.',
-            '/ProviServers/cliente/explorar-servicios'
-        );
-    } else {
+        if ($resultado === true) {
+            mostrarSweetAlert(
+                'success',
+                'Solicitud enviada',
+                'El proveedor recibirá tu solicitud.',
+                '/ProviServers/cliente/explorar-servicios'
+            );
+        } else {
+            mostrarSweetAlert(
+                'error',
+                'Error',
+                'No se pudo enviar la solicitud (crear() devolvió false).'
+            );
+        }
+    } catch (Throwable $e) {
         mostrarSweetAlert(
             'error',
-            'Error',
-            'No se pudo enviar la solicitud'
+            'Error técnico al crear la solicitud',
+            'Mensaje: ' . $e->getMessage()
         );
     }
 
     exit();
 }
 
+/* ======================================================
+   ACEPTAR SOLICITUD (PROVEEDOR)
+   ====================================================== */
+
 function aceptarSolicitud($id)
 {
     if (!$id) {
         mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
-        exit;
+        exit();
     }
 
-    $proveedorId = $_SESSION['user']['id'];
-
-    $modelo = new Solicitud();
-    $resultado = $modelo->aceptar($id, $proveedorId);
-
-    if ($resultado) {
-        mostrarSweetAlert(
-            'success',
-            'Solicitud aceptada',
-            'La solicitud fue aceptada correctamente',
-            '/ProviServers/proveedor/nuevas_solicitudes'
-        );
-    } else {
+    // Validar sesión y rol proveedor
+    if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
         mostrarSweetAlert(
             'error',
-            'Error',
-            'No se pudo aceptar la solicitud'
+            'Acceso denegado',
+            'Solo los proveedores pueden aceptar solicitudes'
+        );
+        exit();
+    }
+
+    // Este es el ID de la tabla usuarios (coincide con proveedores.usuario_id)
+    $proveedorUsuarioId = (int) $_SESSION['user']['id'];
+
+    $modelo = new Solicitud();
+
+    try {
+        $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
+
+        if ($resultado) {
+            mostrarSweetAlert(
+                'success',
+                'Solicitud aceptada',
+                'La solicitud fue aceptada correctamente y el servicio se marcó como en proceso.',
+                '/ProviServers/proveedor/nuevas_solicitudes' // ajusta esta ruta si tienes otra
+            );
+        } else {
+            mostrarSweetAlert(
+                'error',
+                'Error',
+                'No se pudo aceptar la solicitud (aceptar() devolvió false).'
+            );
+        }
+    } catch (Throwable $e) {
+        mostrarSweetAlert(
+            'error',
+            'Error técnico al aprobar',
+            'Mensaje: ' . $e->getMessage()
         );
     }
 
-    exit;
+    exit();
 }
 
+/* ======================================================
+   RECHAZAR SOLICITUD (PROVEEDOR)
+   ====================================================== */
 
 function rechazarSolicitud($id)
 {
     if (!$id) {
         mostrarSweetAlert('error', 'Error', 'Solicitud inválida');
-        exit;
+        exit();
     }
 
-    $proveedorId = $_SESSION['proveedor_id'];
-
-    $modelo = new Solicitud();
-    $resultado = $modelo->rechazar($id, $proveedorId);
-
-    if ($resultado) {
-        mostrarSweetAlert(
-            'success',
-            'Solicitud rechazada',
-            'La solicitud fue rechazada',
-            '/ProviServers/proveedor/solicitudes'
-        );
-    } else {
+    if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
         mostrarSweetAlert(
             'error',
-            'Error',
-            'No se pudo rechazar la solicitud'
+            'Acceso denegado',
+            'Solo los proveedores pueden rechazar solicitudes'
+        );
+        exit();
+    }
+
+    // ⚠️ Antes usabas $_SESSION['proveedor_id'], aquí debe ser el ID de usuarios
+    $proveedorUsuarioId = (int) $_SESSION['user']['id'];
+
+    $modelo = new Solicitud();
+
+    try {
+        $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
+
+        if ($resultado) {
+            mostrarSweetAlert(
+                'success',
+                'Solicitud rechazada',
+                'La solicitud fue rechazada',
+                '/ProviServers/proveedor/solicitudes'
+            );
+        } else {
+            mostrarSweetAlert(
+                'error',
+                'Error',
+                'No se pudo rechazar la solicitud'
+            );
+        }
+    } catch (Throwable $e) {
+        mostrarSweetAlert(
+            'error',
+            'Error técnico al rechazar',
+            'Mensaje: ' . $e->getMessage()
         );
     }
 
-    exit;
+    exit();
 }
 
+/* ======================================================
+   OBTENER DETALLE (PUEDES USARLO EN UNA VISTA/MODAL)
+   ====================================================== */
 
 function mostrarDetalle($id)
 {
+    if (!$id) {
+        return [];
+    }
+
     $modelo = new Solicitud();
-    $detalle = $modelo->obtenerDetalle($id);
+    $detalle = $modelo->obtenerDetalle((int)$id);
 
     return $detalle;
 }
