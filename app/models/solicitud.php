@@ -32,11 +32,13 @@ class Solicitud
         return $fila ? (int)$fila['id'] : null;
     }
 
+    /* ======================================================
+       CREAR SOLICITUD + ADJUNTOS
+       ====================================================== */
     public function crear(array $data): bool
     {
         try {
-            // SOLUCIÓN AL ERROR 1452:
-            // Convertimos el ID que viene de la sesión (ej. 26) al ID de cliente (ej. 5)
+            // Convertimos ID de sesión (usuarios.id) a clientes.id
             $clienteIdReal = $this->obtenerClienteIdReal((int)$data['cliente_id']);
 
             if (!$clienteIdReal) {
@@ -76,7 +78,7 @@ class Solicitud
             $stmt = $this->conexion->prepare($sql);
 
             $stmt->execute([
-                ':cliente_id'           => $clienteIdReal, // ID corregido (ej. 5)
+                ':cliente_id'           => $clienteIdReal, // ID de clientes.id
                 ':proveedor_id'         => $data['proveedor_id'],
                 ':publicacion_id'       => $data['publicacion_id'],
                 ':titulo'               => $data['titulo'],
@@ -84,17 +86,30 @@ class Solicitud
                 ':direccion'            => $data['direccion'],
                 ':ciudad'               => $data['ciudad'],
                 ':zona'                 => $data['zona'],
-                ':fecha_preferida'      => $data['fecha_servicio'] ?? $data['fecha_preferida'],
+                ':fecha_preferida'      => $data['fecha_servicio'] ?? $data['fecha_preferida'] ?? null,
                 ':franja_horaria'       => $data['franja_horaria'],
                 ':presupuesto_estimado' => $data['presupuesto_estimado']
             ]);
 
             $solicitudId = $this->conexion->lastInsertId();
+            if (!$solicitudId) {
+                throw new Exception("No se pudo obtener el ID de la solicitud recién creada.");
+            }
 
             // Insertar adjuntos si existen
             if (!empty($data['adjuntos']) && is_array($data['adjuntos'])) {
-                $sqlAdjunto = "INSERT INTO solicitud_adjuntos (solicitud_id, archivo, tipo_archivo, tamano) 
-                               VALUES (:sid, :arc, :tip, :tam)";
+                $sqlAdjunto = "INSERT INTO solicitud_adjuntos (
+                                   solicitud_id,
+                                   archivo,
+                                   tipo_archivo,
+                                   tamano
+                               ) VALUES (
+                                   :sid,
+                                   :arc,
+                                   :tip,
+                                   :tam
+                               )";
+
                 $stmtAdj = $this->conexion->prepare($sqlAdjunto);
 
                 foreach ($data['adjuntos'] as $adjunto) {
@@ -109,20 +124,20 @@ class Solicitud
 
             $this->conexion->commit();
             return true;
-
-        } catch (Exception $e) {
+        } catch (PDOException $e) {
+            error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
+            return false;
+        } catch (Exception $e) {
             error_log("Error en Solicitud::crear -> " . $e->getMessage());
-            // Re-lanzamos la excepción para que el controlador la maneje
-            throw $e;
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
+            return false;
         }
     }
-
-    // El resto de tus métodos (listarPorProveedor, aceptar, etc.) funcionan bien 
-    // siempre que los JOINS usen s.cliente_id = c.id
-
 
     /* ======================================================
        LISTAR SOLICITUDES PARA EL PROVEEDOR
@@ -130,46 +145,43 @@ class Solicitud
     public function listarPorProveedor(int $usuarioId): array
     {
         try {
-            // Ajustamos el JOIN de clientes para que use usuario_id 
-            // ya que la base de datos parece estar guardando ese valor en solicitudes.cliente_id
-        $sql = "SELECT 
-            s.id,
-            s.titulo,
-            s.descripcion,
-            s.direccion,
-            s.ciudad,
-            s.zona,
-            s.fecha_preferida,
-            s.franja_horaria,
-            s.estado,
-            s.presupuesto_estimado AS presupuesto,
-            s.created_at,
+            $sql = "SELECT 
+                        s.id,
+                        s.titulo,
+                        s.descripcion,
+                        s.direccion,
+                        s.ciudad,
+                        s.zona,
+                        s.fecha_preferida,
+                        s.franja_horaria,
+                        s.estado,
+                        s.presupuesto_estimado AS presupuesto,
+                        s.created_at,
 
-            -- Datos del Cliente
-            CONCAT(c.nombres, ' ', c.apellidos) AS nombre_cliente,
-            c.telefono AS telefono_cliente,
-            c.foto AS foto_cliente,
-            u_c.email AS email_cliente,
+                        -- Datos del Cliente
+                        CONCAT(c.nombres, ' ', c.apellidos) AS nombre_cliente,
+                        c.telefono AS telefono_cliente,
+                        c.foto AS foto_cliente,
+                        u_c.email AS email_cliente,
 
-            -- Datos de la Publicación
-            p.titulo AS publicacion_titulo,
-            ser.nombre AS servicio_nombre,
+                        -- Datos de la Publicación
+                        p.titulo AS publicacion_titulo,
+                        ser.nombre AS servicio_nombre,
 
-            -- Archivos adjuntos
-            GROUP_CONCAT(sa.archivo) AS archivos_adjuntos
+                        -- Archivos adjuntos
+                        GROUP_CONCAT(sa.archivo) AS archivos_adjuntos
 
-        FROM solicitudes s
-        INNER JOIN proveedores pr ON s.proveedor_id = pr.id
-        LEFT JOIN clientes c ON s.cliente_id = c.id
-        LEFT JOIN usuarios u_c ON c.usuario_id = u_c.id
-        LEFT JOIN publicaciones p ON s.publicacion_id = p.id
-        LEFT JOIN servicios ser ON p.servicio_id = ser.id
-        LEFT JOIN solicitud_adjuntos sa ON sa.solicitud_id = s.id
+                    FROM solicitudes s
+                    INNER JOIN proveedores pr ON s.proveedor_id = pr.id
+                    LEFT JOIN clientes c      ON s.cliente_id = c.id
+                    LEFT JOIN usuarios u_c    ON c.usuario_id = u_c.id
+                    LEFT JOIN publicaciones p ON s.publicacion_id = p.id
+                    LEFT JOIN servicios ser   ON p.servicio_id = ser.id
+                    LEFT JOIN solicitud_adjuntos sa ON sa.solicitud_id = s.id
 
-        WHERE pr.usuario_id = :usuario_id
-        GROUP BY s.id
-        ORDER BY s.created_at DESC";
-
+                    WHERE pr.usuario_id = :usuario_id
+                    GROUP BY s.id
+                    ORDER BY s.created_at DESC";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute([':usuario_id' => $usuarioId]);
@@ -181,11 +193,16 @@ class Solicitud
         }
     }
 
+    /* ======================================================
+       VALIDAR SOLICITUD DUPLICADA
+       (recibe ID de sesión y lo mapea a clientes.id)
+       ====================================================== */
     public function tieneSolicitudActiva($idEntrada, $publicacionId): bool
     {
         $clienteIdReal = $this->obtenerClienteIdReal((int)$idEntrada);
-        
-        if (!$clienteIdReal) return false;
+        if (!$clienteIdReal) {
+            return false;
+        }
 
         $sql = "SELECT COUNT(*) 
                 FROM solicitudes
@@ -200,11 +217,17 @@ class Solicitud
     }
 
     /* ======================================================
-       LISTAR SOLICITUDES POR CLIENTE (para “Servicios contratados”)
+       LISTAR SOLICITUDES POR CLIENTE (Servicios contratados)
+       Recibe ID de sesión (usuarios.id) y lo mapea a clientes.id
        ====================================================== */
-    public function listarPorCliente(int $clienteId): array
+    public function listarPorCliente(int $idEntrada): array
     {
         try {
+            $clienteIdReal = $this->obtenerClienteIdReal($idEntrada);
+            if (!$clienteIdReal) {
+                return [];
+            }
+
             $sql = "
                 SELECT
                     s.id,
@@ -237,43 +260,56 @@ class Solicitud
             ";
 
             $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':cliente_id', $clienteId, PDO::PARAM_INT);
+            $stmt->bindParam(':cliente_id', $clienteIdReal, PDO::PARAM_INT);
             $stmt->execute();
 
             $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
             return $filas ?: [];
         } catch (PDOException $e) {
             error_log("Error en Solicitud::listarPorCliente -> " . $e->getMessage());
+            return [];
+        }
+    }
 
+    /* ======================================================
+       ACEPTAR SOLICITUD (Proveedor)
+       ====================================================== */
     public function aceptar(int $solicitudId, int $proveedorUsuarioId): bool
     {
         try {
             $this->conexion->beginTransaction();
 
-            // 1. Actualizar el estado de la solicitud
-            // Verificamos que pertenezca al proveedor y esté pendiente
+            // 1. Actualizar el estado de la solicitud (validando que pertenezca a este proveedor)
             $sqlUpd = "UPDATE solicitudes s
-                       INNER JOIN proveedores p ON s.proveedor_id = p.id
-                       SET s.estado = 'aceptada'
-                       WHERE s.id = :id 
-                         AND p.usuario_id = :usuario 
-                         AND s.estado = 'pendiente'";
+                   INNER JOIN proveedores p ON s.proveedor_id = p.id
+                   SET s.estado = 'aceptada'
+                   WHERE s.id = :id 
+                     AND p.usuario_id = :usuario 
+                     AND s.estado = 'pendiente'";
 
             $stmtUpd = $this->conexion->prepare($sqlUpd);
             $stmtUpd->execute([
-                ':id' => $solicitudId,
+                ':id'      => $solicitudId,
                 ':usuario' => $proveedorUsuarioId
             ]);
 
-            // Si no se afectaron filas, la solicitud no existe o no es del proveedor
             if ($stmtUpd->rowCount() === 0) {
-                throw new Exception("La solicitud no pudo ser aceptada (ya aceptada o no autorizada).");
+                throw new Exception("La solicitud no pudo ser aceptada (ya aceptada, inexistente o no pertenece a este proveedor).");
             }
 
-            // 2. Obtener los datos de la solicitud para insertarlos en servicios_contratados
-            $sqlData = "SELECT cliente_id, proveedor_id, publicacion_id, presupuesto_estimado, fecha_preferida 
-                        FROM solicitudes 
-                        WHERE id = ?";
+            // 2. Obtener datos completos de la solicitud + publicación + servicio
+            $sqlData = "SELECT 
+                        s.cliente_id,
+                        s.proveedor_id,
+                        s.publicacion_id,
+                        s.presupuesto_estimado,
+                        s.fecha_preferida,
+                        p.servicio_id
+                    FROM solicitudes s
+                    INNER JOIN publicaciones p ON s.publicacion_id = p.id
+                    WHERE s.id = ? 
+                    LIMIT 1";
+
             $stmtData = $this->conexion->prepare($sqlData);
             $stmtData->execute([$solicitudId]);
             $solicitud = $stmtData->fetch(PDO::FETCH_ASSOC);
@@ -282,62 +318,75 @@ class Solicitud
                 throw new Exception("No se pudieron recuperar los datos de la solicitud.");
             }
 
-            // 3. Insertar en servicios_contratados
-            // Agregamos solicitud_id para mantener el vínculo
-            $sqlIns = "INSERT INTO servicios_contratados (
-                            solicitud_id,
-                            cotizacion_id,
-                            cliente_id,
-                            proveedor_id,
-                            servicio_id,
-                            fecha_solicitud,
-                            estado
-                        ) VALUES (
-                            :solicitud_id,
-                            NULL,
-                            :cliente_id,
-                            :proveedor_id,
-                            :servicio_id,
-                            :fecha,
-                            'en_proceso'
-                        )";
+            if (empty($solicitud['servicio_id'])) {
+                throw new Exception("La publicación asociada a la solicitud no tiene un servicio vinculado.");
+            }
 
+            // 3. Insertar en servicios_contratados (ahora con servicio_id correcto)
+            $sqlIns = "INSERT INTO servicios_contratados (
+                        solicitud_id,
+                        cotizacion_id,
+                        cliente_id,
+                        proveedor_id,
+                        servicio_id,
+                        fecha_solicitud,
+                        estado
+                    ) VALUES (
+                        :solicitud_id,
+                        NULL,
+                        :cliente_id,
+                        :proveedor_id,
+                        :servicio_id,
+                        :fecha,
+                        'en_proceso'
+                    )";
 
             $stmtIns = $this->conexion->prepare($sqlIns);
             $stmtIns->execute([
                 ':solicitud_id' => $solicitudId,
                 ':cliente_id'   => $solicitud['cliente_id'],
                 ':proveedor_id' => $solicitud['proveedor_id'],
-                ':servicio_id'  => $solicitud['publicacion_id'], // referencia funcional
+                ':servicio_id'  => $solicitud['servicio_id'], // <- AHORA SÍ el ID real de servicios
                 ':fecha'        => $solicitud['fecha_preferida']
             ]);
 
-
             $this->conexion->commit();
             return true;
-
         } catch (Exception $e) {
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
+
+            // 🔴 LOG para el servidor
             error_log("Error en Solicitud::aceptar -> " . $e->getMessage());
-            return false;
+
+            // 🔴 OPCIONAL: mientras depuras, puedes ver el error en pantalla así:
+            // OJO: usa esto solo en desarrollo, no en producción.
+            echo "<pre>Error en Solicitud::aceptar:\n" . htmlspecialchars($e->getMessage()) . "</pre>";
+            exit;
+
+            // Si no quieres mostrarlo en pantalla, comenta las 2 líneas anteriores y deja solo:
+            // return false;
         }
     }
 
+
+    /* ======================================================
+       RECHAZAR SOLICITUD (Proveedor)
+       ====================================================== */
     public function rechazar(int $solicitudId, int $proveedorUsuarioId): bool
     {
         try {
             $sql = "UPDATE solicitudes s
-                INNER JOIN proveedores p ON s.proveedor_id = p.id
-                SET s.estado = 'rechazada'
-                WHERE s.id = :id
-                  AND p.usuario_id = :usuario
-                  AND s.estado = 'pendiente'";
+                    INNER JOIN proveedores p ON s.proveedor_id = p.id
+                    SET s.estado = 'rechazada'
+                    WHERE s.id = :id
+                      AND p.usuario_id = :usuario
+                      AND s.estado = 'pendiente'";
 
             $stmt = $this->conexion->prepare($sql);
             return $stmt->execute([
-                ':id' => $solicitudId,
+                ':id'      => $solicitudId,
                 ':usuario' => $proveedorUsuarioId
             ]);
         } catch (PDOException $e) {
@@ -346,23 +395,26 @@ class Solicitud
         }
     }
 
+    /* ======================================================
+       OBTENER DETALLE DE UNA SOLICITUD
+       ====================================================== */
     public function obtenerDetalle(int $id): array
     {
         try {
             $sql = "SELECT 
-                    s.*,
-                    CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
-                    c.telefono,
-                    c.ubicacion,
-                    u.email AS email_cliente,
-                    p.titulo AS publicacion,
-                    p.descripcion AS descripcion_publicacion
-                FROM solicitudes s
-                LEFT JOIN clientes c ON s.cliente_id = c.id
-                LEFT JOIN usuarios u ON c.usuario_id = u.id
-                LEFT JOIN publicaciones p ON s.publicacion_id = p.id
-                WHERE s.id = :id
-                LIMIT 1";
+                        s.*,
+                        CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
+                        c.telefono,
+                        c.ubicacion,
+                        u.email AS email_cliente,
+                        p.titulo      AS publicacion,
+                        p.descripcion AS descripcion_publicacion
+                    FROM solicitudes s
+                    LEFT JOIN clientes c   ON s.cliente_id = c.id
+                    LEFT JOIN usuarios u   ON c.usuario_id = u.id
+                    LEFT JOIN publicaciones p ON s.publicacion_id = p.id
+                    WHERE s.id = :id
+                    LIMIT 1";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute([':id' => $id]);
@@ -373,4 +425,68 @@ class Solicitud
             return [];
         }
     }
+
+
+
+        /**
+     * Lista servicios contratados para el cliente logueado (usuario_id).
+     * Usa servicios_contratados como tabla principal.
+     */
+    public function listarContratosPorClienteUsuario(int $usuarioId): array
+    {
+        try {
+            // Convertimos usuario_id -> clientes.id
+            $clienteId = $this->obtenerClienteIdReal($usuarioId);
+            if (!$clienteId) {
+                return [];
+            }
+
+            $sql = "
+                SELECT
+                    sc.id                    AS contrato_id,
+                    sc.estado                AS estado_contrato,
+                    sc.fecha_solicitud,
+                    sc.fecha_ejecucion,
+
+                    s.id                     AS solicitud_id,
+                    s.titulo                 AS solicitud_titulo,
+                    s.descripcion            AS solicitud_descripcion,
+                    s.fecha_preferida,
+                    s.franja_horaria,
+                    s.ciudad,
+                    s.zona,
+
+                    p.id                     AS publicacion_id,
+                    p.titulo                 AS publicacion_titulo,
+
+                    sv.id                    AS servicio_id,
+                    sv.nombre                AS servicio_nombre,
+                    sv.imagen                AS servicio_imagen,
+
+                    pr.id                    AS proveedor_id,
+                    CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                    pr.ubicacion             AS proveedor_ubicacion
+
+                FROM servicios_contratados sc
+                INNER JOIN solicitudes   s  ON sc.solicitud_id = s.id
+                INNER JOIN publicaciones p  ON s.publicacion_id = p.id
+                INNER JOIN servicios     sv ON p.servicio_id    = sv.id
+                INNER JOIN proveedores   pr ON sc.proveedor_id  = pr.id
+
+                WHERE sc.cliente_id = :cliente_id
+                ORDER BY sc.created_at DESC
+            ";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':cliente_id', $clienteId, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return $rows ?: [];
+        } catch (PDOException $e) {
+            error_log("Error en Solicitud::listarContratosPorClienteUsuario -> " . $e->getMessage());
+            return [];
+        }
+    }
+
 }

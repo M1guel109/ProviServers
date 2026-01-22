@@ -267,9 +267,14 @@ switch ($request) {
         mostrarCatalogoPublico();
         break;
 
+    // case '/cliente/servicios-contratados':
+    //     require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
+    //     break;
+
+
     case '/cliente/servicios-contratados':
-        require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
-        break;
+    require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
+    break;
 
 
     case '/cliente/mensajes':
