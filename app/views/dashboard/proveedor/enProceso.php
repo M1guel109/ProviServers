@@ -1,5 +1,13 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/controllers/proveedorServiciosContratadosController.php';
+$servicios = mostrarServiciosContratadosProveedor();
+
+// var_dump($servicios);
+// exit;
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -104,237 +112,95 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
         <!-- Lista de servicios en proceso -->
         <section id="lista-procesos">
-            <!-- Servicio 1 -->
-            <div class="tarjeta-proceso">
-                <div class="proceso-header">
-                    <div class="proceso-info-principal">
-                        <h3 class="proceso-titulo">Reparación de sistema eléctrico</h3>
-                        <div class="proceso-meta">
-                            <span class="badge-categoria electricidad">
-                                <i class="bi bi-lightning-charge"></i> Electricidad
-                            </span>
-                            <span class="proceso-fecha">
-                                <i class="bi bi-calendar3"></i> Inicio: 28 Nov 2024
-                            </span>
+
+            <?php if (!empty($servicios)): ?>
+                <?php foreach ($servicios as $servicio): ?>
+
+                    <div class="tarjeta-proceso">
+
+                        <div class="proceso-header">
+                            <div class="proceso-info-principal">
+                                <h3 class="proceso-titulo">
+                                    <?= htmlspecialchars($servicio['servicio_nombre']) ?>
+                                </h3>
+
+                                <div class="proceso-meta">
+                                    <span class="badge-categoria">
+                                        <i class="bi bi-briefcase"></i>
+                                        <?= htmlspecialchars($servicio['solicitud_titulo']) ?>
+                                    </span>
+
+                                    <span class="proceso-fecha">
+                                        <i class="bi bi-calendar3"></i>
+                                        Inicio:
+                                        <?= date('d M Y', strtotime($servicio['fecha_solicitud'])) ?>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="proceso-prioridad">
+                                <span class="badge-prioridad alta">
+                                    <?= ucfirst($servicio['estado']) ?>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="proceso-prioridad">
-                        <span class="badge-prioridad alta">Alta</span>
-                    </div>
-                </div>
 
-                <div class="proceso-cliente">
-                    <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="cliente-avatar">
-                    <div class="cliente-info">
-                        <div class="cliente-nombre">Carlos Rodríguez</div>
-                        <div class="cliente-contacto">
-                            <i class="bi bi-telephone"></i> +57 300 123 4567
+                        <div class="proceso-cliente">
+                            <img
+                                src="<?= BASE_URL . '/public/uploads/usuarios/' . ($servicio['cliente_foto'] ?: 'default_user.png') ?>"
+                                alt="Cliente"
+                                class="cliente-avatar"
+                            >
+
+
+                            <div class="cliente-info">
+                                <div class="cliente-nombre">
+                                    <?= htmlspecialchars($servicio['cliente_nombre']) ?>
+                                </div>
+                                <div class="cliente-contacto">
+                                    <i class="bi bi-telephone"></i>
+                                    <?= htmlspecialchars($servicio['cliente_telefono']) ?>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="proceso-progreso">
-                    <div class="progreso-header">
-                        <span class="progreso-label">Progreso del servicio</span>
-                        <span class="progreso-porcentaje">75%</span>
-                    </div>
-                    <div class="barra-progreso">
-                        <div class="barra-progreso-fill" style="width: 75%"></div>
-                    </div>
-                    <div class="proceso-etapas">
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Inspección</span>
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Materiales</span>
-                        <span class="etapa activa"><i class="bi bi-arrow-right-circle-fill"></i> Instalación</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Pruebas</span>
-                    </div>
-                </div>
+                        <!-- Progreso (placeholder por ahora) -->
+                        <div class="proceso-progreso">
+                            <div class="progreso-header">
+                                <span class="progreso-label">Estado del servicio</span>
+                                <span class="progreso-porcentaje">En proceso</span>
+                            </div>
 
-                <div class="proceso-acciones">
-                    <button class="btn-accion btn-actualizar">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
-                    </button>
-                    <button class="btn-accion btn-contactar">
-                        <i class="bi bi-chat-dots"></i> Contactar Cliente
-                    </button>
-                    <button class="btn-accion btn-completar">
-                        <i class="bi bi-check-circle"></i> Marcar Completado
-                    </button>
-                </div>
-            </div>
-
-            <!-- Servicio 2 -->
-            <div class="tarjeta-proceso">
-                <div class="proceso-header">
-                    <div class="proceso-info-principal">
-                        <h3 class="proceso-titulo">Limpieza profunda residencial</h3>
-                        <div class="proceso-meta">
-                            <span class="badge-categoria limpieza">
-                                <i class="bi bi-droplet"></i> Limpieza
-                            </span>
-                            <span class="proceso-fecha">
-                                <i class="bi bi-calendar3"></i> Inicio: 29 Nov 2024
-                            </span>
+                            <div class="barra-progreso">
+                                <div class="barra-progreso-fill" style="width: 50%"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="proceso-prioridad">
-                        <span class="badge-prioridad media">Media</span>
-                    </div>
-                </div>
 
-                <div class="proceso-cliente">
-                    <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="cliente-avatar">
-                    <div class="cliente-info">
-                        <div class="cliente-nombre">María González</div>
-                        <div class="cliente-contacto">
-                            <i class="bi bi-telephone"></i> +57 301 987 6543
+                        <div class="proceso-acciones">
+                            <button class="btn-accion btn-actualizar">
+                                <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
+                            </button>
+
+                            <button class="btn-accion btn-contactar">
+                                <i class="bi bi-chat-dots"></i> Contactar Cliente
+                            </button>
+
+                            <button class="btn-accion btn-completar">
+                                <i class="bi bi-check-circle"></i> Marcar Completado
+                            </button>
                         </div>
-                    </div>
-                </div>
 
-                <div class="proceso-progreso">
-                    <div class="progreso-header">
-                        <span class="progreso-label">Progreso del servicio</span>
-                        <span class="progreso-porcentaje">45%</span>
                     </div>
-                    <div class="barra-progreso">
-                        <div class="barra-progreso-fill" style="width: 45%"></div>
-                    </div>
-                    <div class="proceso-etapas">
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Evaluación</span>
-                        <span class="etapa activa"><i class="bi bi-arrow-right-circle-fill"></i> Limpieza</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Desinfección</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Revisión</span>
-                    </div>
-                </div>
 
-                <div class="proceso-acciones">
-                    <button class="btn-accion btn-actualizar">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
-                    </button>
-                    <button class="btn-accion btn-contactar">
-                        <i class="bi bi-chat-dots"></i> Contactar Cliente
-                    </button>
-                    <button class="btn-accion btn-completar">
-                        <i class="bi bi-check-circle"></i> Marcar Completado
-                    </button>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php else: ?>
 
-            <!-- Servicio 3 -->
-            <div class="tarjeta-proceso">
-                <div class="proceso-header">
-                    <div class="proceso-info-principal">
-                        <h3 class="proceso-titulo">Instalación de tubería principal</h3>
-                        <div class="proceso-meta">
-                            <span class="badge-categoria plomeria">
-                                <i class="bi bi-wrench"></i> Plomería
-                            </span>
-                            <span class="proceso-fecha">
-                                <i class="bi bi-calendar3"></i> Inicio: 30 Nov 2024
-                            </span>
-                        </div>
-                    </div>
-                    <div class="proceso-prioridad">
-                        <span class="badge-prioridad alta">Alta</span>
-                    </div>
-                </div>
+                <p class="text-muted text-center">
+                    No tienes servicios en proceso actualmente.
+                </p>
 
-                <div class="proceso-cliente">
-                    <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="cliente-avatar">
-                    <div class="cliente-info">
-                        <div class="cliente-nombre">Pedro Martínez</div>
-                        <div class="cliente-contacto">
-                            <i class="bi bi-telephone"></i> +57 302 456 7890
-                        </div>
-                    </div>
-                </div>
+            <?php endif; ?>
 
-                <div class="proceso-progreso">
-                    <div class="progreso-header">
-                        <span class="progreso-label">Progreso del servicio</span>
-                        <span class="progreso-porcentaje">30%</span>
-                    </div>
-                    <div class="barra-progreso">
-                        <div class="barra-progreso-fill" style="width: 30%"></div>
-                    </div>
-                    <div class="proceso-etapas">
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Cotización</span>
-                        <span class="etapa activa"><i class="bi bi-arrow-right-circle-fill"></i> Excavación</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Instalación</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Pruebas</span>
-                    </div>
-                </div>
-
-                <div class="proceso-acciones">
-                    <button class="btn-accion btn-actualizar">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
-                    </button>
-                    <button class="btn-accion btn-contactar">
-                        <i class="bi bi-chat-dots"></i> Contactar Cliente
-                    </button>
-                    <button class="btn-accion btn-completar">
-                        <i class="bi bi-check-circle"></i> Marcar Completado
-                    </button>
-                </div>
-            </div>
-
-            <!-- Servicio 4 -->
-            <div class="tarjeta-proceso">
-                <div class="proceso-header">
-                    <div class="proceso-info-principal">
-                        <h3 class="proceso-titulo">Pintura de fachada exterior</h3>
-                        <div class="proceso-meta">
-                            <span class="badge-categoria pintura">
-                                <i class="bi bi-paint-bucket"></i> Pintura
-                            </span>
-                            <span class="proceso-fecha">
-                                <i class="bi bi-calendar3"></i> Inicio: 1 Dic 2024
-                            </span>
-                        </div>
-                    </div>
-                    <div class="proceso-prioridad">
-                        <span class="badge-prioridad baja">Baja</span>
-                    </div>
-                </div>
-
-                <div class="proceso-cliente">
-                    <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="cliente-avatar">
-                    <div class="cliente-info">
-                        <div class="cliente-nombre">Ana López</div>
-                        <div class="cliente-contacto">
-                            <i class="bi bi-telephone"></i> +57 303 654 3210
-                        </div>
-                    </div>
-                </div>
-
-                <div class="proceso-progreso">
-                    <div class="progreso-header">
-                        <span class="progreso-label">Progreso del servicio</span>
-                        <span class="progreso-porcentaje">60%</span>
-                    </div>
-                    <div class="barra-progreso">
-                        <div class="barra-progreso-fill" style="width: 60%"></div>
-                    </div>
-                    <div class="proceso-etapas">
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Preparación</span>
-                        <span class="etapa completada"><i class="bi bi-check-circle-fill"></i> Primera Capa</span>
-                        <span class="etapa activa"><i class="bi bi-arrow-right-circle-fill"></i> Segunda Capa</span>
-                        <span class="etapa pendiente"><i class="bi bi-circle"></i> Acabados</span>
-                    </div>
-                </div>
-
-                <div class="proceso-acciones">
-                    <button class="btn-accion btn-actualizar">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
-                    </button>
-                    <button class="btn-accion btn-contactar">
-                        <i class="bi bi-chat-dots"></i> Contactar Cliente
-                    </button>
-                    <button class="btn-accion btn-completar">
-                        <i class="bi bi-check-circle"></i> Marcar Completado
-                    </button>
-                </div>
-            </div>
         </section>
 
     </main>
