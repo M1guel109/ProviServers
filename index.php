@@ -231,9 +231,27 @@ switch ($request) {
     case '/proveedor/nuevas_solicitudes':
         require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
         break;
+ 
+
+    // Vista: Ver lista de trabajos en proceso
     case '/proveedor/en-proceso':
+        require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
+        // Nota: Como tu controlador ejecuta lógica al cargarse (el switch interno), 
+        // solo con requerirlo ya funcionaría si el REQUEST_METHOD es GET.
+        // Pero para ser limpios, tu vista 'en-proceso.php' debería llamar a mostrarServiciosContratadosProveedor().
+
+        // Lo ideal es que aquí cargues la VISTA:
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
+
         break;
+
+    // Acción AJAX: Actualizar estado (POST)
+    case '/proveedor/actualizar-estado':
+        require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
+        // Al requerir el archivo, tu switch interno detectará REQUEST_METHOD = POST
+        // y llamará a actualizarEstadoServicio(). ¡Magia!
+        break;
+        
     case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
@@ -273,8 +291,8 @@ switch ($request) {
 
 
     case '/cliente/servicios-contratados':
-    require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
-    break;
+        require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
+        break;
 
 
     case '/cliente/mensajes':
