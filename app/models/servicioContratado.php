@@ -57,7 +57,7 @@ class ServicioContratado
      *
      * Recibe el id de la tabla usuarios (el que guardas en $_SESSION['user']['id'])
      */
- public function listarPorClienteUsuario(int $usuarioId): array
+    public function listarPorClienteUsuario(int $usuarioId): array
     {
         $sql = "
             SELECT
@@ -79,12 +79,20 @@ class ServicioContratado
 
                 CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre
 
+
+                CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion
+
+
             FROM servicios_contratados sc
             INNER JOIN clientes c     ON sc.cliente_id   = c.id
             INNER JOIN usuarios u     ON c.usuario_id    = u.id
             INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
             INNER JOIN servicios sv   ON sc.servicio_id  = sv.id
             INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
+            LEFT JOIN valoraciones v
+            ON v.servicio_contratado_id = sc.id
+            AND v.cliente_id = sc.cliente_id
+
 
             WHERE u.id = :usuario_id
             ORDER BY sc.created_at DESC
@@ -104,13 +112,14 @@ class ServicioContratado
         $estadosValidos = [
             'pendiente',
             'confirmado',
-            'rechazado',
-            'expirado',
             'en_proceso',
             'finalizado',
+            'cancelado',
             'cancelado_cliente',
             'cancelado_proveedor'
         ];
+
+
 
         if (!in_array($nuevoEstado, $estadosValidos, true)) {
             return false;
@@ -170,8 +179,8 @@ class ServicioContratado
     }
 
     public function cancelarPorClienteUsuario(int $contratoId, int $usuarioId): bool
-{
-    $sql = "
+    {
+        $sql = "
         UPDATE servicios_contratados sc
         INNER JOIN clientes c ON sc.cliente_id = c.id
         SET sc.estado = 'cancelado_cliente',
@@ -180,15 +189,14 @@ class ServicioContratado
           AND c.usuario_id = :usuario_id
           AND sc.estado IN ('pendiente','confirmado')
         LIMIT 1
-    ";
+        ";
 
-    $stmt = $this->db->prepare($sql);
-    $stmt->execute([
-        ':contrato_id' => $contratoId,
-        ':usuario_id'  => $usuarioId
-    ]);
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':contrato_id' => $contratoId,
+            ':usuario_id'  => $usuarioId
+        ]);
 
-    return $stmt->rowCount() > 0;
-}
-
+        return $stmt->rowCount() > 0;
+    }
 }

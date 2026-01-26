@@ -9,18 +9,16 @@ require_once __DIR__ . '/../models/ServicioContratado.php';
 
 session_start();
 
-$usuarioId = $_SESSION['user']['id'] ?? null;
+$usuarioId = (int)($_SESSION['user']['id'] ?? 0);
 
 $serviciosEnCurso      = [];
 $serviciosProgramados  = [];
 $serviciosCompletados  = [];
 $serviciosCancelados   = [];
 
-if ($usuarioId) {
-    $modelo = new ServicioContratado();
-    $contratos = $modelo->listarPorClienteUsuario((int)$usuarioId);
-
-    $hoy = date('Y-m-d');
+if ($usuarioId > 0) {
+    $modelo    = new ServicioContratado();
+    $contratos = $modelo->listarPorClienteUsuario($usuarioId) ?: [];
 
     foreach ($contratos as $c) {
         $estado = $c['estado'] ?? 'pendiente';
@@ -32,6 +30,7 @@ if ($usuarioId) {
 
             case 'cancelado_cliente':
             case 'cancelado_proveedor':
+            case 'cancelado': // compatibilidad con registros antiguos (si aún existen)
                 $serviciosCancelados[] = $c;
                 break;
 
