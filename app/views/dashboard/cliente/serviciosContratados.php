@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +16,13 @@
   <!-- Estilos específicos -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
+
 <body>
 
   <!-- SIDEBAR -->
-  <?php 
-    $currentPage = 'servicios-contratados';
-    include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
+  <?php
+  $currentPage = 'servicios-contratados';
+  include_once __DIR__ . '/../../layouts/sidebar_cliente.php';
   ?>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -67,15 +69,15 @@
             <?php if (!empty($serviciosEnCurso)): ?>
               <?php foreach ($serviciosEnCurso as $srv): ?>
                 <?php
-                  $imagen = !empty($srv['servicio_imagen'])
-                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                $imagen = !empty($srv['servicio_imagen'])
+                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
-                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
-                  $ciudad           = $srv['ciudad']             ?? '';
-                  $zona             = $srv['zona']               ?? '';
+                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $ciudad           = $srv['ciudad'] ?? '';
+                $zona             = $srv['zona'] ?? '';
                 ?>
                 <div class="col">
                   <div class="card service-card estado-curso">
@@ -86,12 +88,14 @@
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
+
                       <?php if ($fechaTexto): ?>
                         <p class="card-text">
                           <i class="bi bi-calendar-event"></i>
                           Programado para <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
+
                       <?php if ($ciudad): ?>
                         <p class="card-text">
                           <i class="bi bi-geo-alt"></i>
@@ -102,9 +106,9 @@
                       <!-- Barra de progreso placeholder -->
                       <div class="progress mb-3" style="height: 20px;">
                         <div class="progress-bar bg-success"
-                             role="progressbar"
-                             style="width: 0%;"
-                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                          role="progressbar"
+                          style="width: 0%;"
+                          aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                           En curso
                         </div>
                       </div>
@@ -130,15 +134,17 @@
             <?php if (!empty($serviciosProgramados)): ?>
               <?php foreach ($serviciosProgramados as $srv): ?>
                 <?php
-                  $imagen = !empty($srv['servicio_imagen'])
-                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                $imagen = !empty($srv['servicio_imagen'])
+                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
-                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
-                  $ciudad           = $srv['ciudad']             ?? '';
-                  $zona             = $srv['zona']               ?? '';
+                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $ciudad           = $srv['ciudad'] ?? '';
+                $zona             = $srv['zona'] ?? '';
+                $estado           = $srv['estado'] ?? '';
+                $contratoId       = (int)($srv['contrato_id'] ?? 0);
                 ?>
                 <div class="col">
                   <div class="card service-card estado-programado">
@@ -149,19 +155,36 @@
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
+
                       <?php if ($fechaTexto): ?>
                         <p class="card-text">
                           <i class="bi bi-calendar-event"></i>
                           <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
+
                       <?php if ($ciudad): ?>
                         <p class="card-text">
                           <i class="bi bi-geo-alt"></i>
                           <?= htmlspecialchars($ciudad . ($zona ? ' - ' . $zona : '')) ?>
                         </p>
                       <?php endif; ?>
+
                       <a href="#" class="btn btn-primary w-100">Ver detalles</a>
+
+                      <!-- ✅ 3.2 Acción cliente: Cancelar (solo si pendiente/confirmado) -->
+                      <?php if ($contratoId > 0 && in_array($estado, ['pendiente', 'confirmado'], true)): ?>
+                        <form method="POST"
+                          action="<?= BASE_URL ?>/cliente/servicios-contratados/cancelar"
+                          class="mt-2"
+                          onsubmit="return confirm('¿Seguro que deseas cancelar este servicio?');">
+                          <input type="hidden" name="contrato_id" value="<?= $contratoId ?>">
+                          <button type="submit" class="btn btn-danger w-100">
+                            <i class="bi bi-x-circle"></i> Cancelar servicio
+                          </button>
+                        </form>
+                      <?php endif; ?>
+
                     </div>
                   </div>
                 </div>
@@ -182,13 +205,13 @@
             <?php if (!empty($serviciosCompletados)): ?>
               <?php foreach ($serviciosCompletados as $srv): ?>
                 <?php
-                  $imagen = !empty($srv['servicio_imagen'])
-                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                $imagen = !empty($srv['servicio_imagen'])
+                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
-                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
                 ?>
                 <div class="col">
                   <div class="card service-card estado-completado">
@@ -226,13 +249,13 @@
             <?php if (!empty($serviciosCancelados)): ?>
               <?php foreach ($serviciosCancelados as $srv): ?>
                 <?php
-                  $imagen = !empty($srv['servicio_imagen'])
-                    ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                    : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                $imagen = !empty($srv['servicio_imagen'])
+                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
+                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                  $tituloServicio   = $srv['servicio_nombre']    ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                  $proveedorNombre  = $srv['proveedor_nombre']   ?? 'Proveedor sin nombre';
-                  $fechaTexto       = $srv['fecha_ejecucion']    ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
+                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
                 ?>
                 <div class="col">
                   <div class="card service-card estado-cancelado">
@@ -265,9 +288,11 @@
         </div>
       </div>
     </section>
+
   </main>
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

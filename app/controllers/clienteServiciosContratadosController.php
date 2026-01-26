@@ -5,7 +5,7 @@ require_once __DIR__ . '/../helpers/alert_helper.php';
 // Si tienes un helper de sesión específico para cliente, úsalo aquí:
 // require_once __DIR__ . '/../helpers/session_cliente.php';
 
-require_once __DIR__ . '/../models/Solicitud.php';
+require_once __DIR__ . '/../models/ServicioContratado.php';
 
 session_start();
 
@@ -17,36 +17,32 @@ $serviciosCompletados  = [];
 $serviciosCancelados   = [];
 
 if ($usuarioId) {
-    $modelo = new Solicitud();
-    $contratos = $modelo->listarContratosPorClienteUsuario((int)$usuarioId);
+    $modelo = new ServicioContratado();
+    $contratos = $modelo->listarPorClienteUsuario((int)$usuarioId);
 
     $hoy = date('Y-m-d');
 
     foreach ($contratos as $c) {
-        $estado    = $c['estado_contrato'] ?? 'pendiente';
-        $fechaRef  = $c['fecha_ejecucion'] ?: $c['fecha_preferida'] ?: $c['fecha_solicitud'];
+        $estado = $c['estado'] ?? 'pendiente';
 
         switch ($estado) {
             case 'finalizado':
                 $serviciosCompletados[] = $c;
                 break;
 
-            case 'cancelado':
+            case 'cancelado_cliente':
+            case 'cancelado_proveedor':
                 $serviciosCancelados[] = $c;
                 break;
 
             case 'pendiente':
             case 'confirmado':
+                $serviciosProgramados[] = $c;
+                break;
+
             case 'en_proceso':
             default:
-                // Regla simple:
-                // - Si está pendiente/confirmado y la fecha es futura => Programado
-                // - Si está en_proceso o la fecha ya pasó/igual => En curso
-                if ($fechaRef && $fechaRef > $hoy && in_array($estado, ['pendiente','confirmado'], true)) {
-                    $serviciosProgramados[] = $c;
-                } else {
-                    $serviciosEnCurso[] = $c;
-                }
+                $serviciosEnCurso[] = $c;
                 break;
         }
     }
