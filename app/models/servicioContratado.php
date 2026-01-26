@@ -168,4 +168,27 @@ class ServicioContratado
 
         return (bool) $stmt->fetchColumn();
     }
+
+    public function cancelarPorClienteUsuario(int $contratoId, int $usuarioId): bool
+{
+    $sql = "
+        UPDATE servicios_contratados sc
+        INNER JOIN clientes c ON sc.cliente_id = c.id
+        SET sc.estado = 'cancelado_cliente',
+            sc.modified_at = NOW()
+        WHERE sc.id = :contrato_id
+          AND c.usuario_id = :usuario_id
+          AND sc.estado IN ('pendiente','confirmado')
+        LIMIT 1
+    ";
+
+    $stmt = $this->db->prepare($sql);
+    $stmt->execute([
+        ':contrato_id' => $contratoId,
+        ':usuario_id'  => $usuarioId
+    ]);
+
+    return $stmt->rowCount() > 0;
+}
+
 }
