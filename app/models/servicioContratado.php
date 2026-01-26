@@ -57,50 +57,43 @@ class ServicioContratado
      *
      * Recibe el id de la tabla usuarios (el que guardas en $_SESSION['user']['id'])
      */
-    public function listarPorClienteUsuario(int $usuarioId): array
+ public function listarPorClienteUsuario(int $usuarioId): array
     {
-        try {
-            $sql = "
-                SELECT
-                    sc.id AS contrato_id,
-                    sc.estado,
-                    sc.fecha_solicitud,
-                    sc.fecha_ejecucion,
-                    sc.created_at,
+        $sql = "
+            SELECT
+                sc.id              AS contrato_id,
+                sc.estado,
+                sc.fecha_solicitud,
+                sc.fecha_ejecucion,
 
-                    -- Datos de la solicitud
-                    s.titulo          AS solicitud_titulo,
-                    s.descripcion     AS solicitud_descripcion,
-                    s.fecha_preferida,
-                    s.franja_horaria,
-                    s.ciudad,
-                    s.zona,
-                    s.presupuesto_estimado,
+                s.titulo           AS solicitud_titulo,
+                s.descripcion      AS solicitud_descripcion,
+                s.fecha_preferida,
+                s.franja_horaria,
+                s.ciudad,
+                s.zona,
+                s.presupuesto_estimado,
 
-                    -- Datos del servicio
-                    sv.nombre         AS servicio_nombre,
-                    sv.imagen         AS servicio_imagen,
+                sv.nombre          AS servicio_nombre,
+                sv.imagen          AS servicio_imagen,
 
-                    -- Datos del proveedor
-                    u_p.nombre        AS proveedor_nombre
-                FROM servicios_contratados sc
-                INNER JOIN clientes cl      ON sc.cliente_id   = cl.id
-                INNER JOIN solicitudes s    ON sc.solicitud_id = s.id
-                INNER JOIN servicios sv     ON sc.servicio_id  = sv.id
-                INNER JOIN proveedores pr   ON sc.proveedor_id = pr.id
-                INNER JOIN usuarios u_p     ON pr.usuario_id   = u_p.id
-                WHERE cl.usuario_id = :usuario_id
-                ORDER BY sc.created_at DESC
-            ";
+                CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre
 
-            $stmt = $this->db->prepare($sql);
-            $stmt->execute([':usuario_id' => $usuarioId]);
+            FROM servicios_contratados sc
+            INNER JOIN clientes c     ON sc.cliente_id   = c.id
+            INNER JOIN usuarios u     ON c.usuario_id    = u.id
+            INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
+            INNER JOIN servicios sv   ON sc.servicio_id  = sv.id
+            INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
 
-            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-        } catch (PDOException $e) {
-            error_log("Error en ServicioContratado::listarPorClienteUsuario -> " . $e->getMessage());
-            return [];
-        }
+            WHERE u.id = :usuario_id
+            ORDER BY sc.created_at DESC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':usuario_id' => $usuarioId]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
