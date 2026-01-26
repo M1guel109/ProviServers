@@ -294,6 +294,16 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
         break;
 
+
+    case '/cliente/servicios-contratados/calificar':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/clienteCalificarServicioContratadoController.php';
+        break;
+
+
     case '/cliente/servicios-contratados/cancelar':
         // Recomendado: asegurar que sea POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

@@ -231,19 +231,43 @@
                       <a href="#" class="btn btn-primary w-100">Ver detalles</a>
 
 
-                      <?php if ((int)($srv['tiene_valoracion'] ?? 0) === 0): ?>
-                        <button type="button"
-                          class="btn btn-success w-100 mt-2"
-                          data-bs-toggle="modal"
-                          data-bs-target="#modalCalificar"
-                          data-contrato-id="<?= (int)$srv['contrato_id'] ?>">
-                          <i class="bi bi-star-fill"></i> Calificar servicio
-                        </button>
-                      <?php else: ?>
-                        <div class="alert alert-success mt-2 mb-0">
-                          Ya calificaste este servicio.
-                        </div>
+                      <?php if (($srv['estado'] ?? '') === 'finalizado'): ?>
+
+                        <?php if ((int)($srv['tiene_valoracion'] ?? 0) === 0): ?>
+                          <button type="button"
+                            class="btn btn-success w-100 mt-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#modalCalificar"
+                            data-contrato-id="<?= (int)$srv['contrato_id'] ?>"
+                            data-servicio-nombre="<?= htmlspecialchars($srv['servicio_nombre'] ?? $srv['solicitud_titulo'] ?? 'Servicio') ?>">
+                            <i class="bi bi-star-fill"></i> Calificar servicio
+                          </button>
+                        <?php else: ?>
+                          <?php
+                          $miCalif = (int)($srv['mi_calificacion'] ?? 0);
+                          $miCom   = trim((string)($srv['mi_comentario'] ?? ''));
+                          ?>
+
+                          <div class="mt-2 p-2 border rounded bg-light">
+                            <div class="d-flex align-items-center justify-content-between">
+                              <span class="fw-semibold">Tu calificación:</span>
+                              <span class="text-warning">
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                  <i class="bi <?= $i <= $miCalif ? 'bi-star-fill' : 'bi-star' ?>"></i>
+                                <?php endfor; ?>
+                              </span>
+                            </div>
+
+                            <?php if ($miCom !== ''): ?>
+                              <div class="mt-2 small text-muted">
+                                “<?= htmlspecialchars($miCom) ?>”
+                              </div>
+                            <?php endif; ?>
+                          </div>
+                        <?php endif; ?>
+
                       <?php endif; ?>
+
 
 
                     </div>

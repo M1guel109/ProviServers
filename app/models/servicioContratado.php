@@ -59,50 +59,51 @@ class ServicioContratado
      */
     public function listarPorClienteUsuario(int $usuarioId): array
     {
-        $sql = "
-            SELECT
-                sc.id              AS contrato_id,
-                sc.estado,
-                sc.fecha_solicitud,
-                sc.fecha_ejecucion,
+     $sql = "
+    SELECT
+        sc.id              AS contrato_id,
+        sc.estado,
+        sc.fecha_solicitud,
+        sc.fecha_ejecucion,
 
-                s.titulo           AS solicitud_titulo,
-                s.descripcion      AS solicitud_descripcion,
-                s.fecha_preferida,
-                s.franja_horaria,
-                s.ciudad,
-                s.zona,
-                s.presupuesto_estimado,
+        s.titulo           AS solicitud_titulo,
+        s.descripcion      AS solicitud_descripcion,
+        s.fecha_preferida,
+        s.franja_horaria,
+        s.ciudad,
+        s.zona,
+        s.presupuesto_estimado,
 
-                sv.nombre          AS servicio_nombre,
-                sv.imagen          AS servicio_imagen,
+        sv.nombre          AS servicio_nombre,
+        sv.imagen          AS servicio_imagen,
 
-                CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre
+        CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
 
+        CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
+        v.calificacion AS mi_calificacion,
+        v.comentario   AS mi_comentario,
+        v.created_at   AS mi_calificado_en
 
-                CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion
+    FROM servicios_contratados sc
+    INNER JOIN clientes c     ON sc.cliente_id   = c.id
+    INNER JOIN usuarios u     ON c.usuario_id    = u.id
+    INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
+    INNER JOIN servicios sv   ON sc.servicio_id  = sv.id
+    INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
+    LEFT JOIN valoraciones v
+      ON v.servicio_contratado_id = sc.id
+     AND v.cliente_id = sc.cliente_id
 
-
-            FROM servicios_contratados sc
-            INNER JOIN clientes c     ON sc.cliente_id   = c.id
-            INNER JOIN usuarios u     ON c.usuario_id    = u.id
-            INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
-            INNER JOIN servicios sv   ON sc.servicio_id  = sv.id
-            INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
-            LEFT JOIN valoraciones v
-            ON v.servicio_contratado_id = sc.id
-            AND v.cliente_id = sc.cliente_id
-
-
-            WHERE u.id = :usuario_id
-            ORDER BY sc.created_at DESC
-        ";
+    WHERE u.id = :usuario_id
+    ORDER BY sc.created_at DESC
+    ";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':usuario_id' => $usuarioId]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
 
     /**
      * Actualizar estado del contrato (para proveedor, o luego cliente)
