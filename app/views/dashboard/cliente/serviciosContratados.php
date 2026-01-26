@@ -229,6 +229,23 @@
                         </p>
                       <?php endif; ?>
                       <a href="#" class="btn btn-primary w-100">Ver detalles</a>
+
+
+                      <?php if ((int)($srv['tiene_valoracion'] ?? 0) === 0): ?>
+                        <button type="button"
+                          class="btn btn-success w-100 mt-2"
+                          data-bs-toggle="modal"
+                          data-bs-target="#modalCalificar"
+                          data-contrato-id="<?= (int)$srv['contrato_id'] ?>">
+                          <i class="bi bi-star-fill"></i> Calificar servicio
+                        </button>
+                      <?php else: ?>
+                        <div class="alert alert-success mt-2 mb-0">
+                          Ya calificaste este servicio.
+                        </div>
+                      <?php endif; ?>
+
+
                     </div>
                   </div>
                 </div>
@@ -290,6 +307,59 @@
     </section>
 
   </main>
+
+
+
+  <!-- Modal Calificar -->
+  <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <form method="POST" action="<?= BASE_URL ?>/cliente/servicios-contratados/calificar" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Calificar servicio</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" name="contrato_id" id="calificar_contrato_id" value="">
+
+          <div class="mb-3">
+            <label class="form-label">Calificación</label>
+            <select name="calificacion" class="form-select" required>
+              <option value="">Selecciona…</option>
+              <option value="5">5 - Excelente</option>
+              <option value="4">4 - Muy bueno</option>
+              <option value="3">3 - Bueno</option>
+              <option value="2">2 - Regular</option>
+              <option value="1">1 - Malo</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Comentario (opcional)</label>
+            <textarea name="comentario" class="form-control" rows="3" maxlength="800"
+              placeholder="Cuéntanos cómo te fue con el servicio..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">
+            Guardar calificación
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modalCalificar = document.getElementById('modalCalificar');
+    modalCalificar?.addEventListener('show.bs.modal', function(event) {
+      const button = event.relatedTarget;
+      const contratoId = button.getAttribute('data-contrato-id');
+      document.getElementById('calificar_contrato_id').value = contratoId || '';
+    });
+  </script>
+
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
