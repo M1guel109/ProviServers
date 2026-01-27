@@ -57,4 +57,33 @@ function mostrarResenasProveedor()
     // pasan automáticamente a la vista.
     require BASE_PATH . '/app/views/dashboard/proveedor/resenas.php';
 }
+
+
+
+function guardarRespuestaProveedor()
+{
+    // Verificar que sea POST
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header('Location: ' . BASE_URL . '/proveedor/resenas');
+        exit;
+    }
+
+    $idResena = $_POST['id_valoracion'] ?? null;
+    $textoRespuesta = $_POST['texto_respuesta'] ?? '';
+    $usuarioId = $_SESSION['user']['id'];
+
+    if ($idResena && !empty($textoRespuesta)) {
+        $modelo = new Valoracion();
+        $exito = $modelo->responderResena($idResena, $usuarioId, $textoRespuesta);
+
+        if ($exito) {
+            // Redirigir con éxito (puedes usar una variable de sesión para mostrar alerta luego)
+            header('Location: ' . BASE_URL . '/proveedor/resenas?status=success');
+        } else {
+            header('Location: ' . BASE_URL . '/proveedor/resenas?status=error');
+        }
+    } else {
+        header('Location: ' . BASE_URL . '/proveedor/resenas?status=empty');
+    }
+}
 ?>

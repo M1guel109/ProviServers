@@ -262,6 +262,11 @@ switch ($request) {
         mostrarResenasProveedor();
         break;
 
+    case '/proveedor/resenas/responder':
+        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+        guardarRespuestaProveedor();
+        break;
+
     case '/proveedor/logout':
         require BASE_PATH . '/app/controllers/logoutController.php';
         break;

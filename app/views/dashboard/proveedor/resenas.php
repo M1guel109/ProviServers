@@ -53,8 +53,8 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                 <div class="etiqueta-estadistica">Total de Reseñas</div>
             </div>
 
-            <?php 
-                $positivas = $porcentajes[5] + $porcentajes[4]; 
+            <?php
+            $positivas = $porcentajes[5] + $porcentajes[4];
             ?>
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-hand-thumbs-up icono-estadistica text-success"></i>
@@ -67,7 +67,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             <div class="tarjeta">
                 <h3>Distribución de Calificaciones</h3>
                 <div class="calificaciones-detalle">
-                    
+
                     <?php for ($i = 5; $i >= 1; $i--): ?>
                         <div class="calificacion-fila">
                             <span class="estrellas-label"><?= $i ?> <i class="bi bi-star-fill text-warning"></i></span>
@@ -88,7 +88,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                     <option value="">Todas las calificaciones</option>
                     <option value="5">5 estrellas</option>
                     <option value="4">4 estrellas</option>
-                    </select>
+                </select>
                 <div class="buscador-resenas">
                     <i class="bi bi-search"></i>
                     <input type="text" id="buscar-resena" placeholder="Buscar en reseñas...">
@@ -110,12 +110,12 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <div class="tarjeta tarjeta-resena">
                             <div class="resena-header">
                                 <div class="cliente-info">
-                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= !empty($r['cliente_foto']) ? $r['cliente_foto'] : 'default_user.png' ?>" 
-                                         alt="Cliente" class="avatar-cliente">
-                                    
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= !empty($r['cliente_foto']) ? $r['cliente_foto'] : 'default_user.png' ?>"
+                                        alt="Cliente" class="avatar-cliente">
+
                                     <div>
                                         <h4 class="nombre-cliente"><?= htmlspecialchars($r['cliente_nombre']) ?></h4>
-                                        
+
                                         <div class="calificacion-estrellas">
                                             <?php for ($x = 1; $x <= 5; $x++): ?>
                                                 <?php if ($x <= $r['calificacion']): ?>
@@ -128,17 +128,17 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="resena-meta">
                                     <span class="fecha-resena">
-                                        <i class="bi bi-calendar3"></i> 
+                                        <i class="bi bi-calendar3"></i>
                                         <?= date('d M Y', strtotime($r['fecha'])) ?>
                                     </span>
                                 </div>
                             </div>
 
                             <div class="servicio-asociado">
-                                <i class="bi bi-briefcase"></i> 
+                                <i class="bi bi-briefcase"></i>
                                 <strong>Servicio:</strong> <?= htmlspecialchars($r['servicio_nombre']) ?>
                             </div>
 
@@ -147,9 +147,19 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                             </div>
 
                             <div class="resena-acciones mt-3 pt-2 border-top">
-                                <button class="btn btn-sm btn-outline-primary rounded-pill">
-                                    <i class="bi bi-reply"></i> Responder
-                                </button>
+                                <?php if (empty($r['respuesta_proveedor'])): ?>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill btn-abrir-modal"
+                                        data-id="<?= /* OJO: Necesitas el ID de la valoración aquí. Asegúrate que tu SELECT en el modelo traiga 'v.id' */ $r['id'] ?? '' ?>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalResponder">
+                                        <i class="bi bi-reply"></i> Responder
+                                    </button>
+                                <?php else: ?>
+                                    <div class="mt-3 p-3 bg-light rounded border-start border-4 border-primary">
+                                        <small class="fw-bold text-primary"><i class="bi bi-person-check"></i> Tu respuesta:</small>
+                                        <p class="mb-0 small fst-italic text-muted"><?= htmlspecialchars($r['respuesta_proveedor']) ?></p>
+                                    </div>
+                                <?php endif; ?>
                                 <button class="btn btn-sm btn-outline-secondary rounded-pill ms-2">
                                     <i class="bi bi-flag"></i> Reportar
                                 </button>
@@ -164,9 +174,36 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     </main>
 
+    <div class="modal fade" id="modalResponder" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<?= BASE_URL ?>/proveedor/resenas/responder" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Responder al Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_valoracion" id="modal_id_valoracion">
+                        <div class="mb-3">
+                            <label for="texto_respuesta" class="form-label">Tu respuesta:</label>
+                            <textarea class="form-control" name="texto_respuesta" id="texto_respuesta" rows="4" required placeholder="Escribe aquí tu agradecimiento o aclaración..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar Respuesta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>const BASE_URL = "<?= BASE_URL ?>";</script>
+
+    <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/resenas.js"></script>
 </body>
+
 </html>
