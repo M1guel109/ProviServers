@@ -231,7 +231,7 @@ switch ($request) {
     case '/proveedor/nuevas_solicitudes':
         require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
         break;
- 
+
 
     // Vista: Ver lista de trabajos en proceso
     case '/proveedor/en-proceso':
@@ -292,6 +292,27 @@ switch ($request) {
     case '/cliente/servicios-contratados':
         require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
         break;
+
+
+    case '/cliente/servicios-contratados/calificar':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/clienteCalificarServicioContratadoController.php';
+        break;
+
+
+    case '/cliente/servicios-contratados/cancelar':
+        // Recomendado: asegurar que sea POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
+            exit;
+        }
+
+        require BASE_PATH . '/app/controllers/clienteCancelarServicioContratadoController.php';
+        break;
+
 
 
     case '/cliente/mensajes':
