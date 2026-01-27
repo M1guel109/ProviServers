@@ -255,7 +255,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
     case '/proveedor/resenas':
-        require BASE_PATH . '/app/views/dashboard/proveedor/resenas.php';
+        // 1. Cargamos el Controlador (el "Cocinero")
+        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+
+        // 2. Ejecutamos la función que prepara los datos y luego llama a la vista
+        mostrarResenasProveedor();
         break;
 
     case '/proveedor/logout':
