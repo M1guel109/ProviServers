@@ -251,12 +251,20 @@ switch ($request) {
         // Al requerir el archivo, tu switch interno detectará REQUEST_METHOD = POST
         // y llamará a actualizarEstadoServicio(). ¡Magia!
         break;
-
     case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
     case '/proveedor/resenas':
-        require BASE_PATH . '/app/views/dashboard/proveedor/resenas.php';
+        // 1. Cargamos el Controlador (el "Cocinero")
+        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+
+        // 2. Ejecutamos la función que prepara los datos y luego llama a la vista
+        mostrarResenasProveedor();
+        break;
+
+    case '/proveedor/resenas/responder':
+        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+        guardarRespuestaProveedor();
         break;
 
     case '/proveedor/logout':
@@ -337,13 +345,13 @@ switch ($request) {
         break;
 
 
-    case '/cliente/dashboard':
-        require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
-        break;
+    // case '/cliente/dashboard':
+    //     require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
+    //     break;
 
-    case '/cliente/explorar-servicios':
-        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
-        break;
+    // case '/cliente/explorar-servicios':
+    //     require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+    //     break;
 
     case '/cliente/publicacion':
         require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';

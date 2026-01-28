@@ -57,4 +57,72 @@ class Valoracion
 
         return $stmt->rowCount() > 0;
     }
+
+    public function obtenerResenasPorProveedor(int $usuarioId): array
+    {
+        // Esta consulta une 5 tablas para darte toda la información completa:
+        // 1. valoraciones (la reseña en sí)
+        // 2. proveedores (para filtrar por TU usuario)
+        // 3. clientes (para saber quién escribió y su foto)
+        // 4. servicios_contratados (para saber de qué contrato viene)
+        // 5. servicios (para saber el nombre del servicio, ej: "Plomería")
+
+        $sql = "
+            SELECT 
+                v.id,
+                v.calificacion,
+                v.comentario,
+                v.created_at as fecha,
+                
+                -- Datos del Cliente
+                CONCAT(c.nombres, ' ', c.apellidos) as cliente_nombre,
+                c.foto as cliente_foto,
+                
+                -- Datos del Servicio
+                sv.nombre as servicio_nombre
+
+            FROM valoraciones v
+            INNER JOIN proveedores p ON v.proveedor_id = p.id
+            INNER JOIN clientes c ON v.cliente_id = c.id
+            INNER JOIN servicios_contratados sc ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv ON sc.servicio_id = sv.id
+            
+            WHERE p.usuario_id = :usuario_id
+            ORDER BY v.created_at DESC
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':usuario_id', $usuarioId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function responderResena(int $valoracionId, int $proveedorUsuarioId, string $respuesta): bool
+    {
+        // 1. Obtenemos el ID del proveedor basado en el usuario logueado
+        // (Esto es seguridad: para asegurarnos que solo tú respondas tus reseñas)
+        $sqlProv = "SELECT id FROM proveedores WHERE usuario_id = :uid";
+        $stmtProv = $this->db->prepare($sqlProv);
+        $stmtProv->bindParam(':uid', $proveedorUsuarioId);
+        $stmtProv->execute();
+        $proveedor = $stmtProv->fetch(PDO::FETCH_ASSOC);
+
+        if (!$proveedor) return false;
+
+        $proveedorId = $proveedor['id'];
+
+        // 2. Actualizamos la reseña con tu respuesta
+        $sql = "UPDATE valoraciones 
+                SET respuesta_proveedor = :resp, 
+                    fecha_respuesta = NOW() 
+                WHERE id = :id AND proveedor_id = :pid"; // WHERE extra por seguridad
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindParam(':resp', $respuesta);
+        $stmt->bindParam(':id', $valoracionId);
+        $stmt->bindParam(':pid', $proveedorId);
+
+        return $stmt->execute();
+    }
 }

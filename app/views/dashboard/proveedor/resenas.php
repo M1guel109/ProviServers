@@ -1,5 +1,18 @@
 <?php
+// Asegúrate de que BASE_PATH esté definido en tu config
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+// Las variables $resenas, $promedio, $totalResenas, $porcentajes llegan del controlador
+
+
+// echo "<pre style='background:white; color:black; z-index:9999; position:relative; padding:20px;'>";
+// echo "<h1>🔍 DIAGNÓSTICO DE DATOS</h1>";
+// echo "<strong>Total Reseñas:</strong> "; var_dump($totalResenas); echo "<br>";
+// echo "<strong>Promedio:</strong> "; var_dump($promedio); echo "<br>";
+// echo "<strong>Porcentajes:</strong> "; print_r($porcentajes); echo "<br>";
+// echo "<strong>Lista de Reseñas:</strong> "; print_r($resenas);
+// echo "</pre>";
+// die(); // Detiene la carga de la página aquí para que solo veas los datos
+
 ?>
 
 <!DOCTYPE html>
@@ -9,137 +22,73 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Reseñas y Calificaciones</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
-    <!-- CSS específico para reseñas -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/resenas.css">
 </head>
 
 <body>
-    <!-- SIDEBAR (lateral izquierdo) -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar_proveedor.php';
-    ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
 
     <main class="contenido">
-        <?php
-        include_once __DIR__ . '/../../layouts/header_proveedor.php';
-        ?>
+        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
 
-        <!-- Secciones -->
-        <!-- titulo -->
         <section id="titulo-principal">
             <h1>Reseñas y Calificaciones</h1>
-            <p class="descripcion-seccion">Gestiona las opiniones de tus clientes y responde a sus comentarios. Las reseñas ayudan a mejorar tu reputación y atraer más clientes.</p>
+            <p class="descripcion-seccion">Gestiona las opiniones de tus clientes. Las reseñas ayudan a mejorar tu reputación.</p>
         </section>
 
-        <!-- Tarjetas de estadísticas de reseñas -->
         <section id="tarjetas-superiores">
             <div class="tarjeta tarjeta-estadistica">
-                <i class="bi bi-star-fill icono-estadistica"></i>
-                <div class="valor-estadistica">4.8</div>
+                <i class="bi bi-star-fill icono-estadistica text-warning"></i>
+                <div class="valor-estadistica"><?= $promedio ?></div>
                 <div class="etiqueta-estadistica">Calificación Promedio</div>
-                <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> +0.3 este mes
-                </div>
             </div>
 
             <div class="tarjeta tarjeta-estadistica">
-                <i class="bi bi-chat-square-text icono-estadistica"></i>
-                <div class="valor-estadistica">127</div>
+                <i class="bi bi-chat-square-text icono-estadistica text-primary"></i>
+                <div class="valor-estadistica"><?= $totalResenas ?></div>
                 <div class="etiqueta-estadistica">Total de Reseñas</div>
-                <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> 8 nuevas
-                </div>
             </div>
 
+            <?php
+            $positivas = $porcentajes[5] + $porcentajes[4];
+            ?>
             <div class="tarjeta tarjeta-estadistica">
-                <i class="bi bi-hand-thumbs-up icono-estadistica"></i>
-                <div class="valor-estadistica">95%</div>
-                <div class="etiqueta-estadistica">Recomendación</div>
-                <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> Excelente
-                </div>
-            </div>
-
-            <div class="tarjeta tarjeta-estadistica">
-                <i class="bi bi-clock-history icono-estadistica"></i>
-                <div class="valor-estadistica">3</div>
-                <div class="etiqueta-estadistica">Pendientes de Responder</div>
-                <div class="tendencia neutral">
-                    <i class="bi bi-dash-circle"></i> Responde pronto
-                </div>
+                <i class="bi bi-hand-thumbs-up icono-estadistica text-success"></i>
+                <div class="valor-estadistica"><?= $positivas ?>%</div>
+                <div class="etiqueta-estadistica">Clientes satisfechos</div>
             </div>
         </section>
 
-        <!-- Distribución de Calificaciones -->
         <section id="distribucion-calificaciones">
             <div class="tarjeta">
                 <h3>Distribución de Calificaciones</h3>
                 <div class="calificaciones-detalle">
-                    <div class="calificacion-fila">
-                        <span class="estrellas-label">5 <i class="bi bi-star-fill"></i></span>
-                        <div class="barra-progreso-calificacion">
-                            <div class="progreso-fill" style="width: 75%"></div>
+
+                    <?php for ($i = 5; $i >= 1; $i--): ?>
+                        <div class="calificacion-fila">
+                            <span class="estrellas-label"><?= $i ?> <i class="bi bi-star-fill text-warning"></i></span>
+                            <div class="barra-progreso-calificacion">
+                                <div class="progreso-fill" style="width: <?= $porcentajes[$i] ?>%"></div>
+                            </div>
+                            <span class="porcentaje-label"><?= $porcentajes[$i] ?>%</span>
                         </div>
-                        <span class="porcentaje-label">75%</span>
-                    </div>
-                    <div class="calificacion-fila">
-                        <span class="estrellas-label">4 <i class="bi bi-star-fill"></i></span>
-                        <div class="barra-progreso-calificacion">
-                            <div class="progreso-fill" style="width: 18%"></div>
-                        </div>
-                        <span class="porcentaje-label">18%</span>
-                    </div>
-                    <div class="calificacion-fila">
-                        <span class="estrellas-label">3 <i class="bi bi-star-fill"></i></span>
-                        <div class="barra-progreso-calificacion">
-                            <div class="progreso-fill" style="width: 5%"></div>
-                        </div>
-                        <span class="porcentaje-label">5%</span>
-                    </div>
-                    <div class="calificacion-fila">
-                        <span class="estrellas-label">2 <i class="bi bi-star-fill"></i></span>
-                        <div class="barra-progreso-calificacion">
-                            <div class="progreso-fill" style="width: 2%"></div>
-                        </div>
-                        <span class="porcentaje-label">2%</span>
-                    </div>
-                    <div class="calificacion-fila">
-                        <span class="estrellas-label">1 <i class="bi bi-star-fill"></i></span>
-                        <div class="barra-progreso-calificacion">
-                            <div class="progreso-fill negativo" style="width: 0%"></div>
-                        </div>
-                        <span class="porcentaje-label">0%</span>
-                    </div>
+                    <?php endfor; ?>
+
                 </div>
             </div>
         </section>
 
-        <!-- Filtros -->
         <section id="filtros-resenas">
             <div class="filtros-contenedor">
                 <select id="filtro-calificacion" class="filtro-select">
                     <option value="">Todas las calificaciones</option>
                     <option value="5">5 estrellas</option>
                     <option value="4">4 estrellas</option>
-                    <option value="3">3 estrellas</option>
-                    <option value="2">2 estrellas</option>
-                    <option value="1">1 estrella</option>
                 </select>
-
-                <select id="filtro-respuesta" class="filtro-select">
-                    <option value="">Todas</option>
-                    <option value="respondidas">Respondidas</option>
-                    <option value="sin-responder">Sin responder</option>
-                </select>
-
                 <div class="buscador-resenas">
                     <i class="bi bi-search"></i>
                     <input type="text" id="buscar-resena" placeholder="Buscar en reseñas...">
@@ -147,208 +96,113 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             </div>
         </section>
 
-        <!-- ----------------------------
-             CONTENEDOR SCROLL: AQUI VA
-             ---------------------------- -->
         <div id="contenedor-scrollable-resenas">
-            <!-- Lista de Reseñas -->
             <section id="lista-resenas">
-                <!-- Reseña 1 - Sin responder -->
-                <div class="tarjeta tarjeta-resena sin-responder">
-                    <div class="resena-header">
-                        <div class="cliente-info">
-                            <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="avatar-cliente">
-                            <div>
-                                <h4 class="nombre-cliente">María González</h4>
-                                <div class="calificacion-estrellas">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <span class="calificacion-numero">5.0</span>
+
+                <?php if (empty($resenas)): ?>
+                    <div class="text-center py-5">
+                        <i class="bi bi-chat-square text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">Aún no tienes reseñas registradas.</p>
+                    </div>
+                <?php else: ?>
+
+                    <?php foreach ($resenas as $r): ?>
+                        <div class="tarjeta tarjeta-resena">
+                            <div class="resena-header">
+                                <div class="cliente-info">
+                                    <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= !empty($r['cliente_foto']) ? $r['cliente_foto'] : 'default_user.png' ?>"
+                                        alt="Cliente" class="avatar-cliente">
+
+                                    <div>
+                                        <h4 class="nombre-cliente"><?= htmlspecialchars($r['cliente_nombre']) ?></h4>
+
+                                        <div class="calificacion-estrellas">
+                                            <?php for ($x = 1; $x <= 5; $x++): ?>
+                                                <?php if ($x <= $r['calificacion']): ?>
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                <?php else: ?>
+                                                    <i class="bi bi-star text-muted opacity-25"></i>
+                                                <?php endif; ?>
+                                            <?php endfor; ?>
+                                            <span class="calificacion-numero ms-2"><?= $r['calificacion'] ?>.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="resena-meta">
+                                    <span class="fecha-resena">
+                                        <i class="bi bi-calendar3"></i>
+                                        <?= date('d M Y', strtotime($r['fecha'])) ?>
+                                    </span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="resena-meta">
-                            <span class="fecha-resena"><i class="bi bi-calendar3"></i> Hace 2 días</span>
-                            <span class="badge-estado pendiente">Sin responder</span>
-                        </div>
-                    </div>
 
-                    <div class="servicio-asociado">
-                        <i class="bi bi-laptop"></i> <strong>Servicio:</strong> Reparación de computador portátil
-                    </div>
+                            <div class="servicio-asociado">
+                                <i class="bi bi-briefcase"></i>
+                                <strong>Servicio:</strong> <?= htmlspecialchars($r['servicio_nombre']) ?>
+                            </div>
 
-                    <div class="resena-comentario">
-                        <p>"Excelente servicio técnico. Muy profesional, rápido y eficiente. Mi laptop quedó funcionando perfectamente. Explicó claramente el problema y la solución. Totalmente recomendado."</p>
-                    </div>
+                            <div class="resena-comentario">
+                                <p>"<?= !empty($r['comentario']) ? htmlspecialchars($r['comentario']) : 'Sin comentario escrito.' ?>"</p>
+                            </div>
 
-                    <div class="resena-acciones">
-                        <button class="btn-responder">
-                            <i class="bi bi-reply-fill"></i> Responder
-                        </button>
-                        <button class="btn-reportar">
-                            <i class="bi bi-flag"></i> Reportar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Reseña 2 - Ya respondida -->
-                <div class="tarjeta tarjeta-resena respondida">
-                    <div class="resena-header">
-                        <div class="cliente-info">
-                            <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="avatar-cliente">
-                            <div>
-                                <h4 class="nombre-cliente">Carlos Rodríguez</h4>
-                                <div class="calificacion-estrellas">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-half"></i>
-                                    <span class="calificacion-numero">4.5</span>
-                                </div>
+                            <div class="resena-acciones mt-3 pt-2 border-top">
+                                <?php if (empty($r['respuesta_proveedor'])): ?>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill btn-abrir-modal"
+                                        data-id="<?= /* OJO: Necesitas el ID de la valoración aquí. Asegúrate que tu SELECT en el modelo traiga 'v.id' */ $r['id'] ?? '' ?>"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#modalResponder">
+                                        <i class="bi bi-reply"></i> Responder
+                                    </button>
+                                <?php else: ?>
+                                    <div class="mt-3 p-3 bg-light rounded border-start border-4 border-primary">
+                                        <small class="fw-bold text-primary"><i class="bi bi-person-check"></i> Tu respuesta:</small>
+                                        <p class="mb-0 small fst-italic text-muted"><?= htmlspecialchars($r['respuesta_proveedor']) ?></p>
+                                    </div>
+                                <?php endif; ?>
+                                <button class="btn btn-sm btn-outline-secondary rounded-pill ms-2">
+                                    <i class="bi bi-flag"></i> Reportar
+                                </button>
                             </div>
                         </div>
-                        <div class="resena-meta">
-                            <span class="fecha-resena"><i class="bi bi-calendar3"></i> Hace 5 días</span>
-                            <span class="badge-estado respondida">Respondida</span>
-                        </div>
-                    </div>
+                    <?php endforeach; ?>
 
-                    <div class="servicio-asociado">
-                        <i class="bi bi-wifi"></i> <strong>Servicio:</strong> Instalación de red WiFi empresarial
-                    </div>
-
-                    <div class="resena-comentario">
-                        <p>"Buen trabajo en general. La instalación fue correcta y la red funciona bien. Hubo un pequeño retraso en el inicio pero el resultado final fue satisfactorio."</p>
-                    </div>
-
-                    <!-- Respuesta del proveedor -->
-                    <div class="respuesta-proveedor">
-                        <div class="respuesta-header">
-                            <i class="bi bi-person-circle"></i>
-                            <strong>Tu respuesta</strong>
-                            <span class="fecha-respuesta">Hace 4 días</span>
-                        </div>
-                        <p>"Muchas gracias por tu comentario Carlos. Lamento el retraso inicial, tuvimos un inconveniente con el equipo. Me alegra que el resultado final haya sido de tu agrado. ¡Espero poder ayudarte nuevamente!"</p>
-                    </div>
-
-                    <div class="resena-acciones">
-                        <button class="btn-editar-respuesta">
-                            <i class="bi bi-pencil"></i> Editar respuesta
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Reseña 3 - Sin responder -->
-                <div class="tarjeta tarjeta-resena sin-responder">
-                    <div class="resena-header">
-                        <div class="cliente-info">
-                            <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="avatar-cliente">
-                            <div>
-                                <h4 class="nombre-cliente">Ana López</h4>
-                                <div class="calificacion-estrellas">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <span class="calificacion-numero">5.0</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="resena-meta">
-                            <span class="fecha-resena"><i class="bi bi-calendar3"></i> Hace 1 semana</span>
-                            <span class="badge-estado pendiente">Sin responder</span>
-                        </div>
-                    </div>
-
-                    <div class="servicio-asociado">
-                        <i class="bi bi-laptop"></i> <strong>Servicio:</strong> Mantenimiento preventivo de equipos
-                    </div>
-
-                    <div class="resena-comentario">
-                        <p>"Servicio impecable. Muy puntual, ordenado y profesional. Hizo un trabajo completo y dejó todo funcionando perfecto. Los precios son justos y la atención es excelente."</p>
-                    </div>
-
-                    <div class="resena-acciones">
-                        <button class="btn-responder">
-                            <i class="bi bi-reply-fill"></i> Responder
-                        </button>
-                        <button class="btn-reportar">
-                            <i class="bi bi-flag"></i> Reportar
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Reseña 4 - Calificación baja -->
-                <div class="tarjeta tarjeta-resena respondida">
-                    <div class="resena-header">
-                        <div class="cliente-info">
-                            <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" alt="Cliente" class="avatar-cliente">
-                            <div>
-                                <h4 class="nombre-cliente">Pedro Martínez</h4>
-                                <div class="calificacion-estrellas baja">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star"></i>
-                                    <i class="bi bi-star"></i>
-                                    <span class="calificacion-numero">3.0</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="resena-meta">
-                            <span class="fecha-resena"><i class="bi bi-calendar3"></i> Hace 2 semanas</span>
-                            <span class="badge-estado respondida">Respondida</span>
-                        </div>
-                    </div>
-
-                    <div class="servicio-asociado">
-                        <i class="bi bi-laptop"></i> <strong>Servicio:</strong> Formateo y reinstalación de sistema
-                    </div>
-
-                    <div class="resena-comentario">
-                        <p>"El servicio estuvo bien pero esperaba más rapidez. Tardó más de lo acordado inicialmente. El trabajo quedó correcto pero la comunicación podría mejorar."</p>
-                    </div>
-
-                    <!-- Respuesta del proveedor -->
-                    <div class="respuesta-proveedor">
-                        <div class="respuesta-header">
-                            <i class="bi bi-person-circle"></i>
-                            <strong>Tu respuesta</strong>
-                            <span class="fecha-respuesta">Hace 2 semanas</span>
-                        </div>
-                        <p>"Gracias por tu comentario Pedro. Entiendo tu punto sobre los tiempos. Hubo complicaciones técnicas imprevistas que requirieron más trabajo del estimado. Tomaré en cuenta tu feedback sobre la comunicación. Saludos."</p>
-                    </div>
-
-                    <div class="resena-acciones">
-                        <button class="btn-editar-respuesta">
-                            <i class="bi bi-pencil"></i> Editar respuesta
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Puedes añadir más reseñas aquí replicando la estructura anterior -->
+                <?php endif; ?>
 
             </section>
         </div>
-        <!-- FIN CONTENEDOR SCROLL -->
 
     </main>
 
-    <footer>
-        <!-- Enlaces / Información -->
-    </footer>
+    <div class="modal fade" id="modalResponder" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<?= BASE_URL ?>/proveedor/resenas/responder" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Responder al Cliente</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="id_valoracion" id="modal_id_valoracion">
+                        <div class="mb-3">
+                            <label for="texto_respuesta" class="form-label">Tu respuesta:</label>
+                            <textarea class="form-control" name="texto_respuesta" id="texto_respuesta" rows="4" required placeholder="Escribe aquí tu agradecimiento o aclaración..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Enviar Respuesta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- tu javaScript -->
+    <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/resenas.js"></script>
 </body>
 
