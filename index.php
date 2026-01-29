@@ -322,6 +322,11 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteCancelarServicioContratadoController.php';
         break;
 
+    case '/cliente/mis-solicitudes':
+        require BASE_PATH . '/app/controllers/clienteMisSolicitudesController.php';
+        break;
+
+
 
 
     case '/cliente/mensajes':
