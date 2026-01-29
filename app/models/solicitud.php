@@ -17,20 +17,22 @@ class Solicitud
      */
     private function obtenerClienteIdReal(int $idEntrada): ?int
     {
-        // 1. Verificamos si el ID ya es un ID válido en la tabla clientes
-        $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE id = ?");
-        $stmt->execute([$idEntrada]);
-        if ($stmt->fetch()) {
-            return $idEntrada;
-        }
-
-        // 2. Si no es un ID de cliente, buscamos si es el ID de la tabla usuarios
+        // Primero asumimos que el ID que llega es usuarios.id (lo normal en sesión)
         $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = ? LIMIT 1");
         $stmt->execute([$idEntrada]);
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($fila) {
+            return (int)$fila['id'];
+        }
 
-        return $fila ? (int)$fila['id'] : null;
+        // Si no existe por usuario_id, permitimos que sea clientes.id (caso raro/compatibilidad)
+        $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE id = ? LIMIT 1");
+        $stmt->execute([$idEntrada]);
+        $fila2 = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $fila2 ? (int)$fila2['id'] : null;
     }
+
 
     /* ======================================================
        CREAR SOLICITUD + ADJUNTOS
@@ -428,7 +430,7 @@ class Solicitud
 
 
 
-        /**
+    /**
      * Lista servicios contratados para el cliente logueado (usuario_id).
      * Usa servicios_contratados como tabla principal.
      */
@@ -488,5 +490,4 @@ class Solicitud
             return [];
         }
     }
-
 }

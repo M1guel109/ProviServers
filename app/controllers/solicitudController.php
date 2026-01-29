@@ -59,9 +59,20 @@ function guardarSolicitud()
         exit();
     }
 
+    // ✅ (Recomendado) Validar que sea cliente
+    if (isset($_SESSION['user']['rol']) && $_SESSION['user']['rol'] !== 'cliente') {
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Solo los clientes pueden enviar solicitudes'
+        );
+        exit();
+    }
+
     // 📥 Datos principales
-    $clienteId     = (int) $_SESSION['user']['id'];
+    $usuarioId     = (int) $_SESSION['user']['id']; // usuarios.id (NO clientes.id)
     $publicacionId = (int) ($_POST['publicacion_id'] ?? 0);
+
     $titulo        = trim($_POST['titulo'] ?? '');
     $descripcion   = trim($_POST['descripcion'] ?? '');
     $direccion     = trim($_POST['direccion'] ?? '');
@@ -69,23 +80,24 @@ function guardarSolicitud()
     $zona          = trim($_POST['zona'] ?? '');
     $fecha         = trim($_POST['fecha_preferida'] ?? '');
     $franja        = trim($_POST['franja_horaria'] ?? '');
-    $presupuesto   = $_POST['presupuesto'] ?? null;
+
+    // Compatibilidad: si tu form manda presupuesto o presupuesto_estimado
+    $presupuesto   = $_POST['presupuesto_estimado'] ?? ($_POST['presupuesto'] ?? null);
 
     // 🧪 Validaciones básicas
-    if (
-        !$publicacionId ||
-        !$titulo ||
-        !$descripcion ||
-        !$direccion ||
-        !$ciudad ||
-        !$fecha
-    ) {
+    if (!$publicacionId || !$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha) {
         mostrarSweetAlert(
             'error',
             'Campos incompletos',
             'Completa los campos obligatorios'
         );
         exit();
+    }
+
+    // Validar franja (según enum de tu BD: manana/tarde/noche)
+    $franjasValidas = ['manana','tarde','noche'];
+    if ($franja !== '' && !in_array($franja, $franjasValidas, true)) {
+        $franja = '';
     }
 
     // 🔎 Obtener publicación y proveedor
@@ -101,11 +113,20 @@ function guardarSolicitud()
         exit();
     }
 
-    $proveedorId = (int) $publicacion['proveedor_id'];
+    $proveedorId = (int) ($publicacion['proveedor_id'] ?? 0);
+    if ($proveedorId <= 0) {
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'La publicación no tiene proveedor asociado'
+        );
+        exit();
+    }
 
-    // 🛑 Validar solicitud duplicada
     $solicitudModel = new Solicitud();
-    if ($solicitudModel->tieneSolicitudActiva($clienteId, $publicacionId)) {
+
+    // 🛑 Validar solicitud duplicada (recibe usuarios.id y lo mapea a clientes.id)
+    if ($solicitudModel->tieneSolicitudActiva($usuarioId, $publicacionId)) {
         mostrarSweetAlert(
             'warning',
             'Solicitud ya enviada',
@@ -136,11 +157,11 @@ function guardarSolicitud()
             }
 
             $ext   = strtolower(pathinfo($nombre_original, PATHINFO_EXTENSION));
-            $size  = $_FILES['adjuntos']['size'][$i];
-            $tipo  = $_FILES['adjuntos']['type'][$i];
+            $size  = (int)$_FILES['adjuntos']['size'][$i];
+            $tipo  = (string)$_FILES['adjuntos']['type'][$i];
             $tmp   = $_FILES['adjuntos']['tmp_name'][$i];
 
-            if (!in_array($ext, $permitidas)) {
+            if (!in_array($ext, $permitidas, true)) {
                 mostrarSweetAlert(
                     'error',
                     'Archivo no permitido',
@@ -182,7 +203,8 @@ function guardarSolicitud()
        📦 DATA FINAL PARA EL MODELO
        ====================================================== */
     $data = [
-        'cliente_id'           => $clienteId,
+        // OJO: aquí mandamos usuarios.id; el modelo lo mapea a clientes.id
+        'cliente_id'           => $usuarioId,
         'proveedor_id'         => $proveedorId,
         'publicacion_id'       => $publicacionId,
         'titulo'               => $titulo,
@@ -190,8 +212,8 @@ function guardarSolicitud()
         'direccion'            => $direccion,
         'ciudad'               => $ciudad,
         'zona'                 => $zona,
-        'fecha_servicio'       => $fecha,
-        'franja_horaria'       => $franja,
+        'fecha_preferida'      => $fecha,
+        'franja_horaria'       => ($franja === '' ? null : $franja),
         'presupuesto_estimado' => $presupuesto,
         'adjuntos'             => $adjuntos_guardados
     ];
@@ -211,7 +233,7 @@ function guardarSolicitud()
             mostrarSweetAlert(
                 'error',
                 'Error',
-                'No se pudo enviar la solicitud (crear() devolvió false).'
+                'No se pudo enviar la solicitud.'
             );
         }
     } catch (Throwable $e) {
@@ -236,17 +258,11 @@ function aceptarSolicitud($id)
         exit();
     }
 
-    // Validar sesión y rol proveedor
     if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert(
-            'error',
-            'Acceso denegado',
-            'Solo los proveedores pueden aceptar solicitudes'
-        );
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo los proveedores pueden aceptar solicitudes');
         exit();
     }
 
-    // Este es el ID de la tabla usuarios (coincide con proveedores.usuario_id)
     $proveedorUsuarioId = (int) $_SESSION['user']['id'];
 
     $modelo = new Solicitud();
@@ -258,22 +274,14 @@ function aceptarSolicitud($id)
             mostrarSweetAlert(
                 'success',
                 'Solicitud aceptada',
-                'La solicitud fue aceptada correctamente y el servicio se marcó como en proceso.',
-                '/ProviServers/proveedor/nuevas_solicitudes' // ajusta esta ruta si tienes otra
+                'La solicitud fue aceptada correctamente.',
+                '/ProviServers/proveedor/nuevas_solicitudes'
             );
         } else {
-            mostrarSweetAlert(
-                'error',
-                'Error',
-                'No se pudo aceptar la solicitud (aceptar() devolvió false).'
-            );
+            mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.');
         }
     } catch (Throwable $e) {
-        mostrarSweetAlert(
-            'error',
-            'Error técnico al aprobar',
-            'Mensaje: ' . $e->getMessage()
-        );
+        mostrarSweetAlert('error', 'Error técnico al aprobar', 'Mensaje: ' . $e->getMessage());
     }
 
     exit();
@@ -291,15 +299,10 @@ function rechazarSolicitud($id)
     }
 
     if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert(
-            'error',
-            'Acceso denegado',
-            'Solo los proveedores pueden rechazar solicitudes'
-        );
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo los proveedores pueden rechazar solicitudes');
         exit();
     }
 
-    // ⚠️ Antes usabas $_SESSION['proveedor_id'], aquí debe ser el ID de usuarios
     $proveedorUsuarioId = (int) $_SESSION['user']['id'];
 
     $modelo = new Solicitud();
@@ -308,42 +311,25 @@ function rechazarSolicitud($id)
         $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert(
-                'success',
-                'Solicitud rechazada',
-                'La solicitud fue rechazada',
-                '/ProviServers/proveedor/solicitudes'
-            );
+            mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada', '/ProviServers/proveedor/solicitudes');
         } else {
-            mostrarSweetAlert(
-                'error',
-                'Error',
-                'No se pudo rechazar la solicitud'
-            );
+            mostrarSweetAlert('error', 'Error', 'No se pudo rechazar la solicitud');
         }
     } catch (Throwable $e) {
-        mostrarSweetAlert(
-            'error',
-            'Error técnico al rechazar',
-            'Mensaje: ' . $e->getMessage()
-        );
+        mostrarSweetAlert('error', 'Error técnico al rechazar', 'Mensaje: ' . $e->getMessage());
     }
 
     exit();
 }
 
 /* ======================================================
-   OBTENER DETALLE (PUEDES USARLO EN UNA VISTA/MODAL)
+   OBTENER DETALLE
    ====================================================== */
 
 function mostrarDetalle($id)
 {
-    if (!$id) {
-        return [];
-    }
+    if (!$id) return [];
 
     $modelo = new Solicitud();
-    $detalle = $modelo->obtenerDetalle((int)$id);
-
-    return $detalle;
+    return $modelo->obtenerDetalle((int)$id);
 }

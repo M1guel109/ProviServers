@@ -180,14 +180,14 @@ $imagenSrc      = $imagenServicio
                                 </div>
                             </div>
 
-                            <!-- Presupuesto opcional -->
+                            <!-- Presupuesto opcional (✅ unificado a presupuesto_estimado) -->
                             <div class="mb-3">
                                 <label class="form-label">Presupuesto estimado (opcional)</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
                                     <input
                                         type="number"
-                                        name="presupuesto"
+                                        name="presupuesto_estimado"
                                         class="form-control"
                                         min="0"
                                         step="1000"
@@ -208,7 +208,7 @@ $imagenSrc      = $imagenServicio
                                     accept="image/*,application/pdf"
                                     multiple>
                                 <small class="text-muted">
-                                    Puedes subir fotos del problema o documentos relevantes. Máx. 5 archivos.
+                                    Puedes subir fotos del problema o documentos relevantes. Máx. 5MB por archivo.
                                 </small>
                             </div>
 
@@ -224,6 +224,7 @@ $imagenSrc      = $imagenServicio
                                 </button>
                             </div>
                         </form>
+
                     </div>
                 </div>
 
@@ -235,8 +236,8 @@ $imagenSrc      = $imagenServicio
                         <div class="d-flex align-items-center mb-3">
                             <div class="me-3">
                                 <img src="<?= htmlspecialchars($imagenSrc) ?>"
-                                     alt="Servicio"
-                                     style="width:64px;height:64px;border-radius:8px;object-fit:cover;">
+                                    alt="Servicio"
+                                    style="width:64px;height:64px;border-radius:8px;object-fit:cover;">
                             </div>
                             <div>
                                 <p class="mb-1 fw-semibold" style="font-size: 0.95rem;">
@@ -271,7 +272,9 @@ $imagenSrc      = $imagenServicio
 
     </main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS propio -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></s_
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JS propio -->
+<script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+</body>
+</html>
