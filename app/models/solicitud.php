@@ -17,22 +17,20 @@ class Solicitud
      */
     private function obtenerClienteIdReal(int $idEntrada): ?int
     {
-        // Primero asumimos que el ID que llega es usuarios.id (lo normal en sesión)
+        // 1. Verificamos si el ID ya es un ID válido en la tabla clientes
+        $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE id = ?");
+        $stmt->execute([$idEntrada]);
+        if ($stmt->fetch()) {
+            return $idEntrada;
+        }
+
+        // 2. Si no es un ID de cliente, buscamos si es el ID de la tabla usuarios
         $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = ? LIMIT 1");
         $stmt->execute([$idEntrada]);
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($fila) {
-            return (int)$fila['id'];
-        }
 
-        // Si no existe por usuario_id, permitimos que sea clientes.id (caso raro/compatibilidad)
-        $stmt = $this->conexion->prepare("SELECT id FROM clientes WHERE id = ? LIMIT 1");
-        $stmt->execute([$idEntrada]);
-        $fila2 = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return $fila2 ? (int)$fila2['id'] : null;
+        return $fila ? (int)$fila['id'] : null;
     }
-
 
     /* ======================================================
        CREAR SOLICITUD + ADJUNTOS
@@ -132,11 +130,14 @@ class Solicitud
                 $this->conexion->rollBack();
             }
             return false;
-        } catch (Exception $e) {
-            error_log("Error en Solicitud::crear -> " . $e->getMessage());
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
+        } catch (PDOException $e) {
+            error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
+            if ($this->conexion->inTransaction()) $this->conexion->rollBack();
+
+            // 👇 TEMPORAL (dev): ver en pantalla el error exacto
+            echo "<pre>PDOException: " . htmlspecialchars($e->getMessage()) . "</pre>";
+            exit;
+
             return false;
         }
     }

@@ -1,6 +1,25 @@
+<?php
+// dashboardCliente.php (arriba del todo, antes del HTML)
+session_start();
+
+require_once BASE_PATH . '/app/models/Publicacion.php';
+
+// Publicaciones aprobadas para poder asociar la solicitud desde el modal
+$pubModel = new Publicacion();
+$publicacionesAprobadas = $pubModel->listarPublicacionesAprobadasParaSolicitudes(); // ya la tienes en tu modelo
+
+// (Opcional) Si quieres precargar datos del cliente:
+$usuarioC = $_SESSION['user'] ?? [];
+?>
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,13 +37,14 @@
     <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
+
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-        
+
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
@@ -44,43 +64,43 @@
             <div class="section-content">
                 <!-- Estadísticas visuales -->
                 <div class="stats-visual row text-center">
-                <div class="col stat-visual-item">
-                    <i class="bi bi-clock-history"></i>
-                    <h3>3</h3>
-                    <p>Servicios Activos</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-check-circle"></i>
-                    <h3>1</h3>
-                    <p>Completados</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-heart"></i>
-                    <h3>3</h3>
-                    <p>Favoritos</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-star"></i>
-                    <h3>4.8</h3>
-                    <p>Calificación</p>
-                </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-clock-history"></i>
+                        <h3>3</h3>
+                        <p>Servicios Activos</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-check-circle"></i>
+                        <h3>1</h3>
+                        <p>Completados</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-heart"></i>
+                        <h3>3</h3>
+                        <p>Favoritos</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-star"></i>
+                        <h3>4.8</h3>
+                        <p>Calificación</p>
+                    </div>
                 </div>
 
 
                 <!-- Acciones rápidas -->
                 <div class="mt-5">
-                <h2 class="mb-4">¿Qué necesitas hoy?</h2>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
-                    <i class="bi bi-search"></i> Buscar Servicio
-                    </a>
-                    <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
-                    <i class="bi bi-briefcase"></i> Ver Mis Servicios
-                    </a>
-                    <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
-                    <i class="bi bi-plus-circle"></i> Publicar Necesidad
-                    </button>
-                </div>
+                    <h2 class="mb-4">¿Qué necesitas hoy?</h2>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
+                            <i class="bi bi-search"></i> Buscar Servicio
+                        </a>
+                        <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                            <i class="bi bi-briefcase"></i> Ver Mis Servicios
+                        </a>
+                        <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
+                            <i class="bi bi-plus-circle"></i> Publicar Necesidad
+                        </button>
+                    </div>
                 </div>
 
 
@@ -303,8 +323,8 @@
                         <div class="service-item text-center">
                             <div class="service-content">
                                 <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/Foto-usuario.png"
-                                     alt="Perfil"
-                                     style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
+                                    alt="Perfil"
+                                    style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
                                 <h3><?= htmlspecialchars($nombreSaludo) ?></h3>
                                 <p class="text-muted">cliente@correo.com</p>
                                 <button class="btn-modern-outline w-100">Cambiar foto</button>
@@ -347,88 +367,152 @@
     </main>
 
     <!-- Modal -->
+    <!-- Modal -->
+    <!-- Modal Publicar Necesidad (CORREGIDO) -->
     <div class="modal fade" id="modalNecesidad" tabindex="-1" aria-labelledby="modalNecesidadLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-        
-        <!-- Encabezado -->
-        <div class="modal-header">
-            <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        
-        <!-- Cuerpo con formulario -->
-        <div class="modal-body">
-            <form id="formNecesidad" novalidate>
-            <!-- Categoría -->
-            <div class="mb-3">
-            <label for="categoria" class="form-label">Categoría del servicio</label>
-            <select class="form-select" id="categoria" required>
-                <option value="">Selecciona una categoría</option>
-                <option value="Salud">Salud</option>
-                <option value="Educación">Educación</option>
-                <option value="Tecnología">Tecnología</option>
-                <option value="Hogar">Hogar</option>
-                <option value="Otros">Otros</option>
-            </select>
-            <div class="invalid-feedback">Por favor selecciona una categoría.</div>
-            </div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
 
-            <!-- Campo cuando eligen "Otros" -->
-            <div class="mb-3 d-none" id="categoriaOtroWrapper">
-            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
-            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
-            <div class="invalid-feedback">Por favor especifica la categoría.</div>
-            </div>
-
-
-            <!-- Descripción -->
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción detallada</label>
-                <textarea class="form-control" id="descripcion" rows="3" required></textarea>
-                <div class="invalid-feedback">La descripción es obligatoria.</div>
-            </div>
-
-            <!-- Presupuesto -->
-            <div class="mb-3">
-                <label for="presupuesto" class="form-label">Presupuesto estimado (COP)</label>
-                <input type="number" class="form-control" id="presupuesto" min="0" required>
-                <div class="invalid-feedback">Ingresa un presupuesto válido.</div>
-            </div>
-
-            <!-- Fecha y hora -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                <label for="fecha" class="form-label">Fecha deseada</label>
-                <input type="date" class="form-control" id="fecha" required>
-                <div class="invalid-feedback">Selecciona una fecha.</div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="col-md-6">
-                <label for="hora" class="form-label">Hora deseada</label>
-                <input type="time" class="form-control" id="hora" required>
-                <div class="invalid-feedback">Selecciona una hora.</div>
-                </div>
-            </div>
 
-            <!-- Ubicación -->
-            <div class="mb-3">
-                <label for="ubicacion" class="form-label">Ubicación</label>
-                <input type="text" class="form-control" id="ubicacion" required>
-                <div class="invalid-feedback">La ubicación es obligatoria.</div>
+                <form
+                    id="formNecesidad"
+                    action="<?= rtrim(BASE_URL, '/') ?>/cliente/guardar-solicitud"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="needs-validation"
+                    novalidate>
+                    <div class="modal-body">
+
+                        <!-- ✅ Selección de publicación aprobada (OBLIGATORIO para tu flujo actual) -->
+                        <div class="mb-3">
+                            <label class="form-label">Servicio / Publicación <span class="text-danger">*</span></label>
+                            <select class="form-select" name="publicacion_id" id="publicacion_id" required>
+                                <option value="">Selecciona un servicio</option>
+                                <?php foreach ($publicacionesAprobadas as $p): ?>
+                                    <option value="<?= (int)$p['id'] ?>">
+                                        <?= htmlspecialchars($p['titulo']) ?>
+                                        <?php if (!empty($p['proveedor_nombre'])): ?>
+                                            — <?= htmlspecialchars($p['proveedor_nombre']) ?>
+                                        <?php endif; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="invalid-feedback">Debes seleccionar un servicio/publicación.</div>
+                        </div>
+
+                        <!-- Categoría (solo UI; no la usa tu backend, pero ayuda a armar título) -->
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoría del servicio</label>
+                            <select class="form-select" id="categoria">
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Salud">Salud</option>
+                                <option value="Educación">Educación</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Hogar">Hogar</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 d-none" id="categoriaOtroWrapper">
+                            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
+                            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
+                        </div>
+
+                        <!-- ✅ Título (backend espera name="titulo") -->
+                        <div class="mb-3">
+                            <label class="form-label">Título <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="titulo" name="titulo" maxlength="120" required>
+                            <div class="invalid-feedback">El título es obligatorio.</div>
+                        </div>
+
+                        <!-- ✅ Descripción (backend espera name="descripcion") -->
+                        <div class="mb-3">
+                            <label class="form-label">Descripción detallada <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                            <div class="invalid-feedback">La descripción es obligatoria.</div>
+                        </div>
+
+                        <!-- ✅ Presupuesto (backend usa presupuesto_estimado) -->
+                        <div class="mb-3">
+                            <label class="form-label">Presupuesto estimado (COP)</label>
+                            <input type="number" class="form-control" id="presupuesto" name="presupuesto_estimado" min="0">
+                        </div>
+
+                        <!-- ✅ Fecha (backend espera name="fecha_preferida") -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha deseada <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="fecha" name="fecha_preferida" min="<?= date('Y-m-d') ?>" required>
+                                <div class="invalid-feedback">Selecciona una fecha.</div>
+                            </div>
+
+                            <!-- Hora: tu BD no tiene columna "hora", así que se anexará a la descripción -->
+                            <div class="col-md-6">
+                                <label class="form-label">Hora deseada</label>
+                                <input type="time" class="form-control" id="hora">
+                                <small class="text-muted">Se anexará a la descripción.</small>
+                            </div>
+                        </div>
+
+                        <!-- ✅ Dirección (backend espera direccion) -->
+                        <div class="mb-3">
+                            <label class="form-label">Dirección <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" required>
+                            <div class="invalid-feedback">La dirección es obligatoria.</div>
+                        </div>
+
+                        <!-- ✅ Ciudad / zona -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="ciudad" name="ciudad" required>
+                                <div class="invalid-feedback">La ciudad es obligatoria.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Barrio o zona</label>
+                                <input type="text" class="form-control" id="zona" name="zona">
+                            </div>
+                        </div>
+
+                        <!-- ✅ Franja horaria (si quieres usarlo, tu backend la recibe) -->
+                        <div class="mb-3">
+                            <label class="form-label">Franja horaria (opcional)</label>
+                            <select class="form-select" name="franja_horaria" id="franja_horaria">
+                                <option value="">Cualquiera</option>
+                                <option value="manana">Mañana</option>
+                                <option value="tarde">Tarde</option>
+                                <option value="noche">Noche</option>
+                            </select>
+                        </div>
+
+                        <!-- Adjuntos -->
+                        <div class="mb-3">
+                            <label class="form-label">Adjuntar fotos o archivos (opcional)</label>
+                            <input type="file" name="adjuntos[]" class="form-control" accept="image/*,application/pdf" multiple>
+                            <small class="text-muted">Máx. 5MB por archivo.</small>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Publicar
+                        </button>
+                    </div>
+                </form>
+
             </div>
-            </form>
-        </div>
-        
-        <!-- Footer con botones -->
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" form="formNecesidad" class="btn btn-outline-primary">
-            <i class="bi bi-send"></i> Publicar
-            </button>
-        </div>
         </div>
     </div>
-    </div>
+
+
+
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -438,4 +522,5 @@
 
 
 </body>
+
 </html>

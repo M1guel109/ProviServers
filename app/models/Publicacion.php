@@ -265,4 +265,27 @@ class Publicacion
             return null;
         }
     }
+
+    public function listarPublicacionesAprobadasParaSolicitudes(): array
+{
+    $sql = "
+        SELECT
+            p.id,
+            p.titulo,
+            p.precio,
+            sv.nombre AS servicio_nombre,
+            CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre
+        FROM publicaciones p
+        INNER JOIN servicios sv   ON p.servicio_id = sv.id
+        INNER JOIN proveedores pr ON p.proveedor_id = pr.id
+        WHERE p.estado = 'aprobado'
+          AND p.tipo_publicacion = 'proveedor'
+        ORDER BY p.fecha_publicacion DESC, p.id DESC
+    ";
+
+    $stmt = $this->conexion->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+}
+
 }
