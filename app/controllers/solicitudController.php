@@ -69,7 +69,18 @@ function guardarSolicitud()
     $zona          = trim($_POST['zona'] ?? '');
     $fecha         = trim($_POST['fecha_preferida'] ?? '');
     $franja        = trim($_POST['franja_horaria'] ?? '');
-    $presupuesto   = $_POST['presupuesto'] ?? null;
+    // Compatibilidad: si tu form manda presupuesto o presupuesto_estimado
+    $presupuestoRaw = $_POST['presupuesto_estimado'] ?? ($_POST['presupuesto'] ?? null);
+
+    // ✅ Normalizar: si viene vacío => NULL (evita error en DECIMAL)
+    $presupuesto = null;
+    if ($presupuestoRaw !== null) {
+        $presupuestoRaw = trim((string)$presupuestoRaw);
+        if ($presupuestoRaw !== '') {
+            $presupuesto = (float)$presupuestoRaw;
+        }
+    }
+
 
     // 🧪 Validaciones básicas
     if (
