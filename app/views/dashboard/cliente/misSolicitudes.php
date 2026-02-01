@@ -2,12 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proviservers | Mis Solicitudes</title>
-
+  <title>Mis Solicitudes</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
@@ -19,176 +15,141 @@
 ?>
 
 <main class="contenido">
-
   <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
-  <section class="mt-2">
+  <section class="p-3">
     <div class="section-hero mb-4">
-      <p class="breadcrumb">Inicio > Mis Solicitudes</p>
-      <h1><i class="bi bi-clipboard-check text-primary"></i> Mis Solicitudes</h1>
-      <p>Revisa el estado de las solicitudes que has enviado a proveedores.</p>
+      <p class="breadcrumb">Inicio > Mis solicitudes</p>
+      <h1>Mis solicitudes</h1>
+      <p>Consulta tus solicitudes por estado y revisa el detalle.</p>
     </div>
 
-    <ul class="nav nav-tabs mb-4" role="tablist">
-      <li class="nav-item">
-        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabPendientes" type="button">
-          Pendientes <span class="badge bg-secondary"><?= count($pendientes) ?></span>
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabAceptadas" type="button">
-          Aceptadas <span class="badge bg-success"><?= count($aceptadas) ?></span>
-        </button>
-      </li>
-      <li class="nav-item">
-        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabRechazadas" type="button">
-          Rechazadas <span class="badge bg-danger"><?= count($rechazadas) ?></span>
-        </button>
-      </li>
+    <!-- Tabs -->
+    <ul class="nav nav-tabs mb-3">
+      <?php
+        $tabs = [
+          'pendiente' => 'Pendientes',
+          'aceptada'  => 'Aceptadas',
+          'rechazada' => 'Rechazadas',
+          'cancelada' => 'Canceladas'
+        ];
+      ?>
+      <?php foreach ($tabs as $key => $label): ?>
+        <li class="nav-item">
+          <a class="nav-link <?= ($estado === $key ? 'active' : '') ?>"
+             href="<?= BASE_URL ?>/cliente/mis-solicitudes?estado=<?= $key ?>">
+            <?= $label ?>
+            <span class="badge bg-secondary ms-1"><?= (int)($contadores[$key] ?? 0) ?></span>
+          </a>
+        </li>
+      <?php endforeach; ?>
     </ul>
 
-    <div class="tab-content">
+    <div class="row g-4">
+      <!-- Listado -->
+      <div class="col-lg-6">
+        <div class="card p-3">
+          <h5 class="mb-3">Listado (<?= htmlspecialchars($tabs[$estado] ?? $estado) ?>)</h5>
 
-      <!-- Pendientes -->
-      <div class="tab-pane fade show active" id="tabPendientes">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-          <?php if (!empty($pendientes)): ?>
-            <?php foreach ($pendientes as $s): ?>
-              <?php
-                $titulo = $s['titulo'] ?? 'Solicitud';
-                $servicio = $s['servicio_nombre'] ?? '';
-                $proveedor = $s['proveedor_nombre'] ?? 'Proveedor';
-                $fecha = $s['fecha_preferida'] ?? '';
-                $img = !empty($s['servicio_imagen'])
-                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($s['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
-              ?>
-              <div class="col">
-                <div class="card service-card">
-                  <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                  <div class="card-body">
-                    <h5 class="card-title"><?= htmlspecialchars($titulo) ?></h5>
-                    <p class="text-muted mb-1">
-                      <i class="bi bi-tools"></i> <?= htmlspecialchars($servicio) ?>
-                    </p>
-                    <p class="text-muted mb-1">
-                      <i class="bi bi-person-fill"></i> <?= htmlspecialchars($proveedor) ?>
-                    </p>
-                    <?php if ($fecha): ?>
-                      <p class="text-muted mb-2">
-                        <i class="bi bi-calendar-event"></i> <?= htmlspecialchars($fecha) ?>
-                      </p>
-                    <?php endif; ?>
+          <?php if (!empty($solicitudes)): ?>
+            <div class="list-group">
+              <?php foreach ($solicitudes as $s): ?>
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                      <strong><?= htmlspecialchars($s['titulo']) ?></strong><br>
+                      <small class="text-muted">
+                        Proveedor: <?= htmlspecialchars($s['proveedor_nombre'] ?? '-') ?> ·
+                        <?= htmlspecialchars($s['ciudad'] ?? '-') ?><?= !empty($s['zona']) ? (' / '.htmlspecialchars($s['zona'])) : '' ?>
+                      </small><br>
+                      <small class="text-muted">
+                        Fecha: <?= htmlspecialchars($s['fecha_preferida'] ?? '-') ?>
+                        <?= !empty($s['franja_horaria']) ? (' · '.htmlspecialchars($s['franja_horaria'])) : '' ?>
+                      </small>
+                    </div>
 
-                    <span class="badge bg-warning text-dark">Pendiente</span>
+                    <div class="text-end">
+                      <span class="badge bg-<?=
+                        $s['estado']==='pendiente' ? 'primary' :
+                        ($s['estado']==='aceptada' ? 'success' :
+                        ($s['estado']==='rechazada' ? 'secondary' : 'warning'))
+                      ?>">
+                        <?= htmlspecialchars($s['estado']) ?>
+                      </span>
 
-                    <div class="d-grid gap-2 mt-3">
-                      <a href="<?= BASE_URL ?>/cliente/publicacion?id=<?= (int)$s['publicacion_id'] ?>" class="btn btn-outline-primary">
-                        Ver publicación
+                      <div class="mt-2">
+                        <small class="text-muted">
+                          Presupuesto: $ <?= htmlspecialchars($s['presupuesto_estimado'] ?? '0') ?>
+                        </small>
+                      </div>
+
+                      <a class="btn btn-sm btn-outline-primary mt-2"
+                         href="<?= BASE_URL ?>/cliente/mis-solicitudes?estado=<?= urlencode($estado) ?>&id=<?= (int)$s['id'] ?>">
+                        Ver detalle
                       </a>
                     </div>
                   </div>
                 </div>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div class="col">
-              <div class="alert alert-info">No tienes solicitudes pendientes.</div>
+              <?php endforeach; ?>
             </div>
+          <?php else: ?>
+            <div class="alert alert-info mb-0">No tienes solicitudes en este estado.</div>
           <?php endif; ?>
         </div>
       </div>
 
-      <!-- Aceptadas -->
-      <div class="tab-pane fade" id="tabAceptadas">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-          <?php if (!empty($aceptadas)): ?>
-            <?php foreach ($aceptadas as $s): ?>
-              <?php
-                $titulo = $s['titulo'] ?? 'Solicitud';
-                $servicio = $s['servicio_nombre'] ?? '';
-                $proveedor = $s['proveedor_nombre'] ?? 'Proveedor';
-                $fecha = $s['fecha_preferida'] ?? '';
-                $img = !empty($s['servicio_imagen'])
-                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($s['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
-              ?>
-              <div class="col">
-                <div class="card service-card">
-                  <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                  <div class="card-body">
-                    <h5 class="card-title"><?= htmlspecialchars($titulo) ?></h5>
-                    <p class="text-muted mb-1"><i class="bi bi-tools"></i> <?= htmlspecialchars($servicio) ?></p>
-                    <p class="text-muted mb-1"><i class="bi bi-person-fill"></i> <?= htmlspecialchars($proveedor) ?></p>
-                    <?php if ($fecha): ?>
-                      <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> <?= htmlspecialchars($fecha) ?></p>
-                    <?php endif; ?>
+      <!-- Detalle -->
+      <div class="col-lg-6">
+        <div class="card p-3">
+          <h5 class="mb-3">Detalle</h5>
 
-                    <span class="badge bg-success">Aceptada</span>
+          <?php if (!empty($detalle)): ?>
+            <p class="mb-1"><strong><?= htmlspecialchars($detalle['titulo']) ?></strong></p>
+            <p class="text-muted"><?= nl2br(htmlspecialchars($detalle['descripcion'] ?? '')) ?></p>
 
-                    <div class="d-grid gap-2 mt-3">
-                      <!-- Puedes apuntar a servicios contratados -->
-                      <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn btn-primary">
-                        Ir a servicios contratados
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            <?php endforeach; ?>
+            <hr>
+
+            <p class="mb-1"><strong>Proveedor:</strong> <?= htmlspecialchars($detalle['proveedor_nombre'] ?? '-') ?></p>
+            <p class="mb-1"><strong>Servicio:</strong> <?= htmlspecialchars($detalle['servicio_nombre'] ?? '-') ?></p>
+            <p class="mb-1"><strong>Ciudad/Zona:</strong>
+              <?= htmlspecialchars($detalle['ciudad'] ?? '-') ?>
+              <?= !empty($detalle['zona']) ? (' / '.htmlspecialchars($detalle['zona'])) : '' ?>
+            </p>
+            <p class="mb-1"><strong>Dirección:</strong> <?= htmlspecialchars($detalle['direccion'] ?? '-') ?></p>
+            <p class="mb-1"><strong>Fecha:</strong> <?= htmlspecialchars($detalle['fecha_preferida'] ?? '-') ?></p>
+            <p class="mb-1"><strong>Horario:</strong> <?= htmlspecialchars($detalle['franja_horaria'] ?? 'Cualquiera') ?></p>
+            <p class="mb-3"><strong>Presupuesto:</strong> $ <?= htmlspecialchars($detalle['presupuesto_estimado'] ?? '0') ?></p>
+
+            <?php
+              $adj = [];
+              if (!empty($detalle['adjuntos'])) {
+                $adj = array_filter(array_map('trim', explode(',', $detalle['adjuntos'])));
+              }
+            ?>
+
+            <h6>Adjuntos</h6>
+            <?php if (!empty($adj)): ?>
+              <ul class="mb-0">
+                <?php foreach ($adj as $file): ?>
+                  <li>
+                    <a href="<?= BASE_URL ?>/public/uploads/solicitudes/<?= urlencode($file) ?>" target="_blank">
+                      <?= htmlspecialchars($file) ?>
+                    </a>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            <?php else: ?>
+              <div class="text-muted">No hay adjuntos.</div>
+            <?php endif; ?>
+
           <?php else: ?>
-            <div class="col">
-              <div class="alert alert-info">Aún no tienes solicitudes aceptadas.</div>
-            </div>
+            <div class="alert alert-info mb-0">Selecciona una solicitud del listado para ver el detalle.</div>
           <?php endif; ?>
+
         </div>
       </div>
-
-      <!-- Rechazadas -->
-      <div class="tab-pane fade" id="tabRechazadas">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-          <?php if (!empty($rechazadas)): ?>
-            <?php foreach ($rechazadas as $s): ?>
-              <?php
-                $titulo = $s['titulo'] ?? 'Solicitud';
-                $servicio = $s['servicio_nombre'] ?? '';
-                $proveedor = $s['proveedor_nombre'] ?? 'Proveedor';
-                $fecha = $s['fecha_preferida'] ?? '';
-                $img = !empty($s['servicio_imagen'])
-                  ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($s['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
-              ?>
-              <div class="col">
-                <div class="card service-card">
-                  <img src="<?= $img ?>" class="card-img-top" alt="Servicio">
-                  <div class="card-body">
-                    <h5 class="card-title"><?= htmlspecialchars($titulo) ?></h5>
-                    <p class="text-muted mb-1"><i class="bi bi-tools"></i> <?= htmlspecialchars($servicio) ?></p>
-                    <p class="text-muted mb-1"><i class="bi bi-person-fill"></i> <?= htmlspecialchars($proveedor) ?></p>
-                    <?php if ($fecha): ?>
-                      <p class="text-muted mb-2"><i class="bi bi-calendar-event"></i> <?= htmlspecialchars($fecha) ?></p>
-                    <?php endif; ?>
-
-                    <span class="badge bg-danger">Rechazada</span>
-
-                    <div class="d-grid gap-2 mt-3">
-                      <a href="<?= BASE_URL ?>/cliente/explorar-servicios" class="btn btn-outline-secondary">
-                        Buscar otro proveedor
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <div class="col">
-              <div class="alert alert-info">No tienes solicitudes rechazadas.</div>
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-
     </div>
+
   </section>
 </main>
 
