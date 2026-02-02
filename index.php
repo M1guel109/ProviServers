@@ -259,7 +259,15 @@ switch ($request) {
         break;
 
     case '/proveedor/oportunidades':
-        require BASE_PATH . '/app/views/dashboard/proveedor/oportunidades.php';
+        // 1. Llamas al CONTROLADOR
+        require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
+        // 2. Ejecutas la FUNCIÓN que busca los datos y luego carga la vista
+        mostrarOportunidades(); 
+        break;
+
+    case '/proveedor/oportunidades/enviar-cotizacion':
+        require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
+        enviarCotizacion();
         break;
 
     case '/proveedor/resenas':
