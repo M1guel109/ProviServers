@@ -262,7 +262,7 @@ switch ($request) {
         // 1. Llamas al CONTROLADOR
         require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
         // 2. Ejecutas la FUNCIÓN que busca los datos y luego carga la vista
-        mostrarOportunidades(); 
+        mostrarOportunidades();
         break;
 
     case '/proveedor/oportunidades/enviar-cotizacion':
@@ -356,8 +356,28 @@ switch ($request) {
         break;
 
     case '/cliente/perfil':
+        require BASE_PATH . '/app/controllers/perfilController.php';
+
+        if (session_status() === PHP_SESSION_NONE) session_start();
+        $id = (int)($_SESSION['user']['id'] ?? 0);
+
+        if ($id <= 0) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
+        }
+
+        // ✅ Carga el perfil con llaves compatibles con la vista
+        $usuario = mostrarPerfilCliente($id);
+
         require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
         break;
+
+    case '/cliente/perfil/cambiar-clave':
+        require BASE_PATH . '/app/controllers/perfilController.php';
+        cambiarContrasenaUsuario('/cliente/perfil');
+        break;
+
+
 
     case '/cliente/ayuda':
         require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
