@@ -301,7 +301,7 @@ body {
     position: relative;
 }
 
-.badge {
+/* .badge {
     position: absolute;
     top: -5px;
     right: -5px;
@@ -315,7 +315,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 600;
-}
+} */
 
 .usuario {
     text-decoration: none;
@@ -448,12 +448,12 @@ body {
 }
 
 
-/* Badges */
+/* Badges
 .badge {
   font-size: .8rem;
   padding: .4em .6em;
   border-radius: 6px;
-}
+} */
 
 /* Botones dentro de la tarjeta */
 .service-card .btn {
@@ -919,7 +919,7 @@ border-radius: 6px;
 /* ========================================
    BADGES
    ======================================== */
-.badge {
+/* .badge {
     font-family: var(--font-text);
     font-size: var(--fs-small);
     font-weight: 600;
@@ -931,7 +931,7 @@ border-radius: 6px;
 .badge.bg-primary {
     background-color: var(--primary-color) !important;
     color: var(--white-color);
-}
+} */
 
 /* ========================================
    BARRAS DE PROGRESO

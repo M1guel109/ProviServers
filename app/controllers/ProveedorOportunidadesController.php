@@ -1,6 +1,7 @@
 <?php
 // Importamos Modelo y Sesión
 require_once BASE_PATH . '/app/models/Necesidad.php';
+require_once BASE_PATH . '/app/models/Cotizacion.php';
 require_once BASE_PATH . '/app/helpers/session_proveedor.php'; 
 
 function mostrarOportunidades() {
@@ -32,23 +33,33 @@ function enviarCotizacion() {
         $usuarioId = $_SESSION['user']['id'];
         $necesidadId = $_POST['necesidad_id'] ?? null;
         
-        // Datos del formulario
+        // 1. CAMBIO: Recoger el Título real y mapear datos
         $datos = [
-            'titulo'          => 'Propuesta enviada desde plataforma',
-            'precio'          => $_POST['precio_oferta'],
-            'tiempo_estimado' => $_POST['tiempo_estimado'],
+            'titulo'          => $_POST['titulo'],           // <--- Ahora viene del formulario
+            'precio'          => $_POST['precio_oferta'],    // name="precio_oferta" en el HTML
+            'tiempo_estimado' => $_POST['tiempo_estimado'],  // name="tiempo_estimado" en el HTML
             'mensaje'         => $_POST['mensaje']
         ];
 
-        // Guardar
-        $modelo = new Necesidad();
-        $exito = $modelo->crearCotizacionParaNecesidad($usuarioId, $necesidadId, $datos);
+        // Validacion simple por seguridad
+        if (empty($necesidadId) || empty($datos['precio'])) {
+            header('Location: ' . BASE_URL . '/proveedor/oportunidades?status=error');
+            exit;
+        }
 
-        // Redirección con estado para SweetAlert
+        // 2. CAMBIO: Usar el modelo Cotizacion
+        $modelo = new Cotizacion();
+        
+        // 3. CAMBIO: Llamar al método específico de tu nuevo modelo
+        // Este método ya se encarga de buscar el ID del proveedor usando el $usuarioId
+        $exito = $modelo->crearParaNecesidadPorProveedorUsuario($usuarioId, $necesidadId, $datos);
+
+        // Redirección
         if ($exito) {
             header('Location: ' . BASE_URL . '/proveedor/oportunidades?status=success');
         } else {
-            header('Location: ' . BASE_URL . '/proveedor/oportunidades?status=error');
+            // Si falla (probablemente porque ya cotizó), mandamos error
+            header('Location: ' . BASE_URL . '/proveedor/oportunidades?status=error&msg=No se pudo enviar o ya existe una cotización');
         }
         exit;
     }

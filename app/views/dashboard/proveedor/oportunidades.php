@@ -203,46 +203,60 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     </main>
 
     <div class="modal fade" id="modalCotizar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="<?= BASE_URL ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Enviar Cotización</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" name="necesidad_id" id="modal_necesidad_id">
-
-                        <div class="alert alert-light border mb-3">
-                            <small class="text-muted d-block">Estás aplicando a:</small>
-                            <strong id="modal_titulo_necesidad" class="text-primary"></strong>
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="<?= BASE_URL ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Nueva Cotización</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
+                        
+                        <div class="modal-body">
+                            <input type="hidden" name="necesidad_id" id="modal_necesidad_id">
 
-                        <div class="mb-3">
-                            <label class="form-label">Tu Precio Final ($)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">$</span>
-                                <input type="number" name="precio_oferta" class="form-control" required placeholder="Ej: 75000">
+                            <div class="alert alert-light border mb-3">
+                                <small class="text-muted d-block">Estás aplicando a:</small>
+                                <strong id="modal_titulo_necesidad" class="text-primary"></strong>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Título de tu Propuesta</label>
+                                <input type="text" name="titulo" class="form-control" required 
+                                    placeholder="Ej: Servicio completo con repuestos incluidos" maxlength="50">
+                                <div class="form-text small">Dale un nombre corto y claro a tu oferta.</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tu Precio Final ($)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" name="precio_oferta" class="form-control" required 
+                                        placeholder="Ej: 75000" min="1">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tiempo Estimado</label>
+                                <input type="text" name="tiempo_estimado" class="form-control" 
+                                    placeholder="Ej: 2 días, 4 horas..." required maxlength="50">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Mensaje para el Cliente</label>
+                                <textarea name="mensaje" class="form-control" rows="4" 
+                                        placeholder="Hola, tengo experiencia en este tipo de trabajos. Incluyo..." required></textarea>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Tiempo Estimado</label>
-                            <input type="text" name="tiempo_estimado" class="form-control" placeholder="Ej: 2 días..." required>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                Enviar Propuesta <i class="bi bi-send-fill ms-1"></i>
+                            </button>
                         </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Mensaje para el Cliente</label>
-                            <textarea name="mensaje" class="form-control" rows="4" placeholder="Hola, tengo experiencia..." required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Enviar Propuesta 🚀</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
