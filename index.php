@@ -257,6 +257,11 @@ switch ($request) {
     case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
+
+    case '/proveedor/oportunidades':
+        require BASE_PATH . '/app/views/dashboard/proveedor/oportunidades.php';
+        break;
+
     case '/proveedor/resenas':
         // 1. Cargamos el Controlador (el "Cocinero")
         require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';

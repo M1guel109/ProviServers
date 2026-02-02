@@ -50,6 +50,17 @@
                     <li><a href="<?= BASE_URL ?>/proveedor/completadas" class="submenu-link"><i class="bi bi-check-circle"></i>Completadas</a></li>
                 </ul>
             </li>
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/oportunidades" data-title="Oportunidades">
+                    <i class="bi bi-binoculars"></i> 
+                    
+                     <span>Oportunidades</span> 
+                    
+                    <!-- <span class="badge bg-success rounded-pill ms-auto" style="font-size: 0.65rem;">
+                        Activas
+                    </span>  -->
+                </a>
+            </li>
 
             <li><a href="<?= BASE_URL?>/proveedor/resenas" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
             <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
