@@ -24,6 +24,23 @@
       <p>Revisa tus necesidades publicadas y las ofertas recibidas.</p>
     </div>
 
+    <!-- Tabs por estado -->
+    <ul class="nav nav-tabs mb-3">
+      <?php $estadoSel = $_GET['estado'] ?? ''; ?>
+      <li class="nav-item">
+        <a class="nav-link <?= $estadoSel===''?'active':'' ?>" href="<?= BASE_URL ?>/cliente/necesidades">Todas</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <?= $estadoSel==='abierta'?'active':'' ?>" href="<?= BASE_URL ?>/cliente/necesidades?estado=abierta">Abiertas</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <?= $estadoSel==='cerrada'?'active':'' ?>" href="<?= BASE_URL ?>/cliente/necesidades?estado=cerrada">Cerradas</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link <?= $estadoSel==='cancelada'?'active':'' ?>" href="<?= BASE_URL ?>/cliente/necesidades?estado=cancelada">Canceladas</a>
+      </li>
+    </ul>
+
     <div class="row g-4">
       <div class="col-lg-6">
         <div class="card p-3">
@@ -33,17 +50,19 @@
             <div class="list-group">
               <?php foreach ($misNecesidades as $n): ?>
                 <a class="list-group-item list-group-item-action"
-                   href="<?= BASE_URL ?>/cliente/necesidades?id=<?= (int)$n['id'] ?>">
+                   href="<?= BASE_URL ?>/cliente/necesidades?id=<?= (int)$n['id'] ?><?= $estadoSel ? '&estado='.urlencode($estadoSel) : '' ?>">
                   <div class="d-flex justify-content-between">
                     <div>
                       <strong><?= htmlspecialchars($n['titulo']) ?></strong><br>
                       <small class="text-muted">
-                        <?= htmlspecialchars($n['servicio_nombre'] ?? 'Servicio') ?> ·
-                        <?= htmlspecialchars($n['ciudad']) ?>
+                        <?= htmlspecialchars($n['ciudad']) ?><?= !empty($n['zona']) ? (' · '.htmlspecialchars($n['zona'])) : '' ?>
                       </small>
                     </div>
                     <div class="text-end">
-                      <span class="badge bg-<?= $n['estado']==='abierta'?'primary':($n['estado']==='cerrada'?'success':'secondary') ?>">
+                      <span class="badge bg-<?=
+                        ($n['estado']==='abierta' ? 'primary' :
+                        ($n['estado']==='cerrada' ? 'success' : 'secondary'))
+                      ?>">
                         <?= htmlspecialchars($n['estado']) ?>
                       </span>
                       <div><small class="text-muted">Ofertas: <?= (int)$n['total_ofertas'] ?></small></div>
@@ -64,15 +83,14 @@
 
           <?php if (!empty($detalle)): ?>
             <p class="mb-1"><strong><?= htmlspecialchars($detalle['titulo']) ?></strong></p>
-            <p class="text-muted mb-2"><?= htmlspecialchars($detalle['descripcion']) ?></p>
+            <p class="text-muted mb-2"><?= nl2br(htmlspecialchars($detalle['descripcion'])) ?></p>
 
-            <p class="mb-1"><strong>Servicio:</strong> <?= htmlspecialchars($detalle['servicio_nombre'] ?? '-') ?></p>
-            <p class="mb-1"><strong>Ubicación:</strong> <?= htmlspecialchars($detalle['ciudad'].' '.$detalle['zona']) ?></p>
+            <p class="mb-1"><strong>Ubicación:</strong>
+              <?= htmlspecialchars($detalle['ciudad']) ?><?= !empty($detalle['zona']) ? (' · '.htmlspecialchars($detalle['zona'])) : '' ?>
+            </p>
             <p class="mb-1"><strong>Dirección:</strong> <?= htmlspecialchars($detalle['direccion']) ?></p>
             <p class="mb-1"><strong>Fecha:</strong> <?= htmlspecialchars($detalle['fecha_preferida']) ?></p>
-            <?php if (!empty($detalle['hora_preferida'])): ?>
-              <p class="mb-1"><strong>Hora:</strong> <?= htmlspecialchars($detalle['hora_preferida']) ?></p>
-            <?php endif; ?>
+            <p class="mb-1"><strong>Franja:</strong> <?= htmlspecialchars($detalle['franja_horaria'] ?? 'Cualquiera') ?></p>
             <p class="mb-3"><strong>Presupuesto:</strong> <?= htmlspecialchars($detalle['presupuesto_estimado'] ?? '-') ?></p>
 
             <hr>
@@ -87,7 +105,10 @@
                       <strong><?= htmlspecialchars($c['proveedor_nombre'] ?? 'Proveedor') ?></strong>
                       <div class="text-muted small"><?= htmlspecialchars($c['titulo']) ?></div>
                     </div>
-                    <span class="badge bg-<?= $c['estado']==='aceptada'?'success':($c['estado']==='rechazada'?'secondary':'primary') ?>">
+                    <span class="badge bg-<?=
+                      ($c['estado']==='aceptada' ? 'success' :
+                      ($c['estado']==='rechazada' ? 'secondary' : 'primary'))
+                    ?>">
                       <?= htmlspecialchars($c['estado']) ?>
                     </span>
                   </div>

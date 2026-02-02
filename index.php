@@ -395,19 +395,6 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
         break;
 
-    // Proveedor - ver necesidades y ofertar
-    case '/proveedor/necesidades':
-        require BASE_PATH . '/app/controllers/proveedorNecesidadesController.php';
-        break;
-
-    case '/proveedor/necesidades/ofertar':
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/proveedor/necesidades');
-            exit;
-        }
-        require BASE_PATH . '/app/controllers/proveedorNecesidadesOfertarController.php';
-        break;
-
 
     default:
         http_response_code(404);
