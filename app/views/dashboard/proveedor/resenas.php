@@ -107,6 +107,9 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                 <?php else: ?>
 
                     <?php foreach ($resenas as $r): ?>
+                        <!-- <pre style="background: yellow; color: black;">
+                            <?php print_r($r); ?>
+                        </pre> -->
                         <div class="tarjeta tarjeta-resena">
                             <div class="resena-header">
                                 <div class="cliente-info">

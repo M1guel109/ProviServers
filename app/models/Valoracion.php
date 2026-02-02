@@ -74,6 +74,11 @@ class Valoracion
                 v.comentario,
                 v.created_at as fecha,
                 
+                -- ¡AQUÍ ESTABAN FALTANDO ESTOS DOS! 👇
+                v.respuesta_proveedor,
+                v.fecha_respuesta,
+                -- -----------------------------------
+
                 -- Datos del Cliente
                 CONCAT(c.nombres, ' ', c.apellidos) as cliente_nombre,
                 c.foto as cliente_foto,
@@ -90,7 +95,6 @@ class Valoracion
             WHERE p.usuario_id = :usuario_id
             ORDER BY v.created_at DESC
         ";
-
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':usuario_id', $usuarioId, PDO::PARAM_INT);
         $stmt->execute();
