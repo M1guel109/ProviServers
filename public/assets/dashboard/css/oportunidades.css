@@ -1,0 +1,72 @@
+/* =========================================
+   ESTILOS PARA LA VISTA DE OPORTUNIDADES
+   ========================================= */
+
+/* Contenedor de Filtros */
+.filtros-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    border: 1px solid #eef2f6;
+}
+
+/* Tarjetas (Cards) */
+.card-oportunidad {
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: #fff;
+    height: 100%; /* Asegura altura igual en grilla */
+    display: flex;
+    flex-direction: column;
+}
+
+.card-oportunidad:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    border-color: var(--primary-color);
+}
+
+.card-body {
+    flex: 1; /* Empuja el footer hacia abajo */
+}
+
+/* Elementos internos de la tarjeta */
+.badge-presupuesto {
+    background-color: #ecfdf5;
+    color: #059669;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.meta-info {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.avatar-cliente-mini {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+/* Estado Vacío */
+.empty-state {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.empty-state img {
+    width: 150px; 
+    opacity: 0.6;
+    margin-bottom: 1.5rem;
+}
