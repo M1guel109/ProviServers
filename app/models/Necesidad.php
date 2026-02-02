@@ -223,30 +223,74 @@ class Necesidad
         }
     }
 
-    /* ============================
-       PROVEEDOR: ver necesidades abiertas
+/* ============================
+       PROVEEDOR: Obtener Oportunidades (Con filtros y datos extra)
     ============================ */
-    public function listarAbiertasParaProveedorUsuario(int $usuarioId): array
+    public function obtenerOportunidades(int $usuarioId, array $filtros = []): array
     {
         $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
         if (!$proveedorId) return [];
 
+        // Hacemos JOIN con clientes, servicios y categorias para tener la info completa de la tarjeta
         $sql = "
-            SELECT
+            SELECT 
                 n.*,
+                c.nombres AS cliente_nombre,
+                c.apellidos AS cliente_apellido,
+                c.foto AS cliente_foto,
+                cat.nombre AS categoria,
                 CASE WHEN cot.id IS NULL THEN 0 ELSE 1 END AS ya_cotizo
             FROM necesidades n
-            LEFT JOIN cotizaciones cot
-              ON cot.necesidad_id = n.id
-             AND cot.proveedor_id = :pid
+            INNER JOIN clientes c ON n.cliente_id = c.id
+            LEFT JOIN servicios s ON n.servicio_id = s.id
+            LEFT JOIN categorias cat ON s.id_categoria = cat.id
+            LEFT JOIN cotizaciones cot ON (cot.necesidad_id = n.id AND cot.proveedor_id = :pid)
             WHERE n.estado = 'abierta'
-            ORDER BY n.created_at DESC
         ";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':pid' => $proveedorId]);
+        // --- Aplicar Filtros Dinámicos ---
+        
+        // 1. Búsqueda por texto (Título o Descripción)
+        if (!empty($filtros['busqueda'])) {
+            $sql .= " AND (n.titulo LIKE :busqueda OR n.descripcion LIKE :busqueda)";
+        }
+        
+        // 2. Filtro por Ciudad
+        if (!empty($filtros['ciudad'])) {
+            $sql .= " AND n.ciudad = :ciudad";
+        }
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        // 3. Filtro por Categoría (Si el select envía el nombre de la categoría)
+        if (!empty($filtros['categoria'])) {
+            $sql .= " AND cat.nombre = :categoria";
+        }
+
+        $sql .= " ORDER BY n.created_at DESC";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            
+            // Bind de parámetros fijos
+            $stmt->bindValue(':pid', $proveedorId);
+
+            // Bind de filtros variables
+            if (!empty($filtros['busqueda'])) {
+                $stmt->bindValue(':busqueda', "%" . $filtros['busqueda'] . "%");
+            }
+            if (!empty($filtros['ciudad'])) {
+                $stmt->bindValue(':ciudad', $filtros['ciudad']);
+            }
+            if (!empty($filtros['categoria'])) {
+                $stmt->bindValue(':categoria', $filtros['categoria']);
+            }
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        } catch (PDOException $e) {
+            error_log("Error en obtenerOportunidades: " . $e->getMessage());
+            return [];
+        }
     }
 
     /* ============================

@@ -3,46 +3,56 @@
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
 // 2. DATOS DE PRUEBA (Borrar cuando tengas el controlador real)
-if (!isset($necesidades)) {
-    $necesidades = [
-        [
-            'id' => 1,
-            'titulo' => 'Reparación de fuga en baño principal',
-            'descripcion' => 'Tengo una fuga constante en la llave del lavamanos y necesito cambiar el empaque o la llave completa. Es urgente.',
-            'ciudad' => 'Bogotá',
-            'zona' => 'Chapinero',
-            'presupuesto' => 80000,
-            'fecha' => '2026-02-15',
-            'categoria' => 'Plomería',
-            'cliente_nombre' => 'Ana María',
-            'cliente_foto' => 'default_user.png'
-        ],
-        [
-            'id' => 2,
-            'titulo' => 'Mantenimiento de Jardín Delantero',
-            'descripcion' => 'Necesito podar el césped, cortar unos arbustos que están muy altos y limpiar la maleza. El área es de aprox 20m2.',
-            'ciudad' => 'Medellín',
-            'zona' => 'El Poblado',
-            'presupuesto' => 150000,
-            'fecha' => '2026-02-20',
-            'categoria' => 'Jardinería',
-            'cliente_nombre' => 'Carlos Ruiz',
-            'cliente_foto' => 'default_user.png'
-        ],
-        [
-            'id' => 3,
-            'titulo' => 'Clases de Guitarra para Principiante',
-            'descripcion' => 'Busco profesor para mi hijo de 10 años. No tiene experiencia previa. Preferiblemente a domicilio los sábados.',
-            'ciudad' => 'Cali',
-            'zona' => 'Sur',
-            'presupuesto' => 50000,
-            'fecha' => '2026-02-10',
-            'categoria' => 'Educación',
-            'cliente_nombre' => 'Luisa F.',
-            'cliente_foto' => 'default_user.png'
-        ]
-    ];
-}
+// if (!isset($necesidades)) {
+//     $necesidades = [
+//         [
+//             'id' => 1,
+//             'titulo' => 'Reparación de fuga en baño principal',
+//             'descripcion' => 'Tengo una fuga constante en la llave del lavamanos y necesito cambiar el empaque o la llave completa. Es urgente.',
+//             'ciudad' => 'Bogotá',
+//             'zona' => 'Chapinero',
+//             'presupuesto' => 80000,
+//             'fecha' => '2026-02-15',
+//             'categoria' => 'Plomería',
+//             'cliente_nombre' => 'Ana María',
+//             'cliente_foto' => 'default_user.png'
+//         ],
+//         [
+//             'id' => 2,
+//             'titulo' => 'Mantenimiento de Jardín Delantero',
+//             'descripcion' => 'Necesito podar el césped, cortar unos arbustos que están muy altos y limpiar la maleza. El área es de aprox 20m2.',
+//             'ciudad' => 'Medellín',
+//             'zona' => 'El Poblado',
+//             'presupuesto' => 150000,
+//             'fecha' => '2026-02-20',
+//             'categoria' => 'Jardinería',
+//             'cliente_nombre' => 'Carlos Ruiz',
+//             'cliente_foto' => 'default_user.png'
+//         ],
+//         [
+//             'id' => 3,
+//             'titulo' => 'Clases de Guitarra para Principiante',
+//             'descripcion' => 'Busco profesor para mi hijo de 10 años. No tiene experiencia previa. Preferiblemente a domicilio los sábados.',
+//             'ciudad' => 'Cali',
+//             'zona' => 'Sur',
+//             'presupuesto' => 50000,
+//             'fecha' => '2026-02-10',
+//             'categoria' => 'Educación',
+//             'cliente_nombre' => 'Luisa F.',
+//             'cliente_foto' => 'default_user.png'
+//         ]
+//     ];
+// }
+
+// echo "<div style='background:white; padding:10px; border:1px solid red; margin-bottom:20px;'>";
+//     echo "<strong>🔍 DEBUG DE DATOS:</strong><br>";
+//     echo "Total encontradas: " . count($necesidades) . "<br>";
+//     echo "<pre>";
+//     print_r($necesidades);
+//     echo "</pre>";
+//     echo "</div>";
+
+
 ?>
 
 <!DOCTYPE html>
@@ -143,7 +153,7 @@ if (!isset($necesidades)) {
                                         <i class="bi bi-cash-stack text-success fs-5"></i>
                                         <div>
                                             <small class="d-block text-muted" style="line-height: 1;">Presupuesto est.</small>
-                                            <span class="fw-bold text-dark">$ <?= number_format($nec['presupuesto'], 0, ',', '.') ?></span>
+                                            <span class="fw-bold text-dark">$ <?= number_format($nec['presupuesto_estimado'], 0, ',', '.') ?></span>
                                         </div>
                                     </div>
                                 </div>
@@ -152,8 +162,26 @@ if (!isset($necesidades)) {
                                     <hr class="text-muted opacity-25 mt-0 mb-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="d-flex align-items-center gap-2">
-                                            <img src="<?= BASE_URL ?>/public/assets/img/default_user.png" 
-                                                 alt="C" class="avatar-cliente-mini">
+
+                                            <?php 
+                                                // 1. Calcular la ruta DE CADA cliente específico dentro del bucle
+                                                $nombreFoto = $nec['cliente_foto'] ?? 'default_user.png';
+                                                
+                                                // Si no tiene foto o es la default, usamos la de assets
+                                                if ($nombreFoto == 'default_user.png' || empty($nombreFoto)) {
+                                                    $rutaFinal = BASE_URL . '/public/uploads/usuarios/default_user.png';
+                                                } else {
+                                                    // Si tiene foto, usamos la de uploads
+                                                    $rutaFinal = BASE_URL . '/public/uploads/usuarios/' . $nombreFoto;
+                                                }
+                                            ?>
+
+                                            <img src="<?= $rutaFinal ?>" 
+                                                alt="Foto Cliente" 
+                                                class="avatar-cliente-mini"
+                                                style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;" 
+                                                onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/assets/img/default_user.png';">
+
                                             <small class="text-muted"><?= htmlspecialchars($nec['cliente_nombre']) ?></small>
                                         </div>
 
