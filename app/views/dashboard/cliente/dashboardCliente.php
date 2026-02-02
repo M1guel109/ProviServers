@@ -1,22 +1,3 @@
-<?php
-// dashboardCliente.php (arriba del todo, antes del HTML)
-session_start();
-
-require_once BASE_PATH . '/app/models/Publicacion.php';
-
-// Publicaciones aprobadas para poder asociar la solicitud desde el modal
-$pubModel = new Publicacion();
-$publicacionesAprobadas = $pubModel->listarPublicacionesAprobadasParaSolicitudes(); // ya la tienes en tu modelo
-
-// (Opcional) Si quieres precargar datos del cliente:
-$usuarioC = $_SESSION['user'] ?? [];
-?>
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="es">
 
@@ -366,9 +347,6 @@ $usuarioC = $_SESSION['user'] ?? [];
 
     </main>
 
-    <!-- Modal -->
-    <!-- Modal -->
-    <!-- Modal Publicar Necesidad (CORREGIDO) -->
     <div class="modal fade" id="modalNecesidad" tabindex="-1" aria-labelledby="modalNecesidadLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -379,35 +357,19 @@ $usuarioC = $_SESSION['user'] ?? [];
                 </div>
 
                 <form
-                    id="formNecesidad"
-                    action="<?= rtrim(BASE_URL, '/') ?>/cliente/guardar-solicitud"
+                    id="formNecesidadModal"
+                    action="<?= rtrim(BASE_URL, '/') ?>/cliente/necesidades/crear"
                     method="POST"
                     enctype="multipart/form-data"
                     class="needs-validation"
                     novalidate>
+
                     <div class="modal-body">
 
-                        <!-- ✅ Selección de publicación aprobada (OBLIGATORIO para tu flujo actual) -->
+                        <!-- Categoría (si no la guardas en BD, no afecta el INSERT) -->
                         <div class="mb-3">
-                            <label class="form-label">Servicio / Publicación <span class="text-danger">*</span></label>
-                            <select class="form-select" name="publicacion_id" id="publicacion_id" required>
-                                <option value="">Selecciona un servicio</option>
-                                <?php foreach ($publicacionesAprobadas as $p): ?>
-                                    <option value="<?= (int)$p['id'] ?>">
-                                        <?= htmlspecialchars($p['titulo']) ?>
-                                        <?php if (!empty($p['proveedor_nombre'])): ?>
-                                            — <?= htmlspecialchars($p['proveedor_nombre']) ?>
-                                        <?php endif; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <div class="invalid-feedback">Debes seleccionar un servicio/publicación.</div>
-                        </div>
-
-                        <!-- Categoría (solo UI; no la usa tu backend, pero ayuda a armar título) -->
-                        <div class="mb-3">
-                            <label for="categoria" class="form-label">Categoría del servicio</label>
-                            <select class="form-select" id="categoria">
+                            <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                            <select class="form-select" name="categoria" id="categoria_nec" required>
                                 <option value="">Selecciona una categoría</option>
                                 <option value="Salud">Salud</option>
                                 <option value="Educación">Educación</option>
@@ -415,84 +377,130 @@ $usuarioC = $_SESSION['user'] ?? [];
                                 <option value="Hogar">Hogar</option>
                                 <option value="Otros">Otros</option>
                             </select>
+                            <div class="invalid-feedback">Selecciona una categoría.</div>
                         </div>
 
-                        <div class="mb-3 d-none" id="categoriaOtroWrapper">
-                            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
-                            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
+                        <!-- Categoría otros -->
+                        <div class="mb-3 d-none" id="categoriaOtroWrapper_nec">
+                            <label class="form-label">Especifica la categoría <span class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control"
+                                name="categoria_otro"
+                                id="categoriaOtro_nec"
+                                maxlength="80">
+                            <div class="invalid-feedback">Especifica la categoría.</div>
                         </div>
 
-                        <!-- ✅ Título (backend espera name="titulo") -->
+                        <!-- Título -->
                         <div class="mb-3">
                             <label class="form-label">Título <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="titulo" name="titulo" maxlength="120" required>
+                            <input type="text"
+                                class="form-control"
+                                name="titulo"
+                                id="titulo_nec"
+                                maxlength="120"
+                                required>
                             <div class="invalid-feedback">El título es obligatorio.</div>
                         </div>
 
-                        <!-- ✅ Descripción (backend espera name="descripcion") -->
+                        <!-- Descripción -->
                         <div class="mb-3">
-                            <label class="form-label">Descripción detallada <span class="text-danger">*</span></label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                            <label class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <textarea class="form-control"
+                                name="descripcion"
+                                id="descripcion_nec"
+                                rows="3"
+                                required></textarea>
                             <div class="invalid-feedback">La descripción es obligatoria.</div>
                         </div>
 
-                        <!-- ✅ Presupuesto (backend usa presupuesto_estimado) -->
+                        <!-- Presupuesto -->
                         <div class="mb-3">
                             <label class="form-label">Presupuesto estimado (COP)</label>
-                            <input type="number" class="form-control" id="presupuesto" name="presupuesto_estimado" min="0">
+                            <input type="number"
+                                class="form-control"
+                                name="presupuesto_estimado"
+                                id="presupuesto_nec"
+                                min="0"
+                                step="1000">
                         </div>
 
-                        <!-- ✅ Fecha (backend espera name="fecha_preferida") -->
-                        <div class="row mb-3">
+                        <!-- Fecha / Franja horaria -->
+                        <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Fecha deseada <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control" id="fecha" name="fecha_preferida" min="<?= date('Y-m-d') ?>" required>
+                                <input type="date"
+                                    class="form-control"
+                                    name="fecha_preferida"
+                                    id="fecha_nec"
+                                    min="<?= date('Y-m-d') ?>"
+                                    required>
                                 <div class="invalid-feedback">Selecciona una fecha.</div>
                             </div>
 
-                            <!-- Hora: tu BD no tiene columna "hora", así que se anexará a la descripción -->
                             <div class="col-md-6">
-                                <label class="form-label">Hora deseada</label>
-                                <input type="time" class="form-control" id="hora">
-                                <small class="text-muted">Se anexará a la descripción.</small>
+                                <label class="form-label">Franja horaria <span class="text-danger">*</span></label>
+                                <select class="form-select" name="franja_horaria" id="franja_nec" required>
+                                    <option value="">Selecciona una franja</option>
+                                    <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                    <option value="tarde">Tarde (12:00 - 18:00)</option>
+                                    <option value="noche">Noche (18:00 - 22:00)</option>
+                                </select>
+                                <div class="invalid-feedback">Selecciona una franja horaria.</div>
+                                <small class="text-muted">
+                                    Si no eliges hora exacta, se asignará una hora referencial según la franja.
+                                </small>
                             </div>
                         </div>
 
-                        <!-- ✅ Dirección (backend espera direccion) -->
+                        <!-- Hora exacta (opcional) -->
+                        <div class="mb-3">
+                            <label class="form-label">Hora exacta (opcional)</label>
+                            <input type="time"
+                                class="form-control"
+                                name="hora_preferida"
+                                id="hora_nec">
+                        </div>
+
+                        <!-- Ubicación -->
                         <div class="mb-3">
                             <label class="form-label">Dirección <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="direccion" name="direccion" required>
+                            <input type="text"
+                                class="form-control"
+                                name="direccion"
+                                id="direccion_nec"
+                                required>
                             <div class="invalid-feedback">La dirección es obligatoria.</div>
                         </div>
 
-                        <!-- ✅ Ciudad / zona -->
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Ciudad <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="ciudad" name="ciudad" required>
+                                <input type="text"
+                                    class="form-control"
+                                    name="ciudad"
+                                    id="ciudad_nec"
+                                    required>
                                 <div class="invalid-feedback">La ciudad es obligatoria.</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Barrio o zona</label>
-                                <input type="text" class="form-control" id="zona" name="zona">
+                                <label class="form-label">Barrio / zona</label>
+                                <input type="text"
+                                    class="form-control"
+                                    name="zona"
+                                    id="zona_nec">
                             </div>
                         </div>
 
-                        <!-- ✅ Franja horaria (si quieres usarlo, tu backend la recibe) -->
+                        <!-- Adjuntos (opcional) - si no los procesas en backend no afecta el INSERT -->
                         <div class="mb-3">
-                            <label class="form-label">Franja horaria (opcional)</label>
-                            <select class="form-select" name="franja_horaria" id="franja_horaria">
-                                <option value="">Cualquiera</option>
-                                <option value="manana">Mañana</option>
-                                <option value="tarde">Tarde</option>
-                                <option value="noche">Noche</option>
-                            </select>
-                        </div>
-
-                        <!-- Adjuntos -->
-                        <div class="mb-3">
-                            <label class="form-label">Adjuntar fotos o archivos (opcional)</label>
-                            <input type="file" name="adjuntos[]" class="form-control" accept="image/*,application/pdf" multiple>
+                            <label class="form-label">Adjuntos (opcional)</label>
+                            <input type="file"
+                                name="adjuntos[]"
+                                id="adjuntos_nec"
+                                class="form-control"
+                                accept="image/*,application/pdf"
+                                multiple>
                             <small class="text-muted">Máx. 5MB por archivo.</small>
                         </div>
 
@@ -504,11 +512,35 @@ $usuarioC = $_SESSION['user'] ?? [];
                             <i class="bi bi-send"></i> Publicar
                         </button>
                     </div>
-                </form>
 
+                </form>
             </div>
         </div>
     </div>
+
+    <script>
+        (function() {
+            // Mostrar/ocultar "categoría otro"
+            const sel = document.getElementById('categoria_nec');
+            const wrap = document.getElementById('categoriaOtroWrapper_nec');
+            const inputOtro = document.getElementById('categoriaOtro_nec');
+
+            function toggleOtro() {
+                const isOtro = sel && sel.value === 'Otros';
+                if (!wrap) return;
+                wrap.classList.toggle('d-none', !isOtro);
+                if (inputOtro) {
+                    inputOtro.required = isOtro;
+                    if (!isOtro) inputOtro.value = '';
+                }
+            }
+
+            if (sel) {
+                sel.addEventListener('change', toggleOtro);
+                toggleOtro();
+            }
+        })();
+    </script>
 
 
 
