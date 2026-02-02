@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +16,12 @@
   <!-- Estilos específicos de cliente -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
+
 <body>
   <!-- SIDEBAR -->
-  <?php 
-    $currentPage = 'perfil';
-    include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; 
+  <?php
+  $currentPage = 'perfil';
+  include_once __DIR__ . '/../../layouts/sidebar_cliente.php';
   ?>
 
   <!-- CONTENIDO PRINCIPAL -->
@@ -46,19 +48,32 @@
 
         <div class="row">
           <!-- Columna izquierda -->
+          <?php
+          $foto = $usuario['foto'] ?? 'default_user.png';
+
+          // Si NO hay foto o viene la default, usamos la default
+          $fotoUrl = (empty($foto) || $foto === 'default_user.png')
+            ? BASE_URL . '/public/uploads/default_user.png'
+            : BASE_URL . '/public/uploads/usuarios/' . $foto;
+          ?>
+
           <div class="col-xl-4">
             <div class="card shadow-sm border-0 rounded-3">
               <div class="card-body profile-card pt-4 d-flex flex-column align-items-center">
-                <img src="<?= BASE_URL ?>/public/uploads/default_user.png/<?= $usuario['foto'] ?>" 
-                     alt="Foto de Perfil" 
-                     class="rounded-circle border border-3 border-light shadow-sm" 
-                     style="width:130px; height:130px; object-fit:cover;">
-                <h2><?= $usuario['nombres'] ?></h2>
-                <h3 class="text-muted"><?= $usuario['correo'] ?></h3>
+
+                <img src="<?= htmlspecialchars($fotoUrl) ?>"
+                  alt="Foto de Perfil"
+                  class="rounded-circle border border-3 border-light shadow-sm"
+                  style="width:130px; height:130px; object-fit:cover;">
+
+                <h2><?= htmlspecialchars($usuario['nombres'] ?? '') ?></h2>
+                <h3 class="text-muted"><?= htmlspecialchars($usuario['correo'] ?? '') ?></h3>
+
                 <button class="btn btn-outline-primary btn-sm mt-2">Cambiar foto</button>
               </div>
             </div>
           </div>
+
 
           <!-- Columna derecha -->
           <div class="col-xl-8">
@@ -192,4 +207,5 @@
   <!-- JS propio -->
   <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
 </body>
+
 </html>
