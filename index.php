@@ -18,6 +18,9 @@ $request = rtrim($request, '/');
 // Si la ruta queda vacia, se interactua como "/"
 if ($request === '') $request = '/';
 
+
+
+
 //Enrutaminento basico
 switch ($request) {
     case '/':
@@ -327,6 +330,9 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteCancelarServicioContratadoController.php';
         break;
 
+    case '/cliente/mis-solicitudes':
+        require BASE_PATH . '/app/controllers/clienteMisSolicitudesController.php';
+        break;
 
 
     case '/cliente/mensajes':
@@ -370,6 +376,30 @@ switch ($request) {
     case '/cliente/guardar-solicitud':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
+
+
+
+    // Cliente - Necesidades
+    case '/cliente/necesidades':
+        require BASE_PATH . '/app/controllers/clienteNecesidadesController.php';
+        break;
+
+    case '/cliente/necesidades/crear':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/dashboard');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/clienteNecesidadesCrearController.php';
+        break;
+
+    case '/cliente/necesidades/aceptar-cotizacion':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/necesidades');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
+        break;
+
 
     default:
         http_response_code(404);

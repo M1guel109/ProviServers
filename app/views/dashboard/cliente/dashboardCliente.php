@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,13 +18,14 @@
     <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
 </head>
+
 <body>
     <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_cliente.php'; ?>
 
     <!-- CONTENIDO PRINCIPAL -->
     <main class="contenido">
-        
+
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
@@ -44,43 +45,43 @@
             <div class="section-content">
                 <!-- Estadísticas visuales -->
                 <div class="stats-visual row text-center">
-                <div class="col stat-visual-item">
-                    <i class="bi bi-clock-history"></i>
-                    <h3>3</h3>
-                    <p>Servicios Activos</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-check-circle"></i>
-                    <h3>1</h3>
-                    <p>Completados</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-heart"></i>
-                    <h3>3</h3>
-                    <p>Favoritos</p>
-                </div>
-                <div class="col stat-visual-item">
-                    <i class="bi bi-star"></i>
-                    <h3>4.8</h3>
-                    <p>Calificación</p>
-                </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-clock-history"></i>
+                        <h3>3</h3>
+                        <p>Servicios Activos</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-check-circle"></i>
+                        <h3>1</h3>
+                        <p>Completados</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-heart"></i>
+                        <h3>3</h3>
+                        <p>Favoritos</p>
+                    </div>
+                    <div class="col stat-visual-item">
+                        <i class="bi bi-star"></i>
+                        <h3>4.8</h3>
+                        <p>Calificación</p>
+                    </div>
                 </div>
 
 
                 <!-- Acciones rápidas -->
                 <div class="mt-5">
-                <h2 class="mb-4">¿Qué necesitas hoy?</h2>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
-                    <i class="bi bi-search"></i> Buscar Servicio
-                    </a>
-                    <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
-                    <i class="bi bi-briefcase"></i> Ver Mis Servicios
-                    </a>
-                    <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
-                    <i class="bi bi-plus-circle"></i> Publicar Necesidad
-                    </button>
-                </div>
+                    <h2 class="mb-4">¿Qué necesitas hoy?</h2>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="<?= BASE_URL ?>/cliente/explorar" class="btn-modern-outline">
+                            <i class="bi bi-search"></i> Buscar Servicio
+                        </a>
+                        <a href="<?= BASE_URL ?>/cliente/servicios-contratados" class="btn-modern-outline">
+                            <i class="bi bi-briefcase"></i> Ver Mis Servicios
+                        </a>
+                        <button type="button" class="btn-modern-outline" data-bs-toggle="modal" data-bs-target="#modalNecesidad">
+                            <i class="bi bi-plus-circle"></i> Publicar Necesidad
+                        </button>
+                    </div>
                 </div>
 
 
@@ -303,8 +304,8 @@
                         <div class="service-item text-center">
                             <div class="service-content">
                                 <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/Foto-usuario.png"
-                                     alt="Perfil"
-                                     style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
+                                    alt="Perfil"
+                                    style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
                                 <h3><?= htmlspecialchars($nombreSaludo) ?></h3>
                                 <p class="text-muted">cliente@correo.com</p>
                                 <button class="btn-modern-outline w-100">Cambiar foto</button>
@@ -346,89 +347,204 @@
 
     </main>
 
-    <!-- Modal -->
     <div class="modal fade" id="modalNecesidad" tabindex="-1" aria-labelledby="modalNecesidadLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-        
-        <!-- Encabezado -->
-        <div class="modal-header">
-            <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        
-        <!-- Cuerpo con formulario -->
-        <div class="modal-body">
-            <form id="formNecesidad" novalidate>
-            <!-- Categoría -->
-            <div class="mb-3">
-            <label for="categoria" class="form-label">Categoría del servicio</label>
-            <select class="form-select" id="categoria" required>
-                <option value="">Selecciona una categoría</option>
-                <option value="Salud">Salud</option>
-                <option value="Educación">Educación</option>
-                <option value="Tecnología">Tecnología</option>
-                <option value="Hogar">Hogar</option>
-                <option value="Otros">Otros</option>
-            </select>
-            <div class="invalid-feedback">Por favor selecciona una categoría.</div>
-            </div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
 
-            <!-- Campo cuando eligen "Otros" -->
-            <div class="mb-3 d-none" id="categoriaOtroWrapper">
-            <label for="categoriaOtro" class="form-label">Especifica la categoría</label>
-            <input type="text" class="form-control" id="categoriaOtro" placeholder="Ej. Carpintería fina">
-            <div class="invalid-feedback">Por favor especifica la categoría.</div>
-            </div>
-
-
-            <!-- Descripción -->
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción detallada</label>
-                <textarea class="form-control" id="descripcion" rows="3" required></textarea>
-                <div class="invalid-feedback">La descripción es obligatoria.</div>
-            </div>
-
-            <!-- Presupuesto -->
-            <div class="mb-3">
-                <label for="presupuesto" class="form-label">Presupuesto estimado (COP)</label>
-                <input type="number" class="form-control" id="presupuesto" min="0" required>
-                <div class="invalid-feedback">Ingresa un presupuesto válido.</div>
-            </div>
-
-            <!-- Fecha y hora -->
-            <div class="row mb-3">
-                <div class="col-md-6">
-                <label for="fecha" class="form-label">Fecha deseada</label>
-                <input type="date" class="form-control" id="fecha" required>
-                <div class="invalid-feedback">Selecciona una fecha.</div>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNecesidadLabel">Publicar una Necesidad</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="col-md-6">
-                <label for="hora" class="form-label">Hora deseada</label>
-                <input type="time" class="form-control" id="hora" required>
-                <div class="invalid-feedback">Selecciona una hora.</div>
-                </div>
-            </div>
 
-            <!-- Ubicación -->
-            <div class="mb-3">
-                <label for="ubicacion" class="form-label">Ubicación</label>
-                <input type="text" class="form-control" id="ubicacion" required>
-                <div class="invalid-feedback">La ubicación es obligatoria.</div>
+                <form
+                    id="formNecesidadModal"
+                    action="<?= rtrim(BASE_URL, '/') ?>/cliente/necesidades/crear"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="needs-validation"
+                    novalidate>
+
+                    <div class="modal-body">
+
+                        <!-- Categoría (si no la guardas en BD, no afecta el INSERT) -->
+                        <div class="mb-3">
+                            <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                            <select class="form-select" name="categoria" id="categoria_nec" required>
+                                <option value="">Selecciona una categoría</option>
+                                <option value="Salud">Salud</option>
+                                <option value="Educación">Educación</option>
+                                <option value="Tecnología">Tecnología</option>
+                                <option value="Hogar">Hogar</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                            <div class="invalid-feedback">Selecciona una categoría.</div>
+                        </div>
+
+                        <!-- Categoría otros -->
+                        <div class="mb-3 d-none" id="categoriaOtroWrapper_nec">
+                            <label class="form-label">Especifica la categoría <span class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control"
+                                name="categoria_otro"
+                                id="categoriaOtro_nec"
+                                maxlength="80">
+                            <div class="invalid-feedback">Especifica la categoría.</div>
+                        </div>
+
+                        <!-- Título -->
+                        <div class="mb-3">
+                            <label class="form-label">Título <span class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control"
+                                name="titulo"
+                                id="titulo_nec"
+                                maxlength="120"
+                                required>
+                            <div class="invalid-feedback">El título es obligatorio.</div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label class="form-label">Descripción <span class="text-danger">*</span></label>
+                            <textarea class="form-control"
+                                name="descripcion"
+                                id="descripcion_nec"
+                                rows="3"
+                                required></textarea>
+                            <div class="invalid-feedback">La descripción es obligatoria.</div>
+                        </div>
+
+                        <!-- Presupuesto -->
+                        <div class="mb-3">
+                            <label class="form-label">Presupuesto estimado (COP)</label>
+                            <input type="number"
+                                class="form-control"
+                                name="presupuesto_estimado"
+                                id="presupuesto_nec"
+                                min="0"
+                                step="1000">
+                        </div>
+
+                        <!-- Fecha / Franja horaria -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Fecha deseada <span class="text-danger">*</span></label>
+                                <input type="date"
+                                    class="form-control"
+                                    name="fecha_preferida"
+                                    id="fecha_nec"
+                                    min="<?= date('Y-m-d') ?>"
+                                    required>
+                                <div class="invalid-feedback">Selecciona una fecha.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Franja horaria <span class="text-danger">*</span></label>
+                                <select class="form-select" name="franja_horaria" id="franja_nec" required>
+                                    <option value="">Selecciona una franja</option>
+                                    <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                    <option value="tarde">Tarde (12:00 - 18:00)</option>
+                                    <option value="noche">Noche (18:00 - 22:00)</option>
+                                </select>
+                                <div class="invalid-feedback">Selecciona una franja horaria.</div>
+                                <small class="text-muted">
+                                    Si no eliges hora exacta, se asignará una hora referencial según la franja.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Hora exacta (opcional) -->
+                        <div class="mb-3">
+                            <label class="form-label">Hora exacta (opcional)</label>
+                            <input type="time"
+                                class="form-control"
+                                name="hora_preferida"
+                                id="hora_nec">
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="mb-3">
+                            <label class="form-label">Dirección <span class="text-danger">*</span></label>
+                            <input type="text"
+                                class="form-control"
+                                name="direccion"
+                                id="direccion_nec"
+                                required>
+                            <div class="invalid-feedback">La dirección es obligatoria.</div>
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text"
+                                    class="form-control"
+                                    name="ciudad"
+                                    id="ciudad_nec"
+                                    required>
+                                <div class="invalid-feedback">La ciudad es obligatoria.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Barrio / zona</label>
+                                <input type="text"
+                                    class="form-control"
+                                    name="zona"
+                                    id="zona_nec">
+                            </div>
+                        </div>
+
+                        <!-- Adjuntos (opcional) - si no los procesas en backend no afecta el INSERT -->
+                        <div class="mb-3">
+                            <label class="form-label">Adjuntos (opcional)</label>
+                            <input type="file"
+                                name="adjuntos[]"
+                                id="adjuntos_nec"
+                                class="form-control"
+                                accept="image/*,application/pdf"
+                                multiple>
+                            <small class="text-muted">Máx. 5MB por archivo.</small>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Publicar
+                        </button>
+                    </div>
+
+                </form>
             </div>
-            </form>
-        </div>
-        
-        <!-- Footer con botones -->
-        <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" form="formNecesidad" class="btn btn-outline-primary">
-            <i class="bi bi-send"></i> Publicar
-            </button>
-        </div>
         </div>
     </div>
-    </div>
+
+    <script>
+        (function() {
+            // Mostrar/ocultar "categoría otro"
+            const sel = document.getElementById('categoria_nec');
+            const wrap = document.getElementById('categoriaOtroWrapper_nec');
+            const inputOtro = document.getElementById('categoriaOtro_nec');
+
+            function toggleOtro() {
+                const isOtro = sel && sel.value === 'Otros';
+                if (!wrap) return;
+                wrap.classList.toggle('d-none', !isOtro);
+                if (inputOtro) {
+                    inputOtro.required = isOtro;
+                    if (!isOtro) inputOtro.value = '';
+                }
+            }
+
+            if (sel) {
+                sel.addEventListener('change', toggleOtro);
+                toggleOtro();
+            }
+        })();
+    </script>
+
+
+
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
@@ -438,4 +554,5 @@
 
 
 </body>
+
 </html>
