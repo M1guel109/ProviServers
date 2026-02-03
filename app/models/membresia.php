@@ -7,190 +7,162 @@ class Membresia
 
     public function __construct()
     {
-        $db = new  Conexion();
+        $db = new Conexion();
         $this->conexion = $db->getConexion();
     }
 
+    /**
+     * Registra una nueva membresía en la BD
+     */
     public function registrar($data)
     {
         try {
-            // Inicia una transacción para asegurar la atomicidad (aunque es una sola inserción, es buena práctica)
-            $this->conexion->beginTransaction();
+            $sql = "INSERT INTO membresias (
+                        tipo, 
+                        descripcion, 
+                        costo, 
+                        duracion_dias, 
+                        estado, 
+                        es_destacado, 
+                        orden_visual, 
+                        max_servicios_activos, 
+                        acceso_estadisticas_pro, 
+                        permite_videos,
+                        created_at
+                    ) VALUES (
+                        :tipo, 
+                        :desc, 
+                        :costo, 
+                        :dias, 
+                        :estado, 
+                        :destacado, 
+                        :orden, 
+                        :max_serv, 
+                        :stats, 
+                        :videos,
+                        NOW()
+                    )";
 
-            // Consulta SQL para insertar los datos del plan en la tabla 'membresias'
-            $insertar = "INSERT INTO membresias (tipo, 
-                            costo, 
-                            duracion_dias, 
-                            descripcion, 
-                            max_servicios_activos, 
-                            orden_visual, 
-                            acceso_estadisticas_pro, 
-                            permite_videos, 
-                            es_destacado, 
-                            estado
-                        ) VALUES (
-                            :tipo, 
-                            :costo, 
-                            :duracion_dias, 
-                            :descripcion, 
-                            :max_servicios_activos, 
-                            :orden_visual, 
-                            :acceso_estadisticas_pro, 
-                            :permite_videos, 
-                            :es_destacado, 
-                            :estado
-                        )";
+            $stmt = $this->conexion->prepare($sql);
 
-            $resultado = $this->conexion->prepare($insertar);
+            // Vinculación de parámetros
+            $stmt->bindParam(':tipo',      $data['tipo']);
+            $stmt->bindParam(':desc',      $data['descripcion']);
+            $stmt->bindParam(':costo',     $data['costo']);
+            $stmt->bindParam(':dias',      $data['duracion_dias']);
+            $stmt->bindParam(':estado',    $data['estado']); // 'ACTIVO' o 'INACTIVO'
+            $stmt->bindParam(':destacado', $data['es_destacado'], PDO::PARAM_INT);
+            $stmt->bindParam(':max_serv',  $data['max_servicios_activos'], PDO::PARAM_INT);
+            $stmt->bindParam(':stats',     $data['acceso_estadisticas_pro'], PDO::PARAM_INT);
+            $stmt->bindParam(':videos',    $data['permite_videos'], PDO::PARAM_INT);
 
-            // 1. Asignación de Parámetros
-            $resultado->bindParam(':tipo', $data['tipo']);
-            $resultado->bindParam(':costo', $data['costo']);
-            $resultado->bindParam(':duracion_dias', $data['duracion_dias']);
-            $resultado->bindParam(':descripcion', $data['descripcion']);
-            $resultado->bindParam(':max_servicios_activos', $data['max_servicios_activos']);
+            // Manejo especial para NULL en orden_visual
+            if ($data['orden_visual'] === null) {
+                $stmt->bindValue(':orden', null, PDO::PARAM_NULL);
+            } else {
+                $stmt->bindValue(':orden', $data['orden_visual'], PDO::PARAM_INT);
+            }
 
-            // Si orden_visual es null, se debe enviar PDO::PARAM_NULL si el campo en DB lo permite
-            $ordenVisual = $data['orden_visual'];
-            $resultado->bindParam(':orden_visual', $ordenVisual, is_null($ordenVisual) ? PDO::PARAM_NULL : PDO::PARAM_INT);
+            return $stmt->execute();
 
-            $resultado->bindParam(':acceso_estadisticas_pro', $data['acceso_estadisticas_pro']);
-            $resultado->bindParam(':permite_videos', $data['permite_videos']);
-            $resultado->bindParam(':es_destacado', $data['es_destacado']);
-            $resultado->bindParam(':estado', $data['estado']);
-
-            // 2. Ejecución de la Consulta
-            $resultado->execute();
-
-            // 3. Confirmar la transacción
-            $this->conexion->commit();
-
-            return true;
         } catch (PDOException $e) {
-            // Si algo falla, se revierte la transacción
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
-
-            // Registrar el error para fines de depuración
-            error_log("Error en Membresia::registrar -> " . $e->getMessage());
-
-            // Devolver false para indicar que el registro falló
-            return false;
-        } catch (Exception $e) {
-            if ($this->conexion->inTransaction()) {
-                $this->conexion->rollBack();
-            }
-            error_log("Error general en Membresia::registrar -> " . $e->getMessage());
+            error_log("Error Membresia::registrar: " . $e->getMessage());
             return false;
         }
     }
 
+    /**
+     * Listar todas las membresías
+     */
     public function mostrar()
     {
         try {
-            // VARIABLE QUE ALMACENA LA SENTENCIA DE SQL A EJECUTAR
-            $consultar = "SELECT * FROM membresias";
-
-            // PREPARAR LO NECESARIO PARA EJECUTAR LA CONSULTA 
-            $resultado = $this->conexion->prepare($consultar);
-            // EJECUTAR LA CONSULTA
-            $resultado->execute();
-
-            return $resultado->fetchAll(); // Usamos FETCH_ASSOC para devolver un array asociativo
+            $sql = "SELECT * FROM membresias ORDER BY orden_visual ASC, created_at DESC";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            // Registrar el error en el log del sistema
-            error_log("Error en MembresiaModel::mostrarMembresias -> " . $e->getMessage());
-            // Devolver un array vacío para manejo seguro en la aplicación
+            error_log("Error Membresia::mostrar: " . $e->getMessage());
             return [];
         }
     }
 
+    /**
+     * Obtener una membresía por ID
+     */
     public function mostrarId($id)
     {
         try {
-            $consultar = "SELECT * FROM membresias WHERE id = :id";
-
-            $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
-
-            return $resultado->fetch();
+            $sql = "SELECT * FROM membresias WHERE id = :id LIMIT 1";
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            error_log("Error en Membresia::mostrar->" . $e->getMessage());
-            return [];
-        }
-    }
-
-    public function actualizar($data)
-    {
-        // Iniciamos la transacción para asegurar la integridad de la operación (aunque es una sola consulta)
-        $this->conexion->beginTransaction();
-
-        try {
-            // Consulta SQL para actualizar todos los campos de la tabla 'membresias'
-            $actualizar = "UPDATE membresias 
-                            SET 
-                                tipo = :tipo,
-                                descripcion = :descripcion,
-                                costo = :costo,
-                                duracion_dias = :duracion_dias,
-                                estado = :estado,
-                                es_destacado = :es_destacado,
-                                orden_visual = :orden_visual,
-                                max_servicios_activos = :max_servicios_activos,
-                                acceso_estadisticas_pro = :acceso_estadisticas_pro,
-                                permite_videos = :permite_videos
-                            WHERE id = :id";
-
-            $resultado = $this->conexion->prepare($actualizar);
-
-            // BINDING DE PARÁMETROS:
-            $resultado->bindParam(':id', $data['id'], PDO::PARAM_INT);
-            $resultado->bindParam(':tipo', $data['tipo']);
-            $resultado->bindParam(':costo', $data['costo']);
-            $resultado->bindParam(':duracion_dias', $data['duracion_dias'], PDO::PARAM_INT);
-            $resultado->bindParam(':descripcion', $data['descripcion']);
-            $resultado->bindParam(':max_servicios_activos', $data['max_servicios_activos'], PDO::PARAM_INT);
-
-            // Manejo de 'orden_visual': Puede ser NULL
-            $orden_visual = $data['orden_visual'] !== null ? $data['orden_visual'] : null;
-            $tipo_orden = $orden_visual === null ? PDO::PARAM_NULL : PDO::PARAM_INT;
-            $resultado->bindParam(':orden_visual', $orden_visual, $tipo_orden);
-
-
-            // Los campos booleanos/enteros se asumen como enteros (1 o 0)
-            $resultado->bindParam(':acceso_estadisticas_pro', $data['acceso_estadisticas_pro'], PDO::PARAM_INT);
-            $resultado->bindParam(':permite_videos', $data['permite_videos'], PDO::PARAM_INT);
-            $resultado->bindParam(':es_destacado', $data['es_destacado'], PDO::PARAM_INT);
-            $resultado->bindParam(':estado', $data['estado']);
-
-            // Ejecutar la consulta
-            $resultado->execute();
-
-            // Si todo fue exitoso, hacemos commit
-            $this->conexion->commit();
-            return true;
-        } catch (PDOException $e) {
-            // Si algo falla, hacemos rollback y registramos el error
-            $this->conexion->rollBack();
-            error_log("Error en Membresia::actualizar -> " . $e->getMessage());
+            error_log("Error Membresia::mostrarId: " . $e->getMessage());
             return false;
         }
     }
 
+    /**
+     * Actualizar una membresía existente
+     */
+    public function actualizar($data)
+    {
+        try {
+            $sql = "UPDATE membresias SET 
+                        tipo = :tipo,
+                        descripcion = :desc,
+                        costo = :costo,
+                        duracion_dias = :dias,
+                        estado = :estado,
+                        es_destacado = :destacado,
+                        orden_visual = :orden,
+                        max_servicios_activos = :max_serv,
+                        acceso_estadisticas_pro = :stats,
+                        permite_videos = :videos,
+                        modified_at = NOW()
+                    WHERE id = :id";
+
+            $stmt = $this->conexion->prepare($sql);
+
+            $stmt->bindParam(':id',        $data['id'], PDO::PARAM_INT);
+            $stmt->bindParam(':tipo',      $data['tipo']);
+            $stmt->bindParam(':desc',      $data['descripcion']);
+            $stmt->bindParam(':costo',     $data['costo']);
+            $stmt->bindParam(':dias',      $data['duracion_dias']);
+            $stmt->bindParam(':estado',    $data['estado']);
+            $stmt->bindParam(':destacado', $data['es_destacado'], PDO::PARAM_INT);
+            $stmt->bindParam(':max_serv',  $data['max_servicios_activos'], PDO::PARAM_INT);
+            $stmt->bindParam(':stats',     $data['acceso_estadisticas_pro'], PDO::PARAM_INT);
+            $stmt->bindParam(':videos',    $data['permite_videos'], PDO::PARAM_INT);
+
+            if ($data['orden_visual'] === null) {
+                $stmt->bindValue(':orden', null, PDO::PARAM_NULL);
+            } else {
+                $stmt->bindValue(':orden', $data['orden_visual'], PDO::PARAM_INT);
+            }
+
+            return $stmt->execute();
+
+        } catch (PDOException $e) {
+            error_log("Error Membresia::actualizar: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Eliminar membresía
+     */
     public function eliminar($id)
     {
         try {
-            $eliminar = "DELETE FROM membresias WHERE id = :id";
-            $resultado = $this->conexion->prepare($eliminar);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
-
-            return true;
+            $sql = "DELETE FROM membresias WHERE id = :id";
+            $stmt = $this->conexion->prepare($sql);
+            return $stmt->execute([':id' => $id]);
         } catch (PDOException $e) {
-            error_log("Error en Membresia::eliminar->" . $e->getMessage());
+            error_log("Error Membresia::eliminar: " . $e->getMessage());
             return false;
         }
     }
 }
+?>
