@@ -27,11 +27,14 @@ switch ($request) {
         require BASE_PATH . '/app/views/website/index.php';
         break;
 
+    // ... otros casos ...
+
     case '/contacto/enviar':
-        require BASE_PATH . '/app/controllers/contactController.php';
-        $controller = new ContactController();
-        $controller->enviar();
+        require_once BASE_PATH . '/app/controllers/ContactoController.php';
+        procesarContacto();
         break;
+
+    // ...
     // Inicio rutas que sean necesarias para el login
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
