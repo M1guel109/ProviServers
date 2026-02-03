@@ -129,6 +129,9 @@ class Cotizacion
     /**
      * CLIENTE: aceptar una cotización (cierra la necesidad y rechaza las demás)
      */
+/**
+     * CLIENTE: Aceptar cotización (Versión Final)
+     */
     public function aceptarCotizacionParaClienteUsuario(int $usuarioClienteId, int $cotizacionId): bool
     {
         $clienteId = $this->obtenerClienteIdPorUsuario($usuarioClienteId);
@@ -137,47 +140,66 @@ class Cotizacion
         try {
             $this->db->beginTransaction();
 
-            // Traer cotización y validar pertenencia + necesidad abierta
+            // 1. Traer datos clave (incluyendo servicio_id para el contrato)
             $sql = "
-                SELECT c.id, c.necesidad_id, c.estado, n.estado AS estado_necesidad, n.cliente_id
+                SELECT 
+                    c.id, c.necesidad_id, c.estado, c.proveedor_id,
+                    n.estado AS estado_necesidad, n.cliente_id, n.servicio_id
                 FROM cotizaciones c
                 INNER JOIN necesidades n ON c.necesidad_id = n.id
-                WHERE c.id = :cid
-                  AND n.cliente_id = :cliente_id
+                WHERE c.id = :cid AND n.cliente_id = :cliente_id
                 LIMIT 1
             ";
             $st = $this->db->prepare($sql);
             $st->execute([':cid' => $cotizacionId, ':cliente_id' => $clienteId]);
             $row = $st->fetch(PDO::FETCH_ASSOC);
 
-            if (!$row) { $this->db->rollBack(); return false; }
-            if (($row['estado_necesidad'] ?? '') !== 'abierta') { $this->db->rollBack(); return false; }
-            if (($row['estado'] ?? '') !== 'pendiente') { $this->db->rollBack(); return false; }
+            // Validaciones de negocio
+            if (!$row) { 
+                $this->db->rollBack(); return false; 
+            }
+            if ($row['estado_necesidad'] !== 'abierta') { 
+                $this->db->rollBack(); return false; 
+            }
+            if ($row['estado'] !== 'pendiente') { 
+                $this->db->rollBack(); return false; 
+            }
 
+            // Datos para las actualizaciones
             $necesidadId = (int)$row['necesidad_id'];
+            $proveedorId = (int)$row['proveedor_id'];
+            $servicioId  = !empty($row['servicio_id']) ? (int)$row['servicio_id'] : null;
 
-            // 1) aceptar la elegida
-            $up1 = $this->db->prepare("UPDATE cotizaciones SET estado='aceptada', modified_at=NOW() WHERE id=:cid LIMIT 1");
-            $up1->execute([':cid' => $cotizacionId]);
+            // 2. Actualizar estados (Aceptar cotización, rechazar las demás, cerrar necesidad)
+            $this->db->prepare("UPDATE cotizaciones SET estado='aceptada', modified_at=NOW() WHERE id=?")->execute([$cotizacionId]);
+            $this->db->prepare("UPDATE cotizaciones SET estado='rechazada', modified_at=NOW() WHERE necesidad_id=? AND id<>? AND estado='pendiente'")->execute([$necesidadId, $cotizacionId]);
+            $this->db->prepare("UPDATE necesidades SET estado='cerrada', modified_at=NOW() WHERE id=?")->execute([$necesidadId]);
 
-            // 2) rechazar las demás pendientes
-            $up2 = $this->db->prepare("
-                UPDATE cotizaciones
-                SET estado='rechazada', modified_at=NOW()
-                WHERE necesidad_id=:nid AND id<>:cid AND estado='pendiente'
-            ");
-            $up2->execute([':nid' => $necesidadId, ':cid' => $cotizacionId]);
+            // 3. Crear el contrato (Puente para la ejecución del servicio)
+            $sqlContrato = "
+                INSERT INTO servicios_contratados (
+                    cotizacion_id, cliente_id, proveedor_id, servicio_id, fecha_solicitud, estado, created_at
+                ) VALUES (
+                    ?, ?, ?, ?, CURDATE(), 'pendiente', NOW()
+                )
+            ";
+            
+            $ins = $this->db->prepare($sqlContrato);
+            $exitoInsert = $ins->execute([$cotizacionId, $clienteId, $proveedorId, $servicioId]);
 
-            // 3) cerrar necesidad
-            $up3 = $this->db->prepare("UPDATE necesidades SET estado='cerrada', modified_at=NOW() WHERE id=:nid LIMIT 1");
-            $up3->execute([':nid' => $necesidadId]);
+            if (!$exitoInsert) {
+                // Si falla el insert, revertimos todo
+                $this->db->rollBack();
+                error_log("Error al insertar servicio contratado: " . print_r($ins->errorInfo(), true));
+                return false;
+            }
 
             $this->db->commit();
             return true;
 
         } catch (Throwable $e) {
             if ($this->db->inTransaction()) $this->db->rollBack();
-            error_log("Cotizacion::aceptarCotizacion -> " . $e->getMessage());
+            error_log("Excepción en aceptarCotizacionParaClienteUsuario: " . $e->getMessage());
             return false;
         }
     }
