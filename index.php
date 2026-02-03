@@ -247,6 +247,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
 
         break;
+       
 
     // Acción AJAX: Actualizar estado (POST)
     case '/proveedor/actualizar-estado':
@@ -290,6 +291,8 @@ switch ($request) {
     case '/proveedor/solicitudes':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
+      
+    
 
 
     // Rutas del cliente
