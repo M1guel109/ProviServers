@@ -20,9 +20,11 @@ class MensajesController
 
     public function inbox()
     {
-        $uid = (int)$_SESSION['user']['id'];
+        $uid   = (int)$_SESSION['user']['id'];
         $convs = $this->convModel->listarInbox($uid);
-        require BASE_PATH . '/app/views/mensajes/inbox.php';
+
+        // ✅ Usa vista por rol (cliente/proveedor)
+        require $this->vista('inbox');
     }
 
     /**
@@ -44,7 +46,9 @@ class MensajesController
                 ? $this->convModel->getOrCreateFromSolicitud($id, $uid)
                 : $this->convModel->getOrCreateFromCotizacion($id, $uid);
 
-            header("Location: /ProviServers/mensajes/ver?id=" . $convId);
+            // ✅ No hardcodear /ProviServers
+            $base = $this->baseUrl();
+            header("Location: {$base}/mensajes/ver?id=" . $convId);
             exit();
         } catch (Exception $e) {
             die($e->getMessage());
@@ -53,8 +57,9 @@ class MensajesController
 
     public function ver()
     {
-        $uid = (int)$_SESSION['user']['id'];
+        $uid    = (int)$_SESSION['user']['id'];
         $convId = (int)($_GET['id'] ?? 0);
+
         if ($convId <= 0) die('Conversación inválida');
 
         if (!$this->convModel->usuarioTieneAcceso($convId, $uid)) {
@@ -64,22 +69,23 @@ class MensajesController
         $conv = $this->convModel->obtenerPorId($convId);
         if (!$conv) die('No existe conversación');
 
-        $tema = $this->convModel->obtenerTema($convId);
+        $tema          = $this->convModel->obtenerTema($convId);
         $otroUsuarioId = $this->convModel->obtenerOtroUsuarioId($conv, $uid);
 
         $mensajes = $this->msgModel->listarPorConversacion($convId, 80);
         $this->msgModel->marcarLeidos($convId, $uid);
 
-        require BASE_PATH . '/app/views/mensajes/chat.php';
+        // ✅ Usa vista por rol (cliente/proveedor)
+        require $this->vista('chat');
     }
 
     public function enviar()
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        $uid = (int)$_SESSION['user']['id'];
+        $uid    = (int)$_SESSION['user']['id'];
         $convId = (int)($_POST['conversacion_id'] ?? 0);
-        $texto = trim($_POST['mensaje'] ?? '');
+        $texto  = trim($_POST['mensaje'] ?? '');
 
         if ($convId <= 0 || $texto === '') {
             http_response_code(400);
@@ -95,7 +101,7 @@ class MensajesController
         }
 
         $receptorId = $this->convModel->obtenerOtroUsuarioId($conv, $uid);
-        $msgId = $this->msgModel->crear($convId, $uid, $receptorId, $texto);
+        $msgId      = $this->msgModel->crear($convId, $uid, $receptorId, $texto);
 
         echo json_encode(['ok' => true, 'id' => $msgId]);
     }
@@ -104,9 +110,9 @@ class MensajesController
     {
         header('Content-Type: application/json; charset=utf-8');
 
-        $uid = (int)$_SESSION['user']['id'];
+        $uid    = (int)$_SESSION['user']['id'];
         $convId = (int)($_GET['id'] ?? 0);
-        $after = $_GET['after'] ?? null;
+        $after  = $_GET['after'] ?? null;
 
         if ($convId <= 0) {
             http_response_code(400);
@@ -126,5 +132,26 @@ class MensajesController
         }
 
         echo json_encode(['ok' => true, 'mensajes' => $nuevos]);
+    }
+
+    private function vista(string $nombre): string
+    {
+        $rol = $_SESSION['user']['rol'] ?? '';
+
+        if ($rol === 'cliente') {
+            return BASE_PATH . "/app/views/dashboard/cliente/mensajes/{$nombre}.php";
+        }
+
+        if ($rol === 'proveedor') {
+            return BASE_PATH . "/app/views/dashboard/proveedor/mensajes/{$nombre}.php";
+        }
+
+        die('Rol no permitido');
+    }
+
+    private function baseUrl(): string
+    {
+        // BASE_URL normalmente ya incluye /ProviServers
+        return defined('BASE_URL') ? rtrim(BASE_URL, '/') : '/ProviServers';
     }
 }

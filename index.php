@@ -428,8 +428,8 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
         break;
 
-        //case necesarios para mensajes 📩
-    case '/mensajes':
+    //case necesarios para mensajes 📩
+    case 'cliente/mensajes':
         require BASE_PATH . '/app/controllers/MensajesController.php';
         (new MensajesController())->inbox();
         break;
@@ -453,6 +453,7 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/MensajesController.php';
         (new MensajesController())->poll();
         break;
+
 
 
     default:

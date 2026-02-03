@@ -66,12 +66,10 @@
             </li>
 
             <li>
-                <a href="<?= BASE_URL ?>/cliente/mensajes"
-                    class="<?= ($currentPage ?? '') === 'mensajes' ? 'active' : '' ?>"
-                    data-title="Mensajes">
-                    <i class="bi bi-chat-dots"></i>
-                    <span>Mensajes</span>
+                <a href="<?= BASE_URL ?>/cliente/mensajes" class="nav-link <?= ($currentPage === 'mensajes' ? 'active' : '') ?>">
+                    <i class="bi bi-chat-dots"></i> Mensajes
                 </a>
+
             </li>
 
             <li>
