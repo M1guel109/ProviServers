@@ -431,6 +431,33 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
         break;
 
+    //case necesarios para mensajes 📩
+    case 'cliente/mensajes':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->inbox();
+        break;
+
+    case '/mensajes/abrir':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->abrir();
+        break;
+
+    case '/mensajes/ver':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->ver();
+        break;
+
+    case '/mensajes/enviar':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->enviar();
+        break;
+
+    case '/mensajes/poll':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->poll();
+        break;
+
+
 
     default:
         http_response_code(404);
