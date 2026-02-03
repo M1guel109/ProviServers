@@ -1,9 +1,9 @@
 <?php
 // Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helper.php';
-require_once __DIR__ . '/../models/membresia.php';
+require_once __DIR__ . '/../models/Membresia.php';
 
-// Capturamos en una variale el metodo o solicitud hecha al servidor
+// Capturamos el método de solicitud
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
@@ -11,236 +11,178 @@ switch ($method) {
         $accion = $_POST['accion'] ?? '';
 
         if ($accion === 'actualizar') {
-            // Llama a la función para actualizar una membresía existente
             actualizarMembresia();
         } else {
-            // Llama a la función para registrar una nueva membresía (Crear)
             registrarMembresia();
         }
-
         break;
+
     case 'GET':
         $accion = $_GET['accion'] ?? '';
 
         if ($accion === 'eliminar') {
-            // Llama a la función para eliminar una membresía
-            // Asegúrate de validar que $_GET['id'] existe antes de usarlo
             eliminarMembresia($_GET['id'] ?? null);
-        }
-
-        if (isset($_GET['id'])) {
-            // Muestra los detalles de una membresía específica
-            mostrarMembresiaId($_GET['id']);
+        } elseif (isset($_GET['id'])) {
+            // Retorna JSON si se pide por AJAX o carga vista si es necesario
+            // Por ahora asumimos uso interno
+            $datos = mostrarMembresiaId($_GET['id']);
+            echo json_encode($datos); 
         } else {
-            // Muestra la lista completa de membresías
-            mostrarMembresias();
+            // Retornar array para la vista
+            return mostrarMembresias();
         }
-
         break;
-    // Puedes descomentar y usar PUT/DELETE si tu framework lo permite y lo configuras
-    // case 'PUT':
-    //      actualizarMembresia();
-    //      break;
-    // case 'DELETE':
-    //      eliminarMembresia();
-    //      break;
+
     default:
-        // Manejo de métodos no soportados
         http_response_code(405);
         echo "Método no permitido";
         break;
 }
-// Funciones del crud
+
+// ==========================================================
+// FUNCIONES CRUD
+// ==========================================================
+
 function registrarMembresia()
 {
-    // 1. CAPTURA DE DATOS DEL FORMULARIO
-    // Capturamos los datos del Paso 1 (Información General)
-    $tipo = $_POST['tipo'] ?? '';
-    $costo = $_POST['costo'] ?? '';
-    $duracion_dias = $_POST['duracion_dias'] ?? '';
-    $descripcion = $_POST['descripcion'] ?? '';
+    // 1. CAPTURA DE DATOS
+    $tipo          = trim($_POST['tipo'] ?? '');
+    $costo         = $_POST['costo'] ?? '';
+    $duracion      = $_POST['duracion_dias'] ?? '';
+    $descripcion   = trim($_POST['descripcion'] ?? '');
+    $max_servicios = $_POST['max_servicios_activos'] ?? '';
+    $orden_visual  = $_POST['orden_visual'] ?? null; // Puede ser NULL
 
-    // Capturamos los datos del Paso 2 (Configuración de Límites)
-    $max_servicios_activos = $_POST['max_servicios_activos'] ?? '';
-    $orden_visual = $_POST['orden_visual'] ?? null; // Es opcional, puede ser null
-    // ** CORRECCIÓN INICIADA AQUÍ: Si el campo viene vacío, lo convertimos a NULL. **
+    // Manejo de Checkboxes (Si no vienen en POST, son 0 o INACTIVO)
+    $es_destacado  = isset($_POST['es_destacado']) ? 1 : 0;
+    $permite_videos = isset($_POST['permite_videos']) ? 1 : 0;
+    $acceso_stats  = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
+    
+    // El estado en tu BD es ENUM('ACTIVO','INACTIVO')
+    // El checkbox envía "ACTIVO" si está marcado, o nada si no.
+    $estado = isset($_POST['estado']) ? 'ACTIVO' : 'INACTIVO';
+
+    // 2. VALIDACIÓN
+    if (empty($tipo) || $costo === '' || empty($duracion) || empty($descripcion)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa Tipo, Costo, Duración y Descripción.');
+        exit;
+    }
+
+    if (!is_numeric($costo) || !is_numeric($duracion) || !is_numeric($max_servicios)) {
+        mostrarSweetAlert('error', 'Formato inválido', 'Costo, Duración y Máx Servicios deben ser números.');
+        exit;
+    }
+
+    // Limpieza de orden visual
     if ($orden_visual === '') {
-        $orden_visual = 0;
-    }
-    $acceso_estadisticas_pro = $_POST['acceso_estadisticas_pro'] ?? 0; // Radio buttons
-    $permite_videos = $_POST['permite_videos'] ?? 0; // Radio buttons
-    $es_destacado = $_POST['es_destacado'] ?? 0; // Radio buttons
-    $estado = $_POST['estado'] ?? ''; // Select (ACTIVO/INACTIVO)
-
-
-    // 2. VALIDACIÓN DE CAMPOS OBLIGATORIOS
-    // El campo 'orden_visual' es el único opcional (se permite null)
-    if (empty($tipo) || !isset($_POST['costo']) || trim((string)$_POST['costo']) === '' || empty($duracion_dias) || empty($descripcion) || empty($max_servicios_activos) || empty($estado)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios del plan.');
-        exit();
+        $orden_visual = null;
     }
 
-    // 3. VALIDACIÓN ADICIONAL DE VALORES NUMÉRICOS
-    // Aseguramos que costo y límites sean valores positivos válidos
-    $costo_float = floatval($costo);
-    $duracion_int = intval($duracion_dias);
-    $max_servicios_int = intval($max_servicios_activos);
-
-    $orden_visual_int = intval($orden_visual);
-
-    if ($costo_float < 0 || $duracion_int < 1 || $max_servicios_int < 1) {
-        mostrarSweetAlert('error', 'Valores Inválidos', 'El costo, la duración y el límite de servicios deben ser valores positivos.');
-        exit();
-    }
-
-    // El campo 'orden_visual' si se proporciona debe ser un entero positivo
-    if ($orden_visual_int < 0) {
-        mostrarSweetAlert('error', 'Orden Visual Inválida', 'La prioridad visual debe ser un número entero positivo o cero.');
-        exit();
-    }
-
-
-    // *********************************************************************************
-    // 4. LÓGICA DE ARCHIVOS (Removida: El plan de membresía no requiere subir una foto)
-    // *********************************************************************************
-
-
-    // 5. INSTANCIAR MODELO Y PREPARAR DATOS
-    // Asumiendo que tu modelo se llama 'Membresia'
+    // 3. PREPARAR DATOS PARA EL MODELO
     $objMembresia = new Membresia();
 
     $data = [
-        'tipo' => $tipo,
-        'costo' => $costo_float, // Usamos el float validado
-        'duracion_dias' => $duracion_int, // Usamos el int validado
-        'descripcion' => $descripcion,
-        'max_servicios_activos' => $max_servicios_int, // Usamos el int validado
-        'orden_visual' => ($orden_visual !== null && $orden_visual !== '') ? intval($orden_visual) : null,
-        'acceso_estadisticas_pro' => intval($acceso_estadisticas_pro),
-        'permite_videos' => intval($permite_videos),
-        'es_destacado' => intval($es_destacado),
-        'estado' => $estado,
-        // Si necesitas guardar el ID del administrador que lo registró:
-        // 'id_admin' => $_SESSION['user']['id'], 
+        'tipo'                    => $tipo,
+        'costo'                   => (float)$costo,
+        'duracion_dias'           => (int)$duracion,
+        'descripcion'             => $descripcion,
+        'max_servicios_activos'   => (int)$max_servicios,
+        'orden_visual'            => $orden_visual, // Puede ser null
+        'acceso_estadisticas_pro' => $acceso_stats,
+        'permite_videos'          => $permite_videos,
+        'es_destacado'            => $es_destacado,
+        'estado'                  => $estado
     ];
 
-    // 6. LLAMAR AL MÉTODO DEL MODELO
-    // Enviamos la data al método "registrar()" del modelo "Membresia()"
+    // 4. GUARDAR
     $resultado = $objMembresia->registrar($data);
 
-    // 7. RESPUESTA Y REDIRECCIÓN
-    if ($resultado === true) {
-        mostrarSweetAlert('success', 'Registro de Plan exitoso', 'El nuevo plan de membresía ha sido guardado.', '/ProviServers/admin/registrar-membresia');
+    if ($resultado) {
+        mostrarSweetAlert('success', 'Membresía creada', 'El plan ha sido registrado correctamente.', '/ProviServers/admin/membresias');
     } else {
-        // Podrías necesitar un manejo de errores más específico aquí si el modelo devuelve
-        // información sobre duplicados de 'tipo' de plan, por ejemplo.
-        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el plan de membresía. Intenta nuevamente.');
+        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo guardar en la base de datos.');
     }
-
-    exit();
-}
-
-function mostrarMembresias()
-{
-
-    // 1. Instanciar el modelo de Membresía, pasándole la conexión.
-    $resultado = new Membresia();
-
-    // 2. Llamar al método del modelo que contiene la lógica SQL.
-    $membresias = $resultado->mostrar();
-
-    // 3. Devolver el resultado (la lista de membresías).
-    return $membresias;
-}
-
-function mostrarMembresiaId($id)
-{
-    $objMembresia = new Membresia();
-    $membresia = $objMembresia->mostrarId($id);
-
-    return $membresia;
+    exit;
 }
 
 function actualizarMembresia()
 {
-    // ====== 1. Captura de datos ======
-    $id = $_POST['id'] ?? '';
-    $tipo = $_POST['tipo'] ?? '';
-    $costo = $_POST['costo'] ?? '';
-    $duracion = $_POST['duracion_dias'] ?? '';
-    $descripcion = $_POST['descripcion'] ?? '';
+    // Captura ID y valida
+    $id = $_POST['id'] ?? null;
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'Identificador de membresía no válido.');
+        exit;
+    }
+
+    // 1. CAPTURA DE DATOS (Igual que registrar)
+    $tipo          = trim($_POST['tipo'] ?? '');
+    $costo         = $_POST['costo'] ?? '';
+    $duracion      = $_POST['duracion_dias'] ?? '';
+    $descripcion   = trim($_POST['descripcion'] ?? '');
     $max_servicios = $_POST['max_servicios_activos'] ?? '';
-    $orden_visual = $_POST['orden_visual'] ?? '';
-    $acceso = $_POST['acceso_estadisticas_pro'] ?? 0;
-    $videos = $_POST['permite_videos'] ?? 0;
-    $destacado = $_POST['es_destacado'] ?? 0;
-    $estado = $_POST['estado'] ?? '';
+    $orden_visual  = $_POST['orden_visual'] ?? null;
 
-    // ====== 2. Validación mínima como Usuarios ======
-    if (
-        empty($id) || empty($tipo) || empty($costo) || empty($duracion) ||
-        empty($descripcion) || empty($max_servicios) || empty($estado)
-    ) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
-        exit();
+    // Checkboxes
+    $es_destacado  = isset($_POST['es_destacado']) ? 1 : 0;
+    $permite_videos = isset($_POST['permite_videos']) ? 1 : 0;
+    $acceso_stats  = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
+    $estado        = isset($_POST['estado']) ? 'ACTIVO' : 'INACTIVO';
+
+    // 2. VALIDACIÓN
+    if (empty($tipo) || $costo === '' || empty($duracion)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Faltan datos obligatorios.');
+        exit;
     }
 
-    // (lo mismo que usuarios: validación simple de formato)
-    if (!is_numeric($costo) || !is_numeric($duracion) || !is_numeric($max_servicios)) {
-        mostrarSweetAlert('error', 'Formato inválido', 'Costo, duración y servicios deben ser numéricos.');
-        exit();
-    }
+    if ($orden_visual === '') $orden_visual = null;
 
-    $orden_visual = ($orden_visual === '' ? 0 : intval($orden_visual));
-
-    // ====== 3. Crear data igual que en usuarios ======
+    // 3. ACTUALIZAR
+    $obj = new Membresia();
     $data = [
-        'id' => $id,
-        'tipo' => $tipo,
-        'costo' => floatval($costo),
-        'duracion_dias' => intval($duracion),
-        'descripcion' => $descripcion,
-        'max_servicios_activos' => intval($max_servicios),
-        'orden_visual' => $orden_visual,
-        'acceso_estadisticas_pro' => intval($acceso),
-        'permite_videos' => intval($videos),
-        'es_destacado' => intval($destacado),
-        'estado' => $estado
+        'id'                      => $id,
+        'tipo'                    => $tipo,
+        'costo'                   => (float)$costo,
+        'duracion_dias'           => (int)$duracion,
+        'descripcion'             => $descripcion,
+        'max_servicios_activos'   => (int)$max_servicios,
+        'orden_visual'            => $orden_visual,
+        'acceso_estadisticas_pro' => $acceso_stats,
+        'permite_videos'          => $permite_videos,
+        'es_destacado'            => $es_destacado,
+        'estado'                  => $estado
     ];
 
-    // ====== 4. Ejecutar modelo ======
-    $obj = new Membresia();
-    $resultado = $obj->actualizar($data);
-
-    if ($resultado === true) {
-        mostrarSweetAlert('success', 'Membresía actualizada', 'Cambios guardados correctamente.', '/ProviServers/admin/consultar-membresias');
+    if ($obj->actualizar($data)) {
+        mostrarSweetAlert('success', 'Actualizado', 'La membresía se actualizó correctamente.', '/ProviServers/admin/membresias');
     } else {
-        mostrarSweetAlert('error', 'Error', $resultado ?: 'No se pudo actualizar.');
+        mostrarSweetAlert('error', 'Error', 'No se pudieron guardar los cambios.');
     }
-    exit();
+    exit;
 }
-
 
 function eliminarMembresia($id)
 {
-    $objmembresia = new Membresia();
-    $respuesta = $objmembresia->eliminar($id);
-
-
-    if ($respuesta === true) {
-        // Mostrar alerta de éxito y redirigir a la página de membresías
-        mostrarSweetAlert(
-            'success',
-            'Eliminación exitosa',
-            'Se ha eliminado la membresía correctamente',
-            '/ProviServers/admin/consultar-membresias' // ruta a la lista de membresías
-        );
-    } else {
-        // Mostrar alerta de error
-        mostrarSweetAlert(
-            'error',
-            'Error al eliminar',
-            'No se pudo eliminar la membresía. Intenta nuevamente'
-        );
+    if (!$id) {
+        mostrarSweetAlert('error', 'Error', 'ID inválido.');
+        exit;
     }
+
+    $obj = new Membresia();
+    if ($obj->eliminar($id)) {
+        mostrarSweetAlert('success', 'Eliminado', 'La membresía ha sido eliminada.', '/ProviServers/admin/consultar-membresias');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se puede eliminar. Puede que esté en uso.');
+    }
+    exit;
 }
+
+function mostrarMembresias() {
+    $obj = new Membresia();
+    return $obj->mostrar();
+}
+
+function mostrarMembresiaId($id) {
+    $obj = new Membresia();
+    return $obj->mostrarId($id);
+}
+?>
