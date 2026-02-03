@@ -129,3 +129,4 @@ document.addEventListener("DOMContentLoaded", function () {
   
   showTestimonial(currentIndex);
 });
+
