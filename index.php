@@ -136,7 +136,7 @@ switch ($request) {
         break;
 
     case '/admin/registrar-membresia':
-        require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
+        require BASE_PATH . '/app/views/dashboard/admin/gestionarMembresias.php';
         break;
 
     case '/admin/guardar-membresia':
