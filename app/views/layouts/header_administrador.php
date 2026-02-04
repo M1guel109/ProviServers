@@ -90,7 +90,9 @@ $cantidadNotif = count($misNotificaciones);
 
                 <div class="info-usuario d-none d-md-block ps-2">
                     <span class="nombre"><?= $usuarioP['nombres'] ?></span>
-                    <span class="rol"><?= $usuarioP['rol'] ?></span>
+                    <span class="rol">
+                        <?= ($usuarioP['rol'] === 'admin' || $usuarioP['rol'] === 'superadmin') ? 'Administrador' : ucfirst($usuarioP['rol']) ?>
+                    </span>
                 </div>
 
                 <i class="bi bi-chevron-down ms-2"></i>
@@ -101,7 +103,9 @@ $cantidadNotif = count($misNotificaciones);
 
                 <li class="dropdown-header">
                     <h6><?= $usuarioP['nombres'] ?></h6>
-                    <span><?= $usuarioP['rol'] ?></span>
+                    <span>
+                        <?= ($usuarioP['rol'] === 'admin' || $usuarioP['rol'] === 'superadmin') ? 'Administrador' : ucfirst($usuarioP['rol']) ?>
+                    </span>
                 </li>
 
                 <li>

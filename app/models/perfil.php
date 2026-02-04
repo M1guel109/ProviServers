@@ -17,17 +17,22 @@ class Perfil
     {
         try {
 
-            $consultar = "SELECT 
-                    -- 1. Trae TODAS las columnas de TODAS las tablas unidas
+           $consultar = "SELECT 
+                    -- 1. Trae TODAS las columnas (Base)
                     u.*, c.*, p.*, a.*, 
 
-                    -- 2. Consolida las columnas clave para fácil acceso en la vista
+                    -- 2. COLUMNAS CLAVE CONSOLIDADAS
+                    -- 🔥 IMPORTANTE: Forzamos que 'email' venga de usuarios (u)
+                    u.email, 
+
+                    -- Consolida nombres, apellidos, etc.
                     COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
                     COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
                     COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
                     COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
                     COALESCE(c.foto, p.foto, a.foto) AS foto
-                FROM usuarios u  -- ✅ El alias 'u' es crucial aquí
+
+                FROM usuarios u
                 LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
                 LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
                 LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
