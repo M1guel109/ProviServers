@@ -250,6 +250,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
 
         break;
+       
 
     // Acción AJAX: Actualizar estado (POST)
     case '/proveedor/actualizar-estado':
@@ -293,6 +294,8 @@ switch ($request) {
     case '/proveedor/solicitudes':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
+      
+    
 
 
     // Rutas del cliente
@@ -430,6 +433,33 @@ switch ($request) {
         }
         require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
         break;
+
+    //case necesarios para mensajes 📩
+    case 'cliente/mensajes':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->inbox();
+        break;
+
+    case '/mensajes/abrir':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->abrir();
+        break;
+
+    case '/mensajes/ver':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->ver();
+        break;
+
+    case '/mensajes/enviar':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->enviar();
+        break;
+
+    case '/mensajes/poll':
+        require BASE_PATH . '/app/controllers/MensajesController.php';
+        (new MensajesController())->poll();
+        break;
+
 
 
     default:
