@@ -19,8 +19,10 @@
 <body>
     <header>
         <div class="header-container">
-            <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Proviservers - Plataforma de servicios locales"
-                class="header-logo">
+            <a href="<?= BASE_URL ?>/">
+                <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Proviservers - Plataforma de servicios locales"
+                    class="header-logo">
+            </a>
         </div>
     </header>
 
@@ -30,13 +32,13 @@
                 <h1>Inicia Sesión</h1>
                 <p>Accede a tu cuenta para encontrar o fofrecer servicios locales</p>
                 <form id="loginForm" action="iniciar-sesion" method="POST">
-                    <div class="form-group" >
+                    <div class="form-group">
                         <label for="email">Correo Electrónico</label>
                         <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com" required>
                     </div>
                     <div class="form-group">
                         <label for="password">Contraseña</label>
-                        <input type="password" id="password"  name="clave"  placeholder="Ingresa tu contraseña" required>
+                        <input type="password" id="password" name="clave" placeholder="Ingresa tu contraseña" required>
                     </div>
                     <div class="remember-forgot">
                         <!-- <label>
