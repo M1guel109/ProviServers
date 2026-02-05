@@ -106,7 +106,16 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        xintegrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <!-- tu javaScript -->
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>

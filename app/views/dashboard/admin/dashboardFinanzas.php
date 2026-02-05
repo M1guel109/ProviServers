@@ -324,10 +324,18 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        xintegrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+
+    <!-- tu javaScript -->
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+        
 
     <!-- JavaScript de Finanzas -->
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/finanzas.js"></script>
