@@ -1,82 +1,113 @@
+/* main.js - Lógica general del sitio */
+
+// 1. Definir BASE_URL si no existe (Parche de seguridad)
+// Lo ideal es que definas "const BASE_URL = '...'" en tu HTML antes de cargar este script
+const PROJECT_URL = (typeof BASE_URL !== 'undefined') ? BASE_URL : '/proviservers'; // Ajusta '/proviservers' si es necesario
+
 document.addEventListener("DOMContentLoaded", () => {
+    
+// ==========================================
+    // 1. LÓGICA DEL SIDEBAR (Con Memoria)
+    // ==========================================
+    const btnToggle = document.getElementById("btn-toggle-menu"); // Asegúrate que el ID coincida
+
+    // 1. Revisar si el usuario ya lo había plegado antes
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        document.body.classList.add('toggle-sidebar');
+    }
+
+    if (btnToggle) {
+        btnToggle.addEventListener("click", () => {
+            document.body.classList.toggle("toggle-sidebar");
+            
+            // 2. Guardar la preferencia del usuario
+            if (document.body.classList.contains('toggle-sidebar')) {
+                localStorage.setItem('sidebar-collapsed', 'true');
+            } else {
+                localStorage.setItem('sidebar-collapsed', 'false');
+            }
+        });
+    }
+
+    // ==========================================
+    // 2. LÓGICA DE BREADCRUMBS (Ruta de navegación)
+    // ==========================================
     const breadcrumb = document.getElementById("breadcrumb");
-    if (!breadcrumb) return;
+    
+    if (breadcrumb) { // Solo se ejecuta si existe el breadcrumb en esta vista
+        breadcrumb.innerHTML = ""; 
 
-    breadcrumb.innerHTML = ""; // limpiar
+        // Obtener ruta y limpiar
+        const path = window.location.pathname
+            .split("/")
+            .filter(segment => segment !== "" && segment !== "proviservers"); // Filtramos la carpeta raíz si es necesario
 
-    // Obtener la ruta actual
-    const path = window.location.pathname
-        .split("/")
-        .filter(segment => segment !== "");
+        // Agregar enlace Inicio
+        const homeItem = document.createElement("li");
+        homeItem.className = "breadcrumb-item";
+        
+        const homeLink = document.createElement("a");
+        homeLink.href = PROJECT_URL + "/admin/dashboard"; // Usamos la URL del proyecto
+        homeLink.textContent = "Inicio";
+        
+        homeItem.appendChild(homeLink);
+        breadcrumb.appendChild(homeItem);
 
-    // 🔍 Para verificar qué ruta está leyendo
-    console.log("Ruta detectada:", path);
+        // Construir el resto
+        let rutaAcumulada = PROJECT_URL;
+        
+        path.forEach((segmento, index) => {
+            // Ignorar segmentos numéricos (IDs) o 'admin' si ya está en Inicio
+            if(segmento === 'admin') return; 
 
-    // Agregar el enlace a Inicio
-    const homeItem = document.createElement("li");
-    homeItem.className = "breadcrumb-item";
-    const homeLink = document.createElement("a");
-    homeLink.href = "/";
-    homeLink.textContent = "Inicio";
-    homeItem.appendChild(homeLink);
-    breadcrumb.appendChild(homeItem);
+            rutaAcumulada += `/${segmento}`;
+            const item = document.createElement("li");
+            item.classList.add("breadcrumb-item");
 
-    // Si no hay más segmentos, terminamos
-    if (path.length === 0) return;
+            // Formatear texto (primera mayúscula, quitar guiones)
+            const texto = decodeURIComponent(segmento)
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, l => l.toUpperCase());
 
-    // Crear los demás elementos
-    let rutaAcumulada = "";
-    path.forEach((segmento, index) => {
-        rutaAcumulada += `/${segmento}`;
-        const item = document.createElement("li");
-        item.classList.add("breadcrumb-item");
+            if (index < path.length - 1) {
+                const link = document.createElement("a");
+                link.href = rutaAcumulada;
+                link.textContent = texto;
+                item.appendChild(link);
+            } else {
+                item.textContent = texto;
+                item.classList.add("active");
+                item.setAttribute("aria-current", "page");
+            }
+            breadcrumb.appendChild(item);
+        });
+    }
 
-        // Formatear texto
-        const texto = decodeURIComponent(segmento)
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, l => l.toUpperCase());
-
-        if (index < path.length - 1) {
-            const link = document.createElement("a");
-            link.href = rutaAcumulada;
-            link.textContent = texto;
-            item.appendChild(link);
-        } else {
-            item.textContent = texto;
-            item.classList.add("active");
-            item.setAttribute("aria-current", "page");
-        }
-
-        breadcrumb.appendChild(item);
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    // Obtenemos las referencias a los elementos
+    // ==========================================
+    // 3. PREVISUALIZACIÓN DE IMAGEN (Solo formularios)
+    // ==========================================
     const fotoInput = document.getElementById('foto-input');
     const fotoPreview = document.getElementById('foto-preview');
 
-    // Escuchamos el evento 'change' en el input de tipo file
-    fotoInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
+    // IMPORTANTE: El if verifica que AMBOS existan antes de intentar hacer nada
+    if (fotoInput && fotoPreview) {
+        
+        // Guardamos la imagen original por si cancela
+        const defaultImage = fotoPreview.src; 
 
-        if (file) {
-            // Creamos un lector de archivos (FileReader)
-            const reader = new FileReader();
+        fotoInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
 
-            // Definimos qué hacer cuando el archivo se haya leído
-            reader.onload = function (event) {
-                // Actualizamos el atributo 'src' del <img> con la URL temporal del archivo
-                fotoPreview.src = event.target.result;
-            };
-
-            // Leemos el archivo como una URL de datos (Data URL)
-            reader.readAsDataURL(file);
-        } else {
-            // Si el usuario cancela la selección, volvemos a la imagen por defecto
-            // Asume que esta es la ruta de tu imagen por defecto
-            fotoPreview.src = '<?= BASE_URL ?>/public/uploads/usuarios/default_user.png';
-        }
-    });
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    fotoPreview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Si cancela, volvemos a la que estaba al cargar la página
+                fotoPreview.src = defaultImage; 
+            }
+        });
+    }
 });
-

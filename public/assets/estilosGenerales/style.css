@@ -30,7 +30,7 @@
     --fs-small: 14px;
     
     /* Layout */
-    --sidebar-width: 290px;
+    --sidebar-width: 300px;
     --sidebar-collapsed-width: 80px;
     --header-height: 70px;
 }
@@ -69,7 +69,13 @@ ul { list-style: none; }
     display: flex;
     flex-direction: column;
     overflow-y: auto;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* 🔥 Ocultar scroll en Chrome, Safari y Opera (Navegadores WebKit) */
+.sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 /* Logo */
@@ -132,8 +138,8 @@ ul { list-style: none; }
     left: -30px; /* Ajustado al padding del contenedor */
     top: 50%;
     transform: translateY(-50%);
-    width: 4px;
-    height: 80%;
+    width: 5px;
+    height: 100%;
     background-color: #004ecc;
     border-radius: 0 4px 4px 0;
 }
@@ -178,19 +184,42 @@ ul { list-style: none; }
     padding: 25px;
     transition: margin-left 0.3s ease;
     width: calc(100% - var(--sidebar-width));
+    /* 🔥 Importante: Espacio arriba para el header fijo */
+    /* margin-top: var(--header-height); */
 }
 
-/* --- BARRA SUPERIOR (HEADER) --- */
 .barra-superior {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: var(--white-color);
-    padding: 15px 30px;
+    padding: 10px 30px;
     border-radius: 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 30px;
     border: 1px solid #e2e8f0;
+}
+
+.btn-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+    color: var(--primary-color);
+    margin-right: 20px;
+}
+
+.btn-toggle i {
+    font-size: 24px; /* Tamaño grande */
+}
+
+.btn-toggle:hover {
+    color:var(--dark-color) ;
 }
 
 /* Buscador */
@@ -224,37 +253,157 @@ ul { list-style: none; }
 .item-barra:hover { background-color: #f1f5f9; }
 
 /* Usuario */
-.usuario { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.usuario { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    text-decoration: none; 
+    color: var(--dark-color);
+}
+
 .usuario img {
-    width: 40px; height: 40px;
+    width: 40px; 
+    height: 40px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e2e8f0;
 }
-.info-usuario { display: flex; flex-direction: column; line-height: 1.2; }
-.nombre { font-weight: 600; font-size: var(--fs-text); }
-.rol { font-size: var(--fs-small); color: #64748b; }
 
+.info-usuario { 
+    /* 🔥 Usamos !important para anular el "d-md-block" de Bootstrap */
+    display: flex !important; 
+    flex-direction: column !important; /* Fuerza verticalidad */
+    justify-content: center;
+    line-height: 1.2; 
+    text-align: left;
+}
+
+.nombre { 
+    font-weight: 600; 
+    font-size: var(--fs-text);
+    display: block; /* Asegura que ocupe su propia línea */
+}
+
+.rol { 
+    font-size: 12px; 
+    color: #64748b; 
+    font-weight: 500;
+    text-transform: capitalize; 
+    display: block; /* Asegura que ocupe su propia línea */
+    margin-top: 2px; /* Pequeño espacio entre nombre y rol */
+}
 /* ==========================================================================
    5. LOGICA PLEGADO (SIDEBAR COLLAPSED)
    ========================================================================== */
-body.toggle-sidebar .sidebar { width: var(--sidebar-collapsed-width); }
-body.toggle-sidebar .contenido { margin-left: var(--sidebar-collapsed-width); width: calc(100% - var(--sidebar-collapsed-width)); }
 
-/* Ocultar elementos al plegar */
+/* 1. Ajuste de la Sidebar: ¡IMPORTANTE! */
+body.toggle-sidebar .sidebar { 
+    width: var(--sidebar-collapsed-width); 
+    /* 🔥 VITAL: Esto permite que el submenú "salga" de la barra lateral */
+    overflow: visible !important; 
+}
+
+/* Ajustes de contenido y header */
+body.toggle-sidebar .contenido { 
+    margin-left: var(--sidebar-collapsed-width); 
+    width: calc(100% - var(--sidebar-collapsed-width)); 
+}
+body.toggle-sidebar .barra-superior { 
+    left: var(--sidebar-collapsed-width); 
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+/* 2. Ocultar textos y flechas */
 body.toggle-sidebar .logo-completo,
 body.toggle-sidebar .sidebar span,
 body.toggle-sidebar .menu-header,
 body.toggle-sidebar .toggle-submenu,
-body.toggle-sidebar .submenu { display: none !important; }
-
-/* Mostrar favicon y centrar íconos */
-body.toggle-sidebar .logo-favicon { display: block; margin: 0 auto; width: 40px; }
-body.toggle-sidebar .menu-principal a, body.toggle-sidebar .menu-footer a {
-    justify-content: center; padding: 15px 0;
+body.toggle-sidebar .info-usuario { 
+    display: none !important; 
 }
-body.toggle-sidebar .menu-principal a i { margin: 0; font-size: 1.4rem; }
 
+/* 3. Centrar íconos */
+body.toggle-sidebar .logo-favicon { display: block; margin: 0 auto; width: 40px; }
+body.toggle-sidebar .menu-principal { padding: 0 10px; }
+body.toggle-sidebar .menu-principal a, body.toggle-sidebar .menu-footer a {
+    justify-content: center; padding: 15px 0; border-radius: 8px;
+}
+body.toggle-sidebar .menu-principal a i { margin: 0; font-size: 1.5rem; }
+
+/* =========================================================
+   🔥 AQUÍ ESTÁ LA MAGIA DEL SUBMENÚ FLOTANTE
+   ========================================================= */
+
+/* A. Ocultar el submenú por defecto en modo plegado */
+body.toggle-sidebar .submenu {
+    display: none; /* Se oculta */
+    position: absolute; /* Se prepara para flotar */
+    left: 100%; /* Se mueve a la derecha de la barra */
+    top: 0;
+    margin-left: 10px; /* Separación de la barra */
+    width: 220px; /* Ancho cómodo para leer */
+    background-color: var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Sombra elegante */
+    border: 1px solid #eef2f6;
+    padding: 10px 0;
+    z-index: 999;
+}
+
+/* B. Mostrar el submenú al pasar el mouse sobre el ÍCONO (li padre) */
+body.toggle-sidebar .has-submenu:hover .submenu {
+    display: block !important;
+    max-height: none !important; /* Ignora la animación de altura del JS */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* C. Título del submenú (Opcional: Para saber qué estás abriendo) */
+body.toggle-sidebar .has-submenu:hover .submenu::before {
+    content: attr(data-title); /* Si usaste data-title en el li */
+    display: block;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--primary-color);
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 5px;
+}
+
+/* D. Estilo de los enlaces dentro del flotante */
+body.toggle-sidebar .submenu li a {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--dark-color);
+    justify-content: flex-start; /* Texto a la izquierda */
+    border-radius: 0;
+}
+
+body.toggle-sidebar .submenu li a:hover {
+    background-color: #f8fafc;
+    color: var(--primary-color);
+}
+
+/* 1. QUE EL ÍCONO PADRE SE PONGA AZUL CUANDO EL HIJO ESTÁ ACTIVO */
+/* Si el li tiene la clase 'active', pintamos el enlace principal también */
+.has-submenu.active > .menu-link {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
+}
+
+/* 2. FLECHITA "CONECTORA" (Estético) */
+/* Crea un triangulito que apunta del menú flotante hacia el ícono */
+body.toggle-sidebar .has-submenu:hover .submenu::after {
+    content: "";
+    position: absolute;
+    top: 15px; /* Altura de la flecha */
+    left: -10px; /* La saca del cuadro hacia la izquierda */
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--white-color) transparent transparent; /* Triángulo apuntando izq */
+    filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.05));
+}
 /* ==========================================================================
    6. RESPONSIVIDAD
    ========================================================================== */
