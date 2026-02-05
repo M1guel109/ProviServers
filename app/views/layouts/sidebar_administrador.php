@@ -86,7 +86,7 @@
         <a href="<?= BASE_URL ?>/admin/ajustes" title="Configuración">
             <i class="bi bi-gear-fill"></i><span>Ajustes</span>
         </a>
-        <a href="<?= BASE_URL ?>/cerrar-sesion" title="Salir" class="text-danger">
+        <a href="<?= BASE_URL ?>/cerrar-sesion" title="Salir" >
             <i class="bi bi-box-arrow-right"></i><span>Salir</span>
         </a>
     </div>

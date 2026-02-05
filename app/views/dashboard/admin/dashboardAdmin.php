@@ -113,6 +113,10 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
     <!-- tu javaScript -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
+    <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
+
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 
