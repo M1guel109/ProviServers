@@ -29,56 +29,80 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // ==========================================
-    // 2. LÓGICA DE BREADCRUMBS (Ruta de navegación)
+// ==========================================
+    // 2. LÓGICA DE BREADCRUMBS (Corregida)
     // ==========================================
     const breadcrumb = document.getElementById("breadcrumb");
     
-    if (breadcrumb) { // Solo se ejecuta si existe el breadcrumb en esta vista
+    if (breadcrumb) { 
         breadcrumb.innerHTML = ""; 
 
-        // Obtener ruta y limpiar
+        // 1. Obtener segmentos limpios
         const path = window.location.pathname
             .split("/")
-            .filter(segment => segment !== "" && segment !== "proviservers"); // Filtramos la carpeta raíz si es necesario
+            .filter(segment => segment !== "" && segment !== "proviservers");
 
-        // Agregar enlace Inicio
+        // 2. Agregar "Inicio" (Link al Dashboard)
         const homeItem = document.createElement("li");
         homeItem.className = "breadcrumb-item";
         
         const homeLink = document.createElement("a");
-        homeLink.href = PROJECT_URL + "/admin/dashboard"; // Usamos la URL del proyecto
-        homeLink.textContent = "Inicio";
+        homeLink.href = PROJECT_URL + "/admin/dashboard"; 
+        homeLink.innerHTML = '<i class="bi bi-house-door-fill"></i>'; // Icono de casa se ve mejor
+        // homeLink.textContent = "Inicio"; // O usa texto si prefieres
         
         homeItem.appendChild(homeLink);
         breadcrumb.appendChild(homeItem);
 
-        // Construir el resto
-        let rutaAcumulada = PROJECT_URL;
+        // 3. Variable acumuladora (Inicia con la base del proyecto)
+        let rutaAcumulada = PROJECT_URL; 
         
         path.forEach((segmento, index) => {
-            // Ignorar segmentos numéricos (IDs) o 'admin' si ya está en Inicio
-            if(segmento === 'admin') return; 
-
+            
+            // A. Construimos la ruta REAL siempre (Vital para que los enlaces funcionen)
             rutaAcumulada += `/${segmento}`;
+
+            // B. FILTROS VISUALES (Aquí decidimos qué NO mostrar)
+            
+            // 1. Si es "admin", no lo mostramos en texto, pero ya lo sumamos a la ruta arriba.
+            if(segmento === 'admin') {
+                return; 
+            }
+
+            // 2. Si es un número (ID), no lo mostramos (Ej: /editar-usuario/45 -> No mostrar "45")
+            if(!isNaN(segmento)) {
+                return;
+            }
+
+            // 3. Si es "dashboard", no lo mostramos porque ya pusimos el icono de "Inicio"
+            if(segmento === 'dashboard') {
+                return;
+            }
+
+            // C. CREAR EL ELEMENTO VISUAL
             const item = document.createElement("li");
             item.classList.add("breadcrumb-item");
 
-            // Formatear texto (primera mayúscula, quitar guiones)
+            // Formatear texto (Quitar guiones y capitalizar)
             const texto = decodeURIComponent(segmento)
                 .replace(/-/g, " ")
                 .replace(/\b\w/g, l => l.toUpperCase());
 
-            if (index < path.length - 1) {
+            // D. DECIDIR SI ES ENLACE O TEXTO PLANO
+            const esUltimo = index === path.length - 1;
+            
+            if (!esUltimo) {
                 const link = document.createElement("a");
                 link.href = rutaAcumulada;
                 link.textContent = texto;
                 item.appendChild(link);
             } else {
+                // El último elemento no lleva enlace
                 item.textContent = texto;
                 item.classList.add("active");
                 item.setAttribute("aria-current", "page");
             }
+
             breadcrumb.appendChild(item);
         });
     }
@@ -110,4 +134,45 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    const currentUrl = window.location.href;
+    const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+    // 1. Limpiar estados previos
+    sidebarLinks.forEach(link => {
+        link.classList.remove("active");
+    });
+
+    // 2. Identificar el enlace activo
+    sidebarLinks.forEach(link => {
+        const linkHref = link.href;
+
+        // Verificamos si la URL actual termina con el href o es exactamente igual
+        // (Evitamos marcar "/" si estamos en "/admin/dashboard")
+        if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
+            link.classList.add("active");
+
+            // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
+            const parentSubmenu = link.closest(".submenu");
+            if (parentSubmenu) {
+                // Mostramos el submenú (el <ul>)
+                parentSubmenu.style.display = "block";
+                
+                // Marcamos el contenedor padre (el <li> con clase has-submenu)
+                const parentLi = parentSubmenu.closest(".has-submenu");
+                if (parentLi) {
+                    parentLi.classList.add("active"); // Opcional: estilo para el padre
+                    
+                    // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
+                    const icon = parentLi.querySelector(".toggle-icon");
+                    if (icon) {
+                        icon.style.transform = "rotate(180deg)";
+                    }
+                }
+            }
+        }
+    });
+
 });

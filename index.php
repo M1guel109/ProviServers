@@ -72,6 +72,13 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/dashboardAdmin.php';
         break;
 
+    // 🔥 AÑADIR ESTE CASO NUEVO AQUÍ:
+    case '/admin/api/dashboard-data':
+        require_once BASE_PATH . '/app/controllers/dashboardAdminController.php';
+        $controller = new DashboardController();
+        $controller->obtenerDatosAjax(); // Método que devuelve JSON
+        break;
+
     case '/admin/perfil':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardPerfil.php';
         break;
@@ -250,7 +257,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
 
         break;
-       
+
 
     // Acción AJAX: Actualizar estado (POST)
     case '/proveedor/actualizar-estado':
@@ -294,8 +301,8 @@ switch ($request) {
     case '/proveedor/solicitudes':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
-      
-    
+
+
 
 
     // Rutas del cliente
