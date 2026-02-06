@@ -1,241 +1,226 @@
-/*Primera grafica */
-
-
-
-var options = {
-    chart: {
-        type: 'area',
-        height: 350,
-        toolbar: { show: false }
-    },
-    colors: ['#0066ff', '#0e1116'], // Azul y gris oscuro
-    dataLabels: { enabled: false },
-    stroke: { curve: 'smooth' },
-    series: [
-        {
-            name: 'Servicios publicados',
-            data: [20, 35, 28, 27, 55, 30, 90, 50, 65, 28, 60, 20]
-        },
-        {
-            name: 'Servicios contratados',
-            data: [20, 70, 40, 30, 50, 50, 30, 55, 40, 35, 90, 25]
-        }
-    ],
-    xaxis: {
-        categories: ['5k', '10k', '15k', '20k', '25k', '30k', '35k', '40k', '45k', '50k', '55k', '60k']
-    },
-    legend: {
-        position: 'bottom',
-        markers: { width: 12, height: 12 }
-    },
-    fill: {
-        type: 'solid',
-        opacity: 0.6
-    }
-};
-
-var chart = new ApexCharts(document.querySelector("#chart"), options);
-chart.render();
-
-/*segunda grafica */
-
-var optionsUsuarios = {
-    chart: {
-        type: 'donut',
-        height: 250
-    },
-    series: [34249, 1420], // Clientes activos, Proveedores activos
-    labels: ['34249', '1420'],
-    labels: ['Clientes activos', 'Proveedores activos'],
-    colors: ['#007bff', '#000000'], // Opcional: azul y negro como en el diseño
-    dataLabels: {
-        enabled: false
-    },
-    legend: {
-        position: 'bottom'
-    },
-    plotOptions: {
-        pie: {
-            donut: {
-                size: '70%' // Ajusta el grosor del anillo
-            }
-        }
-    }
-};
-
-var chartUsuarios = new ApexCharts(document.querySelector("#chart-usuarios"), optionsUsuarios);
-chartUsuarios.render();
-
-/*tercera grafica */
-
-var optionsMetricas = {
-    chart: {
-        type: 'line',
-        height: 280,
-        toolbar: { show: false }
-    },
-    series: [
-        {
-            name: 'Servicios publicados',
-            data: [25, 65, 55, 45, 50, 75, 100] // azul
-        },
-        {
-            name: 'Servicios contratados',
-            data: [0, 50, 60, 25, 30, 60, 95] // negro
-        }
-    ],
-    stroke: {
-        width: 3,
-        curve: 'smooth'
-    },
-    markers: {
-        size: 5
-    },
-    xaxis: {
-        categories: ['2015', '2016', '2017', '2018', '2019'],
-        labels: {
-            style: { fontSize: '12px' }
-        }
-    },
-    yaxis: {
-        labels: {
-            style: { fontSize: '12px' }
-        }
-    },
-    grid: {
-        strokeDashArray: 4
-    },
-    dataLabels: {
-        enabled: false
-    },
-    legend: {
-        show: true,
-        position: 'bottom'
-    }
-};
-
-var chartMetricas = new ApexCharts(
-    document.querySelector("#chart-nuevos-servicios"),
-    optionsMetricas
-);
-chartMetricas.render();
+/* ==========================================================================
+   DASHBOARD.JS - Lógica específica del Panel Principal (Gráficas y Métricas)
+   ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Iniciamos la carga de datos apenas carga la página
+    cargarDatosBackend();
+});
+
+/**
+ * Función asíncrona para pedir datos al servidor
+ */
+async function cargarDatosBackend() {
+    try {
+        // Petición al endpoint que creamos en el index.php
+        const response = await fetch(BASE_URL + '/admin/api/dashboard-data');
+        
+        // Convertir respuesta a JSON
+        const data = await response.json();
+
+        if (data.success) {
+            console.log("Datos recibidos:", data); // Para depuración
+
+            // 1. Renderizar Gráfica Principal (Área)
+            renderizarGraficaServicios(data.grafica_principal);
+
+            // 2. Renderizar Gráfica de Usuarios (Dona)
+            renderizarGraficaUsuarios(data.tarjetas);
+
+            // 3. Actualizar Tarjetas de Texto (Métricas)
+            actualizarTarjetas(data.tarjetas);
+
+            // 4. Actualizar Servicio Destacado
+            actualizarServicioDestacado(data.servicio_destacado);
+            
+            // 5. Renderizar tercera gráfica (Usaremos datos estáticos o del backend si agregas más)
+            renderizarGraficaMetricas(); 
+
+        } else {
+            console.error("Error del servidor:", data.error);
+        }
+
+    } catch (error) {
+        console.error("Error de conexión:", error);
+    }
+}
+
+/**
+ * Actualiza los números en las tarjetas HTML
+ */
+function actualizarTarjetas(datosUsuarios) {
+    // Buscamos el contenedor de métricas dentro de la tarjeta de usuarios
+    const contenedorMetricas = document.querySelector('.tarjeta .metricas');
     
-    // Seleccionamos TODOS los elementos que pueden abrir el menú:
-    // 1. El enlace de texto (a) directo hijo de .has-submenu
-    // 2. El botón de la flecha (.toggle-submenu)
-    const triggers = document.querySelectorAll(".has-submenu > a, .has-submenu .toggle-submenu");
-
-    triggers.forEach(trigger => {
-        trigger.addEventListener("click", (e) => {
-            // Detenemos cualquier comportamiento por defecto (como recargar página)
-            e.preventDefault();
-            // Detenemos la propagación para que no haga burbuja a otros elementos
-            e.stopPropagation();
-
-            // 1. Identificar el contenedor padre y el submenú
-            // Usamos closest para encontrar el LI padre sin importar cuál de los dos se clickeó
-            const parentLi = trigger.closest(".has-submenu");
-            const submenu = parentLi.querySelector(".submenu");
-
-            // Si no hay submenú, no hacemos nada
-            if (!submenu) return;
-
-            // 2. Determinar si vamos a ABRIR o CERRAR
-            // Verificamos si ya tiene la clase active
-            const isOpen = parentLi.classList.contains("active");
-
-            if (isOpen) {
-                // --- CERRAR ---
-                
-                // Paso clave para que la animación no sea brusca:
-                // Antes de colapsar, reasignamos la altura actual en píxeles explícitamente.
-                // Esto permite al navegador saber desde dónde animar hacia 0.
-                submenu.style.maxHeight = submenu.scrollHeight + "px";
-
-                // Forzamos un "reflow" (lectura de propiedad) para que el navegador aplique el estilo de arriba
-                // antes de aplicar el estilo de cierre.
-                submenu.offsetHeight; 
-
-                // Ahora sí, colapsamos
-                parentLi.classList.remove("active");
-                submenu.style.maxHeight = "0"; 
-
-            } else {
-                // --- ABRIR ---
-                
-                // (Opcional) Cerrar otros menús abiertos si quieres efecto acordeón:
-                /* document.querySelectorAll('.has-submenu.active').forEach(activeLi => {
-                    activeLi.classList.remove('active');
-                    activeLi.querySelector('.submenu').style.maxHeight = "0";
-                });
-                */
-
-                parentLi.classList.add("active");
-                // Asignamos la altura real del contenido para que se expanda suavemente
-                submenu.style.maxHeight = submenu.scrollHeight + "px";
-            }
-        });
-    });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar DataTable directamente (sin fetch)
-    new DataTable('#tabla-1', {
-        responsive: true,
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
-        layout: {
-            topStart: {
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-            }
-        },
-        language: {
-            search: "",
-            searchPlaceholder: "Buscar",
-            lengthMenu: "Mostrar _MENU_ registros",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros totales)",
-            zeroRecords: "No se encontraron resultados",
-            paginate: {
-                first: "<<",
-                previous: "‹",
-                next: "›",
-                last: ">>"
-            },
-            buttons: {
-                copy: "Copiar",
-                csv: "Exportar CSV",
-                excel: "Exportar Excel",
-                pdf: "Exportar PDF",
-                print: "Imprimir"
-            }
-        },
-        initComplete: function () {
-            const dtSearch = document.querySelector('.dt-search');
-            if (!dtSearch) return;
-
-            const input = dtSearch.querySelector('input[type="search"]');
-            if (!input) return;
-
-            const buscadorDiv = document.createElement('div');
-            buscadorDiv.className = 'buscador';
-            buscadorDiv.innerHTML = `<i class="bi bi-search"></i>`;
-            buscadorDiv.appendChild(input);
-
-            dtSearch.innerHTML = '';
-            dtSearch.appendChild(buscadorDiv);
-
-            input.setAttribute('placeholder', 'Buscar');
-            input.style.width = "100%";
-            input.style.border = "none";
-            input.style.background = "transparent";
-            input.style.outline = "none";
+    if (contenedorMetricas) {
+        // Asumiendo el orden: Primero Clientes, Segundo Proveedores
+        const valores = contenedorMetricas.querySelectorAll('.valor');
+        if (valores.length >= 2) {
+            valores[0].innerText = datosUsuarios.clientes.toLocaleString(); // Formato 1,000
+            valores[1].innerText = datosUsuarios.proveedores.toLocaleString();
         }
-    });
-});
+    }
+}
 
+/**
+ * Actualiza la tarjeta del Servicio Destacado
+ */
+function actualizarServicioDestacado(servicio) {
+    if (!servicio) return;
 
+    const imgElement = document.querySelector('.servicio-imagen img');
+    const nameElement = document.querySelector('.servicio-nombre');
 
+    if (nameElement) nameElement.textContent = servicio.nombre || 'Sin datos';
+    
+    // Si tienes imagen en BD, úsala. Si no, deja la default.
+    if (imgElement && servicio.imagen) {
+        imgElement.src = BASE_URL + '/public/uploads/servicios/' + servicio.imagen;
+    }
+}
+
+/* ==========================================================================
+   CONFIGURACIÓN DE GRÁFICAS (APEXCHARTS)
+   ========================================================================== */
+
+// 1. GRÁFICA PRINCIPAL (Servicios por Mes)
+function renderizarGraficaServicios(dataMensual) {
+    var options = {
+        chart: {
+            type: 'area',
+            height: 350,
+            toolbar: { show: false },
+            fontFamily: 'Poppins, sans-serif'
+        },
+        colors: ['#0066ff', '#0e1116'],
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        series: [
+            {
+                name: 'Servicios Publicados',
+                data: dataMensual // [10, 5, 20...] Datos reales del PHP
+            }
+        ],
+        xaxis: {
+            // Meses estáticos
+            categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            labels: { style: { colors: '#64748b' } }
+        },
+        yaxis: {
+            labels: { style: { colors: '#64748b' } }
+        },
+        grid: {
+            borderColor: '#e2e8f0',
+            strokeDashArray: 4
+        },
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.3,
+                stops: [0, 90, 100]
+            }
+        },
+        tooltip: { theme: 'light' }
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart"), options);
+    chart.render();
+}
+
+// 2. GRÁFICA DE USUARIOS (Dona)
+function renderizarGraficaUsuarios(datosUsuarios) {
+    // Convertimos a números para evitar errores
+    const clientes = parseInt(datosUsuarios.clientes) || 0;
+    const proveedores = parseInt(datosUsuarios.proveedores) || 0;
+
+    var optionsUsuarios = {
+        chart: {
+            type: 'donut',
+            height: 280,
+            fontFamily: 'Poppins, sans-serif'
+        },
+        series: [clientes, proveedores], // Datos reales
+        labels: ['Clientes', 'Proveedores'],
+        colors: ['#0066ff', '#1e293b'], // Azul ProviServers y Oscuro
+        dataLabels: { enabled: false },
+        legend: {
+            position: 'bottom',
+            itemMargin: { horizontal: 10, vertical: 5 }
+        },
+        plotOptions: {
+            pie: {
+                donut: {
+                    size: '75%',
+                    labels: {
+                        show: true,
+                        total: {
+                            show: true,
+                            label: 'Total',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            color: '#64748b',
+                            formatter: function (w) {
+                                // Sumar total
+                                return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                            }
+                        },
+                        value: {
+                            fontSize: '24px',
+                            fontWeight: 700,
+                            color: '#0e1116',
+                        }
+                    }
+                }
+            }
+        },
+        tooltip: {
+            y: {
+                formatter: function (val) {
+                    return val + " usuarios";
+                }
+            }
+        }
+    };
+
+    var chartUsuarios = new ApexCharts(document.querySelector("#chart-usuarios"), optionsUsuarios);
+    chartUsuarios.render();
+}
+
+// 3. TERCERA GRÁFICA (Métricas)
+// (Esta la dejé con datos estáticos por ahora, ya que el controlador no enviaba datos específicos para esta)
+function renderizarGraficaMetricas() {
+    var optionsMetricas = {
+        chart: {
+            type: 'bar', // Cambié a barra para variar visualmente
+            height: 280,
+            toolbar: { show: false },
+            fontFamily: 'Poppins, sans-serif'
+        },
+        series: [
+            {
+                name: 'Ingresos',
+                data: [25, 65, 55, 45, 50, 75, 100] 
+            }
+        ],
+        colors: ['#0066ff'],
+        plotOptions: {
+            bar: { borderRadius: 4, columnWidth: '50%' }
+        },
+        xaxis: {
+            categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        grid: {
+            borderColor: '#f1f5f9',
+            strokeDashArray: 4
+        }
+    };
+
+    if(document.querySelector("#chart-nuevos-servicios")) {
+        var chartMetricas = new ApexCharts(document.querySelector("#chart-nuevos-servicios"), optionsMetricas);
+        chartMetricas.render();
+    }
+}
