@@ -1,7 +1,7 @@
 /* registroUsuario.js - Lógica del formulario de registro */
 
 document.addEventListener('DOMContentLoaded', function () {
-    
+
     // =======================================================
     // 1. INICIALIZAR TOOLTIPS (Bootstrap 5)
     // =======================================================
@@ -34,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // =======================================================
     const rolSelect = document.getElementById('rol');
     const contenedorProveedor = document.getElementById('campos-proveedor'); // El div padre que contiene cat + docs
-    
+
     // Seleccionamos los inputs de archivo que deben ser obligatorios
     // Nota: Asegúrate de que en el HTML los inputs tengan la clase 'file-doc-proveedor' o selecciona por ID
-    const inputsDocumentos = document.querySelectorAll('input[type="file"][name^="doc-"]'); 
+    const inputsDocumentos = document.querySelectorAll('input[type="file"][name^="doc-"]');
 
     function toggleProveedor() {
         if (!contenedorProveedor) return;
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // Ocultar sección
             contenedorProveedor.classList.add('d-none');
-            
+
             // Quitar obligatoriedad para que deje guardar si es cliente o admin
             inputsDocumentos.forEach(input => {
                 input.required = false;
@@ -80,13 +80,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnAddCat = document.getElementById('btn-add-categoria'); // Asegúrate que tu botón tenga este ID
     const contenedorTags = document.getElementById('contenedor-tags');
     const inputHiddenTags = document.getElementById('lista_categorias');
-    
+
     let categoriasSeleccionadas = []; // Array para guardar las categorías en memoria
 
     if (selectCat && btnAddCat) {
-        
+
         // A. Detectar si elige "Crear nueva categoría"
-        selectCat.addEventListener('change', function() {
+        selectCat.addEventListener('change', function () {
             if (this.value === 'nueva') {
                 divNuevaCat.classList.remove('d-none');
                 inputNuevaCat.focus();
@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // B. Acción del botón "Agregar"
-        btnAddCat.addEventListener('click', function() {
+        btnAddCat.addEventListener('click', function () {
             let valor = '';
 
             // 1. Obtener el valor según el modo (select o input)
@@ -109,14 +109,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // 2. Validaciones básicas
             if (!valor) return; // Si está vacío, no hace nada
-            if (valor === 'nueva') return; 
+            if (valor === 'nueva') return;
 
             // 3. Validación de duplicados (No distinguir mayúsculas/minúsculas)
             const existe = categoriasSeleccionadas.some(cat => cat.toLowerCase() === valor.toLowerCase());
-            
+
             if (existe) {
                 // Usamos SweetAlert2 si está disponible, sino alert normal
-                if(typeof Swal !== 'undefined') {
+                if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Categoría duplicada',
@@ -162,16 +162,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Actualizar el input oculto que se envía al PHP
         // Ejemplo de resultado: "Plomeria,Electricidad,Limpieza"
-        if(inputHiddenTags) {
+        if (inputHiddenTags) {
             inputHiddenTags.value = categoriasSeleccionadas.join(',');
         }
     }
 
     // Exponer la función de eliminar al ámbito global (window)
     // Esto es necesario porque el onclick está en el HTML generado dinámicamente
-    window.eliminarCategoria = function(nombre) {
+    window.eliminarCategoria = function (nombre) {
         categoriasSeleccionadas = categoriasSeleccionadas.filter(cat => cat !== nombre);
         renderizarTags();
     };
+
+    // ... (Tu código existente de tooltips, foto y tags) ...
+
+    // =======================================================
+    // 5. VALIDACIÓN FINAL AL ENVIAR EL FORMULARIO
+    // =======================================================
+    const formulario = document.querySelector('.formulario-usuario'); // O usa id="formRegistro" si se lo pusiste
+
+    if (formulario) {
+        formulario.addEventListener('submit', function (e) {
+
+            // Solo validamos si es proveedor
+            if (rolSelect.value === 'proveedor') {
+
+                // REGLA: Mínimo 3 categorías
+                if (categoriasSeleccionadas.length < 3) {
+                    e.preventDefault(); // DETIENE EL ENVÍO
+
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Faltan categorías',
+                            text: `Debes agregar al menos 3 categorías para el proveedor. Llevas: ${categoriasSeleccionadas.length}.`,
+                            confirmButtonColor: '#0066FF'
+                        });
+                    } else {
+                        alert(`Debes agregar al menos 3 categorías. Llevas: ${categoriasSeleccionadas.length}`);
+                    }
+                    return false;
+                }
+            }
+        });
+    }
+
+
 
 });

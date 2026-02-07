@@ -25,82 +25,109 @@ class Usuario
         try {
             $this->conexion->beginTransaction();
 
-            // 🔒 Encriptar la clave antes de guardar
+            // 1. Insertar en tabla USUARIOS
             $claveHash = password_hash($data['clave'], PASSWORD_DEFAULT);
-
-            // INSERT usuarios (usamos :estado pasado desde el controlador)
-            $insertar = "INSERT INTO usuarios (email, clave, documento, rol, estado) VALUES (:email, :clave, :documento, :rol, :estado)";
-
-            $stmt = $this->conexion->prepare($insertar);
-            $stmt->bindParam(':email', $data['email']);
-            $stmt->bindParam(':clave', $claveHash);
-            $stmt->bindParam(':documento', $data['documento']);
-            $stmt->bindParam(':rol', $data['rol']);
-            $stmt->bindParam(':estado', $data['estado'], PDO::PARAM_INT);
-
-            $stmt->execute();
-
-            // Obtener el ID generado
+            
+            // Asegúrate que tu columna en BD sea 'estado_id' o 'estado' según tu estructura real
+            $sqlUser = "INSERT INTO usuarios (email, clave, documento, rol, estado_id) VALUES (:email, :clave, :doc, :rol, :estado)";
+            
+            $stmt = $this->conexion->prepare($sqlUser);
+            $stmt->execute([
+                ':email'   => $data['email'],
+                ':clave'   => $claveHash,
+                ':doc'     => $data['documento'],
+                ':rol'     => $data['rol'],
+                ':estado'  => $data['estado']
+            ]);
+            
             $usuario_id = $this->conexion->lastInsertId();
-            if (!$usuario_id) throw new Exception("Error al obtener ID de usuario después de la inserción.");
 
-            // 1.2. Inserción en tabla de detalle según rol
+            // 2. Insertar en tabla ESPECÍFICA (Clientes/Proveedores/Admins)
             $tablaDetalle = $this->getTablaDetalle($data['rol']);
+            
+            $sqlDetalle = "INSERT INTO {$tablaDetalle} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) 
+                        VALUES (:uid, :nom, :ape, :tel, :ubi, :foto)";
+            
+            $stmtDetalle = $this->conexion->prepare($sqlDetalle);
+            $stmtDetalle->execute([
+                ':uid'  => $usuario_id,
+                ':nom'  => $data['nombres'],
+                ':ape'  => $data['apellidos'],
+                ':tel'  => $data['telefono'],
+                ':ubi'  => $data['ubicacion'],
+                ':foto' => $data['foto']
+            ]);
 
-            $insertar2 = "INSERT INTO {$tablaDetalle} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) VALUES (:usuario_id, :nombres, :apellidos, :telefono, :ubicacion, :foto)";
-            $resultado = $this->conexion->prepare($insertar2);
-            $resultado->bindParam(':usuario_id', $usuario_id);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':ubicacion', $data['ubicacion']);
-            $resultado->bindParam(':foto', $data['foto']);
-            $resultado->execute();
+            // =========================================================
+            // 3. LÓGICA EXTRA PARA PROVEEDORES (Docs + Categorías)
+            // =========================================================
+            if ($data['rol'] === 'proveedor') {
+                // Obtenemos el ID generado en la tabla 'proveedores' (que es distinto al usuario_id)
+                $proveedor_id = $this->conexion->lastInsertId();
 
-            // Si el rol es proveedor, insertar en documentos_proveedor los archivos subidos
-            if ($data['rol'] === 'proveedor' && !empty($data['documentos']) && is_array($data['documentos'])) {
-                // Primero necesitamos obtener el ID del proveedor (tabla proveedores) que acabamos de insertar
-                // La tabla proveedores tiene su propio id autoincrement, y tiene usuario_id = $usuario_id
-                // Podemos obtener proveedor_id consultando la tabla proveedores por usuario_id
-                $stmtProv = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :usuario_id LIMIT 1");
-                $stmtProv->bindParam(':usuario_id', $usuario_id);
-                $stmtProv->execute();
-                $proveedor_row = $stmtProv->fetch(PDO::FETCH_ASSOC);
+                // A. Guardar Documentos
+                if (!empty($data['documentos'])) {
+                    $sqlDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado) 
+                            VALUES (:pid, :tipo, :archivo, 'pendiente')";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
 
-                if (!$proveedor_row) {
-                    // Si por alguna razón no existe, hacemos rollback y error
-                    throw new Exception("No se encontró el registro en proveedores para usuario_id {$usuario_id}");
+                    foreach ($data['documentos'] as $doc) {
+                        $stmtDoc->execute([
+                            ':pid'     => $proveedor_id,
+                            ':tipo'    => $doc['tipo'],
+                            ':archivo' => $doc['archivo']
+                        ]);
+                    }
                 }
 
-                $proveedor_id = $proveedor_row['id'];
+                // B. Guardar Categorías (Dinámicas)
+                if (!empty($data['categorias'])) {
+                    // Preparar consultas para reutilizar dentro del bucle
+                    $sqlCheckCat  = "SELECT id FROM categorias WHERE nombre = :nombre LIMIT 1";
+                    $sqlInsertCat = "INSERT INTO categorias (nombre) VALUES (:nombre)";
+                    $sqlRelacion  = "INSERT INTO proveedor_categorias (proveedor_id, categoria_id) VALUES (:pid, :cid)";
 
-                // Insertar cada documento en documentos_proveedor
-                $insertDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado, fecha_subida) VALUES (:proveedor_id, :tipo_documento, :archivo, 'pendiente', NOW())";
-                $stmtDoc = $this->conexion->prepare($insertDoc);
+                    $stmtCheck = $this->conexion->prepare($sqlCheckCat);
+                    $stmtInCat = $this->conexion->prepare($sqlInsertCat);
+                    $stmtRel   = $this->conexion->prepare($sqlRelacion);
 
-                foreach ($data['documentos'] as $key => $doc) {
-                    // $doc = ['tipo' => 'dni'|'otro'|'certificado', 'archivo' => 'nombre.ext']
-                    if (!isset($doc['tipo']) || !isset($doc['archivo'])) continue;
+                    foreach ($data['categorias'] as $nombreCat) {
+                        $nombreCat = trim($nombreCat);
+                        if(empty($nombreCat)) continue;
 
-                    $tipo = $doc['tipo'];
-                    $archivo = $doc['archivo'];
+                        // 1. Verificar si existe
+                        $stmtCheck->execute([':nombre' => $nombreCat]);
+                        $catId = $stmtCheck->fetchColumn();
 
-                    $stmtDoc->bindParam(':proveedor_id', $proveedor_id);
-                    $stmtDoc->bindParam(':tipo_documento', $tipo);
-                    $stmtDoc->bindParam(':archivo', $archivo);
-                    $stmtDoc->execute();
+                        // 2. Si no existe, crearla
+                        if (!$catId) {
+                            $stmtInCat->execute([':nombre' => $nombreCat]);
+                            $catId = $this->conexion->lastInsertId();
+                        }
+
+                        // 3. Crear relación (usamos try/catch por si se duplica)
+                        try {
+                            $stmtRel->execute([
+                                ':pid' => $proveedor_id, 
+                                ':cid' => $catId
+                            ]);
+                        } catch (PDOException $e) {
+                            // Si ya existe la relación, continuamos silenciosamente
+                        }
+                    }
                 }
             }
 
             $this->conexion->commit();
             return true;
+
         } catch (PDOException $e) {
             $this->conexion->rollBack();
-            error_log("Error en Usuario::registrar->" . $e->getMessage());
+            error_log("Error BD en registrar: " . $e->getMessage());
             return false;
         } catch (Exception $e) {
             $this->conexion->rollBack();
-            error_log("Error en Usuario::registrar->" . $e->getMessage());
+            error_log("Error General en registrar: " . $e->getMessage());
             return false;
         }
     }
