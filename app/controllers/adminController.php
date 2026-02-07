@@ -48,7 +48,7 @@ switch ($method) {
 
 function registrarUsuario()
 {
-    // Capturamos en variables los datos desde el formulario a traves del metodo post y los name de los campos
+    // 1. Captura de Datos Básicos
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
     $documento = $_POST['documento'] ?? '';
@@ -58,105 +58,86 @@ function registrarUsuario()
     $ubicacion = $_POST['ubicacion'] ?? '';
     $rol = $_POST['rol'] ?? '';
 
-    // 🔑 LÓGICA DE CLAVE TEMPORAL
+    // Lógica de clave temporal (si no hay clave, usa el documento)
     $clave_final = !empty($clave) ? $clave : $documento;
 
-    // Validamos los campos obligatorios
+    // Validación básica
     if (empty($nombres) || empty($apellidos) || empty($documento) || empty($email) || empty($clave_final) || empty($telefono) || empty($ubicacion) || empty($rol)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios');
         exit();
     }
 
-    // ---------------------------
-    // FOTO PERFIL (igual que antes)
-    // ---------------------------
-    $ruta_img = null;
+    // 2. Foto de Perfil
+    $ruta_img = "default_user.png";
     if (!empty($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         $file = $_FILES['foto'];
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $permitidas_img = ['png', 'jpg', 'jpeg'];
+
         if (!in_array($extension, $permitidas_img)) {
-            mostrarSweetAlert('error', 'Extension no permitida', 'Por favor, cargue una imagen (png/jpg/jpeg).');
+            mostrarSweetAlert('error', 'Formato inválido', 'La foto debe ser PNG, JPG o JPEG.');
             exit();
         }
-        if ($file['size'] > 2 * 1024 * 1024) {
-            mostrarSweetAlert('error', 'Error al cargar la foto ', 'El peso de la foto supera el limite de 2MB');
-            exit();
-        }
-        $ruta_img = uniqid('usuario_') . '.' . $extension;
+
+        $ruta_img = uniqid('perfil_') . '.' . $extension;
         $destino_img = BASE_PATH . "/public/uploads/usuarios/" . $ruta_img;
-        // crear carpeta si no existe
+
         if (!is_dir(dirname($destino_img))) mkdir(dirname($destino_img), 0755, true);
         move_uploaded_file($file['tmp_name'], $destino_img);
-    } else {
-        $ruta_img = "default_user.png";
     }
 
-    // ---------------------------
-    // DOCUMENTOS PROVEEDOR (solo si rol = proveedor)
-    // ---------------------------
-    $documentos_guardados = []; // asociativo: tipo_documento => nombreArchivo
+    // ---------------------------------------------------------
+    // 3. LÓGICA ESPECÍFICA DE PROVEEDOR (Categorías y Docs)
+    // ---------------------------------------------------------
+    $datos_proveedor = [
+        'categorias' => [],
+        'documentos' => []
+    ];
 
     if ($rol === 'proveedor') {
-        // Mapeo formulario => tipo_documento
-        $mapeo = [
-            'doc-cedula' => 'dni',
-            'doc-foto' => 'otro',
-            'doc-antecedentes' => 'otro',
-            'doc-certificado' => 'certificado'
+
+        // A. Procesar Categorías (String "Cat1,Cat2" -> Array)
+        if (!empty($_POST['lista_categorias'])) {
+            $datos_proveedor['categorias'] = explode(',', $_POST['lista_categorias']);
+        }
+
+        // 🔥 NUEVA VALIDACIÓN: Mínimo 3 categorías
+        if (count($datos_proveedor['categorias']) < 3) {
+            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 3 categorías de servicio.');
+            exit(); // Detiene todo
+        }
+
+        // B. Procesar Documentos
+        // Mapeamos el 'name' del input HTML al 'tipo' que guardaremos en BD
+        $mapeo_docs = [
+            'doc-cedula'       => 'cedula',
+            'doc-foto'         => 'selfie',
+            'doc-antecedentes' => 'antecedentes',
+            'doc-certificado'  => 'certificado' // Opcional
         ];
 
-        // Carpeta destino
-        $ruta_base_docs = BASE_PATH . '/public/uploads/proveedores/documentos_proveedores/';
+        $ruta_base_docs = BASE_PATH . '/public/uploads/documentos/';
         if (!is_dir($ruta_base_docs)) mkdir($ruta_base_docs, 0755, true);
 
-        // Validaciones generales
-        $permitidas_docs = ['pdf', 'png', 'jpg', 'jpeg'];
-        $max_size = 5 * 1024 * 1024; // 5MB
-
-        foreach ($mapeo as $input_name => $tipo_doc) {
+        foreach ($mapeo_docs as $input_name => $tipo_bd) {
             if (!empty($_FILES[$input_name]) && $_FILES[$input_name]['error'] === UPLOAD_ERR_OK) {
+
                 $file = $_FILES[$input_name];
                 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-                if (!in_array($ext, $permitidas_docs)) {
-                    mostrarSweetAlert('error', 'Extension no permitida', "Archivo {$file['name']} no tiene una extension permitida (pdf/png/jpg/jpeg).");
+                // Validaciones de archivo
+                if (!in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
+                    mostrarSweetAlert('error', 'Archivo inválido', "El documento $tipo_bd debe ser PDF o Imagen.");
                     exit();
                 }
 
-                if ($file['size'] > $max_size) {
-                    mostrarSweetAlert('error', 'Archivo demasiado grande', "El archivo {$file['name']} supera el limite de 5MB.");
-                    exit();
-                }
+                // Generar nombre único: tipo_timestamp_random.ext
+                $nombre_archivo = $tipo_bd . '_' . time() . '_' . uniqid() . '.' . $ext;
 
-                // nombre único
-                // usar el input name como prefijo para identificación
-                $nombre_archivo = $input_name . '_' . uniqid() . '.' . $ext;
-                $destino = $ruta_base_docs . $nombre_archivo;
-
-                if (!move_uploaded_file($file['tmp_name'], $destino)) {
-                    mostrarSweetAlert('error', 'Error al subir', "No se pudo guardar el archivo {$file['name']}.");
-                    exit();
-                }
-
-                // Guardamos en array: tipo_documento => archivo
-                // Si mapeo produce 'otro' varias veces, garantizamos que cada input sea guardado con su propio registro.
-                // Usaremos un sufijo incremental para claves 'otro' si ya existen
-                if ($tipo_doc === 'otro') {
-                    // buscamos el siguiente index para 'otro'
-                    $i = 1;
-                    $key = $tipo_doc;
-                    while (isset($documentos_guardados[$key . ($i > 1 ? $i : '')])) {
-                        $i++;
-                    }
-                    $final_key = $key . ($i > 1 ? $i : '');
-                    $documentos_guardados[$final_key] = [
-                        'tipo' => $tipo_doc,
-                        'archivo' => $nombre_archivo
-                    ];
-                } else {
-                    $documentos_guardados[$tipo_doc] = [
-                        'tipo' => $tipo_doc,
+                if (move_uploaded_file($file['tmp_name'], $ruta_base_docs . $nombre_archivo)) {
+                    // Agregamos al array para enviar al modelo
+                    $datos_proveedor['documentos'][] = [
+                        'tipo' => $tipo_bd,
                         'archivo' => $nombre_archivo
                     ];
                 }
@@ -164,38 +145,37 @@ function registrarUsuario()
         }
     }
 
-    // ---------------------------
-    // Preparar data y llamar al modelo
-    // ---------------------------
+    // 4. Preparar Data Final
     $objUsuario = new Usuario();
 
-    // Estado: proveedor queda pendiente (0), demás 1
-    $estado_usuario = ($rol === 'proveedor') ? 0 : 1;
+    // Estado: Proveedor (0/Pendiente) - Otros (1/Activo)
+    // Ajusta según los IDs de tu tabla usuario_estados (ej: 1=pendiente, 2=activo)
+    $estado_usuario = ($rol === 'proveedor') ? 1 : 2;
 
     $data = [
-        'nombres'   => $nombres,
-        'apellidos' => $apellidos,
-        'documento' => $documento,
-        'email'     => $email,
-        'clave'     => $clave_final,
-        'telefono'  => $telefono,
-        'ubicacion' => $ubicacion,
-        'rol'       => $rol,
-        'foto'      => $ruta_img,
-        'estado'    => $estado_usuario,
-        // documentos: array asociativo (puede contener multiples 'otro' como 'otro','otro2', etc)
-        'documentos' => $documentos_guardados
+        'nombres'    => $nombres,
+        'apellidos'  => $apellidos,
+        'documento'  => $documento,
+        'email'      => $email,
+        'clave'      => $clave_final,
+        'telefono'   => $telefono,
+        'ubicacion'  => $ubicacion,
+        'rol'        => $rol,
+        'foto'       => $ruta_img,
+        'estado'     => $estado_usuario,
+        // Datos extra para el modelo
+        'categorias' => $datos_proveedor['categorias'],
+        'documentos' => $datos_proveedor['documentos']
     ];
 
-    // Llamada al modelo
+    // 5. Guardar en BD
     $resultado = $objUsuario->registrar($data);
 
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Registro de usuario exitoso', 'Se ha creado un nuevo usuario', '/ProviServers/admin/registrar-usuario');
+        mostrarSweetAlert('success', '¡Registro Exitoso!', 'El usuario ha sido creado correctamente.', '/ProviServers/admin/consultar-usuarios');
     } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo registrar el usuario. Intenta nuevamente o verifica si el documento/email ya existe.');
+        mostrarSweetAlert('error', 'Error', 'No se pudo registrar. Verifica si el correo o documento ya existen.');
     }
-
     exit();
 }
 
