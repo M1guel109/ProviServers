@@ -317,3 +317,31 @@ function eliminarUsuario($id)
         mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo registrar el usuario. Intenta nuevamente');
     }
 }
+
+// Función para devolver detalle de usuario vía AJAX
+function obtenerDetalleUsuarioAjax() {
+    // Verificar que sea una petición AJAX y tenga ID
+    if (!isset($_GET['id'])) {
+        echo json_encode(['error' => 'ID no proporcionado']);
+        exit;
+    }
+
+    $id = intval($_GET['id']);
+    $usuarioModel = new Usuario(); // Asumiendo que tienes instanciado tu modelo
+    
+    // Obtener datos básicos
+    // Necesitas un método en tu modelo que traiga TODO por ID
+    // Ejemplo: $datos = $usuarioModel->obtenerUsuarioCompleto($id);
+    
+    // COMO NO TENGO TU MODELO COMPLETO, SIMULARÉ LA ESTRUCTURA QUE DEBES RETORNAR:
+    // Debes crear en tu modelo una función que haga JOIN con proveedores/clientes, categorias y documentos.
+    
+    $datos = $usuarioModel->obtenerDetalleCompleto($id); 
+
+    if ($datos) {
+        echo json_encode($datos);
+    } else {
+        echo json_encode(['error' => 'Usuario no encontrado']);
+    }
+    exit;
+}

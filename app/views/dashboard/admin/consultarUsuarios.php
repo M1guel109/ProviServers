@@ -148,9 +148,14 @@ $datos = mostrarUsuarios();
                                             <!-- Uso de las clases personalizadas para los botones -->
                                             <div class="action-buttons">
                                                 <!-- Botón para ver detalle del servicio (Revisar) -->
-                                                <a href="#" class="btn-action btn-view" title="Revisar detalles">
+                                                <button type="button"
+                                                    class="btn-action btn-view"
+                                                    title="Revisar detalles"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#modalDetalleUsuario"
+                                                    onclick="cargarDetalleUsuario(<?= $usuario['id'] ?>)">
                                                     <i class="bi bi-eye"></i>
-                                                </a>
+                                                </button>
 
                                                 <a href="<?= BASE_URL ?>/admin/editar-usuario?id=<?= $usuario['id'] ?>" class="btn-action btn-edit" title="Editar usuario">
                                                     <i class="bi bi-pencil-square"></i>
@@ -237,6 +242,84 @@ $datos = mostrarUsuarios();
         </section>
 
     </main>
+    <div class="modal fade" id="modalDetalleUsuario" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalDetalleLabel">
+                        <i class="bi bi-person-lines-fill me-2"></i>Detalle del Usuario
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <div id="loader-detalle" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <div id="contenido-detalle" class="d-none">
+
+                        <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                            <div class="position-relative">
+                                <img id="modal-foto" src="" alt="Foto" class="rounded-circle border border-3 border-white shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                                <span id="modal-estado-badge" class="position-absolute bottom-0 start-100 translate-middle p-2 border border-light rounded-circle bg-success">
+                                    <span class="visually-hidden">Estado</span>
+                                </span>
+                            </div>
+                            <div class="ms-4">
+                                <h3 id="modal-nombre" class="mb-0 fw-bold text-dark"></h3>
+                                <p id="modal-rol" class="text-muted mb-0 text-uppercase small fw-bold"></p>
+                                <small id="modal-id" class="text-muted fst-italic"></small>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-envelope-at me-2"></i>Contacto</h6>
+                                    <p class="mb-1"><strong>Email:</strong> <span id="modal-email"></span></p>
+                                    <p class="mb-1"><strong>Teléfono:</strong> <span id="modal-telefono"></span></p>
+                                    <p class="mb-0"><strong>Ubicación:</strong> <span id="modal-ubicacion"></span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <h6 class="text-primary fw-bold mb-3"><i class="bi bi-shield-lock me-2"></i>Cuenta</h6>
+                                    <p class="mb-1"><strong>Documento:</strong> <span id="modal-documento"></span></p>
+                                    <p class="mb-1"><strong>Estado:</strong> <span id="modal-estado-texto"></span></p>
+                                    <p class="mb-0"><strong>Registrado:</strong> <span id="modal-fecha"></span></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="seccion-proveedor" class="mt-4 d-none">
+                            <h6 class="border-bottom pb-2 mb-3 fw-bold text-dark">Información de Proveedor</h6>
+
+                            <div class="mb-3">
+                                <p class="fw-bold mb-2 small text-uppercase text-muted">Categorías / Habilidades:</p>
+                                <div id="modal-categorias" class="d-flex flex-wrap gap-2">
+                                </div>
+                            </div>
+
+                            <div>
+                                <p class="fw-bold mb-2 small text-uppercase text-muted">Documentos Adjuntos:</p>
+                                <div id="modal-documentos" class="list-group list-group-flush border rounded">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 
@@ -265,8 +348,12 @@ $datos = mostrarUsuarios();
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
+     <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/detalleUsuario.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
+    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script> -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 

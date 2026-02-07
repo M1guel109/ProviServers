@@ -136,43 +136,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    const currentUrl = window.location.href;
-    const sidebarLinks = document.querySelectorAll(".sidebar a");
+// document.addEventListener("DOMContentLoaded", () => {
+//     const currentUrl = window.location.href;
+//     const sidebarLinks = document.querySelectorAll(".sidebar a");
 
-    // 1. Limpiar estados previos
-    sidebarLinks.forEach(link => {
-        link.classList.remove("active");
-    });
+//     // 1. Limpiar estados previos
+//     sidebarLinks.forEach(link => {
+//         link.classList.remove("active");
+//     });
 
-    // 2. Identificar el enlace activo
-    sidebarLinks.forEach(link => {
-        const linkHref = link.href;
+//     // 2. Identificar el enlace activo
+//     sidebarLinks.forEach(link => {
+//         const linkHref = link.href;
 
-        // Verificamos si la URL actual termina con el href o es exactamente igual
-        // (Evitamos marcar "/" si estamos en "/admin/dashboard")
-        if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
-            link.classList.add("active");
+//         // Verificamos si la URL actual termina con el href o es exactamente igual
+//         // (Evitamos marcar "/" si estamos en "/admin/dashboard")
+//         if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
+//             link.classList.add("active");
 
-            // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
-            const parentSubmenu = link.closest(".submenu");
-            if (parentSubmenu) {
-                // Mostramos el submenú (el <ul>)
-                parentSubmenu.style.display = "block";
+//             // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
+//             const parentSubmenu = link.closest(".submenu");
+//             if (parentSubmenu) {
+//                 // Mostramos el submenú (el <ul>)
+//                 parentSubmenu.style.display = "block";
                 
-                // Marcamos el contenedor padre (el <li> con clase has-submenu)
-                const parentLi = parentSubmenu.closest(".has-submenu");
-                if (parentLi) {
-                    parentLi.classList.add("active"); // Opcional: estilo para el padre
+//                 // Marcamos el contenedor padre (el <li> con clase has-submenu)
+//                 const parentLi = parentSubmenu.closest(".has-submenu");
+//                 if (parentLi) {
+//                     parentLi.classList.add("active"); // Opcional: estilo para el padre
                     
-                    // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
-                    const icon = parentLi.querySelector(".toggle-icon");
-                    if (icon) {
-                        icon.style.transform = "rotate(180deg)";
-                    }
-                }
-            }
-        }
-    });
+//                     // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
+//                     const icon = parentLi.querySelector(".toggle-icon");
+//                     if (icon) {
+//                         icon.style.transform = "rotate(180deg)";
+//                     }
+//                 }
+//             }
+//         }
+//     });
 
-});
+// });
