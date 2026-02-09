@@ -240,67 +240,161 @@ class Usuario
 
     public function actualizar($data)
     {
-
-        $this->conexion->beginTransaction();
-
-
-        // 1. Determinar la tabla de detalle según el rol
-        $tabla_detalle = '';
-        switch ($data['rol']) {
-            case 'cliente':
-                $tabla_detalle = 'clientes';
-                break;
-            case 'proveedor':
-                $tabla_detalle = 'proveedores';
-                break;
-            case 'admin':
-                $tabla_detalle = 'admins';
-                break;
-            default:
-                error_log("Error: Rol de usuario inválido ({$data['rol']}).");
-                return false;
-        }
-
         try {
-            // A. Actualización de la tabla base 'usuarios' (solo campos esenciales)
-            $actualizar = "UPDATE usuarios 
-                             SET email = :email,
-                             documento = :documento,
-                              rol = :rol,
-                              estado_id = :estado_id 
-                             WHERE id = :id";
+            $this->conexion->beginTransaction();
 
-            $resultado = $this->conexion->prepare($actualizar);
-            $resultado->bindParam(':id', $data['id']);
-            $resultado->bindParam(':email', $data['email']);
-            $resultado->bindParam(':documento', $data['documento']);
-            $resultado->bindParam(':rol', $data['rol']);
-            $resultado->bindParam(':estado_id', $data['estado']);
+            // ---------------------------------------------------------
+            // 1. DETECTAR CAMBIO DE ROL (Vital para migrar datos)
+            // ---------------------------------------------------------
+            // Buscamos qué rol tenía antes de este cambio
+            $stmtActual = $this->conexion->prepare("SELECT rol FROM usuarios WHERE id = :id");
+            $stmtActual->execute([':id' => $data['id']]);
+            $usuarioDb = $stmtActual->fetch(PDO::FETCH_ASSOC);
+            $rolAnterior = $usuarioDb['rol'];
 
-            $resultado->execute();
+            // ---------------------------------------------------------
+            // 2. ACTUALIZAR TABLA USUARIOS (Login)
+            // ---------------------------------------------------------
+            // Construimos la consulta dinámica (solo actualizamos clave si trajo una nueva)
+            $sqlUser = "UPDATE usuarios SET email = :email, documento = :doc, rol = :rol, estado_id = :estado";
+            if (!empty($data['clave'])) {
+                $sqlUser .= ", clave = :clave";
+            }
+            $sqlUser .= " WHERE id = :id";
 
-            // B. Actualización de la tabla de detalle (clientes/proveedores/admins)
-            // Se asume que el ID de la tabla de detalle es 'usuario_id'
-            $actualizar = "UPDATE {$tabla_detalle} 
-                            SET nombres = :nombres, apellidos = :apellidos, telefono = :telefono, ubicacion = :ubicacion ,foto = :foto
-                            WHERE usuario_id = :usuario_id";
+            $stmtUser = $this->conexion->prepare($sqlUser);
+            
+            $paramsUser = [
+                ':email'  => $data['email'],
+                ':doc'    => $data['documento'],
+                ':rol'    => $data['rol'],
+                ':estado' => $data['estado'], // ID numérico (1, 2...)
+                ':id'     => $data['id']
+            ];
+            
+            // Si hay nueva clave, la encriptamos
+            if (!empty($data['clave'])) {
+                $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
+            }
+            
+            $stmtUser->execute($paramsUser);
 
-            $resultado = $this->conexion->prepare($actualizar);
-            $resultado->bindParam(':usuario_id', $data['id']);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':ubicacion', $data['ubicacion']);
-            $resultado->bindParam(':foto', $data['foto_perfil']);
+            // ---------------------------------------------------------
+            // 3. GESTIÓN DE PERFILES (Cliente / Proveedor / Admin)
+            // ---------------------------------------------------------
+            
+            // CASO A: El rol NO cambió (Actualización normal)
+            if ($rolAnterior === $data['rol']) {
+                $tabla = $this->getTablaDetalle($data['rol']);
+                
+                $sqlPerfil = "UPDATE {$tabla} SET 
+                            nombres = :nom, apellidos = :ape, telefono = :tel, 
+                            ubicacion = :ubi, foto = :foto 
+                            WHERE usuario_id = :uid";
+                
+                $stmtPerfil = $this->conexion->prepare($sqlPerfil);
+                $stmtPerfil->execute([
+                    ':nom'  => $data['nombres'],
+                    ':ape'  => $data['apellidos'],
+                    ':tel'  => $data['telefono'],
+                    ':ubi'  => $data['ubicacion'],
+                    ':foto' => $data['foto_perfil'],
+                    ':uid'  => $data['id']
+                ]);
+            } 
+            // CASO B: El rol CAMBIÓ (Migración de datos)
+            else {
+                // 1. Borramos el perfil en la tabla vieja
+                $tablaVieja = $this->getTablaDetalle($rolAnterior);
+                $stmtDel = $this->conexion->prepare("DELETE FROM {$tablaVieja} WHERE usuario_id = :uid");
+                $stmtDel->execute([':uid' => $data['id']]);
 
+                // 2. Creamos el perfil en la tabla nueva
+                $tablaNueva = $this->getTablaDetalle($data['rol']);
+                $sqlIns = "INSERT INTO {$tablaNueva} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) 
+                        VALUES (:uid, :nom, :ape, :tel, :ubi, :foto)";
+                
+                $stmtIns = $this->conexion->prepare($sqlIns);
+                $stmtIns->execute([
+                    ':uid'  => $data['id'],
+                    ':nom'  => $data['nombres'],
+                    ':ape'  => $data['apellidos'],
+                    ':tel'  => $data['telefono'],
+                    ':ubi'  => $data['ubicacion'],
+                    ':foto' => $data['foto_perfil']
+                ]);
+            }
 
-            $resultado->execute();
+            // ---------------------------------------------------------
+            // 4. LÓGICA PROVEEDOR (Categorías y Documentos)
+            // ---------------------------------------------------------
+            if ($data['rol'] === 'proveedor') {
+                
+                // Necesitamos el ID de la tabla 'proveedores' (no el usuario_id)
+                $stmtPid = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid");
+                $stmtPid->execute([':uid' => $data['id']]);
+                $proveedor_id = $stmtPid->fetchColumn();
 
-            // 2. Si ambas consultas fueron exitosas, hacemos commit
+                // A. ACTUALIZAR CATEGORÍAS
+                // Estrategia: Borrar todas las relaciones viejas e insertar las nuevas (Sincronización limpia)
+                if (isset($data['categorias'])) {
+                    $stmtDelCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
+                    $stmtDelCat->execute([':pid' => $proveedor_id]);
+
+                    if (!empty($data['categorias'])) {
+                        // Queries preparadas para el bucle
+                        $sqlCheck = "SELECT id FROM categorias WHERE nombre = :nom LIMIT 1";
+                        $sqlInsCat = "INSERT INTO categorias (nombre) VALUES (:nom)";
+                        $sqlRel = "INSERT INTO proveedor_categorias (proveedor_id, categoria_id) VALUES (:pid, :cid)";
+                        
+                        $stmtCheck = $this->conexion->prepare($sqlCheck);
+                        $stmtInsCat = $this->conexion->prepare($sqlInsCat);
+                        $stmtRel = $this->conexion->prepare($sqlRel);
+
+                        foreach ($data['categorias'] as $catNombre) {
+                            $catNombre = trim($catNombre);
+                            if(empty($catNombre)) continue;
+
+                            // 1. Verificar/Crear Categoría
+                            $stmtCheck->execute([':nom' => $catNombre]);
+                            $catId = $stmtCheck->fetchColumn();
+
+                            if (!$catId) {
+                                $stmtInsCat->execute([':nom' => $catNombre]);
+                                $catId = $this->conexion->lastInsertId();
+                            }
+
+                            // 2. Crear Relación
+                            try {
+                                $stmtRel->execute([':pid' => $proveedor_id, ':cid' => $catId]);
+                            } catch (PDOException $e) { /* Ignorar si ya existe */ }
+                        }
+                    }
+                }
+
+                // B. INSERTAR NUEVOS DOCUMENTOS (Solo los nuevos)
+                // No borramos los viejos para no perder historial
+                if (!empty($data['documentos_nuevos'])) {
+                    $sqlDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado) 
+                            VALUES (:pid, :tipo, :archivo, 'pendiente')";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
+
+                    foreach ($data['documentos_nuevos'] as $doc) {
+                        $stmtDoc->execute([
+                            ':pid'     => $proveedor_id,
+                            ':tipo'    => $doc['tipo'],
+                            ':archivo' => $doc['archivo']
+                        ]);
+                    }
+                }
+            }
+
             $this->conexion->commit();
             return true;
+
         } catch (PDOException $e) {
-            error_log("Error en Usuario::actualizarDetallesUsuario -> " . $e->getMessage());
+            $this->conexion->rollBack();
+            error_log("Error en Usuario::actualizar -> " . $e->getMessage());
             return false;
         }
     }
