@@ -201,7 +201,7 @@ function mostrarUsuarioId($id)
 
 function actualizarUsuario()
 {
-    // Capturamos en variables los datos desde el formulario a traves del metodo post y los name de los campos
+    // 1. Capturar Datos Básicos del Formulario
     $id = $_POST['id'] ?? '';
     $nombres = $_POST['nombres'] ?? '';
     $apellidos = $_POST['apellidos'] ?? '';
@@ -211,98 +211,151 @@ function actualizarUsuario()
     $ubicacion = $_POST['ubicacion'] ?? '';
     $rol = $_POST['rol'] ?? '';
     $nuevo_estado = $_POST['estado'] ?? '';
+    
+    // Contraseña (Opcional - solo se envía si el usuario escribió algo)
+    $nueva_clave = $_POST['clave'] ?? '';
 
-    // Datos de la foto (campo oculto y archivo subido)
-    $foto_perfil_actual = $_POST['foto_perfil_actual'] ?? ''; // La foto que ya estaba en la DB
-    $archivo_nuevo = $_FILES['foto_perfil'] ?? null;
-
-    // Validamos lo campos que son obligatorios
+    // Validar campos obligatorios
     if (empty($id) || empty($nombres) || empty($apellidos) || empty($documento) || empty($email) || empty($telefono) || empty($ubicacion) || empty($rol) || empty($nuevo_estado)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
         exit();
     }
 
+    // ---------------------------------------------------------
+    // 2. GESTIÓN DE FOTO DE PERFIL (Avatar)
+    // ---------------------------------------------------------
+    $foto_perfil_actual = $_POST['foto_actual'] ?? ''; 
+    $foto_para_db = $foto_perfil_actual;
+    $archivo_nuevo = $_FILES['foto'] ?? null;
+    
+    $ruta_destino_perfil = BASE_PATH . '/public/uploads/usuarios/';
 
-    // 3. LÓGICA DE GESTIÓN DE LA FOTO 📸
-    // ----------------------------------------------------
-    $foto_para_db = $foto_perfil_actual; // Por defecto, usamos el nombre de la foto actual
-
-    // Ruta donde se guardan las imágenes (IMPORTANTE: BASE_PATH debe estar definido)
-    $ruta_destino = BASE_PATH . '/public/uploads/usuarios/';
-
-    // Verificar si se subió un nuevo archivo sin errores
     if ($archivo_nuevo && $archivo_nuevo['error'] === UPLOAD_ERR_OK) {
-
-        // Generar un nombre único para el nuevo archivo
-        $extension = pathinfo($archivo_nuevo['name'], PATHINFO_EXTENSION);
-        $nombre_archivo_nuevo = uniqid('user_') . '.' . $extension;
-
-        // Intentar mover el archivo subido
-        if (move_uploaded_file($archivo_nuevo['tmp_name'], $ruta_destino . $nombre_archivo_nuevo)) {
-
-            // Éxito: asignamos la nueva ruta y eliminamos la antigua
-            $foto_para_db = $nombre_archivo_nuevo;
-
-            // Eliminar la foto antigua del servidor (si existe y no es la por defecto/vacía)
-            if (!empty($foto_perfil_actual) && file_exists($ruta_destino . $foto_perfil_actual)) {
-                unlink($ruta_destino . $foto_perfil_actual);
+        $ext = strtolower(pathinfo($archivo_nuevo['name'], PATHINFO_EXTENSION));
+        
+        if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp'])) {
+            $nombre_archivo_nuevo = uniqid('user_') . '.' . $ext;
+            
+            if (move_uploaded_file($archivo_nuevo['tmp_name'], $ruta_destino_perfil . $nombre_archivo_nuevo)) {
+                $foto_para_db = $nombre_archivo_nuevo;
+                
+                // Borrar foto vieja si existe y no es la default
+                if (!empty($foto_perfil_actual) && $foto_perfil_actual !== 'default_user.png' && file_exists($ruta_destino_perfil . $foto_perfil_actual)) {
+                    unlink($ruta_destino_perfil . $foto_perfil_actual);
+                }
             }
         } else {
-            // Error al mover el archivo
-            mostrarSweetAlert('error', 'Error de Subida', 'Hubo un problema al guardar la nueva foto.');
+            mostrarSweetAlert('error', 'Formato inválido', 'La foto de perfil debe ser PNG, JPG o JPEG.');
             exit();
         }
     }
-    // Si no hay archivo nuevo, $foto_para_db mantiene el valor de $foto_perfil_actual.
 
+    // ---------------------------------------------------------
+    // 3. LÓGICA ESPECIAL PARA PROVEEDOR (Categorías + Docs)
+    // ---------------------------------------------------------
+    // Inicializamos arrays vacíos para evitar errores en el modelo
+    $lista_categorias = [];
+    $documentos_nuevos = [];
+
+    if ($rol === 'proveedor') {
+        
+        // A. Procesar Categorías (String "Cat1,Cat2" -> Array)
+        if (!empty($_POST['lista_categorias'])) {
+            $lista_categorias = explode(',', $_POST['lista_categorias']);
+        }
+
+        // Validación: Si es proveedor, debe tener al menos 3 categorías (incluso al editar)
+        if (count($lista_categorias) < 3) {
+            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 3 categorías.');
+            exit();
+        }
+
+        // B. Procesar Documentos Nuevos (Cédula, Antecedentes, etc.)
+        // Solo procesamos los que se hayan subido en este formulario
+        $mapeo_docs = [
+            'doc-cedula'       => 'cedula',
+            'doc-antecedentes' => 'antecedentes',
+            'doc-foto'         => 'selfie',
+            'doc-certificado'  => 'certificado'
+        ];
+
+        $ruta_docs = BASE_PATH . '/public/uploads/documentos/';
+        if (!is_dir($ruta_docs)) mkdir($ruta_docs, 0755, true);
+
+        foreach ($mapeo_docs as $input_name => $tipo_bd) {
+            if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] === UPLOAD_ERR_OK) {
+                
+                $file = $_FILES[$input_name];
+                $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                
+                // Validar extensión
+                if (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
+                    // Nombre único: tipo_timestamp_random.ext
+                    $nombre_doc = $tipo_bd . '_' . time() . '_' . uniqid() . '.' . $ext;
+                    
+                    if (move_uploaded_file($file['tmp_name'], $ruta_docs . $nombre_doc)) {
+                        $documentos_nuevos[] = [
+                            'tipo'    => $tipo_bd,
+                            'archivo' => $nombre_doc
+                        ];
+                    }
+                } else {
+                    mostrarSweetAlert('error', 'Archivo inválido', "El documento $tipo_bd debe ser PDF o Imagen.");
+                    exit();
+                }
+            }
+        }
+    }
+
+    // ---------------------------------------------------------
+    // 4. PREPARAR DATOS Y LLAMAR AL MODELO
+    // ---------------------------------------------------------
     $objUsuario = new Usuario();
-    // Obtenemos el estado anterior para saber si cambió (Para el correo)
-    $datos_anteriores = $objUsuario->mostrarId($id);
-    // protegemos el acceso
+    
+    // Obtenemos estado anterior para la notificación (Lógica existente)
+    $datos_anteriores = $objUsuario->mostrarId($id); // Asegúrate que esta función use tu nueva versión optimizada
     $estado_anterior = $datos_anteriores['estado_id'] ?? null;
 
     $data = [
-        'id' => $id,
+        'id'          => $id,
         'nombres'     => $nombres,
         'apellidos'   => $apellidos,
         'documento'   => $documento,
-        'email' => $email,
-        'telefono' => $telefono,
-        'ubicacion' => $ubicacion,
-        'rol' => $rol,
+        'email'       => $email,
+        'telefono'    => $telefono,
+        'ubicacion'   => $ubicacion,
+        'rol'         => $rol,
         'foto_perfil' => $foto_para_db,
-        'estado'      => $nuevo_estado
-        // 'id_admin' => $id_admin,
+        'estado'      => $nuevo_estado,
+        'clave'       => !empty($nueva_clave) ? $nueva_clave : null,
+        
+        // DATOS EXTRA PARA EL MODELO (Esencial para que funcione el cambio de rol)
+        'categorias'        => $lista_categorias,
+        'documentos_nuevos' => $documentos_nuevos
     ];
 
-    // Enviamos la data al metodo "registrar()" del la clase instanciada anteriormente "Usuario()" y esperamos una respuesta booleana del modelo
+    // Ejecutar actualización en BD
     $resultado = $objUsuario->actualizar($data);
 
-    // Si la respuesta del modelo es verdadera confirmamos el registro y redireccionamos ,si es falsa notificamosy redireccionamos
     if ($resultado === true) {
-        // 6. LÓGICA DE NOTIFICACIÓN POR EMAIL (Si el estado cambió)
-        // echo "<pre>";
-        // var_dump([
-        //     'rol' => $rol,
-        //     'estado_anterior' => $estado_anterior,
-        //     'nuevo_estado' => $nuevo_estado
-        // ]);
-        // exit;
-
+        
+        // 5. Notificación de Activación (Tu lógica existente)
         if (
             $estado_anterior !== null &&
             $rol === 'proveedor' &&
             (int)$estado_anterior === 1 &&   // Pendiente
             (int)$nuevo_estado === 2         // Activo
         ) {
-            enviarCorreoProveedorActivado($email, $nombres);
+            if(function_exists('enviarCorreoProveedorActivado')) {
+                enviarCorreoProveedorActivado($email, $nombres);
+            }
         }
 
-        mostrarSweetAlert('success', 'Usuario actualizado con exito', 'Los datos del usuario se han actualizado correctamente.', '/ProviServers/admin/consultar-usuarios');
+        mostrarSweetAlert('success', 'Actualización exitosa', 'El usuario ha sido modificado correctamente.', '/ProviServers/admin/consultar-usuarios');
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el usuario. Intenta nuevamente');
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la base de datos. Intenta nuevamente.');
     }
-
+    
     exit();
 }
 
