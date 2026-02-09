@@ -235,7 +235,7 @@ switch ($request) {
 
 
     case '/proveedor/nuevas_solicitudes':
-        require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
+        require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
         break;
 
 

@@ -2,57 +2,6 @@
 // 1. Seguridad de Sesión
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
-// 2. DATOS DE PRUEBA (Borrar cuando tengas el controlador real)
-// if (!isset($necesidades)) {
-//     $necesidades = [
-//         [
-//             'id' => 1,
-//             'titulo' => 'Reparación de fuga en baño principal',
-//             'descripcion' => 'Tengo una fuga constante en la llave del lavamanos y necesito cambiar el empaque o la llave completa. Es urgente.',
-//             'ciudad' => 'Bogotá',
-//             'zona' => 'Chapinero',
-//             'presupuesto' => 80000,
-//             'fecha' => '2026-02-15',
-//             'categoria' => 'Plomería',
-//             'cliente_nombre' => 'Ana María',
-//             'cliente_foto' => 'default_user.png'
-//         ],
-//         [
-//             'id' => 2,
-//             'titulo' => 'Mantenimiento de Jardín Delantero',
-//             'descripcion' => 'Necesito podar el césped, cortar unos arbustos que están muy altos y limpiar la maleza. El área es de aprox 20m2.',
-//             'ciudad' => 'Medellín',
-//             'zona' => 'El Poblado',
-//             'presupuesto' => 150000,
-//             'fecha' => '2026-02-20',
-//             'categoria' => 'Jardinería',
-//             'cliente_nombre' => 'Carlos Ruiz',
-//             'cliente_foto' => 'default_user.png'
-//         ],
-//         [
-//             'id' => 3,
-//             'titulo' => 'Clases de Guitarra para Principiante',
-//             'descripcion' => 'Busco profesor para mi hijo de 10 años. No tiene experiencia previa. Preferiblemente a domicilio los sábados.',
-//             'ciudad' => 'Cali',
-//             'zona' => 'Sur',
-//             'presupuesto' => 50000,
-//             'fecha' => '2026-02-10',
-//             'categoria' => 'Educación',
-//             'cliente_nombre' => 'Luisa F.',
-//             'cliente_foto' => 'default_user.png'
-//         ]
-//     ];
-// }
-
-// echo "<div style='background:white; padding:10px; border:1px solid red; margin-bottom:20px;'>";
-//     echo "<strong>🔍 DEBUG DE DATOS:</strong><br>";
-//     echo "Total encontradas: " . count($necesidades) . "<br>";
-//     echo "<pre>";
-//     print_r($necesidades);
-//     echo "</pre>";
-//     echo "</div>";
-
-
 ?>
 
 <!DOCTYPE html>
