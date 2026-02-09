@@ -1,9 +1,10 @@
-/* editarUsuario.js - Lógica específica para la vista de edición */
+/* editarUsuario.js - Lógica corregida */
 
 document.addEventListener('DOMContentLoaded', function () {
-    
+    console.log("Script editarUsuario.js cargado correctamente.");
+
     // =======================================================
-    // 1. PREVISUALIZACIÓN DE FOTO (Si cambia)
+    // 1. PREVISUALIZACIÓN DE FOTO
     // =======================================================
     const fotoInput = document.getElementById('foto-input');
     const fotoPreview = document.getElementById('foto-preview');
@@ -29,12 +30,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnAdd = document.getElementById('btn-add-categoria');
     const contenedorTags = document.getElementById('contenedor-tags');
 
-    // Array en memoria
     let categorias = [];
 
-    // A. Inicializar (Leer input hidden y pintar)
+    // A. Inicializar
     if (inputHidden && inputHidden.value) {
-        // Convierte "Plomeria,Luz" en ['Plomeria', 'Luz']
         const valores = inputHidden.value.split(',').filter(c => c.trim() !== '');
         categorias = valores;
         renderizarTags();
@@ -63,16 +62,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 valor = selectCat.value;
             }
 
-            if (!valor) return; // Validación vacía
+            if (!valor) return;
 
             // Validación duplicados
             if (categorias.some(c => c.toLowerCase() === valor.toLowerCase())) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Repetida',
-                    text: 'Esta categoría ya está agregada.',
-                    toast: true, position: 'top-end', timer: 2000, showConfirmButton: false
-                });
+                if(typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Repetida',
+                        text: 'Esta categoría ya está agregada.',
+                        toast: true, position: 'top-end', timer: 2000, showConfirmButton: false
+                    });
+                } else {
+                    alert('Categoría repetida');
+                }
                 return;
             }
 
@@ -89,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // D. Función Renderizar
+    // D. Función Renderizar (Local)
     function renderizarTags() {
         if(!contenedorTags) return;
         contenedorTags.innerHTML = '';
@@ -100,7 +103,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         categorias.forEach(cat => {
             const tag = document.createElement('div');
-            // Usamos las mismas clases de estilo que tenías
             tag.className = 'badge-categoria'; 
             tag.style.cssText = 'background: #e3f2fd; color: #0d47a1; padding: 5px 10px; border-radius: 20px; font-size: 0.9em; display: inline-flex; align-items: center; gap: 5px; border: 1px solid #bbdefb;';
             tag.innerHTML = `
@@ -110,26 +112,59 @@ document.addEventListener('DOMContentLoaded', function () {
             contenedorTags.appendChild(tag);
         });
 
-        // Actualizar input hidden para enviar al PHP
         if(inputHidden) inputHidden.value = categorias.join(',');
     }
 
-    // E. Función Eliminar (Global para que funcione el onclick)
+    // E. Función Eliminar (Global)
     window.eliminarCategoria = function(nombre) {
         categorias = categorias.filter(c => c !== nombre);
         renderizarTags();
     };
 
+    // =======================================================
+    // 3. LÓGICA DE CAMBIO DE ROL (MOSTRAR/OCULTAR)
+    // =======================================================
+    const rolSelect = document.getElementById('rol');
+    const camposProveedor = document.getElementById('campos-proveedor');
+
+    if (rolSelect && camposProveedor) {
+        
+        function toggleCamposProveedor() {
+            console.log("Cambio de rol detectado: " + rolSelect.value);
+            if (rolSelect.value === 'proveedor') {
+                camposProveedor.classList.remove('d-none');
+                camposProveedor.classList.add('fade-in'); 
+            } else {
+                camposProveedor.classList.add('d-none');
+                camposProveedor.classList.remove('fade-in');
+            }
+        }
+
+        rolSelect.addEventListener('change', toggleCamposProveedor);
+        
+        // Ejecutar al inicio para establecer estado correcto
+        toggleCamposProveedor();
+    } else {
+        console.warn("No se encontraron los elementos 'rol' o 'campos-proveedor'");
+    }
+
 });
 
 // =======================================================
-// 3. CAMBIAR ESTADO DE DOCUMENTO (AJAX)
+// 4. CAMBIAR ESTADO DE DOCUMENTO (FUERA DEL DOMCONTENTLOADED)
 // =======================================================
-function cambiarEstadoDoc(docId, nuevoEstado) {
+// Al estar aquí afuera, el HTML onclick="cambiarEstadoDoc(...)" sí puede verla.
+window.cambiarEstadoDoc = function(docId, nuevoEstado) {
     
-    // Título dinámico para el modal
     const accion = nuevoEstado === 'aprobado' ? 'Aprobar' : 'Rechazar';
     const color = nuevoEstado === 'aprobado' ? '#198754' : '#dc3545';
+
+    if(typeof Swal === 'undefined') {
+        if(confirm(`¿${accion} documento?`)) {
+            alert(`Simulación: Documento ${docId} ${nuevoEstado}`);
+        }
+        return;
+    }
 
     Swal.fire({
         title: `¿${accion} documento?`,
@@ -141,31 +176,12 @@ function cambiarEstadoDoc(docId, nuevoEstado) {
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            
-            // AQUÍ LLAMARÍAS A TU API REAL
-            /*
-            fetch(BASE_URL + '/admin/api/cambiar-estado-doc', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: docId, estado: nuevoEstado })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    Swal.fire('¡Listo!', 'Estado actualizado.', 'success').then(() => location.reload());
-                } else {
-                    Swal.fire('Error', 'No se pudo actualizar.', 'error');
-                }
-            });
-            */
-            
-            // Simulación mientras creas el endpoint
+            // AQUÍ IRÍA TU FETCH REAL
             Swal.fire({
                 icon: 'success',
                 title: 'Simulación Exitosa',
                 text: `Se enviaría ID: ${docId} con Estado: ${nuevoEstado} al servidor.`
             });
-            // location.reload(); // Descomentar para ver efecto real al tener backend
         }
     });
-}
+};
