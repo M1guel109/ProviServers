@@ -1,6 +1,6 @@
 <aside class="sidebar">
     <div class="logo">
-        <a href="#inicio">
+        <a href="<?= BASE_URL ?>/cliente/dashboard">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png"
                 alt="Logo Proviservers" class="logo-completo">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/FAVICON.png"
@@ -49,7 +49,9 @@
             </li>
 
             <li>
-                <a href="<?= BASE_URL ?>/cliente/necesidades" data-title="Mis necesidades">
+                <a href="<?= BASE_URL ?>/cliente/necesidades" 
+                    class="<?= ($currentPage ?? '') === 'necesidades' ? 'active' : '' ?>"
+                    data-title="Mis necesidades">
                     <i class="bi bi-megaphone"></i>
                     <span>Mis necesidades</span>
                 </a>
