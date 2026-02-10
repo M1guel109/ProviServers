@@ -404,32 +404,93 @@ class Usuario
         try {
             $this->conexion->beginTransaction();
 
-            $eliminarRol = "SELECT rol FROM usuarios WHERE id = :id";
+            // 1. Obtener datos del usuario
+            $stmtUser = $this->conexion->prepare("SELECT rol, estado_id FROM usuarios WHERE id = :id");
+            $stmtUser->execute([':id' => $id]);
+            $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-            $resultado = $this->conexion->prepare($eliminarRol);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
-            $rol = $resultado->fetchColumn();
+            if (!$usuario) return false;
 
-            if ($rol) {
-                $tablaDetalle = $this->getTablaDetalle($rol);
+            $rol = $usuario['rol'];
+            $tieneHistorial = false;
+            $pid = null; 
 
-                // 3. ELIMINAR de la tabla de detalle (debe ser primero)
-                $sqlDetalle = "DELETE FROM {$tablaDetalle} WHERE usuario_id = :id";
-                $stmtDetalle = $this->conexion->prepare($sqlDetalle);
-                $stmtDetalle->bindParam(':id', $id);
-                $stmtDetalle->execute();
+            // =========================================================
+            // 2. VERIFICACIÓN DE HISTORIAL Y OBTENCIÓN DE IDs
+            // =========================================================
+            if ($rol === 'proveedor') {
+                $stmtPid = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :id");
+                $stmtPid->execute([':id' => $id]);
+                $pid = $stmtPid->fetchColumn();
+
+                if ($pid) {
+                    // Si tienes tabla de servicios, descomenta esto:
+                    /*
+                    $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE proveedor_id = :pid"); 
+                    $stmtCheck->execute([':pid' => $pid]);
+                    if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                    */
+                }
+
+            } elseif ($rol === 'cliente') {
+                $stmtCid = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = :id");
+                $stmtCid->execute([':id' => $id]);
+                $cid = $stmtCid->fetchColumn();
+
+                /*
+                if ($cid) {
+                   $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE cliente_id = :cid");
+                   $stmtCheck->execute([':cid' => $cid]);
+                   if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                }
+                */
             }
 
-            $eliminar = "DELETE FROM usuarios WHERE id = :id";
-            $resultado = $this->conexion->prepare($eliminar);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
+            // =========================================================
+            // 3. EJECUCIÓN (Lógica vs Física)
+            // =========================================================
+            if ($tieneHistorial) {
+                // A. Desactivar (Borrado Lógico)
+                $sqlSoft = "UPDATE usuarios SET estado_id = 4 WHERE id = :id"; 
+                $stmtSoft = $this->conexion->prepare($sqlSoft);
+                $stmtSoft->execute([':id' => $id]);
+                
+                $this->conexion->commit();
+                return 'desactivado';
 
-            $this->conexion->commit();
-            return true;
+            } else {
+                // B. Eliminar Definitivamente (Borrado Físico)
+                $tablaDetalle = $this->getTablaDetalle($rol);
+
+                // --- LIMPIEZA DE DEPENDENCIAS (Solo Proveedores) ---
+                if ($rol === 'proveedor' && $pid) {
+                    // Categorías (Asegúrate de usar el nombre de columna correcto que te funcionó)
+                    $delCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
+                    $delCat->execute([':pid' => $pid]);
+
+                    // Documentos (Asegúrate de usar el nombre de columna correcto)
+                    $delDoc = $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid");
+                    $delDoc->execute([':pid' => $pid]);
+                }
+
+                // 3. Borrar Perfil
+                $sqlDetalle = "DELETE FROM {$tablaDetalle} WHERE usuario_id = :id";
+                $stmtDetalle = $this->conexion->prepare($sqlDetalle);
+                $stmtDetalle->execute([':id' => $id]);
+
+                // 4. Borrar Usuario Base
+                $eliminar = "DELETE FROM usuarios WHERE id = :id";
+                $stmtEliminar = $this->conexion->prepare($eliminar);
+                $stmtEliminar->execute([':id' => $id]);
+
+                $this->conexion->commit();
+                return 'eliminado';
+            }
+
         } catch (PDOException $e) {
-            error_log("Error en Usuario::eliminar->" . $e->getMessage());
+            $this->conexion->rollBack();
+            // Logueamos el error internamente pero devolvemos false al controlador
+            error_log("Error en Usuario::eliminar -> " . $e->getMessage());
             return false;
         }
     }

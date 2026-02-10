@@ -362,12 +362,18 @@ function actualizarUsuario()
 function eliminarUsuario($id)
 {
     $objUsuario = new Usuario();
+    
+    // Ahora esperamos 'eliminado', 'desactivado' o false
     $respuesta = $objUsuario->eliminar($id);
 
-    if ($respuesta === true) {
-        mostrarSweetAlert('success', 'Eliminacion exitosa', 'Se ha eliminado el usuario', '/ProviServers/admin/consultar-usuarios');
-    } else {
-        mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo registrar el usuario. Intenta nuevamente');
+    if ($respuesta === 'eliminado') {
+        mostrarSweetAlert('success', 'Eliminado Físicamente', 'El usuario no tenía historial y fue borrado permanentemente.', '/ProviServers/admin/consultar-usuarios');
+    } 
+    elseif ($respuesta === 'desactivado') {
+        mostrarSweetAlert('warning', 'Usuario Desactivado', 'El usuario tiene historial de servicios. No se puede borrar, pero ha pasado a estado INACTIVO para impedir su acceso.', '/ProviServers/admin/consultar-usuarios');
+    } 
+    else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo procesar la solicitud.', '/ProviServers/admin/consultar-usuarios');
     }
 }
 
