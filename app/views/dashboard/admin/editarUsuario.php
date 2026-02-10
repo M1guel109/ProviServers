@@ -76,6 +76,7 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                 
                 <form action="<?= BASE_URL ?>/admin/actualizar-usuario" method="post" class="formulario-usuario" enctype="multipart/form-data">
                     
+                    <input type="hidden" name="accion" value="actualizar">
                     <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
                     <input type="hidden" name="foto_actual" value="<?= $usuario['foto'] ?? 'default_user.png' ?>">
 

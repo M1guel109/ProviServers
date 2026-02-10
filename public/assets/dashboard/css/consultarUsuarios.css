@@ -497,3 +497,112 @@ div.dt-container .dt-paging .dt-paging-button:disabled {
         width: 100%;
     }
 }
+
+/* ========================================= */
+/* ESTILOS PARA EL MODAL DE DETALLE       */
+/* ========================================= */
+
+/* 1. Cabecera del Modal */
+#modalDetalleUsuario .modal-header {
+    background: var(--primary-color); /* Tu azul principal */
+    color: var(--white-color);
+    border-bottom: none;
+    padding: 20px 30px;
+}
+
+#modalDetalleUsuario .modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+/* 2. Foto de Perfil Grande */
+#modal-foto {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border: 4px solid var(--white-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    background-color: #f1f5f9;
+}
+
+/* 3. Información del Usuario (Nombre y Rol) */
+#modal-nombre {
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+#modal-rol {
+    color: #64748b; /* Gris azulado elegante */
+    letter-spacing: 1px;
+    font-size: 0.85rem;
+    background-color: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+/* 4. Tarjetas de Información (Gris claro) */
+#modalDetalleUsuario .bg-light {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+#modalDetalleUsuario .bg-light:hover {
+    background-color: #fff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+#modalDetalleUsuario h6.text-primary {
+    color: var(--primary-color) !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* 5. Etiquetas de Categorías (Badges) */
+#modal-categorias .badge {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    background-color: #e0f2fe; /* Azul muy claro */
+    color: #0369a1; /* Azul oscuro */
+    border: 1px solid #bae6fd;
+    font-weight: 500;
+}
+
+/* 6. Lista de Documentos */
+#modal-documentos .list-group-item {
+    border: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 12px 15px;
+    transition: background 0.2s;
+}
+
+#modal-documentos .list-group-item:last-child {
+    border-bottom: none;
+}
+
+#modal-documentos .list-group-item:hover {
+    background-color: #f8fafc;
+}
+
+#modal-documentos i.bi-file-earmark-text {
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Badge de estado del documento */
+#modal-documentos .badge {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+}
+
+/* Loader (Círculo de carga) */
+#loader-detalle {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
