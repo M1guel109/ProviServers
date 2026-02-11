@@ -101,10 +101,23 @@ function registrarUsuario()
             $datos_proveedor['categorias'] = explode(',', $_POST['lista_categorias']);
         }
 
-        // 🔥 NUEVA VALIDACIÓN: Mínimo 3 categorías
-        if (count($datos_proveedor['categorias']) < 3) {
-            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 3 categorías de servicio.');
-            exit(); // Detiene todo
+        // // 🔥 NUEVA VALIDACIÓN: Mínimo 3 categorías
+        // if (count($datos_proveedor['categorias']) < 3) {
+        //     mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 3 categorías de servicio.');
+        //     exit(); // Detiene todo
+        // }
+
+        // Validación: Mínimo 1, Máximo 5 categorías
+        $cantidad_cats = count($datos_proveedor['categorias']);
+
+        if ($cantidad_cats < 1) {
+            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignada al menos 1 categoría.');
+            exit();
+        }
+
+        if ($cantidad_cats > 5) {
+            mostrarSweetAlert('error', 'Límite excedido', 'El proveedor no puede tener más de 5 categorías.');
+            exit();
         }
 
         // B. Procesar Documentos
@@ -211,7 +224,7 @@ function actualizarUsuario()
     $ubicacion = $_POST['ubicacion'] ?? '';
     $rol = $_POST['rol'] ?? '';
     $nuevo_estado = $_POST['estado'] ?? '';
-    
+
     // Contraseña (Opcional - solo se envía si el usuario escribió algo)
     $nueva_clave = $_POST['clave'] ?? '';
 
@@ -224,21 +237,21 @@ function actualizarUsuario()
     // ---------------------------------------------------------
     // 2. GESTIÓN DE FOTO DE PERFIL (Avatar)
     // ---------------------------------------------------------
-    $foto_perfil_actual = $_POST['foto_actual'] ?? ''; 
+    $foto_perfil_actual = $_POST['foto_actual'] ?? '';
     $foto_para_db = $foto_perfil_actual;
     $archivo_nuevo = $_FILES['foto'] ?? null;
-    
+
     $ruta_destino_perfil = BASE_PATH . '/public/uploads/usuarios/';
 
     if ($archivo_nuevo && $archivo_nuevo['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($archivo_nuevo['name'], PATHINFO_EXTENSION));
-        
+
         if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp'])) {
             $nombre_archivo_nuevo = uniqid('user_') . '.' . $ext;
-            
+
             if (move_uploaded_file($archivo_nuevo['tmp_name'], $ruta_destino_perfil . $nombre_archivo_nuevo)) {
                 $foto_para_db = $nombre_archivo_nuevo;
-                
+
                 // Borrar foto vieja si existe y no es la default
                 if (!empty($foto_perfil_actual) && $foto_perfil_actual !== 'default_user.png' && file_exists($ruta_destino_perfil . $foto_perfil_actual)) {
                     unlink($ruta_destino_perfil . $foto_perfil_actual);
@@ -258,7 +271,7 @@ function actualizarUsuario()
     $documentos_nuevos = [];
 
     if ($rol === 'proveedor') {
-        
+
         // A. Procesar Categorías (String "Cat1,Cat2" -> Array)
         if (!empty($_POST['lista_categorias'])) {
             $lista_categorias = explode(',', $_POST['lista_categorias']);
@@ -284,15 +297,15 @@ function actualizarUsuario()
 
         foreach ($mapeo_docs as $input_name => $tipo_bd) {
             if (isset($_FILES[$input_name]) && $_FILES[$input_name]['error'] === UPLOAD_ERR_OK) {
-                
+
                 $file = $_FILES[$input_name];
                 $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-                
+
                 // Validar extensión
                 if (in_array($ext, ['pdf', 'png', 'jpg', 'jpeg'])) {
                     // Nombre único: tipo_timestamp_random.ext
                     $nombre_doc = $tipo_bd . '_' . time() . '_' . uniqid() . '.' . $ext;
-                    
+
                     if (move_uploaded_file($file['tmp_name'], $ruta_docs . $nombre_doc)) {
                         $documentos_nuevos[] = [
                             'tipo'    => $tipo_bd,
@@ -311,7 +324,7 @@ function actualizarUsuario()
     // 4. PREPARAR DATOS Y LLAMAR AL MODELO
     // ---------------------------------------------------------
     $objUsuario = new Usuario();
-    
+
     // Obtenemos estado anterior para la notificación (Lógica existente)
     $datos_anteriores = $objUsuario->mostrarId($id); // Asegúrate que esta función use tu nueva versión optimizada
     $estado_anterior = $datos_anteriores['estado_id'] ?? null;
@@ -328,7 +341,7 @@ function actualizarUsuario()
         'foto_perfil' => $foto_para_db,
         'estado'      => $nuevo_estado,
         'clave'       => !empty($nueva_clave) ? $nueva_clave : null,
-        
+
         // DATOS EXTRA PARA EL MODELO (Esencial para que funcione el cambio de rol)
         'categorias'        => $lista_categorias,
         'documentos_nuevos' => $documentos_nuevos
@@ -338,7 +351,7 @@ function actualizarUsuario()
     $resultado = $objUsuario->actualizar($data);
 
     if ($resultado === true) {
-        
+
         // 5. Notificación de Activación (Tu lógica existente)
         if (
             $estado_anterior !== null &&
@@ -346,7 +359,7 @@ function actualizarUsuario()
             (int)$estado_anterior === 1 &&   // Pendiente
             (int)$nuevo_estado === 2         // Activo
         ) {
-            if(function_exists('enviarCorreoProveedorActivado')) {
+            if (function_exists('enviarCorreoProveedorActivado')) {
                 enviarCorreoProveedorActivado($email, $nombres);
             }
         }
@@ -355,30 +368,29 @@ function actualizarUsuario()
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la base de datos. Intenta nuevamente.');
     }
-    
+
     exit();
 }
 
 function eliminarUsuario($id)
 {
     $objUsuario = new Usuario();
-    
+
     // Ahora esperamos 'eliminado', 'desactivado' o false
     $respuesta = $objUsuario->eliminar($id);
 
     if ($respuesta === 'eliminado') {
         mostrarSweetAlert('success', 'Eliminado Físicamente', 'El usuario no tenía historial y fue borrado permanentemente.', '/ProviServers/admin/consultar-usuarios');
-    } 
-    elseif ($respuesta === 'desactivado') {
+    } elseif ($respuesta === 'desactivado') {
         mostrarSweetAlert('warning', 'Usuario Desactivado', 'El usuario tiene historial de servicios. No se puede borrar, pero ha pasado a estado INACTIVO para impedir su acceso.', '/ProviServers/admin/consultar-usuarios');
-    } 
-    else {
+    } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo procesar la solicitud.', '/ProviServers/admin/consultar-usuarios');
     }
 }
 
 // Función para devolver detalle de usuario vía AJAX
-function obtenerDetalleUsuarioAjax() {
+function obtenerDetalleUsuarioAjax()
+{
     // Verificar que sea una petición AJAX y tenga ID
     if (!isset($_GET['id'])) {
         echo json_encode(['error' => 'ID no proporcionado']);
@@ -387,15 +399,15 @@ function obtenerDetalleUsuarioAjax() {
 
     $id = intval($_GET['id']);
     $usuarioModel = new Usuario(); // Asumiendo que tienes instanciado tu modelo
-    
+
     // Obtener datos básicos
     // Necesitas un método en tu modelo que traiga TODO por ID
     // Ejemplo: $datos = $usuarioModel->obtenerUsuarioCompleto($id);
-    
+
     // COMO NO TENGO TU MODELO COMPLETO, SIMULARÉ LA ESTRUCTURA QUE DEBES RETORNAR:
     // Debes crear en tu modelo una función que haga JOIN con proveedores/clientes, categorias y documentos.
-    
-    $datos = $usuarioModel->obtenerDetalleCompleto($id); 
+
+    $datos = $usuarioModel->obtenerDetalleCompleto($id);
 
     if ($datos) {
         echo json_encode($datos);

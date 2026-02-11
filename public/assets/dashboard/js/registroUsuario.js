@@ -188,14 +188,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (rolSelect.value === 'proveedor') {
 
                 // REGLA: Mínimo 3 categorías
-                if (categoriasSeleccionadas.length < 3) {
+                if (categoriasSeleccionadas.length >= 5) {
                     e.preventDefault(); // DETIENE EL ENVÍO
 
                     if (typeof Swal !== 'undefined') {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Faltan categorías',
-                            text: `Debes agregar al menos 3 categorías para el proveedor. Llevas: ${categoriasSeleccionadas.length}.`,
+                            text: 'Solo puedes asignar un máximo de 5 categorías.',
                             confirmButtonColor: '#0066FF'
                         });
                     } else {

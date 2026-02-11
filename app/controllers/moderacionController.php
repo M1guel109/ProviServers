@@ -2,6 +2,7 @@
 // Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert_helper.php';
 require_once __DIR__ . '/../models/moderacion.php';
+require_once __DIR__ . '/../models/servicio.php';
 
 // Detectamos método HTTP
 $method = $_SERVER['REQUEST_METHOD'];
@@ -104,4 +105,35 @@ function rechazarServicio($id, $motivo)
     }
 
     exit();
+}
+
+function obtenerDetalleServicio()
+{
+    $id = $_GET['id'] ?? null;
+    if (!$id) {
+        echo json_encode(['error' => 'ID faltante']);
+        exit;
+    }
+
+    $objServicio = new Servicio();
+    
+    // USA LA NUEVA FUNCIÓN AQUÍ 👇
+    $datos = $objServicio->obtenerDetalleCompleto($id); 
+
+    if ($datos) {
+        // Mapeo para asegurar que el JS reciba los nombres que espera
+        $respuesta = [
+            'nombre' => $datos['nombre'],
+            'descripcion' => $datos['descripcion'],
+            'precio' => $datos['precio'] ?? 0, // Asegura que precio exista si tu tabla lo tiene
+            'categoria' => $datos['categoria_nombre'],
+            'proveedor_nombre' => $datos['proveedor_nombre'],
+            'foto' => $datos['imagen'], // Tu modelo usa 'imagen', el JS espera esto
+            'estado' => $datos['publicacion_estado'] ?? 'pendiente'
+        ];
+        echo json_encode($respuesta);
+    } else {
+        echo json_encode(['error' => 'Servicio no encontrado']);
+    }
+    exit;
 }
