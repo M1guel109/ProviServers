@@ -153,6 +153,8 @@ $totalCompletadas = count($serviciosCompletados);
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/nuevasSolicitudes.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/enProcesos.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/completadas.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/solicitudes.css">
+
 </head>
 
 <body>
