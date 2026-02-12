@@ -180,6 +180,21 @@ switch ($request) {
     case '/admin/calendario':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
         break;
+
+        // ... (Tus otras rutas de admin) ...
+
+    // =======================================================
+    // 🔍 RUTAS AJAX PARA MODERACIÓN DE SERVICIOS
+    // =======================================================
+
+    // 1. API para obtener el detalle del servicio (JSON)
+    // Se llama cuando das clic en el "Ojito"
+    case '/admin/api/servicio-detalle':
+        require_once BASE_PATH . '/app/controllers/moderacionController.php';
+        apiDetalleServicio();
+        break;
+
+    // ... (El resto de tus rutas) ...
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacionController.php';
         break;

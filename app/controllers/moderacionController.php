@@ -107,33 +107,44 @@ function rechazarServicio($id, $motivo)
     exit();
 }
 
-function obtenerDetalleServicio()
-{
+function apiDetalleServicio() {
+    // 1. Limpiamos cualquier basura anterior
+    if (ob_get_length()) ob_clean();
+    header('Content-Type: application/json');
+
     $id = $_GET['id'] ?? null;
+
     if (!$id) {
-        echo json_encode(['error' => 'ID faltante']);
+        echo json_encode(['error' => 'Falta el ID']);
         exit;
     }
 
-    $objServicio = new Servicio();
-    
-    // USA LA NUEVA FUNCIÓN AQUÍ 👇
-    $datos = $objServicio->obtenerDetalleCompleto($id); 
+    // 2. Llamamos al modelo (que ya vimos que funciona perfecto)
+    $modelo = new Servicio();
+    $datos = $modelo->obtenerDetalleCompleto($id);
 
-    if ($datos) {
-        // Mapeo para asegurar que el JS reciba los nombres que espera
-        $respuesta = [
-            'nombre' => $datos['nombre'],
-            'descripcion' => $datos['descripcion'],
-            'precio' => $datos['precio'] ?? 0, // Asegura que precio exista si tu tabla lo tiene
-            'categoria' => $datos['categoria_nombre'],
-            'proveedor_nombre' => $datos['proveedor_nombre'],
-            'foto' => $datos['imagen'], // Tu modelo usa 'imagen', el JS espera esto
-            'estado' => $datos['publicacion_estado'] ?? 'pendiente'
-        ];
-        echo json_encode($respuesta);
-    } else {
-        echo json_encode(['error' => 'Servicio no encontrado']);
+    // 3. Validamos si trajo datos
+    if (empty($datos) || isset($datos['error'])) {
+        echo json_encode(['error' => 'Servicio no encontrado o error SQL']);
+        exit;
     }
+
+    // 4. Mapeamos los datos para el JavaScript
+    // Usamos los nombres exactos que viste en el Array de debug
+    $respuesta = [
+        'id'               => $datos['id'],
+        'nombre'           => $datos['nombre'],
+        'descripcion'      => $datos['descripcion'],
+        'precio'           => $datos['precio'],
+        'categoria'        => $datos['categoria_nombre'],
+        'proveedor_nombre' => $datos['proveedor_nombre'],
+        'proveedor_tel'    => $datos['proveedor_telefono'], // Extra por si lo quieres usar
+        'proveedor_email'  => $datos['proveedor_email'],    // Extra por si lo quieres usar
+        'foto'             => $datos['imagen'] ?? 'default_service.png',
+        'estado'           => $datos['publicacion_estado']
+    ];
+
+    // 5. Enviamos el JSON limpio
+    echo json_encode($respuesta);
     exit;
 }
