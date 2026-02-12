@@ -117,142 +117,157 @@ if ($usuarioId) {
         </section>
 
         <!-- Tabla de servicios / publicaciones -->
-        <section id="tabla-arriba" class="mt-3">
-            <table id="tabla-1" class="display nowrap">
-                <thead>
-                    <tr>
-                        <th>Imagen</th>
-                        <th>Nombre del servicio</th>
-                        <th>Categoría</th>
-                        <th>Descripción</th>
-                        <th>Disponibilidad</th>
-                        <th>Estado publicación</th>
-                        <th>Fecha de publicación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-servicios">
-                    <?php if (!empty($datos)) : ?>
-                        <?php foreach ($datos as $fila) : ?>
-                            <?php
-                            $estado = $fila['estado_publicacion'] ?? 'pendiente';
+<!-- LISTADO EN TARJETAS -->
+<section id="cards-servicios" class="mt-3">
+    
 
-                            // Texto y estilos por estado
-                            switch ($estado) {
-                                case 'aprobado':
-                                    $textoEstado = 'Publicado';
-                                    $claseEstado = 'estado-publicacion estado-activa';
-                                    break;
-                                case 'rechazada':
-                                    $textoEstado = 'Rechazado';
-                                    $claseEstado = 'estado-publicacion estado-rechazada';
-                                    break;
-                                case 'pausada':
-                                    $textoEstado = 'Pausado';
-                                    $claseEstado = 'estado-publicacion estado-pausada';
-                                    break;
-                                case 'pendiente':
-                                default:
-                                    $textoEstado = 'Pendiente de aprobación';
-                                    $claseEstado = 'estado-publicacion estado-pendiente';
-                                    break;
-                            }
+    <?php if (empty($datos)) : ?>
+        <div class="empty-state">
+            <h5 class="text-muted mb-1">No tienes servicios publicados aún</h5>
+            <p class="text-muted mb-0">Crea tu primer servicio para empezar a recibir solicitudes.</p>
+        </div>
+    <?php else : ?>
 
-                            $disponible = (int)($fila['servicio_disponible'] ?? 0) === 1;
-                            ?>
-                            <tr>
-                                <!-- Imagen -->
-                                <td>
-                                    <?php if (!empty($fila['servicio_imagen'])): ?>
-                                        <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($fila['servicio_imagen']) ?>"
-                                            alt="Imagen del servicio" width="60" height="60"
-                                            style="object-fit: cover; border-radius: 8px;">
-                                    <?php else: ?>
-                                        <span class="text-muted">Sin imagen</span>
-                                    <?php endif; ?>
-                                </td>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
 
-                                <!-- Nombre -->
-                                <td><?= htmlspecialchars($fila['servicio_nombre'] ?? '') ?></td>
+            <?php foreach ($datos as $fila) : ?>
+                <?php
+                $estado = $fila['estado_publicacion'] ?? 'pendiente';
 
-                                <!-- Categoría -->
-                                <td><?= htmlspecialchars($fila['categoria_nombre'] ?? 'Sin categoría') ?></td>
+                // Texto y estilos por estado (igual que tu lógica)
+                switch ($estado) {
+                    case 'aprobado':
+                        $textoEstado = 'Publicado';
+                        $claseEstado = 'estado-publicacion estado-activa';
+                        break;
+                    case 'rechazada':
+                        $textoEstado = 'Rechazado';
+                        $claseEstado = 'estado-publicacion estado-rechazada';
+                        break;
+                    case 'pausada':
+                        $textoEstado = 'Pausado';
+                        $claseEstado = 'estado-publicacion estado-pausada';
+                        break;
+                    case 'pendiente':
+                    default:
+                        $textoEstado = 'Pendiente de aprobación';
+                        $claseEstado = 'estado-publicacion estado-pendiente';
+                        break;
+                }
 
-                                <!-- Descripción -->
-                                <td><?= htmlspecialchars($fila['servicio_descripcion'] ?? 'Sin descripción') ?></td>
+                $disponible = (int)($fila['servicio_disponible'] ?? 0) === 1;
 
-                                <!-- Disponibilidad (on/off del servicio) -->
-                                <td>
-                                    <?php if ($disponible): ?>
-                                        <span class="badge-disponibilidad badge-disponible">
-                                            Disponible
-                                        </span>
-                                    <?php else: ?>
-                                        <span class="badge-disponibilidad badge-no-disponible">
-                                            No disponible
-                                        </span>
-                                    <?php endif; ?>
-                                </td>
+                $img = $fila['servicio_imagen'] ?? '';
+                $imgUrl = !empty($img)
+                    ? (BASE_URL . '/public/uploads/servicios/' . $img)
+                    : (BASE_URL . '/public/assets/img/default_service.png'); // crea este placeholder si quieres
 
-                                <!-- Estado publicación -->
-                                <td>
-                                    <span class="<?= $claseEstado ?>">
-                                        <?= $textoEstado ?>
-                                    </span>
-                                </td>
+                $servicioId = (int)($fila['servicio_id'] ?? 0);
 
-                                <!-- Fecha publicación -->
-                                <td><?= htmlspecialchars($fila['publicacion_created_at'] ?? '') ?></td>
+                // Descripción corta
+                $desc = trim((string)($fila['servicio_descripcion'] ?? 'Sin descripción'));
+                if (mb_strlen($desc) > 120) $desc = mb_substr($desc, 0, 120) . '...';
 
-                                <!-- Acciones -->
-                                <td>
-                                    <div class="action-buttons">
-                                        <!-- Ver detalle (luego puedes conectarlo a un modal o ficha) -->
-                                        <a href="#"
-                                            class="btn-action btn-view"
-                                            title="Ver detalle">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
+                $fechaPub = $fila['publicacion_created_at'] ?? '';
+                ?>
 
-                                        <!-- Editar servicio:
-                                             Permitimos editar si está PENDIENTE o RECHAZADO -->
-                                        <?php if (in_array($estado, ['pendiente', 'rechazada'], true)) : ?>
-                                            <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $fila['servicio_id'] ?>"
-                                                class="btn-action btn-edit"
-                                                title="<?= $estado === 'rechazada' ? 'Editar y reenviar a revisión' : 'Editar servicio' ?>">
-                                                <i class="bi bi-pencil-square"></i>
-                                            </a>
-                                        <?php endif; ?>
+                <div class="col">
+                    <div class="card card-servicio h-100 border-0 shadow-sm">
 
-                                        <!-- Eliminar servicio (reutilizando controlador actual) -->
-                                        <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $fila['servicio_id'] ?>"
-                                            class="btn-action btn-delete"
-                                            title="Eliminar servicio">
-                                            <i class="bi bi-trash3"></i>
-                                        </a>
+                        <!-- Imagen -->
+                        <div class="card-servicio-img">
+                            <img src="<?= htmlspecialchars($imgUrl) ?>"
+                                 alt="Imagen del servicio"
+                                 onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/assets/img/default_service.png';">
+                        </div>
 
-                                        <!-- Opcional: Pausar / reactivar si está publicado (placeholder) -->
-                                        <?php if ($estado === 'activa'): ?>
-                                            <button type="button"
-                                                class="btn-action btn-pause"
-                                                title="Pausar publicación (dejar de mostrar temporalmente)">
-                                                <i class="bi bi-pause-circle"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="8" class="text-center py-4">
-                                <h5 class="text-muted mb-0">No tienes servicios publicados aún</h5>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
-        </section>
+                        <div class="card-body">
+                            <!-- Estado + disponibilidad -->
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <span class="<?= $claseEstado ?>"><?= $textoEstado ?></span>
+
+                                <?php if ($disponible): ?>
+                                    <span class="badge-disponibilidad badge-disponible">Disponible</span>
+                                <?php else: ?>
+                                    <span class="badge-disponibilidad badge-no-disponible">No disponible</span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Nombre -->
+                            <h5 class="card-title fw-bold mb-1">
+                                <?= htmlspecialchars($fila['servicio_nombre'] ?? '') ?>
+                            </h5>
+
+                            <!-- Categoría -->
+                            <div class="text-muted small mb-2">
+                                <i class="bi bi-tag"></i>
+                                <?= htmlspecialchars($fila['categoria_nombre'] ?? 'Sin categoría') ?>
+                            </div>
+
+                            <!-- Descripción -->
+                            <p class="card-text text-secondary small mb-3">
+                                <?= htmlspecialchars($desc) ?>
+                            </p>
+
+                            <!-- Fecha publicación -->
+                            <div class="meta-row text-muted small">
+                                <i class="bi bi-calendar3"></i>
+                                <span>Publicado: <?= htmlspecialchars($fechaPub) ?></span>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                            <div class="d-flex gap-2 flex-wrap">
+
+                                <!-- Ver detalle (placeholder) -->
+                                <a href="#"
+                                   class="btn btn-sm btn-outline-primary flex-fill"
+                                   title="Ver detalle">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+
+                                <!-- Editar (solo pendiente o rechazada) -->
+                                <?php if (in_array($estado, ['pendiente', 'rechazada'], true)) : ?>
+                                    <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
+                                       class="btn btn-sm btn-outline-success flex-fill"
+                                       title="<?= $estado === 'rechazada' ? 'Editar y reenviar a revisión' : 'Editar servicio' ?>">
+                                        <i class="bi bi-pencil-square"></i> Editar
+                                    </a>
+                                <?php endif; ?>
+
+                                <!-- Eliminar -->
+                                <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicioId ?>"
+                                   class="btn btn-sm btn-outline-danger flex-fill"
+                                   title="Eliminar servicio"
+                                   onclick="return confirm('¿Eliminar este servicio?');">
+                                    <i class="bi bi-trash3"></i> Eliminar
+                                </a>
+
+                                <!-- Opcional: Pausar (dejas tu placeholder; OJO: tu condición original decía 'activa' pero tu estado publicado es 'aprobado') -->
+                                <?php if ($estado === 'aprobado') : ?>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary flex-fill"
+                                            title="Pausar publicación (placeholder)">
+                                        <i class="bi bi-pause-circle"></i> Pausar
+                                    </button>
+                                <?php endif; ?>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    <?php endif; ?>
+
+</section>
+
+
 
     </main>
 

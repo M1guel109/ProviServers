@@ -1,104 +1,189 @@
-/* ===========================
-   NUEVAS SOLICITUDES - CARDS
-   =========================== */
+/* =========================================================
+   SOLICITUDES (CONTENEDOR + FILTROS + TABS + MODAL)
+   Basado en tu sistema de variables y estilo "Oportunidades"
+   ========================================================= */
 
-/* Contenedor general */
+/* 1) Header / título */
+.contenido section.mb-4.px-4.pt-4 h1 {
+  font-size: 28px;
+  letter-spacing: -0.2px;
+}
+.contenido section.mb-4.px-4.pt-4 p {
+  font-size: 14px;
+}
+
+/* 2) Filtros (estilo oportunidades) */
+.filtros-container {
+  background: var(--white-color);
+  border: 1px solid #e8eef6;
+  border-radius: 14px;
+  padding: 14px 14px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+}
+
+.filtros-container .input-group-text {
+  border-radius: 12px 0 0 12px !important;
+  border-color: #e8eef6 !important;
+}
+
+.filtros-container .form-control,
+.filtros-container .form-select {
+  border-radius: 0 12px 12px 0;
+  border-color: #e8eef6;
+  background-color: #f8fafc;
+  transition: .18s ease;
+}
+
+.filtros-container .form-select {
+  border-radius: 12px;
+}
+
+.filtros-container .form-control:focus,
+.filtros-container .form-select:focus {
+  border-color: rgba(0, 102, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.12);
+  background-color: #ffffff;
+}
+
+.filtros-container .btn.btn-primary {
+  border-radius: 12px;
+  font-weight: 700;
+  box-shadow: 0 10px 18px rgba(0, 102, 255, 0.16);
+}
+.filtros-container .btn.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+/* 3) Tabs (más modernos) */
+.nav.nav-tabs {
+  border-bottom: 1px solid #e8eef6;
+  gap: 8px;
+}
+
+.nav.nav-tabs .nav-link {
+  border: 1px solid transparent;
+  border-radius: 12px 12px 0 0;
+  color: #334155;
+  font-weight: 700;
+  padding: 10px 14px;
+  transition: .18s ease;
+}
+
+.nav.nav-tabs .nav-link:hover {
+  background: #f8fafc;
+  border-color: #e8eef6 #e8eef6 transparent #e8eef6;
+}
+
+.nav.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  background: #ffffff;
+  border-color: #e8eef6 #e8eef6 #ffffff #e8eef6;
+  box-shadow: 0 -6px 16px rgba(15, 23, 42, 0.04);
+}
+
+.nav.nav-tabs .badge {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* 4) Contenedor del tab content */
+.tab-content.bg-white {
+  border: 1px solid #e8eef6 !important;
+  border-radius: 0 14px 14px 14px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+/* 5) Ajustes de espaciado interno de los partials */
+.tab-content .tab-pane {
+  padding: 6px 4px;
+}
+
+/* =========================================================
+   NUEVAS (CARDS) - compatible con tu partial nuevas.php
+   ========================================================= */
+
 #cards-solicitudes {
   margin-top: 1rem;
 }
 
-/* Card base */
+/* Cards */
 #cards-solicitudes .card {
-  border-radius: 14px;
+  border-radius: 16px;
+  border: 1px solid #edf2f7;
   overflow: hidden;
-  transition: transform .18s ease, box-shadow .18s ease;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
 #cards-solicitudes .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10) !important;
+  border-color: rgba(0, 102, 255, 0.22);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.10) !important;
 }
 
-/* Card body */
 #cards-solicitudes .card-body {
-  padding: 1rem 1rem .85rem 1rem;
+  padding: 16px 16px 10px 16px;
 }
 
-/* Header: nombre cliente */
-#cards-solicitudes .card-body .fw-bold {
-  font-size: 1rem;
+/* Encabezado */
+#cards-solicitudes .fw-bold {
+  font-size: 15px;
   line-height: 1.2;
-  margin-bottom: .15rem;
 }
 
-/* Subtexto (teléfono / recibida / meta) */
 #cards-solicitudes .text-muted.small {
-  font-size: .82rem;
+  font-size: 12.5px;
 }
 
-/* Servicio */
 #cards-solicitudes .fw-medium {
-  font-size: .95rem;
+  font-size: 14px;
 }
 
-#cards-solicitudes .fw-medium i {
-  margin-right: .35rem;
-}
-
-/* Línea meta (fecha / franja) */
+#cards-solicitudes .fw-medium i,
 #cards-solicitudes .text-muted.small i {
-  margin-right: .35rem;
+  margin-right: 6px;
 }
 
-/* Badge de estado */
+/* Badge estado */
 #cards-solicitudes .badge {
-  font-weight: 600;
-  letter-spacing: .2px;
-  padding: .35rem .55rem;
   border-radius: 999px;
-  font-size: .75rem;
-  text-transform: capitalize;
-  white-space: nowrap;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .15px;
 }
 
-/* Footer y acciones */
+/* Footer / botones */
 #cards-solicitudes .card-footer {
-  padding: .85rem 1rem 1rem 1rem;
+  background: #fff;
+  padding: 12px 16px 16px 16px;
 }
 
-/* Botones más "premium" */
 #cards-solicitudes .btn {
-  border-radius: 10px;
-  font-weight: 600;
-  padding: .45rem .6rem;
-  transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
-}
-
-#cards-solicitudes .btn:active {
-  transform: translateY(1px);
+  border-radius: 12px;
+  font-weight: 800;
+  padding: 8px 10px;
+  transition: .15s ease;
 }
 
 #cards-solicitudes .btn i {
-  margin-right: .35rem;
+  margin-right: 6px;
 }
 
-/* Botones outline con hover más suave */
 #cards-solicitudes .btn-outline-primary:hover,
 #cards-solicitudes .btn-outline-success:hover,
 #cards-solicitudes .btn-outline-danger:hover {
-  box-shadow: 0 8px 16px rgba(0,0,0,.08);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.10);
+  transform: translateY(-1px);
 }
 
-/* Ajuste cuando hay 3 botones: que no se rompa en pantallas pequeñas */
+/* En pantallas pequeñas, que acomode mejor botones */
 #cards-solicitudes .card-footer .d-flex {
   flex-wrap: wrap;
 }
-
 #cards-solicitudes .card-footer .btn {
-  min-width: 110px;
+  min-width: 120px;
 }
 
-/* En móvil: botones en 2 filas si hace falta */
 @media (max-width: 576px) {
   #cards-solicitudes .card-footer .btn {
     flex: 1 1 calc(50% - .5rem);
@@ -108,32 +193,82 @@
   }
 }
 
-/* ===========================
-   ESTADÍSTICAS - TARJETAS TOP
-   (por si quieres darles un look similar)
-   =========================== */
+/* =========================================================
+   ESTADÍSTICAS ARRIBA (si las sigues usando en nuevas.php)
+   ========================================================= */
 
 #estadisticas-solicitudes .tarjeta-estadistica {
-  border-radius: 14px;
-  transition: transform .18s ease, box-shadow .18s ease;
+  border-radius: 16px;
+  border: 1px solid #edf2f7;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
 }
 
 #estadisticas-solicitudes .tarjeta-estadistica:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.10);
+  border-color: rgba(0, 102, 255, 0.18);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.10);
 }
 
 #estadisticas-solicitudes .icono-estadistica {
-  font-size: 1.35rem;
+  font-size: 20px;
   display: inline-flex;
-  margin-bottom: .35rem;
+  margin-bottom: 6px;
 }
 
-/* Afinar textos */
 #estadisticas-solicitudes .valor-estadistica {
   line-height: 1;
 }
 
-#estadisticas-solicitudes .etiqueta-estadistica {
-  font-size: .85rem;
+/* =========================================================
+   MODAL DETALLE (modalDetalleSolicitud)
+   ========================================================= */
+
+#modalDetalleSolicitud .modal-content {
+  border-radius: 16px;
+  border: 1px solid #e8eef6;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+}
+
+#modalDetalleSolicitud .modal-header {
+  border-bottom: 1px solid #eef2f7;
+  padding: 14px 18px;
+}
+
+#modalDetalleSolicitud .modal-title {
+  font-weight: 800;
+  letter-spacing: -.2px;
+}
+
+#modalDetalleSolicitud .modal-body {
+  padding: 16px 18px;
+}
+
+#modalDetalleSolicitud .modal-footer {
+  border-top: 1px solid #eef2f7;
+  padding: 12px 18px;
+}
+
+#modalDetalleSolicitud .bg-light.rounded {
+  border-radius: 14px !important;
+  border: 1px solid #eef2f7;
+}
+
+/* =========================================================
+   EMPTY STATE (si usas .empty-state como en oportunidades)
+   ========================================================= */
+
+.empty-state {
+  background: #fff;
+  border: 1px solid #e8eef6;
+  border-radius: 16px;
+  padding: 28px 18px;
+  text-align: center;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.empty-state img {
+  width: 180px;
+  max-width: 60%;
+  margin-bottom: 12px;
+  opacity: .95;
 }
