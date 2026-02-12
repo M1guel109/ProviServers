@@ -53,86 +53,104 @@ document.addEventListener('click', function (e) {
 
 
 // =======================================================
-// LÓGICA DEL MODAL (OJITO)
+// LÓGICA DEL MODAL (OJITO) MEJORADA
 // =======================================================
 function cargarDetalleServicio(id) {
     console.log("🚀 Iniciando petición AJAX para ID:", id);
 
     const modalElement = document.getElementById('modalDetalleServicio');
-    if (!modalElement) {
-        console.error("❌ No se encontró el modal con ID 'modalDetalleServicio' en el HTML");
-        return;
-    }
+    if (!modalElement) return;
 
     const modal = new bootstrap.Modal(modalElement);
 
     // Resetear visualmente
-    const loader = document.getElementById('loader-detalle');
-    const contenido = document.getElementById('contenido-detalle');
+    document.getElementById('loader-detalle').classList.remove('d-none');
+    document.getElementById('contenido-detalle').classList.add('d-none');
     
-    if(loader) loader.classList.remove('d-none');
-    if(contenido) contenido.classList.add('d-none');
-    
+    // Limpiar botones del footer para evitar conflictos de ID anteriores
+    const footerActions = document.getElementById('modal-acciones-footer');
+    if(footerActions) footerActions.classList.add('d-none'); // Ocultar botones mientras carga
+
     modal.show();
 
     // Petición AJAX
-    const url = `${BASE_URL}/admin/api/servicio-detalle?id=${id}`;
-    console.log("🌐 Consultando URL:", url);
-
-    fetch(url)
-        .then(res => {
-            console.log("📩 Respuesta recibida. Status:", res.status);
-            if (!res.ok) throw new Error(`Error HTTP: ${res.status}`);
-            return res.text(); // Usamos text() primero para depurar si no es JSON
-        })
-        .then(texto => {
-            console.log("📄 Cuerpo de la respuesta:", texto);
-            try {
-                return JSON.parse(texto);
-            } catch (e) {
-                throw new Error("La respuesta del servidor no es un JSON válido. Revisa el console.log 'Cuerpo de la respuesta'.");
-            }
-        })
+    fetch(`${BASE_URL}/admin/api/servicio-detalle?id=${id}`)
+        .then(res => res.json())
         .then(data => {
             if (data.error) throw new Error(data.error);
 
-            console.log("✅ Datos procesados correctamente:", data);
+            // 1. INFO PRINCIPAL
+            document.getElementById('modal-titulo').textContent = data.nombre;
+            document.getElementById('modal-categoria').textContent = data.categoria;
+            document.getElementById('modal-descripcion').textContent = data.descripcion;
 
-            // Llenar campos (Validamos que los elementos existan antes de asignar)
-            if(document.getElementById('modal-titulo')) document.getElementById('modal-titulo').textContent = data.nombre;
-            if(document.getElementById('modal-proveedor')) document.getElementById('modal-proveedor').textContent = data.proveedor_nombre;
-            
-            if(document.getElementById('modal-precio')) {
-                const precioF = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(data.precio);
-                document.getElementById('modal-precio').textContent = precioF;
-            }
-            
-            if(document.getElementById('modal-categoria')) document.getElementById('modal-categoria').textContent = data.categoria;
-            if(document.getElementById('modal-descripcion')) document.getElementById('modal-descripcion').textContent = data.descripcion;
+            // 2. PRECIO
+            const precioF = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(data.precio || 0);
+            document.getElementById('modal-precio').textContent = Number(data.precio) > 0 ? precioF : 'A Convenir / Gratis';
 
-            // Foto
+            // 3. FOTO
             const img = document.getElementById('modal-foto-servicio');
-            if(img) img.src = `${BASE_URL}/public/uploads/servicios/${data.foto || 'default_service.png'}`;
+            img.src = `${BASE_URL}/public/uploads/servicios/${data.foto || 'default_service.png'}`;
+            // Manejo de error de imagen
+            img.onerror = function() { this.src = `${BASE_URL}/public/assets/img/no-image.png`; };
 
-            // Badge Estado
+            // 4. DATOS DEL PROVEEDOR (Nuevos campos)
+            document.getElementById('modal-proveedor').textContent = data.proveedor_nombre;
+            document.getElementById('modal-proveedor-email').textContent = data.proveedor_email || 'No disponible';
+            document.getElementById('modal-proveedor-tel').textContent = data.proveedor_tel || 'No disponible';
+            document.getElementById('modal-proveedor-ubicacion').textContent = data.proveedor_ubicacion || 'Ubicación no registrada';
+
+            // 5. FECHA (Formato legible)
+            const fecha = new Date(data.created_at);
+            document.getElementById('modal-fecha').textContent = fecha.toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // 6. ESTADO (Badge)
             const badge = document.getElementById('modal-estado-badge');
-            if(badge) {
-                badge.textContent = (data.estado || 'Pendiente').toUpperCase();
-                badge.className = 'badge rounded-pill px-3 py-2 fs-6';
-                if (data.estado === 'aprobado') badge.classList.add('bg-success');
-                else if (data.estado === 'rechazado') badge.classList.add('bg-danger');
-                else badge.classList.add('bg-warning', 'text-dark');
+            badge.textContent = (data.estado || 'Pendiente').toUpperCase();
+            badge.className = 'badge rounded-pill px-4 py-2 fs-6 shadow-sm';
+            
+            if (data.estado === 'aprobado') {
+                badge.classList.add('bg-success');
+                footerActions.classList.add('d-none'); // Si ya está aprobado, ocultamos botones de acción (opcional)
+            } else if (data.estado === 'rechazado') {
+                badge.classList.add('bg-danger');
+                footerActions.classList.add('d-none');
+            } else {
+                badge.classList.add('bg-warning', 'text-dark');
+                footerActions.classList.remove('d-none'); // Solo mostrar botones si está pendiente
             }
 
-            // Mostrar
-            if(loader) loader.classList.add('d-none');
-            if(contenido) contenido.classList.remove('d-none');
+            // 7. CONFIGURAR BOTONES DEL MODAL (Importante)
+            // Asignamos el ID actual a los botones del footer para que funcionen
+            const btnApproveModal = document.querySelector('.btn-modal-approve');
+            const btnRejectModal = document.querySelector('.btn-modal-reject');
+
+            // Clonamos los botones para eliminar listeners viejos (truco limpio)
+            const newApprove = btnApproveModal.cloneNode(true);
+            const newReject = btnRejectModal.cloneNode(true);
+            
+            btnApproveModal.parentNode.replaceChild(newApprove, btnApproveModal);
+            btnRejectModal.parentNode.replaceChild(newReject, btnRejectModal);
+
+            // Agregamos eventos nuevos
+            newApprove.addEventListener('click', () => {
+                modal.hide(); // Cerramos modal primero
+                confirmarAprobacion(data.id);
+            });
+
+            newReject.addEventListener('click', () => {
+                modal.hide();
+                confirmarRechazo(data.id);
+            });
+
+            // MOSTRAR CONTENIDO
+            document.getElementById('loader-detalle').classList.add('d-none');
+            document.getElementById('contenido-detalle').classList.remove('d-none');
         })
         .catch(err => {
-            console.error("🚨 ERROR AJAX:", err);
+            console.error(err);
             modal.hide();
-            Swal.fire('Error', `Fallo técnico: ${err.message}`, 'error');
+            Swal.fire('Error', 'No se pudo cargar la información.', 'error');
         });
 }
 
-// ... (Mantén tus funciones confirmarAprobacion, confirmarRechazo y enviarEstado igual que antes)

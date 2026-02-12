@@ -175,42 +175,89 @@ $datos = mostrarservicios();
     </main>
 
     <div class="modal fade" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title"><i class="bi bi-box-seam me-2"></i>Detalle del Servicio</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        <div class="modal-dialog modal-lg modal-dialog-centered"> <div class="modal-content border-0 shadow-lg">
+                
+                <div class="modal-header bg-white border-bottom">
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark" id="modal-titulo">Cargando...</h5>
+                        <span id="modal-categoria" class="badge bg-light text-secondary border mt-1">Categoría</span>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-4">
+
+                <div class="modal-body p-0">
                     <div id="loader-detalle" class="text-center py-5">
                         <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div>
                     </div>
+
                     <div id="contenido-detalle" class="d-none">
-                        <div class="row">
-                            <div class="col-md-5 mb-3 text-center">
-                                <img id="modal-foto-servicio" src="" alt="Foto" class="img-fluid rounded shadow-sm border" style="max-height: 250px; object-fit: cover;">
-                                <div class="mt-3"><span id="modal-estado-badge" class="badge rounded-pill px-3 py-2 fs-6"></span></div>
+                        <div class="row g-0">
+                            
+                            <div class="col-md-5 bg-light border-end d-flex flex-column align-items-center justify-content-center p-3">
+                                <div class="position-relative w-100 text-center">
+                                    <img id="modal-foto-servicio" src="" alt="Foto Servicio" 
+                                        class="img-fluid rounded shadow-sm" 
+                                        style="max-height: 280px; object-fit: cover; width: 100%;">
+                                    <div class="mt-3">
+                                        <span id="modal-estado-badge" class="badge rounded-pill px-4 py-2 fs-6 shadow-sm"></span>
+                                    </div>
+                                </div>
+                                <div class="mt-4 w-100 text-center">
+                                    <h4 class="text-success fw-bold mb-0" id="modal-precio"></h4>
+                                    <small class="text-muted">Precio base</small>
+                                </div>
                             </div>
-                            <div class="col-md-7">
-                                <h3 id="modal-titulo" class="fw-bold text-dark mb-2"></h3>
-                                <p class="text-muted small mb-3"><i class="bi bi-person-circle me-1"></i> Por: <span id="modal-proveedor" class="fw-bold"></span></p>
-                                <div class="p-3 bg-light rounded border mb-3">
-                                    <h5 class="text-success fw-bold mb-0"><i class="bi bi-cash-coin me-2"></i> <span id="modal-precio"></span></h5>
+
+                            <div class="col-md-7 p-4">
+                                
+                                <h6 class="text-uppercase text-muted fw-bold small mb-2">Descripción del Servicio</h6>
+                                <div class="p-3 bg-light rounded border mb-4" style="max-height: 150px; overflow-y: auto;">
+                                    <p id="modal-descripcion" class="text-secondary mb-0" style="white-space: pre-line; font-size: 0.95rem;"></p>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold text-muted small text-uppercase">Categoría:</label>
-                                    <p id="modal-categoria" class="mb-0"></p>
+
+                                <div class="card border-primary mb-3">
+                                    <div class="card-header bg-primary text-white py-1">
+                                        <small><i class="bi bi-person-vcard me-1"></i> Datos del Proveedor</small>
+                                    </div>
+                                    <div class="card-body py-2">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="bg-light rounded-circle p-2 me-2 text-primary">
+                                                <i class="bi bi-person-fill fs-5"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0 fw-bold" id="modal-proveedor"></h6>
+                                                <small class="text-muted">Propietario</small>
+                                            </div>
+                                        </div>
+
+                                        <ul class="list-unstyled small mb-0 border-top pt-2">
+                                            <li class="mb-1"><i class="bi bi-envelope text-muted me-2"></i> <span id="modal-proveedor-email">---</span></li>
+                                            <li class="mb-1"><i class="bi bi-telephone text-muted me-2"></i> <span id="modal-proveedor-tel">---</span></li>
+                                            <li><i class="bi bi-geo-alt text-muted me-2"></i> <span id="modal-proveedor-ubicacion">---</span></li>
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="fw-bold text-muted small text-uppercase">Descripción:</label>
-                                    <p id="modal-descripcion" class="text-secondary" style="white-space: pre-line;"></p>
+                                
+                                <div class="text-end">
+                                    <small class="text-muted fst-italic">Publicado el: <span id="modal-fecha"></span></small>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
+
+                <div class="modal-footer bg-light justify-content-between">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    
+                    <div id="modal-acciones-footer">
+                        <button type="button" class="btn btn-outline-danger me-2 btn-modal-reject">
+                            <i class="bi bi-x-circle"></i> Rechazar
+                        </button>
+                        <button type="button" class="btn btn-success btn-modal-approve">
+                            <i class="bi bi-check-circle"></i> Aprobar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
