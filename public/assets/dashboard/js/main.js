@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-// ==========================================
+    // ==========================================
     // 2. LÓGICA DE BREADCRUMBS (Corregida)
     // ==========================================
     const breadcrumb = document.getElementById("breadcrumb");

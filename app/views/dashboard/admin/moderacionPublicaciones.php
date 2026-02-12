@@ -23,7 +23,7 @@ $datos = mostrarservicios();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/consultarUsuarios.css">
     <style>
-        .btn-approve:hover { border-color: #198754; color: #198754; background-color: #d1e7dd; }
+        .btn-approve:hover { border-color: #0066ff; color: #0066ff; background-color: #d1e7dd; }
         .btn-reject:hover { border-color: #dc3545; color: #dc3545; background-color: #f8d7da; }
     </style>
 </head>
@@ -44,9 +44,9 @@ $datos = mostrarservicios();
                             Revisa y aprueba los servicios creados por los proveedores antes de su publicación.
                         </p>
                     </div>
-                    <a href="<?= BASE_URL ?>/admin/reporte?tipo=servicios" target="_blank" class="btn btn-primary mt-3 w-auto" style="width: fit-content;">
+                    <!-- <a href="<?= BASE_URL ?>/admin/reporte?tipo=servicios" target="_blank" class="btn btn-primary mt-3 w-auto" style="width: fit-content;">
                         <i class="bi bi-file-earmark-pdf-fill"></i> Reporte de Servicios
-                    </a>
+                    </a> -->
                 </div>
                 <div class="col-md-4 d-flex justify-content-end align-items-start">
                     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -64,11 +64,11 @@ $datos = mostrarservicios();
                         <i class="bi bi-table"></i> Listado Principal
                     </button>
                 </li>
-                <!-- <li class="nav-item" role="presentation">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="acciones-tab" data-bs-toggle="tab" data-bs-target="#acciones-pane" type="button" role="tab">
                         <i class="bi bi-box-arrow-in-right"></i> Exportar Datos
                     </button>
-                </li> -->
+                </li>
             </ul>
 
             <div class="tab-content" id="tablaTabsContent">
@@ -111,20 +111,28 @@ $datos = mostrarservicios();
                                             </td>
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button type="button" class="btn-action btn-view" title="Ver Detalle"
-                                                            data-id="<?= $servicio['id'] ?>">
+                                                    
+                                                    <button type="button" class="btn-action btn-view" title="Ver Detalle" data-id="<?= $servicio['id'] ?>">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
 
-                                                    <button type="button" class="btn-action btn-approve" title="Aprobar"
-                                                            data-id="<?= $servicio['id'] ?>">
-                                                        <i class="bi bi-check-circle"></i>
-                                                    </button>
+                                                    <?php 
+                                                    // Normalizamos el estado para comparar
+                                                    $estadoActual = strtolower($servicio['publicacion_estado'] ?? 'pendiente');
+                                                    ?>
 
-                                                    <button type="button" class="btn-action btn-reject" title="Rechazar"
-                                                            data-id="<?= $servicio['id'] ?>">
-                                                        <i class="bi bi-x-circle"></i>
-                                                    </button>
+                                                    <?php if ($estadoActual !== 'aprobado') : ?>
+                                                        <button type="button" class="btn-action btn-approve" title="Aprobar" data-id="<?= $servicio['id'] ?>">
+                                                            <i class="bi bi-check-circle"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+
+                                                    <?php if ($estadoActual !== 'rechazado') : ?>
+                                                        <button type="button" class="btn-action btn-reject" title="Rechazar" data-id="<?= $servicio['id'] ?>">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    <?php endif; ?>
+
                                                 </div>
                                             </td>
                                         </tr>
@@ -135,7 +143,7 @@ $datos = mostrarservicios();
                     </div>
                 </div>
 
-                <!-- <div class="tab-pane fade" id="acciones-pane" role="tabpanel">
+                <div class="tab-pane fade" id="acciones-pane" role="tabpanel">
                     <div class="p-3">
                         <div class="alert alert-light border">
                             <i class="bi bi-info-circle me-2"></i> 
@@ -168,7 +176,7 @@ $datos = mostrarservicios();
                             </tbody>
                         </table>
                     </div>
-                </div> -->
+                </div>
 
             </div>
         </section>
