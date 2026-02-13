@@ -1,0 +1,115 @@
+/* ================================
+   MIS SERVICIOS (Cards + Modal)
+   CSS independiente (pégalo tal cual)
+   ================================ */
+
+/* Card base */
+.card-servicio {
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Meta row (icon + text) */
+.card-servicio .meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-servicio .meta-row i {
+  opacity: 0.8;
+}
+
+/* Badges de disponibilidad */
+.badge-disponibilidad {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.badge-disponible {
+  background: #e8f4ff;
+  color: #0b5ed7;
+}
+
+.badge-no-disponible {
+  background: #f2f2f2;
+  color: #333;
+}
+
+/* Estado publicación */
+.estado-publicacion {
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+/* Estados */
+.estado-activa {
+  background: #e9f7ef;
+  color: #198754;
+}
+
+.estado-rechazada {
+  background: #fdecec;
+  color: #dc3545;
+}
+
+.estado-pausada {
+  background: #efefef;
+  color: #6c757d;
+}
+
+.estado-pendiente {
+  background: #fff3cd;
+  color: #664d03;
+}
+
+/* Empty state */
+.empty-state {
+  border: 1px dashed rgba(0, 0, 0, 0.15);
+  border-radius: 14px;
+  padding: 2rem;
+  text-align: center;
+}
+
+/* Modal: contenedor de imagen */
+.modal-img-wrap {
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f3f4f6;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.modal-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ajustes visuales del modal */
+#modalServicio .modal-header {
+  align-items: flex-start;
+}
+
+#modalServicio .modal-title {
+  line-height: 1.2;
+}
+
+/* Botones: que respiren mejor en mobile */
+@media (max-width: 575.98px) {
+  .card-footer .btn.flex-fill,
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
