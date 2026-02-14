@@ -21,7 +21,7 @@ $datos = mostrarservicios();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/consultarUsuarios.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
     <style>
         .btn-approve:hover { border-color: #0066ff; color: #0066ff; background-color: #d1e7dd; }
         .btn-reject:hover { border-color: #dc3545; color: #dc3545; background-color: #f8d7da; }
