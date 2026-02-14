@@ -22,7 +22,7 @@ $datos = mostrarUsuarios();
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/consultarUsuarios.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
 </head>
 
 <body>

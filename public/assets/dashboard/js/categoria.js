@@ -1,21 +1,26 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const inputFile = document.getElementById('icono-input');
-    const previewImage = document.getElementById('foto-preview');
-    const defaultIconPath = '<?= BASE_URL ?>/public/uploads/categorias/default_icon.png';
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Previsualización de Imagen
+    const inputIcono = document.getElementById('icono-input');
+    const imgPreview = document.getElementById('foto-preview');
 
-    if (inputFile && previewImage) {
-        inputFile.addEventListener('change', function(event) {
-            const file = event.target.files[0];
-
+    if (inputIcono && imgPreview) {
+        inputIcono.addEventListener('change', function(e) {
+            const file = e.target.files[0];
             if (file) {
+                // Verificamos que sea imagen
+                if (!file.type.startsWith('image/')) {
+                    Swal.fire('Error', 'El archivo debe ser una imagen', 'error');
+                    this.value = ''; // Limpiar input
+                    return;
+                }
+
+                // Crear URL temporal para mostrarla
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewImage.src = e.target.result;
+                    imgPreview.src = e.target.result;
                 }
                 reader.readAsDataURL(file);
-            } else {
-                // Si el usuario cancela la selección, se restaura el ícono por defecto
-                previewImage.src = defaultIconPath; 
             }
         });
     }

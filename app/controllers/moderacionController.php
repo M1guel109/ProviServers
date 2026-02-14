@@ -29,13 +29,13 @@ if ($method === 'GET') {
         apiDetalleServicio();
     }
     
-    // Acciones Legacy (por URL directa, si se usaran)
-    if ($accion === 'aprobar') {
-        aprobarServicio($_GET['id']);
-    }
-    if ($accion === 'rechazar') {
-        rechazarServicio($_GET['id'], $_GET['motivo'] ?? '');
-    }
+    // // Acciones Legacy (por URL directa, si se usaran)
+    // if ($accion === 'aprobar') {
+    //     aprobarServicio($_GET['id']);
+    // }
+    // if ($accion === 'rechazar') {
+    //     rechazarServicio($_GET['id'], $_GET['motivo'] ?? '');
+    // }
 }
 
 

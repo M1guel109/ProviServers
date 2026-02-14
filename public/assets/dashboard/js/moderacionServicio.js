@@ -238,3 +238,111 @@ function enviarEstado(id, estado, motivo = '') {
     });
 }
 
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // --- CONFIGURACIÓN A: TABLA PRINCIPAL (#tabla) ---
+    // Solo búsqueda y paginación. Diseño limpio.
+    let tableMain = new DataTable('#tabla', {
+        responsive: true,
+        pageLength: 10,
+        layout: {
+            topStart: 'search',
+            topEnd: null,
+            bottomStart: 'info',
+            bottomEnd: 'paging'
+        },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"
+        },
+        // Personalización del input de búsqueda (Lupa)
+        initComplete: function () {
+            styleSearchInput('#tabla_wrapper');
+        }
+    });
+
+    // --- CONFIGURACIÓN B: TABLA EXPORTACIÓN (#tabla-1) ---
+    // Con botones, sin paginación (para exportar todo).
+    let tableExport = new DataTable('#tabla-1', {
+        responsive: true,
+        paging: false, // ¡Importante! Para exportar todos los datos, no solo la página actual
+        layout: {
+            topStart: {
+                buttons: [
+                    {
+                        extend: 'copy',
+                        text: '<i class="bi bi-clipboard"></i> Copiar',
+                        className: 'btn btn-outline-secondary btn-sm',
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                        className: 'btn btn-success btn-sm',
+                        title: 'Reporte_Usuarios'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+                        className: 'btn btn-danger btn-sm',
+                        title: 'Reporte_Usuarios',
+                        orientation: 'landscape'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="bi bi-printer"></i> Imprimir',
+                        className: 'btn btn-info btn-sm text-white',
+                    }
+                ]
+            },
+            topEnd: 'search'
+        },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"
+        },
+        initComplete: function () {
+            styleSearchInput('#tabla-1_wrapper');
+        }
+    });
+
+    // --- FUNCIÓN AUXILIAR: Estilar el buscador con la lupa ---
+    function styleSearchInput(wrapperSelector) {
+        const wrapper = document.querySelector(wrapperSelector);
+        if (!wrapper) return;
+
+        const dtSearch = wrapper.querySelector('.dt-search');
+        if (!dtSearch) return;
+
+        const input = dtSearch.querySelector('input[type="search"]');
+        if (!input) return;
+
+        // Crear contenedor personalizado
+        const buscadorDiv = document.createElement('div');
+        buscadorDiv.className = 'buscador'; // Clase definida en tu CSS
+        buscadorDiv.innerHTML = `<i class="bi bi-search"></i>`;
+        buscadorDiv.appendChild(input);
+
+        // Limpiar y agregar nuevo input
+        dtSearch.innerHTML = '';
+        dtSearch.appendChild(buscadorDiv);
+
+        // Estilos inline para asegurar compatibilidad
+        input.setAttribute('placeholder', 'Buscar...');
+        input.style.width = "100%";
+        input.style.border = "none";
+        input.style.background = "transparent";
+        input.style.outline = "none";
+        input.style.paddingLeft = "10px";
+    }
+
+    // --- CORRECCIÓN DE PESTAÑAS (Tabs) ---
+    // Ajusta las columnas cuando se cambia de pestaña para evitar deformaciones
+    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabEls.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            // Ajustar columnas de ambas tablas
+            tableMain.columns.adjust().responsive.recalc();
+            tableExport.columns.adjust().responsive.recalc();
+        });
+    });
+
+});
