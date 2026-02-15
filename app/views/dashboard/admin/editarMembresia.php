@@ -1,13 +1,27 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_admin.php';
-require_once BASE_PATH . '/app/controllers/membresiaController.php';
 
-// llamamos la funcion especifica que exite en dicho controlador
+// --- CAMBIO AQUÍ ---
+// No llamamos al controlador. Llamamos al Modelo directamente.
+require_once BASE_PATH . '/app/models/Membresia.php';
+
+// Validamos el ID
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header('Location: ' . BASE_URL . '/admin/membresias');
+    exit;
+}
+
 $id = $_GET['id'];
 
-// Llamamos la funcion especifica del controlador y le pasamoas los datos a una variable que podamos manipular en un archivo 
-$membresia = mostrarMembresiaId($id);
+// Instanciamos el Modelo y pedimos los datos
+$objMembresia = new Membresia();
+$membresia = $objMembresia->mostrarId($id);
 
+// Si no existe, devolver
+if (!$membresia) {
+    header('Location: ' . BASE_URL . '/admin/membresias');
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +34,8 @@ $membresia = mostrarMembresiaId($id);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardFormulario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardFormulario.css"> -->
 </head>
 
 <body>

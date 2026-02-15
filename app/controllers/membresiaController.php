@@ -26,7 +26,7 @@ switch ($method) {
             // Retorna JSON si se pide por AJAX o carga vista si es necesario
             // Por ahora asumimos uso interno
             $datos = mostrarMembresiaId($_GET['id']);
-            echo json_encode($datos); 
+            echo json_encode($datos);
         } else {
             // Retornar array para la vista
             return mostrarMembresias();
@@ -57,7 +57,7 @@ function registrarMembresia()
     $es_destacado  = isset($_POST['es_destacado']) ? 1 : 0;
     $permite_videos = isset($_POST['permite_videos']) ? 1 : 0;
     $acceso_stats  = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
-    
+
     // El estado en tu BD es ENUM('ACTIVO','INACTIVO')
     // El checkbox envía "ACTIVO" si está marcado, o nada si no.
     $estado = isset($_POST['estado']) ? 'ACTIVO' : 'INACTIVO';
@@ -98,7 +98,7 @@ function registrarMembresia()
     $resultado = $objMembresia->registrar($data);
 
     if ($resultado) {
-        mostrarSweetAlert('success', 'Membresía creada', 'El plan ha sido registrado correctamente.', '/ProviServers/admin/membresias');
+        mostrarSweetAlert('success', 'Membresía creada', 'El plan ha sido registrado correctamente.', '/ProviServers/admin/consultar-membresias');
     } else {
         mostrarSweetAlert('error', 'Error al registrar', 'No se pudo guardar en la base de datos.');
     }
@@ -153,7 +153,7 @@ function actualizarMembresia()
     ];
 
     if ($obj->actualizar($data)) {
-        mostrarSweetAlert('success', 'Actualizado', 'La membresía se actualizó correctamente.', '/ProviServers/admin/membresias');
+        mostrarSweetAlert('success', 'Actualizado', 'La membresía se actualizó correctamente.', '/ProviServers/admin/consultar-membresias');
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudieron guardar los cambios.');
     }
@@ -168,21 +168,35 @@ function eliminarMembresia($id)
     }
 
     $obj = new Membresia();
+
+    // 1. SEGURIDAD: Verificar si hay proveedores usando este plan
+    if ($obj->tieneProveedores($id)) {
+        mostrarSweetAlert(
+            'warning',
+            'No se puede eliminar',
+            'Esta membresía está asignada a proveedores activos. No se puede borrar.',
+            '/ProviServers/admin/consultar-membresias' // Redirige a la lista
+        );
+        exit;
+    }
+
+    // 2. ELIMINAR
     if ($obj->eliminar($id)) {
         mostrarSweetAlert('success', 'Eliminado', 'La membresía ha sido eliminada.', '/ProviServers/admin/consultar-membresias');
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se puede eliminar. Puede que esté en uso.');
+        mostrarSweetAlert('error', 'Error', 'Ocurrió un error al intentar eliminar.');
     }
     exit;
 }
 
-function mostrarMembresias() {
+function mostrarMembresias()
+{
     $obj = new Membresia();
     return $obj->mostrar();
 }
 
-function mostrarMembresiaId($id) {
+function mostrarMembresiaId($id)
+{
     $obj = new Membresia();
     return $obj->mostrarId($id);
 }
-?>

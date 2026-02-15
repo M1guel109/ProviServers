@@ -322,6 +322,45 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
+.step-indicator {
+    padding: 0.75rem 1.5rem;
+    margin: 0 0.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #6c757d;
+    /* Gris para inactivo */
+    background-color: #f8f9fa;
+    /* Fondo claro */
+    border: 1px solid #dee2e6;
+}
+
+.step-indicator.active {
+    color: #fff;
+    background-color: var(--bs-primary, #0d6efd);
+    /* Usar el color primario de Bootstrap */
+    border-color: var(--bs-primary, #0d6efd);
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.wizard-step {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.wizard-step:not(.active) {
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+.wizard-step.active {
+    opacity: 1;
+    height: auto;
+}
+
 
 
 /* 9. Responsive Tablet */

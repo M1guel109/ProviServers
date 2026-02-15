@@ -150,6 +150,17 @@ class Membresia
         }
     }
 
+    // Verificar si la membresía está asignada a algún proveedor
+    public function tieneProveedores($id)
+    {
+        // Ajusta 'proveedor_membresia' si tu tabla intermedia se llama diferente
+        $sql = "SELECT COUNT(*) FROM proveedor_membresia WHERE membresia_id = :id";
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+        return $stmt->fetchColumn() > 0;
+    }
+
     /**
      * Eliminar membresía
      */
