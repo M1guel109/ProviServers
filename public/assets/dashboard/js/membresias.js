@@ -128,3 +128,141 @@ document.addEventListener('DOMContentLoaded', () => {
     // Asegurar que el paso 1 se muestra correctamente al cargar
     updateWizardDisplay();
 });
+
+function cargarDetalleMembresia(tipo, descripcion, costo, duracion, estado, maxServicios, destacado, videos, stats) {
+
+    // 1. Llenar textos básicos
+    document.getElementById('modal-titulo').innerText = tipo;
+    document.getElementById('modal-descripcion').innerText = descripcion;
+    document.getElementById('modal-duracion').innerText = duracion + " días";
+    document.getElementById('modal-servicios').innerText = maxServicios + " publicaciones";
+
+    // 2. Formatear Moneda (Pesos Colombianos)
+    const formatoMoneda = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+    document.getElementById('modal-costo').innerText = formatoMoneda.format(costo);
+
+    // 3. Badge de Estado
+    const divEstado = document.getElementById('modal-estado-badge');
+    if (estado === 'ACTIVO') {
+        divEstado.innerHTML = '<span class="badge bg-success px-3 py-2 rounded-pill">Activo</span>';
+    } else {
+        divEstado.innerHTML = '<span class="badge bg-danger px-3 py-2 rounded-pill">Inactivo</span>';
+    }
+
+    // 4. Lógica de Iconos (Check Verde / Cruz Roja) para los beneficios
+    const iconCheck = '<i class="bi bi-check-circle-fill text-success fs-5"></i>';
+    const iconX = '<i class="bi bi-x-circle-fill text-secondary opacity-50 fs-5"></i>';
+
+    document.getElementById('check-destacado').innerHTML = (destacado == 1) ? iconCheck : iconX;
+    document.getElementById('check-videos').innerHTML = (videos == 1) ? iconCheck : iconX;
+    document.getElementById('check-stats').innerHTML = (stats == 1) ? iconCheck : iconX;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // --- CONFIGURACIÓN A: TABLA PRINCIPAL (#tabla) ---
+    // Solo búsqueda y paginación. Diseño limpio.
+    let tableMain = new DataTable('#tabla', {
+        responsive: true,
+        pageLength: 10,
+        scrollX: true,
+        layout: {
+            topStart: 'search',
+            topEnd: null,
+            bottomStart: 'info',
+            bottomEnd: 'paging'
+        },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"
+        },
+        // Personalización del input de búsqueda (Lupa)
+        initComplete: function () {
+            styleSearchInput('#tabla_wrapper');
+        }
+    });
+
+    // --- CONFIGURACIÓN B: TABLA EXPORTACIÓN (#tabla-1) ---
+    // Con botones, sin paginación (para exportar todo).
+    let tableExport = new DataTable('#tabla-1', {
+        responsive: true,
+        paging: false, // ¡Importante! Para exportar todos los datos, no solo la página actual
+        layout: {
+            topStart: {
+                buttons: [
+                    {
+                        extend: 'copy',
+                        text: '<i class="bi bi-clipboard"></i> Copiar',
+                        className: 'btn btn-outline-secondary btn-sm',
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="bi bi-file-earmark-excel"></i> Excel',
+                        className: 'btn btn-success btn-sm',
+                        title: 'Reporte_Usuarios'
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="bi bi-file-earmark-pdf"></i> PDF',
+                        className: 'btn btn-danger btn-sm',
+                        title: 'Reporte_Usuarios',
+                        orientation: 'landscape'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="bi bi-printer"></i> Imprimir',
+                        className: 'btn btn-info btn-sm text-white',
+                    }
+                ]
+            },
+            topEnd: 'search'
+        },
+        language: {
+            url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"
+        },
+        initComplete: function () {
+            styleSearchInput('#tabla-1_wrapper');
+        }
+    });
+
+    // --- FUNCIÓN AUXILIAR: Estilar el buscador con la lupa ---
+    function styleSearchInput(wrapperSelector) {
+        const wrapper = document.querySelector(wrapperSelector);
+        if (!wrapper) return;
+
+        const dtSearch = wrapper.querySelector('.dt-search');
+        if (!dtSearch) return;
+
+        const input = dtSearch.querySelector('input[type="search"]');
+        if (!input) return;
+
+        // Crear contenedor personalizado
+        const buscadorDiv = document.createElement('div');
+        buscadorDiv.className = 'buscador'; // Clase definida en tu CSS
+        buscadorDiv.innerHTML = `<i class="bi bi-search"></i>`;
+        buscadorDiv.appendChild(input);
+
+        // Limpiar y agregar nuevo input
+        dtSearch.innerHTML = '';
+        dtSearch.appendChild(buscadorDiv);
+
+        // Estilos inline para asegurar compatibilidad
+        input.setAttribute('placeholder', 'Buscar...');
+        input.style.width = "100%";
+        input.style.border = "none";
+        input.style.background = "transparent";
+        input.style.outline = "none";
+        input.style.paddingLeft = "10px";
+    }
+
+    // --- CORRECCIÓN DE PESTAÑAS (Tabs) ---
+    // Ajusta las columnas cuando se cambia de pestaña para evitar deformaciones
+    const tabEls = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    tabEls.forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (event) {
+            // Ajustar columnas de ambas tablas
+            tableMain.columns.adjust().responsive.recalc();
+            tableExport.columns.adjust().responsive.recalc();
+        });
+    });
+
+});

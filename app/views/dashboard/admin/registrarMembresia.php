@@ -31,10 +31,10 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
 
         <section id="formulario-usuarios">
             <div class="contenedor-formulario">
-                
+
                 <form action="<?= BASE_URL ?>/admin/guardar-membresia" method="post" class="formulario-usuario">
                     <div class="row g-3">
-                        
+
                         <div class="col-md-6">
                             <label for="tipo" class="form-label">Nombre del Plan </label>
                             <input type="text" class="form-control" id="tipo" name="tipo"
@@ -62,10 +62,16 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                             <input type="number" class="form-control" id="max_servicios_activos" name="max_servicios_activos"
                                 value="1" min="1" required>
                         </div>
+                        <div class="col-md-6">
+                            <label for="orden_visual" class="form-label">Orden Visual (Opcional)</label>
+                            <input type="number" class="form-control" id="orden_visual" name="orden_visual"
+                                placeholder="Ej: 1 para mostrar primero" min="0">
+                            <div class="form-text">Define en qué orden aparecen los planes en la web.</div>
+                        </div>
 
                         <div class="col-12">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="2" 
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="2"
                                 maxlength="150" placeholder="Breve descripción de beneficios..." required></textarea>
                             <div class="form-text">Máximo 150 caracteres.</div>
                         </div>
@@ -77,7 +83,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                                 <input class="form-check-input" type="checkbox" id="es_destacado" name="es_destacado" value="1">
                                 <label class="form-check-label" for="es_destacado">¿Es plan Destacado?</label>
                             </div>
-                            
+
                             <div class="form-check form-switch mb-3">
                                 <input class="form-check-input" type="checkbox" id="permite_videos" name="permite_videos" value="1">
                                 <label class="form-check-label" for="permite_videos">¿Permite subir videos?</label>
@@ -119,4 +125,5 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
+
 </html>
