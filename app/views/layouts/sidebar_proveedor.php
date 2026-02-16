@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar"> 
     <div class="logo">
         <a href="#">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers" class="logo-completo">
@@ -22,8 +22,16 @@
                     <i class="bi bi-chevron-down toggle-icon"></i>
                 </button>
                 <ul class="submenu">
-                    <li><a href="<?= BASE_URL ?>/proveedor/registrar-servicio" class="submenu-link"><i class="bi bi-plus-circle"></i>Registrar Servicio</a></li>
-                    <li><a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link"><i class="bi bi-list-ul"></i>Consultar Servicios</a></li>
+                    <li>
+                        <a href="<?= BASE_URL ?>/proveedor/registrar-servicio" class="submenu-link">
+                            <i class="bi bi-plus-circle"></i>Registrar Servicio
+                        </a>
+                    </li>
+                    <li>
+                        <a href="<?= BASE_URL ?>/proveedor/listar-servicio" class="submenu-link">
+                            <i class="bi bi-list-ul"></i>Consultar Servicios
+                        </a>
+                    </li>
                 </ul>
             </li>
 
@@ -67,7 +75,6 @@
                     <i class="bi bi-gear"></i><span>Configuración</span>
                 </a>
             </li>
-
         </ul>
     </nav>
 

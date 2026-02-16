@@ -1,0 +1,197 @@
+/* =====================================================
+   AGENDA PROVEEDOR - MI CALENDARIO
+   ===================================================== */
+
+/* ===== CARDS SUPERIORES (SERVICIOS / INGRESOS / ETC) ===== */
+.contenido .card {
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.25s ease;
+}
+
+.contenido .card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.contenido .card h3 {
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: var(--fs-title3);
+    color: var(--dark-color);
+}
+
+.contenido .card h6 {
+    font-size: var(--fs-small);
+    letter-spacing: 0.4px;
+}
+
+/* ===== CALENDARIO PRINCIPAL ===== */
+#calendarDays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+/* Día individual */
+.calendar-day {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    min-height: 95px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.calendar-day:hover {
+    border-color: var(--primary-color);
+    background-color: #f0f6ff;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--primary-color);
+    background-color: #eef4ff;
+}
+
+.calendar-day.selected {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+.calendar-day.selected small,
+.calendar-day.selected span {
+    color: var(--white-color);
+}
+
+/* Número del día */
+.calendar-day .day-number {
+    font-weight: 600;
+    font-size: var(--fs-text);
+}
+
+/* Indicadores pequeños de eventos */
+.event-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin: 2px;
+    display: inline-block;
+}
+
+.dot-confirmado { background-color: var(--primary-color); }
+.dot-pendiente { background-color: #f39c12; }
+.dot-cancelado { background-color: #e74c3c; }
+.dot-bloqueado { background-color: #64748b; }
+.dot-pago { background-color: var(--success-color); }
+
+/* ===== HEADER DEL CALENDARIO ===== */
+.card-header button.btn-light {
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-header button.btn-light:hover {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+}
+
+#currentMonth {
+    font-family: var(--font-title);
+    font-size: var(--fs-title4);
+    color: var(--dark-color);
+}
+
+/* ===== PANEL DERECHO ===== */
+#servicesOfDay {
+    min-height: 120px;
+}
+
+/* Servicios listados dinámicamente */
+.service-item {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background-color: #f8fafc;
+    border-left: 4px solid var(--primary-color);
+    transition: all 0.2s ease;
+}
+
+.service-item:hover {
+    background-color: #eef4ff;
+}
+
+/* ===== RESUMEN FINANCIERO ===== */
+.card-body p {
+    margin-bottom: 8px;
+    font-size: var(--fs-text);
+}
+
+.card-body strong {
+    font-weight: 600;
+    font-family: var(--font-title);
+}
+
+/* ===== DISPONIBILIDAD ===== */
+.card-body hr {
+    border-top: 1px solid #e2e8f0;
+}
+
+/* ===== MODAL BLOQUEAR DÍA ===== */
+.modal-content {
+    border-radius: 14px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+}
+
+.modal-footer {
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Botón bloquear */
+.btn-danger {
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    transform: translateY(-1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media screen and (max-width: 992px) {
+    #calendarDays {
+        gap: 6px;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 8px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    #calendarDays {
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+    }
+
+    .calendar-day {
+        min-height: 65px;
+        padding: 6px;
+    }
+
+    .calendar-day .day-number {
+        font-size: 12px;
+    }
+}
