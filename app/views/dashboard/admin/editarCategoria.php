@@ -1,19 +1,28 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_admin.php';
-// Enlazamos la dependencia,en este caso el controlador que tiene la funcion de consulatar los datos
-require_once BASE_PATH . '/app/controllers/categoriaController.php';
 
-// llamamos la funcion especifica que exite en dicho controlador
+// --- CAMBIO CLAVE AQUÍ ---
+// En lugar de llamar al Controlador (que nos devuelve JSON por error),
+// llamamos directamente al Modelo para pedir los datos.
+require_once BASE_PATH . '/app/models/categoria.php';
+
+// Validamos que venga el ID
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header('Location: ' . BASE_URL . '/admin/consultar-categorias');
+    exit;
+}
+
 $id = $_GET['id'];
 
-// Llamamos la funcion especifica del controlador y le pasamoas los datos a una variable que podamos manipular en un archivo 
-$categoria = mostrarCategoriaId($id);
+// Instanciamos el Modelo directamente
+$objCategoria = new Categoria();
+$categoria = $objCategoria->mostrarId($id);
 
-// echo "<pre>";
-// var_dump($usuario);
-// echo "</pre>";
-// exit;
-
+// Si no existe la categoría, devolvemos al listado
+if (!$categoria) {
+    header('Location: ' . BASE_URL . '/admin/consultar-categorias');
+    exit;
+}
 ?>
 
 

@@ -47,3 +47,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// --- Toggle Sidebar ---
+const btnToggle = document.getElementById("btn-toggle-menu");
+const sidebar = document.querySelector(".sidebar");
+
+if (btnToggle && sidebar) {
+  btnToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("collapsed");
+  });
+}
+

@@ -25,70 +25,96 @@ class Usuario
         try {
             $this->conexion->beginTransaction();
 
-            // 🔒 Encriptar la clave antes de guardar
+            // 1. Insertar en tabla USUARIOS
             $claveHash = password_hash($data['clave'], PASSWORD_DEFAULT);
 
-            // INSERT usuarios (usamos :estado pasado desde el controlador)
-            $insertar = "INSERT INTO usuarios (email, clave, documento, rol, estado) VALUES (:email, :clave, :documento, :rol, :estado)";
+            // Asegúrate que tu columna en BD sea 'estado_id' o 'estado' según tu estructura real
+            $sqlUser = "INSERT INTO usuarios (email, clave, documento, rol, estado_id) VALUES (:email, :clave, :doc, :rol, :estado)";
 
-            $stmt = $this->conexion->prepare($insertar);
-            $stmt->bindParam(':email', $data['email']);
-            $stmt->bindParam(':clave', $claveHash);
-            $stmt->bindParam(':documento', $data['documento']);
-            $stmt->bindParam(':rol', $data['rol']);
-            $stmt->bindParam(':estado', $data['estado'], PDO::PARAM_INT);
+            $stmt = $this->conexion->prepare($sqlUser);
+            $stmt->execute([
+                ':email'   => $data['email'],
+                ':clave'   => $claveHash,
+                ':doc'     => $data['documento'],
+                ':rol'     => $data['rol'],
+                ':estado'  => $data['estado']
+            ]);
 
-            $stmt->execute();
-
-            // Obtener el ID generado
             $usuario_id = $this->conexion->lastInsertId();
-            if (!$usuario_id) throw new Exception("Error al obtener ID de usuario después de la inserción.");
 
-            // 1.2. Inserción en tabla de detalle según rol
+            // 2. Insertar en tabla ESPECÍFICA (Clientes/Proveedores/Admins)
             $tablaDetalle = $this->getTablaDetalle($data['rol']);
 
-            $insertar2 = "INSERT INTO {$tablaDetalle} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) VALUES (:usuario_id, :nombres, :apellidos, :telefono, :ubicacion, :foto)";
-            $resultado = $this->conexion->prepare($insertar2);
-            $resultado->bindParam(':usuario_id', $usuario_id);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':ubicacion', $data['ubicacion']);
-            $resultado->bindParam(':foto', $data['foto']);
-            $resultado->execute();
+            $sqlDetalle = "INSERT INTO {$tablaDetalle} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) 
+                        VALUES (:uid, :nom, :ape, :tel, :ubi, :foto)";
 
-            // Si el rol es proveedor, insertar en documentos_proveedor los archivos subidos
-            if ($data['rol'] === 'proveedor' && !empty($data['documentos']) && is_array($data['documentos'])) {
-                // Primero necesitamos obtener el ID del proveedor (tabla proveedores) que acabamos de insertar
-                // La tabla proveedores tiene su propio id autoincrement, y tiene usuario_id = $usuario_id
-                // Podemos obtener proveedor_id consultando la tabla proveedores por usuario_id
-                $stmtProv = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :usuario_id LIMIT 1");
-                $stmtProv->bindParam(':usuario_id', $usuario_id);
-                $stmtProv->execute();
-                $proveedor_row = $stmtProv->fetch(PDO::FETCH_ASSOC);
+            $stmtDetalle = $this->conexion->prepare($sqlDetalle);
+            $stmtDetalle->execute([
+                ':uid'  => $usuario_id,
+                ':nom'  => $data['nombres'],
+                ':ape'  => $data['apellidos'],
+                ':tel'  => $data['telefono'],
+                ':ubi'  => $data['ubicacion'],
+                ':foto' => $data['foto']
+            ]);
 
-                if (!$proveedor_row) {
-                    // Si por alguna razón no existe, hacemos rollback y error
-                    throw new Exception("No se encontró el registro en proveedores para usuario_id {$usuario_id}");
+            // =========================================================
+            // 3. LÓGICA EXTRA PARA PROVEEDORES (Docs + Categorías)
+            // =========================================================
+            if ($data['rol'] === 'proveedor') {
+                // Obtenemos el ID generado en la tabla 'proveedores' (que es distinto al usuario_id)
+                $proveedor_id = $this->conexion->lastInsertId();
+
+                // A. Guardar Documentos
+                if (!empty($data['documentos'])) {
+                    $sqlDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado) 
+                            VALUES (:pid, :tipo, :archivo, 'pendiente')";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
+
+                    foreach ($data['documentos'] as $doc) {
+                        $stmtDoc->execute([
+                            ':pid'     => $proveedor_id,
+                            ':tipo'    => $doc['tipo'],
+                            ':archivo' => $doc['archivo']
+                        ]);
+                    }
                 }
 
-                $proveedor_id = $proveedor_row['id'];
+                // B. Guardar Categorías (Dinámicas)
+                if (!empty($data['categorias'])) {
+                    // Preparar consultas para reutilizar dentro del bucle
+                    $sqlCheckCat  = "SELECT id FROM categorias WHERE nombre = :nombre LIMIT 1";
+                    $sqlInsertCat = "INSERT INTO categorias (nombre) VALUES (:nombre)";
+                    $sqlRelacion  = "INSERT INTO proveedor_categorias (proveedor_id, categoria_id) VALUES (:pid, :cid)";
 
-                // Insertar cada documento en documentos_proveedor
-                $insertDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado, fecha_subida) VALUES (:proveedor_id, :tipo_documento, :archivo, 'pendiente', NOW())";
-                $stmtDoc = $this->conexion->prepare($insertDoc);
+                    $stmtCheck = $this->conexion->prepare($sqlCheckCat);
+                    $stmtInCat = $this->conexion->prepare($sqlInsertCat);
+                    $stmtRel   = $this->conexion->prepare($sqlRelacion);
 
-                foreach ($data['documentos'] as $key => $doc) {
-                    // $doc = ['tipo' => 'dni'|'otro'|'certificado', 'archivo' => 'nombre.ext']
-                    if (!isset($doc['tipo']) || !isset($doc['archivo'])) continue;
+                    foreach ($data['categorias'] as $nombreCat) {
+                        $nombreCat = trim($nombreCat);
+                        if (empty($nombreCat)) continue;
 
-                    $tipo = $doc['tipo'];
-                    $archivo = $doc['archivo'];
+                        // 1. Verificar si existe
+                        $stmtCheck->execute([':nombre' => $nombreCat]);
+                        $catId = $stmtCheck->fetchColumn();
 
-                    $stmtDoc->bindParam(':proveedor_id', $proveedor_id);
-                    $stmtDoc->bindParam(':tipo_documento', $tipo);
-                    $stmtDoc->bindParam(':archivo', $archivo);
-                    $stmtDoc->execute();
+                        // 2. Si no existe, crearla
+                        if (!$catId) {
+                            $stmtInCat->execute([':nombre' => $nombreCat]);
+                            $catId = $this->conexion->lastInsertId();
+                        }
+
+                        // 3. Crear relación (usamos try/catch por si se duplica)
+                        try {
+                            $stmtRel->execute([
+                                ':pid' => $proveedor_id,
+                                ':cid' => $catId
+                            ]);
+                        } catch (PDOException $e) {
+                            // Si ya existe la relación, continuamos silenciosamente
+                        }
+                    }
                 }
             }
 
@@ -96,11 +122,11 @@ class Usuario
             return true;
         } catch (PDOException $e) {
             $this->conexion->rollBack();
-            error_log("Error en Usuario::registrar->" . $e->getMessage());
+            error_log("Error BD en registrar: " . $e->getMessage());
             return false;
         } catch (Exception $e) {
             $this->conexion->rollBack();
-            error_log("Error en Usuario::registrar->" . $e->getMessage());
+            error_log("Error General en registrar: " . $e->getMessage());
             return false;
         }
     }
@@ -152,95 +178,223 @@ class Usuario
     public function mostrarId($id)
     {
         try {
+            // 1. Consulta Principal (Datos de Usuario y Perfil)
+            // AGREGUÉ: "p.id AS proveedor_id" para poder buscar sus detalles después
             $consultar = "SELECT 
-                u.id, u.email, u.documento, u.rol, u.estado_id, es.nombre AS estado_nombre,
-                COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
-                COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
-                COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
-                COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
-                COALESCE(c.foto, p.foto, a.foto) AS foto
-            FROM usuarios u
-            LEFT JOIN usuario_estados es ON u.estado_id = es.id
-            LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
-            LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
-            LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
-            WHERE u.id = :id
-            LIMIT 1";
+            u.id, u.email, u.documento, u.clave, u.rol, u.estado_id, es.nombre AS estado_nombre,
+            COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
+            COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
+            COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
+            COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
+            COALESCE(c.foto, p.foto, a.foto) AS foto,
+            p.id AS proveedor_id 
+        FROM usuarios u
+        LEFT JOIN usuario_estados es ON u.estado_id = es.id
+        LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
+        LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
+        LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
+        WHERE u.id = :id
+        LIMIT 1";
 
             $resultado = $this->conexion->prepare($consultar);
             $resultado->bindParam(':id', $id);
             $resultado->execute();
 
-            return $resultado->fetch();
+            $usuario = $resultado->fetch(PDO::FETCH_ASSOC);
+
+            // Si no existe el usuario, devolvemos false
+            if (!$usuario) return false;
+
+            // =========================================================
+            // 2. LÓGICA EXTRA: Si es proveedor, traemos sus "hijos"
+            // =========================================================
+            if ($usuario['rol'] === 'proveedor' && !empty($usuario['proveedor_id'])) {
+                $pid = $usuario['proveedor_id'];
+
+                // A. Traer Categorías (Como un array simple de nombres)
+                // Esto devolverá: ['Plomería', 'Electricidad', ...]
+                $sqlCat = "SELECT c.nombre 
+                       FROM categorias c
+                       JOIN proveedor_categorias pc ON c.id = pc.categoria_id
+                       WHERE pc.proveedor_id = :pid";
+                $stmtCat = $this->conexion->prepare($sqlCat);
+                $stmtCat->execute([':pid' => $pid]);
+                $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+
+                // B. Traer Documentos (Array completo)
+                // Esto devolverá: [['id'=>1, 'tipo'=>'cedula', ...], ...]
+                $sqlDoc = "SELECT id, tipo_documento, archivo, estado, fecha_subida 
+                       FROM documentos_proveedor 
+                       WHERE proveedor_id = :pid";
+                $stmtDoc = $this->conexion->prepare($sqlDoc);
+                $stmtDoc->execute([':pid' => $pid]);
+                $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            return $usuario;
         } catch (PDOException $e) {
-            error_log("Error en Usuario::mostrar->" . $e->getMessage());
-            return [];
+            error_log("Error en Usuario::mostrarId->" . $e->getMessage());
+            return false;
         }
     }
 
     public function actualizar($data)
     {
-
-        $this->conexion->beginTransaction();
-
-
-        // 1. Determinar la tabla de detalle según el rol
-        $tabla_detalle = '';
-        switch ($data['rol']) {
-            case 'cliente':
-                $tabla_detalle = 'clientes';
-                break;
-            case 'proveedor':
-                $tabla_detalle = 'proveedores';
-                break;
-            case 'admin':
-                $tabla_detalle = 'admins';
-                break;
-            default:
-                error_log("Error: Rol de usuario inválido ({$data['rol']}).");
-                return false;
-        }
-
         try {
-            // A. Actualización de la tabla base 'usuarios' (solo campos esenciales)
-            $actualizar = "UPDATE usuarios 
-                             SET email = :email,
-                             documento = :documento,
-                              rol = :rol,
-                              estado_id = :estado_id 
-                             WHERE id = :id";
+            $this->conexion->beginTransaction();
 
-            $resultado = $this->conexion->prepare($actualizar);
-            $resultado->bindParam(':id', $data['id']);
-            $resultado->bindParam(':email', $data['email']);
-            $resultado->bindParam(':documento', $data['documento']);
-            $resultado->bindParam(':rol', $data['rol']);
-            $resultado->bindParam(':estado_id', $data['estado']);
+            // ---------------------------------------------------------
+            // 1. DETECTAR CAMBIO DE ROL (Vital para migrar datos)
+            // ---------------------------------------------------------
+            // Buscamos qué rol tenía antes de este cambio
+            $stmtActual = $this->conexion->prepare("SELECT rol FROM usuarios WHERE id = :id");
+            $stmtActual->execute([':id' => $data['id']]);
+            $usuarioDb = $stmtActual->fetch(PDO::FETCH_ASSOC);
+            $rolAnterior = $usuarioDb['rol'];
 
-            $resultado->execute();
+            // ---------------------------------------------------------
+            // 2. ACTUALIZAR TABLA USUARIOS (Login)
+            // ---------------------------------------------------------
+            // Construimos la consulta dinámica (solo actualizamos clave si trajo una nueva)
+            $sqlUser = "UPDATE usuarios SET email = :email, documento = :doc, rol = :rol, estado_id = :estado";
+            if (!empty($data['clave'])) {
+                $sqlUser .= ", clave = :clave";
+            }
+            $sqlUser .= " WHERE id = :id";
 
-            // B. Actualización de la tabla de detalle (clientes/proveedores/admins)
-            // Se asume que el ID de la tabla de detalle es 'usuario_id'
-            $actualizar = "UPDATE {$tabla_detalle} 
-                            SET nombres = :nombres, apellidos = :apellidos, telefono = :telefono, ubicacion = :ubicacion ,foto = :foto
-                            WHERE usuario_id = :usuario_id";
+            $stmtUser = $this->conexion->prepare($sqlUser);
+            
+            $paramsUser = [
+                ':email'  => $data['email'],
+                ':doc'    => $data['documento'],
+                ':rol'    => $data['rol'],
+                ':estado' => $data['estado'], // ID numérico (1, 2...)
+                ':id'     => $data['id']
+            ];
+            
+            // Si hay nueva clave, la encriptamos
+            if (!empty($data['clave'])) {
+                $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
+            }
+            
+            $stmtUser->execute($paramsUser);
 
-            $resultado = $this->conexion->prepare($actualizar);
-            $resultado->bindParam(':usuario_id', $data['id']);
-            $resultado->bindParam(':nombres', $data['nombres']);
-            $resultado->bindParam(':apellidos', $data['apellidos']);
-            $resultado->bindParam(':telefono', $data['telefono']);
-            $resultado->bindParam(':ubicacion', $data['ubicacion']);
-            $resultado->bindParam(':foto', $data['foto_perfil']);
+            // ---------------------------------------------------------
+            // 3. GESTIÓN DE PERFILES (Cliente / Proveedor / Admin)
+            // ---------------------------------------------------------
+            
+            // CASO A: El rol NO cambió (Actualización normal)
+            if ($rolAnterior === $data['rol']) {
+                $tabla = $this->getTablaDetalle($data['rol']);
+                
+                $sqlPerfil = "UPDATE {$tabla} SET 
+                            nombres = :nom, apellidos = :ape, telefono = :tel, 
+                            ubicacion = :ubi, foto = :foto 
+                            WHERE usuario_id = :uid";
+                
+                $stmtPerfil = $this->conexion->prepare($sqlPerfil);
+                $stmtPerfil->execute([
+                    ':nom'  => $data['nombres'],
+                    ':ape'  => $data['apellidos'],
+                    ':tel'  => $data['telefono'],
+                    ':ubi'  => $data['ubicacion'],
+                    ':foto' => $data['foto_perfil'],
+                    ':uid'  => $data['id']
+                ]);
+            } 
+            // CASO B: El rol CAMBIÓ (Migración de datos)
+            else {
+                // 1. Borramos el perfil en la tabla vieja
+                $tablaVieja = $this->getTablaDetalle($rolAnterior);
+                $stmtDel = $this->conexion->prepare("DELETE FROM {$tablaVieja} WHERE usuario_id = :uid");
+                $stmtDel->execute([':uid' => $data['id']]);
 
+                // 2. Creamos el perfil en la tabla nueva
+                $tablaNueva = $this->getTablaDetalle($data['rol']);
+                $sqlIns = "INSERT INTO {$tablaNueva} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) 
+                        VALUES (:uid, :nom, :ape, :tel, :ubi, :foto)";
+                
+                $stmtIns = $this->conexion->prepare($sqlIns);
+                $stmtIns->execute([
+                    ':uid'  => $data['id'],
+                    ':nom'  => $data['nombres'],
+                    ':ape'  => $data['apellidos'],
+                    ':tel'  => $data['telefono'],
+                    ':ubi'  => $data['ubicacion'],
+                    ':foto' => $data['foto_perfil']
+                ]);
+            }
 
-            $resultado->execute();
+            // ---------------------------------------------------------
+            // 4. LÓGICA PROVEEDOR (Categorías y Documentos)
+            // ---------------------------------------------------------
+            if ($data['rol'] === 'proveedor') {
+                
+                // Necesitamos el ID de la tabla 'proveedores' (no el usuario_id)
+                $stmtPid = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid");
+                $stmtPid->execute([':uid' => $data['id']]);
+                $proveedor_id = $stmtPid->fetchColumn();
 
-            // 2. Si ambas consultas fueron exitosas, hacemos commit
+                // A. ACTUALIZAR CATEGORÍAS
+                // Estrategia: Borrar todas las relaciones viejas e insertar las nuevas (Sincronización limpia)
+                if (isset($data['categorias'])) {
+                    $stmtDelCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
+                    $stmtDelCat->execute([':pid' => $proveedor_id]);
+
+                    if (!empty($data['categorias'])) {
+                        // Queries preparadas para el bucle
+                        $sqlCheck = "SELECT id FROM categorias WHERE nombre = :nom LIMIT 1";
+                        $sqlInsCat = "INSERT INTO categorias (nombre) VALUES (:nom)";
+                        $sqlRel = "INSERT INTO proveedor_categorias (proveedor_id, categoria_id) VALUES (:pid, :cid)";
+                        
+                        $stmtCheck = $this->conexion->prepare($sqlCheck);
+                        $stmtInsCat = $this->conexion->prepare($sqlInsCat);
+                        $stmtRel = $this->conexion->prepare($sqlRel);
+
+                        foreach ($data['categorias'] as $catNombre) {
+                            $catNombre = trim($catNombre);
+                            if(empty($catNombre)) continue;
+
+                            // 1. Verificar/Crear Categoría
+                            $stmtCheck->execute([':nom' => $catNombre]);
+                            $catId = $stmtCheck->fetchColumn();
+
+                            if (!$catId) {
+                                $stmtInsCat->execute([':nom' => $catNombre]);
+                                $catId = $this->conexion->lastInsertId();
+                            }
+
+                            // 2. Crear Relación
+                            try {
+                                $stmtRel->execute([':pid' => $proveedor_id, ':cid' => $catId]);
+                            } catch (PDOException $e) { /* Ignorar si ya existe */ }
+                        }
+                    }
+                }
+
+                // B. INSERTAR NUEVOS DOCUMENTOS (Solo los nuevos)
+                // No borramos los viejos para no perder historial
+                if (!empty($data['documentos_nuevos'])) {
+                    $sqlDoc = "INSERT INTO documentos_proveedor (proveedor_id, tipo_documento, archivo, estado) 
+                            VALUES (:pid, :tipo, :archivo, 'pendiente')";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
+
+                    foreach ($data['documentos_nuevos'] as $doc) {
+                        $stmtDoc->execute([
+                            ':pid'     => $proveedor_id,
+                            ':tipo'    => $doc['tipo'],
+                            ':archivo' => $doc['archivo']
+                        ]);
+                    }
+                }
+            }
+
             $this->conexion->commit();
             return true;
+
         } catch (PDOException $e) {
-            error_log("Error en Usuario::actualizarDetallesUsuario -> " . $e->getMessage());
+            $this->conexion->rollBack();
+            error_log("Error en Usuario::actualizar -> " . $e->getMessage());
             return false;
         }
     }
@@ -250,33 +404,147 @@ class Usuario
         try {
             $this->conexion->beginTransaction();
 
-            $eliminarRol = "SELECT rol FROM usuarios WHERE id = :id";
+            // 1. Obtener datos del usuario
+            $stmtUser = $this->conexion->prepare("SELECT rol, estado_id FROM usuarios WHERE id = :id");
+            $stmtUser->execute([':id' => $id]);
+            $usuario = $stmtUser->fetch(PDO::FETCH_ASSOC);
 
-            $resultado = $this->conexion->prepare($eliminarRol);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
-            $rol = $resultado->fetchColumn();
+            if (!$usuario) return false;
 
-            if ($rol) {
-                $tablaDetalle = $this->getTablaDetalle($rol);
+            $rol = $usuario['rol'];
+            $tieneHistorial = false;
+            $pid = null; 
 
-                // 3. ELIMINAR de la tabla de detalle (debe ser primero)
-                $sqlDetalle = "DELETE FROM {$tablaDetalle} WHERE usuario_id = :id";
-                $stmtDetalle = $this->conexion->prepare($sqlDetalle);
-                $stmtDetalle->bindParam(':id', $id);
-                $stmtDetalle->execute();
+            // =========================================================
+            // 2. VERIFICACIÓN DE HISTORIAL Y OBTENCIÓN DE IDs
+            // =========================================================
+            if ($rol === 'proveedor') {
+                $stmtPid = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :id");
+                $stmtPid->execute([':id' => $id]);
+                $pid = $stmtPid->fetchColumn();
+
+                if ($pid) {
+                    // Si tienes tabla de servicios, descomenta esto:
+                    /*
+                    $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE proveedor_id = :pid"); 
+                    $stmtCheck->execute([':pid' => $pid]);
+                    if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                    */
+                }
+
+            } elseif ($rol === 'cliente') {
+                $stmtCid = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = :id");
+                $stmtCid->execute([':id' => $id]);
+                $cid = $stmtCid->fetchColumn();
+
+                /*
+                if ($cid) {
+                   $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE cliente_id = :cid");
+                   $stmtCheck->execute([':cid' => $cid]);
+                   if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                }
+                */
             }
 
-            $eliminar = "DELETE FROM usuarios WHERE id = :id";
-            $resultado = $this->conexion->prepare($eliminar);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
+            // =========================================================
+            // 3. EJECUCIÓN (Lógica vs Física)
+            // =========================================================
+            if ($tieneHistorial) {
+                // A. Desactivar (Borrado Lógico)
+                $sqlSoft = "UPDATE usuarios SET estado_id = 4 WHERE id = :id"; 
+                $stmtSoft = $this->conexion->prepare($sqlSoft);
+                $stmtSoft->execute([':id' => $id]);
+                
+                $this->conexion->commit();
+                return 'desactivado';
 
-            $this->conexion->commit();
-            return true;
+            } else {
+                // B. Eliminar Definitivamente (Borrado Físico)
+                $tablaDetalle = $this->getTablaDetalle($rol);
+
+                // --- LIMPIEZA DE DEPENDENCIAS (Solo Proveedores) ---
+                if ($rol === 'proveedor' && $pid) {
+                    // Categorías (Asegúrate de usar el nombre de columna correcto que te funcionó)
+                    $delCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
+                    $delCat->execute([':pid' => $pid]);
+
+                    // Documentos (Asegúrate de usar el nombre de columna correcto)
+                    $delDoc = $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid");
+                    $delDoc->execute([':pid' => $pid]);
+                }
+
+                // 3. Borrar Perfil
+                $sqlDetalle = "DELETE FROM {$tablaDetalle} WHERE usuario_id = :id";
+                $stmtDetalle = $this->conexion->prepare($sqlDetalle);
+                $stmtDetalle->execute([':id' => $id]);
+
+                // 4. Borrar Usuario Base
+                $eliminar = "DELETE FROM usuarios WHERE id = :id";
+                $stmtEliminar = $this->conexion->prepare($eliminar);
+                $stmtEliminar->execute([':id' => $id]);
+
+                $this->conexion->commit();
+                return 'eliminado';
+            }
+
         } catch (PDOException $e) {
-            error_log("Error en Usuario::eliminar->" . $e->getMessage());
+            $this->conexion->rollBack();
+            // Logueamos el error internamente pero devolvemos false al controlador
+            error_log("Error en Usuario::eliminar -> " . $e->getMessage());
             return false;
+        }
+    }
+
+    public function obtenerDetalleCompleto($id)
+    {
+        try {
+            // 1. Buscar datos básicos y rol
+            $sql = "SELECT u.id, u.email, u.documento, u.rol, ue.nombre as estado, u.created_at,
+                       COALESCE(p.nombres, c.nombres, a.nombres) as nombres,
+                       COALESCE(p.apellidos, c.apellidos, a.apellidos) as apellidos,
+                       COALESCE(p.telefono, c.telefono, a.telefono) as telefono,
+                       COALESCE(p.ubicacion, c.ubicacion, a.ubicacion) as ubicacion,
+                       COALESCE(p.foto, c.foto, a.foto) as foto,
+                       p.id as proveedor_id
+                FROM usuarios u
+                LEFT JOIN usuario_estados ue ON u.estado_id = ue.id
+                LEFT JOIN proveedores p ON u.id = p.usuario_id
+                LEFT JOIN clientes c ON u.id = c.usuario_id
+                LEFT JOIN admins a ON u.id = a.usuario_id
+                WHERE u.id = :id";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) return null;
+
+            // 2. Si es PROVEEDOR, buscar extras
+            if ($usuario['rol'] === 'proveedor' && !empty($usuario['proveedor_id'])) {
+                $pid = $usuario['proveedor_id'];
+
+                // A. Categorías
+                $sqlCat = "SELECT c.nombre 
+                       FROM categorias c
+                       JOIN proveedor_categorias pc ON c.id = pc.categoria_id
+                       WHERE pc.proveedor_id = :pid";
+                $stmtCat = $this->conexion->prepare($sqlCat);
+                $stmtCat->execute([':pid' => $pid]);
+                $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+
+                // B. Documentos
+                $sqlDoc = "SELECT tipo_documento, archivo, estado 
+                       FROM documentos_proveedor 
+                       WHERE proveedor_id = :pid";
+                $stmtDoc = $this->conexion->prepare($sqlDoc);
+                $stmtDoc->execute([':pid' => $pid]);
+                $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            return $usuario;
+        } catch (PDOException $e) {
+            error_log("Error obtenerDetalleCompleto: " . $e->getMessage());
+            return null;
         }
     }
 }

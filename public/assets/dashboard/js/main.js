@@ -1,82 +1,178 @@
+/* main.js - Lógica general del sitio */
+
+// 1. Definir BASE_URL si no existe (Parche de seguridad)
+// Lo ideal es que definas "const BASE_URL = '...'" en tu HTML antes de cargar este script
+const PROJECT_URL = (typeof BASE_URL !== 'undefined') ? BASE_URL : '/proviservers'; // Ajusta '/proviservers' si es necesario
+
 document.addEventListener("DOMContentLoaded", () => {
+    
+// ==========================================
+    // 1. LÓGICA DEL SIDEBAR (Con Memoria)
+    // ==========================================
+    const btnToggle = document.getElementById("btn-toggle-menu"); // Asegúrate que el ID coincida
+
+    // 1. Revisar si el usuario ya lo había plegado antes
+    if (localStorage.getItem('sidebar-collapsed') === 'true') {
+        document.body.classList.add('toggle-sidebar');
+    }
+
+    if (btnToggle) {
+        btnToggle.addEventListener("click", () => {
+            document.body.classList.toggle("toggle-sidebar");
+            
+            // 2. Guardar la preferencia del usuario
+            if (document.body.classList.contains('toggle-sidebar')) {
+                localStorage.setItem('sidebar-collapsed', 'true');
+            } else {
+                localStorage.setItem('sidebar-collapsed', 'false');
+            }
+        });
+    }
+
+    // ==========================================
+    // 2. LÓGICA DE BREADCRUMBS (Corregida)
+    // ==========================================
     const breadcrumb = document.getElementById("breadcrumb");
-    if (!breadcrumb) return;
+    
+    if (breadcrumb) { 
+        breadcrumb.innerHTML = ""; 
 
-    breadcrumb.innerHTML = ""; // limpiar
+        // 1. Obtener segmentos limpios
+        const path = window.location.pathname
+            .split("/")
+            .filter(segment => segment !== "" && segment !== "proviservers");
 
-    // Obtener la ruta actual
-    const path = window.location.pathname
-        .split("/")
-        .filter(segment => segment !== "");
+        // 2. Agregar "Inicio" (Link al Dashboard)
+        const homeItem = document.createElement("li");
+        homeItem.className = "breadcrumb-item";
+        
+        const homeLink = document.createElement("a");
+        homeLink.href = PROJECT_URL + "/admin/dashboard"; 
+        homeLink.innerHTML = '<i class="bi bi-house-door-fill"></i>'; // Icono de casa se ve mejor
+        // homeLink.textContent = "Inicio"; // O usa texto si prefieres
+        
+        homeItem.appendChild(homeLink);
+        breadcrumb.appendChild(homeItem);
 
-    // 🔍 Para verificar qué ruta está leyendo
-    console.log("Ruta detectada:", path);
+        // 3. Variable acumuladora (Inicia con la base del proyecto)
+        let rutaAcumulada = PROJECT_URL; 
+        
+        path.forEach((segmento, index) => {
+            
+            // A. Construimos la ruta REAL siempre (Vital para que los enlaces funcionen)
+            rutaAcumulada += `/${segmento}`;
 
-    // Agregar el enlace a Inicio
-    const homeItem = document.createElement("li");
-    homeItem.className = "breadcrumb-item";
-    const homeLink = document.createElement("a");
-    homeLink.href = "/";
-    homeLink.textContent = "Inicio";
-    homeItem.appendChild(homeLink);
-    breadcrumb.appendChild(homeItem);
+            // B. FILTROS VISUALES (Aquí decidimos qué NO mostrar)
+            
+            // 1. Si es "admin", no lo mostramos en texto, pero ya lo sumamos a la ruta arriba.
+            if(segmento === 'admin') {
+                return; 
+            }
 
-    // Si no hay más segmentos, terminamos
-    if (path.length === 0) return;
+            // 2. Si es un número (ID), no lo mostramos (Ej: /editar-usuario/45 -> No mostrar "45")
+            if(!isNaN(segmento)) {
+                return;
+            }
 
-    // Crear los demás elementos
-    let rutaAcumulada = "";
-    path.forEach((segmento, index) => {
-        rutaAcumulada += `/${segmento}`;
-        const item = document.createElement("li");
-        item.classList.add("breadcrumb-item");
+            // 3. Si es "dashboard", no lo mostramos porque ya pusimos el icono de "Inicio"
+            if(segmento === 'dashboard') {
+                return;
+            }
 
-        // Formatear texto
-        const texto = decodeURIComponent(segmento)
-            .replace(/-/g, " ")
-            .replace(/\b\w/g, l => l.toUpperCase());
+            // C. CREAR EL ELEMENTO VISUAL
+            const item = document.createElement("li");
+            item.classList.add("breadcrumb-item");
 
-        if (index < path.length - 1) {
-            const link = document.createElement("a");
-            link.href = rutaAcumulada;
-            link.textContent = texto;
-            item.appendChild(link);
-        } else {
-            item.textContent = texto;
-            item.classList.add("active");
-            item.setAttribute("aria-current", "page");
-        }
+            // Formatear texto (Quitar guiones y capitalizar)
+            const texto = decodeURIComponent(segmento)
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, l => l.toUpperCase());
 
-        breadcrumb.appendChild(item);
-    });
-});
+            // D. DECIDIR SI ES ENLACE O TEXTO PLANO
+            const esUltimo = index === path.length - 1;
+            
+            if (!esUltimo) {
+                const link = document.createElement("a");
+                link.href = rutaAcumulada;
+                link.textContent = texto;
+                item.appendChild(link);
+            } else {
+                // El último elemento no lleva enlace
+                item.textContent = texto;
+                item.classList.add("active");
+                item.setAttribute("aria-current", "page");
+            }
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Obtenemos las referencias a los elementos
+            breadcrumb.appendChild(item);
+        });
+    }
+
+    // ==========================================
+    // 3. PREVISUALIZACIÓN DE IMAGEN (Solo formularios)
+    // ==========================================
     const fotoInput = document.getElementById('foto-input');
     const fotoPreview = document.getElementById('foto-preview');
 
-    // Escuchamos el evento 'change' en el input de tipo file
-    fotoInput.addEventListener('change', function (e) {
-        const file = e.target.files[0];
+    // IMPORTANTE: El if verifica que AMBOS existan antes de intentar hacer nada
+    if (fotoInput && fotoPreview) {
+        
+        // Guardamos la imagen original por si cancela
+        const defaultImage = fotoPreview.src; 
 
-        if (file) {
-            // Creamos un lector de archivos (FileReader)
-            const reader = new FileReader();
+        fotoInput.addEventListener('change', function (e) {
+            const file = e.target.files[0];
 
-            // Definimos qué hacer cuando el archivo se haya leído
-            reader.onload = function (event) {
-                // Actualizamos el atributo 'src' del <img> con la URL temporal del archivo
-                fotoPreview.src = event.target.result;
-            };
-
-            // Leemos el archivo como una URL de datos (Data URL)
-            reader.readAsDataURL(file);
-        } else {
-            // Si el usuario cancela la selección, volvemos a la imagen por defecto
-            // Asume que esta es la ruta de tu imagen por defecto
-            fotoPreview.src = '<?= BASE_URL ?>/public/uploads/usuarios/default_user.png';
-        }
-    });
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    fotoPreview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Si cancela, volvemos a la que estaba al cargar la página
+                fotoPreview.src = defaultImage; 
+            }
+        });
+    }
 });
 
+// document.addEventListener("DOMContentLoaded", () => {
+//     const currentUrl = window.location.href;
+//     const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+//     // 1. Limpiar estados previos
+//     sidebarLinks.forEach(link => {
+//         link.classList.remove("active");
+//     });
+
+//     // 2. Identificar el enlace activo
+//     sidebarLinks.forEach(link => {
+//         const linkHref = link.href;
+
+//         // Verificamos si la URL actual termina con el href o es exactamente igual
+//         // (Evitamos marcar "/" si estamos en "/admin/dashboard")
+//         if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
+//             link.classList.add("active");
+
+//             // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
+//             const parentSubmenu = link.closest(".submenu");
+//             if (parentSubmenu) {
+//                 // Mostramos el submenú (el <ul>)
+//                 parentSubmenu.style.display = "block";
+                
+//                 // Marcamos el contenedor padre (el <li> con clase has-submenu)
+//                 const parentLi = parentSubmenu.closest(".has-submenu");
+//                 if (parentLi) {
+//                     parentLi.classList.add("active"); // Opcional: estilo para el padre
+                    
+//                     // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
+//                     const icon = parentLi.querySelector(".toggle-icon");
+//                     if (icon) {
+//                         icon.style.transform = "rotate(180deg)";
+//                     }
+//                 }
+//             }
+//         }
+//     });
+
+// });

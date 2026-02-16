@@ -130,38 +130,102 @@ class Servicio
     /**
      * Eliminar un servicio por ID
      */
-public function eliminar($id)
-{
-    try {
-        // Iniciamos transacción por seguridad
-        $this->conexion->beginTransaction();
+    public function eliminar($id)
+    {
+        try {
+            // Iniciamos transacción por seguridad
+            $this->conexion->beginTransaction();
 
-        // 1. Eliminar publicaciones asociadas a este servicio
-        $sqlPublicaciones = "DELETE FROM publicaciones WHERE servicio_id = :id";
-        $stmtPub = $this->conexion->prepare($sqlPublicaciones);
-        $stmtPub->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmtPub->execute();
+            // 1. Eliminar publicaciones asociadas a este servicio
+            $sqlPublicaciones = "DELETE FROM publicaciones WHERE servicio_id = :id";
+            $stmtPub = $this->conexion->prepare($sqlPublicaciones);
+            $stmtPub->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtPub->execute();
 
-        // 2. Eliminar el servicio
-        $sqlServicio = "DELETE FROM servicios WHERE id = :id";
-        $stmtServ = $this->conexion->prepare($sqlServicio);
-        $stmtServ->bindParam(':id', $id, PDO::PARAM_INT);
-        $stmtServ->execute();
+            // 2. Eliminar el servicio
+            $sqlServicio = "DELETE FROM servicios WHERE id = :id";
+            $stmtServ = $this->conexion->prepare($sqlServicio);
+            $stmtServ->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmtServ->execute();
 
-        // 3. Confirmamos
-        $this->conexion->commit();
-        return true;
+            // 3. Confirmamos
+            $this->conexion->commit();
+            return true;
 
-    } catch (PDOException $e) {
-        // Revertimos todo si algo falla
-        $this->conexion->rollBack();
-        error_log("Error en Servicio::eliminar -> " . $e->getMessage());
-        return false;
+        } catch (PDOException $e) {
+            // Revertimos todo si algo falla
+            $this->conexion->rollBack();
+            error_log("Error en Servicio::eliminar -> " . $e->getMessage());
+            return false;
+        }
     }
-}
 
     public function getUltimoIdInsertado(): int
     {
         return (int) $this->conexion->lastInsertId();
+    }
+
+    /**
+     * Obtener el detalle completo para MODERACIÓN (con Joins)
+     * Trae datos del servicio, categoría, proveedor y estado.
+     */
+    public function obtenerDetalleCompleto($id)
+    {
+        try {
+            $sql = "SELECT 
+                        -- Datos Base del Servicio
+                        s.id, 
+                        s.imagen, 
+                        s.created_at,
+
+                        -- Datos de la Publicación (Aquí está el PRECIO, TITULO y ESTADO REAL)
+                        -- Usamos COALESCE para que si no hay título en publicación, use el del servicio
+                        COALESCE(pub.titulo, s.nombre) AS nombre,
+                        COALESCE(pub.descripcion, s.descripcion) AS descripcion,
+                        COALESCE(pub.precio, 0) AS precio,
+                        COALESCE(pub.estado, 'pendiente') AS publicacion_estado,
+
+                        -- Categoría
+                        COALESCE(c.nombre, 'Sin categoría') AS categoria_nombre,
+
+                        -- Datos del Proveedor
+                        COALESCE(CONCAT(p.nombres, ' ', p.apellidos), 'Proveedor Desconocido') AS proveedor_nombre,
+                        p.telefono AS proveedor_telefono,
+                        p.ubicacion AS proveedor_ubicacion,
+                        
+                        -- Datos del Usuario (Email)
+                        u.email AS proveedor_email
+
+                    FROM servicios s
+                    -- Unimos con Categorías
+                    LEFT JOIN categorias c ON c.id = s.id_categoria
+                    
+                    -- Unimos con Publicaciones (CRUCIAL: Aquí está el precio y el proveedor)
+                    LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
+                    
+                    -- Unimos con Proveedores
+                    LEFT JOIN proveedores p ON p.id = pub.proveedor_id
+                    
+                    -- Unimos con Usuarios (para el email)
+                    LEFT JOIN usuarios u ON u.id = p.usuario_id
+
+                    WHERE s.id = :id
+                    LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$resultado) {
+                return []; 
+            }
+
+            return $resultado;
+
+        } catch (PDOException $e) {
+            return ['error' => 'Error SQL: ' . $e->getMessage()];
+        }
     }
 }

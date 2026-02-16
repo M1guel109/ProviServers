@@ -130,6 +130,11 @@
                     // Manejar nombres compuestos
                     $nombre_completo = $usuario['nombres'] . ' ' . $usuario['apellidos'];
 
+                    // 2. LÓGICA DE ESTADO (COLORES)
+                    $estado = ucfirst($usuario['estado']);
+                    $color_estado = ($estado === 'Activo') ? '#10b981' : '#ef4444'; // Verde o Rojo
+                    $texto_estado = strtoupper($estado);
+
                 ?>
                     <tr>
                         <td class="center-cell">
@@ -143,7 +148,11 @@
                         <td><?= htmlspecialchars($usuario['telefono']) ?></td>
                         <td><?= htmlspecialchars($usuario['ubicacion']) ?></td>
                         <td><?= htmlspecialchars(ucfirst($usuario['rol'])) ?></td>
-                        <td><?= htmlspecialchars(ucfirst($usuario['estado'])) ?></td>
+                        <td>
+                            <span style="color: <?= $color_estado ?>; font-weight: bold;">
+                                <?= $texto_estado ?>
+                            </span>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
 

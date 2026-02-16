@@ -49,76 +49,26 @@
                 </a>
             </li>
 
-            <!-- 🔧 ÚNICO ARREGLO AQUÍ -->
-            <li class="has-submenu">
-                <a href="<?= BASE_URL ?>/proveedor/nuevas_solicitudes" data-title="Solicitudes" class="menu-link">
+            <!-- ✅ Solicitudes SIN submenu (rutas NO tocadas; apunta a la principal actual) -->
+            <li>
+                <a href="<?= BASE_URL ?>/proveedor/nuevas_solicitudes" data-title="Solicitudes">
                     <i class="bi bi-envelope"></i><span>Solicitudes</span>
                 </a>
-                <button class="toggle-submenu" aria-label="Mostrar opciones">
-                    <i class="bi bi-chevron-down toggle-icon"></i>
-                </button>
-                <ul class="submenu">
-                    <li>
-                        <a href="<?= BASE_URL ?>/proveedor/nuevas_solicitudes" class="submenu-link">
-                            <i class="bi bi-plus-circle"></i>Nuevas solicitudes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/proveedor/en-proceso" class="submenu-link">
-                            <i class="bi bi-clock-history"></i>En proceso
-                        </a>
-                    </li>
-                    <li>
-                        <a href="<?= BASE_URL ?>/proveedor/completadas" class="submenu-link">
-                            <i class="bi bi-check-circle"></i>Completadas
-                        </a>
-                    </li>
-                </ul>
             </li>
-            <!-- 🔧 FIN DEL ARREGLO -->
 
             <li>
                 <a href="<?= BASE_URL ?>/proveedor/oportunidades" data-title="Oportunidades">
-                    <i class="bi bi-binoculars"></i> 
-                    <span>Oportunidades</span> 
+                    <i class="bi bi-binoculars"></i>
+                    <span>Oportunidades</span>
                 </a>
             </li>
 
-            <li>
-                <a href="<?= BASE_URL ?>/proveedor/resenas" data-title="Reseñas">
-                    <i class="bi bi-star"></i><span>Reseñas</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="<?= BASE_URL ?>/proveedor/calendarioProveedor" data-title="Calendario">
-                    <i class="bi bi-calendar-event"></i><span>Calendario</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#" data-title="Estadísticas">
-                    <i class="bi bi-graph-up"></i><span>Estadísticas</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#" data-title="Finanzas">
-                    <i class="bi bi-cash-stack"></i><span>Finanzas</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#" data-title="Facturación">
-                    <i class="bi bi-receipt"></i><span>Facturación</span>
-                </a>
-            </li>
-
-            <li>
-                <a href="#" data-title="Promociones">
-                    <i class="bi bi-megaphone"></i><span>Promociones</span>
-                </a>
-            </li>
+            <li><a href="<?= BASE_URL?>/proveedor/resenas" data-title="Reseñas"><i class="bi bi-star"></i><span>Reseñas</span></a></li>
+            <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
+            <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
+            <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
+            <li><a href="#" data-title="Facturación"><i class="bi bi-receipt"></i><span>Facturación</span></a></li>
+            <li><a href="#" data-title="Promociones"><i class="bi bi-megaphone"></i><span>Promociones</span></a></li>
 
             <li>
                 <a href="<?= BASE_URL ?>/proveedor/configuracion" data-title="Configuración">

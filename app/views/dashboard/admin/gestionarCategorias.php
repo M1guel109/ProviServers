@@ -23,7 +23,7 @@ $datos = mostrarCategorias();
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
 </head>
 
 <body>
@@ -46,6 +46,8 @@ $datos = mostrarCategorias();
                         Lista de todas las categorías de servicios registradas en la plataforma.
                     </p>
                 </div>
+
+                
 
                 <div class="col-md-4">
                     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -111,6 +113,7 @@ $datos = mostrarCategorias();
                                                 <!-- <a href="#" class="btn-action btn-view" title="Ver detalle">
                                             <i class="bi bi-eye"></i>
                                         </a> -->
+                                        
 
                                                 <a href="<?= BASE_URL ?>/admin/editar-categoria?id=<?= $categoria['id'] ?>" class="btn-action btn-edit" title="Editar categoría">
                                                     <i class="bi bi-pencil-square"></i>

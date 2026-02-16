@@ -1,45 +1,6 @@
 /*Primera grafica */
 
-document.addEventListener("DOMContentLoaded", () => {
-    const currentUrl = window.location.href;
-    const sidebarLinks = document.querySelectorAll(".sidebar a");
 
-    // 1. Limpiar estados previos
-    sidebarLinks.forEach(link => {
-        link.classList.remove("active");
-    });
-
-    // 2. Identificar el enlace activo
-    sidebarLinks.forEach(link => {
-        const linkHref = link.href;
-
-        // Verificamos si la URL actual termina con el href o es exactamente igual
-        // (Evitamos marcar "/" si estamos en "/admin/dashboard")
-        if (linkHref !== "" && linkHref !== "#" && currentUrl.includes(linkHref)) {
-            link.classList.add("active");
-
-            // 3. Lógica para Submenús: Si el enlace activo está dentro de un submenú, abrirlo
-            const parentSubmenu = link.closest(".submenu");
-            if (parentSubmenu) {
-                // Mostramos el submenú (el <ul>)
-                parentSubmenu.style.display = "block";
-                
-                // Marcamos el contenedor padre (el <li> con clase has-submenu)
-                const parentLi = parentSubmenu.closest(".has-submenu");
-                if (parentLi) {
-                    parentLi.classList.add("active"); // Opcional: estilo para el padre
-                    
-                    // Rotar la flecha si tienes la lógica de CSS para .toggle-icon
-                    const icon = parentLi.querySelector(".toggle-icon");
-                    if (icon) {
-                        icon.style.transform = "rotate(180deg)";
-                    }
-                }
-            }
-        }
-    });
-
-});
 
 var options = {
     chart: {
@@ -159,18 +120,8 @@ var chartMetricas = new ApexCharts(
 );
 chartMetricas.render();
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    const btnToggle = document.getElementById("btn-toggle-menu");
-    const sidebar = document.querySelector(".sidebar");
 
-    btnToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("plegado");
-    });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-    
     // Seleccionamos TODOS los elementos que pueden abrir el menú:
     // 1. El enlace de texto (a) directo hijo de .has-submenu
     // 2. El botón de la flecha (.toggle-submenu)
@@ -197,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isOpen) {
                 // --- CERRAR ---
-                
+
                 // Paso clave para que la animación no sea brusca:
                 // Antes de colapsar, reasignamos la altura actual en píxeles explícitamente.
                 // Esto permite al navegador saber desde dónde animar hacia 0.
@@ -205,15 +156,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Forzamos un "reflow" (lectura de propiedad) para que el navegador aplique el estilo de arriba
                 // antes de aplicar el estilo de cierre.
-                submenu.offsetHeight; 
+                submenu.offsetHeight;
 
                 // Ahora sí, colapsamos
                 parentLi.classList.remove("active");
-                submenu.style.maxHeight = "0"; 
+                submenu.style.maxHeight = "0";
 
             } else {
                 // --- ABRIR ---
-                
+
                 // (Opcional) Cerrar otros menús abiertos si quieres efecto acordeón:
                 /* document.querySelectorAll('.has-submenu.active').forEach(activeLi => {
                     activeLi.classList.remove('active');
@@ -228,63 +179,3 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Inicializar DataTable directamente (sin fetch)
-    new DataTable('#tabla-1', {
-        responsive: true,
-        pageLength: 10,
-        lengthMenu: [5, 10, 25, 50],
-        layout: {
-            topStart: {
-                buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
-            }
-        },
-        language: {
-            search: "",
-            searchPlaceholder: "Buscar",
-            lengthMenu: "Mostrar _MENU_ registros",
-            info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-            infoEmpty: "Mostrando 0 a 0 de 0 registros",
-            infoFiltered: "(filtrado de _MAX_ registros totales)",
-            zeroRecords: "No se encontraron resultados",
-            paginate: {
-                first: "<<",
-                previous: "‹",
-                next: "›",
-                last: ">>"
-            },
-            buttons: {
-                copy: "Copiar",
-                csv: "Exportar CSV",
-                excel: "Exportar Excel",
-                pdf: "Exportar PDF",
-                print: "Imprimir"
-            }
-        },
-        initComplete: function () {
-            const dtSearch = document.querySelector('.dt-search');
-            if (!dtSearch) return;
-
-            const input = dtSearch.querySelector('input[type="search"]');
-            if (!input) return;
-
-            const buscadorDiv = document.createElement('div');
-            buscadorDiv.className = 'buscador';
-            buscadorDiv.innerHTML = `<i class="bi bi-search"></i>`;
-            buscadorDiv.appendChild(input);
-
-            dtSearch.innerHTML = '';
-            dtSearch.appendChild(buscadorDiv);
-
-            input.setAttribute('placeholder', 'Buscar');
-            input.style.width = "100%";
-            input.style.border = "none";
-            input.style.background = "transparent";
-            input.style.outline = "none";
-        }
-    });
-});
-
-
-

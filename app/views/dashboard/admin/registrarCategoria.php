@@ -75,7 +75,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                                 </div>
                                 <label for="icono-input" class="btn-agregar-foto">Subir Ícono</label>
                                 <!-- El name debe coincidir con cómo lo esperas en el controlador, ej: 'icono_url' -->
-                                <input type="file" id="icono-input" accept=".jpg, .png, .jpeg, .svg" style="display: none;" name="icono_url" required>
+                                <input type="file" id="icono-input" accept=".jpg, .png, .jpeg, .svg" style="display: none;" name="icono_url">
                             </div>
                         </div>
 

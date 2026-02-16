@@ -1,283 +1,420 @@
-/* Configuracion basica de un archivo css */
-/* 1.Tipografias */
+/* ==========================================================================
+   1. CONFIGURACIÓN BÁSICA Y FUENTES
+   ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-/* 2.Iconos */
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css');
 
-/* 3.Estilos Generales */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: "Roboto", sans-serif;
-}
-
-p,
-a,
-button,
-li,
-label,
-input,
-select,
-textarea,
-span {
-    font-family: "Poppins", sans-serif;
-    text-decoration: none;
-}
-
-/* 4.Variables */
+/* ==========================================================================
+   2. VARIABLES GLOBALES
+   ========================================================================== */
 :root {
+    /* Colores ProviServers */
     --primary-color: #0066FF;
+    --primary-hover: #0052cc;
     --dark-color: #0E1116;
     --white-color: #FFFFFF;
-
+    --bg-body: #f5f7fb;
+    
+    /* Tipografías */
     --font-title: 'Roboto', sans-serif;
     --font-text: 'Poppins', sans-serif;
-
-    --fs-title1: 48px;
+    
+    /* Tamaños */
+    --fs-title1: 42px;
     --fs-title2: 32px;
     --fs-title3: 24px;
     --fs-title4: 18px;
     --fs-text: 16px;
     --fs-small: 14px;
+    
+    /* Layout */
+    --sidebar-width: 300px;
+    --sidebar-collapsed-width: 80px;
+    --header-height: 70px;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ==========================================================================
+   3. RESET Y BASES
+   ========================================================================== */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-text);
+    background-color: var(--bg-body);
+    color: var(--dark-color);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
+a { text-decoration: none; color: inherit; transition: 0.25s ease; }
+ul { list-style: none; }
 
-.btn-primary-proviservers {
+/* ==========================================================================
+   4. LAYOUT PRINCIPAL (Sidebar + Header + Main)
+   ========================================================================== */
+
+/* --- SIDEBAR --- */
+.sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--white-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    transition: width 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* 🔥 Ocultar scroll en Chrome, Safari y Opera (Navegadores WebKit) */
+.sidebar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Logo */
+.logo {
+    padding: 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.logo img { max-width: 100%; height: auto; }
+.logo-favicon { display: none; }
+
+/* Menú Principal */
+.menu-principal { 
+    padding: 0 15px 0 0 ; flex: 1; 
+}
+
+.menu-principal a, .menu-link {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    font-size: var(--fs-text);
+    font-weight: 500;
+    color: var(--dark-color);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    justify-content: flex-start;
+}
+
+.menu-principal a i, .menu-link i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+    min-width: 24px; /* Para alinear íconos */
+    text-align: center;
+}
+
+/* Hover y Activo */
+.menu-principal a:hover, .menu-link:hover, .submenu-link:hover {
     background-color: var(--primary-color);
     color: var(--white-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: background-color 0.25s ease, transform 0.25s ease;
+    transform: translateX(5px);
 }
 
-.btn-primary-proviservers:hover {
-    background-color: #0052cc;
-    transform: translateY(-1px);
-}
-
-.btn-secondary-proviservers {
-    background-color: var(--white-color);
-    color: var(--primary-color);
-    font-family: var(--font-text);
-    font-size: var(--fs-text);
-    font-weight: 600;
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 12px 24px;
-    cursor: pointer;
-    transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
-}
-
-.btn-secondary-proviservers:hover {
+.menu-principal a.active {
     background-color: var(--primary-color);
     color: var(--white-color);
-    transform: translateY(-1px);
-}
-
-/* 5.Desktop */
-
-/* =======================================
-   ESTILOS PERSONALIZADOS PARA NOTIFICACIONES
-   ======================================= */
-
-/* 1. Icono de Notificación (la campana) */
-.nav-link.nav-icon {
+    font-weight: 600;
     position: relative;
-    color: #444444;
-    /* Color oscuro para el icono */
-    padding: 0 8px;
-    font-size: 24px;
-    transition: color 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
 }
 
-.nav-link.nav-icon:hover {
-    color: #3b82f6;
-    /* Cambio de color al pasar el mouse */
-}
-
-/* 2. El Indicador de Número (Badge) */
-.nav-icon .badge-number {
+/* Barra decorativa azul lateral en activo */
+.menu-principal a.active::before {
+    content: "";
     position: absolute;
-    top: -5px;
-    right: 0px;
-    padding: 3px 6px;
-    border-radius: 50%;
-    font-size: 10px;
-    background-color: #ff5722 !important;
-    /* Un color más llamativo (Naranja/Rojo) */
-    border: 2px solid #ffffff;
-    /* Borde blanco para destacarlo sobre el fondo */
+    left: -30px; /* Ajustado al padding del contenedor */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 100%;
+    background-color: #004ecc;
+    border-radius: 0 4px 4px 0;
 }
 
-/* 3. Contenedor Desplegable (Dropdown Menu) */
-.notifications {
-    --bs-dropdown-min-width: 350px;
-    /* Anchura adecuada para notificaciones */
+/* Footer del Menú */
+.menu-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* --- LOGICA SUBMENÚS --- */
+.has-submenu { position: relative; }
+.toggle-submenu {
+    position: absolute;
+    right: 10px;
+    top: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--dark-color);
+}
+.submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    background-color: #f8fafc;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    /* Sombra suave */
-    border: 1px solid #e0e0e0;
-    padding: 0;
-    /* Quitamos padding externo */
+    margin-left: 10px;
+    border-left: 2px solid var(--primary-color);
+}
+.has-submenu.active .submenu { max-height: 300px; }
+.has-submenu.active .toggle-icon { transform: rotate(180deg); color: var(--primary-color); }
+.submenu li a { font-size: 0.9rem; padding: 10px 10px 10px 15px; }
+
+/* --- CONTENIDO PRINCIPAL --- */
+.contenido {
+    flex: 1;
+    margin-left: var(--sidebar-width);
+    padding: 25px;
+    transition: margin-left 0.3s ease;
+    width: calc(100% - var(--sidebar-width));
+    /* 🔥 Importante: Espacio arriba para el header fijo */
+    /* margin-top: var(--header-height); */
 }
 
-/* 4. Encabezado del Desplegable */
-.notifications .dropdown-header {
+.barra-superior {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #f0f0f0;
-    font-weight: 600;
-    color: #3b82f6;
-    /* Color primario para el título */
+    background-color: var(--white-color);
+    padding: 10px 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    border: 1px solid #e2e8f0;
 }
 
-.notifications .dropdown-header a {
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
-}
-
-/* 5. Elementos Individuales de Notificación */
-.notification-item {
-    display: flex;
-    align-items: flex-start;
-    padding: 15px 20px;
+.btn-toggle {
+    background: transparent;
+    border: none;
     cursor: pointer;
-    transition: background-color 0.2s;
-    border-left: 3px solid transparent;
-    /* Indicador de estado/hover */
-}
-
-.notification-item:hover {
-    background-color: #f8f9fa;
-    /* Fondo gris claro al pasar el mouse */
-    border-left: 3px solid #3b82f6;
-    /* Borde de color para destacar el elemento */
-}
-
-.notification-item i {
-    font-size: 22px;
-    margin-right: 15px;
-    flex-shrink: 0;
-    /* Previene que el icono se comprima */
-}
-
-.notification-item div {
-    flex-grow: 1;
-}
-
-.notification-item h4 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 3px;
-}
-
-.notification-item p {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 2px;
-}
-
-.notification-item p:last-child {
-    font-size: 12px;
-    color: #999;
-    /* Para la marca de tiempo (hace 30 min.) */
-}
-
-/* 6. Pie de Página del Desplegable */
-.dropdown-footer {
-    padding: 10px 20px;
-    text-align: center;
-    border-top: 1px solid #f0f0f0;
-}
-
-.dropdown-footer a {
-    color: #3b82f6;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.badge {
-    /* position: absolute; */
-    /* top: -5px; */
-    /* right: -5px; */
-    background-color: #ef4444;
-    color: white;
-    /* border-radius: 50%; */
-    /* width: 20px;
-    height: 20px; */
-    font-size: 0.7rem;
+    padding: 8px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
+    transition: background-color 0.3s ease;
+    color: var(--primary-color);
+    margin-right: 20px;
 }
 
-.sidebar.plegado .toggle-icon {
-    display: none !important;
+.btn-toggle i {
+    font-size: 24px; /* Tamaño grande */
 }
 
-/* ======== SIDEBAR PLEGABLE ======== */
-.sidebar {
-    width: 260px;
-    transition: width 0.3s ease;
-    overflow: hidden;
+.btn-toggle:hover {
+    color:var(--dark-color) ;
 }
 
-.sidebar.plegado {
-    width: 80px;
+/* Buscador */
+.buscador {
+    display: flex;
+    align-items: center;
+    background-color: #f8fafc;
+    border-radius: 30px;
+    padding: 8px 20px;
+    width: 350px;
+    border: 1px solid #e2e8f0;
+}
+.buscador:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+.buscador input {
+    border: none; background: transparent; outline: none; width: 100%;
+    margin-left: 10px; font-size: var(--fs-text);
 }
 
-/* Oculta textos cuando está plegado */
-.sidebar.plegado .menu-principal a,
-.sidebar.plegado a,
-.sidebar.plegado .menu-footer a {
-    text-align: center;
+/* Acciones Barra */
+.acciones-barra { display: flex; align-items: center; gap: 20px; }
+.item-barra {
+    position: relative;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.item-barra:hover { background-color: #f1f5f9; }
+
+/* Usuario */
+.usuario { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    text-decoration: none; 
+    color: var(--dark-color);
 }
 
-.sidebar.plegado .menu-principal a::after,
-.sidebar.plegado a::after {
-    display: none;
+.usuario img {
+    width: 40px; 
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
 }
 
-/* Oculta los textos, deja los íconos */
-.sidebar.plegado a span {
-    display: none;
+.info-usuario { 
+    /* 🔥 Usamos !important para anular el "d-md-block" de Bootstrap */
+    display: flex !important; 
+    flex-direction: column !important; /* Fuerza verticalidad */
+    justify-content: center;
+    line-height: 1.2; 
+    text-align: left;
 }
 
-/* íconos opcionales, si los agregas luego */
-.sidebar a i {
-    margin-right: 10px;
-    transition: all 0.3s ease;
+.nombre { 
+    font-weight: 600; 
+    font-size: var(--fs-text);
+    display: block; /* Asegura que ocupe su propia línea */
 }
 
-.sidebar.plegado a i {
-    margin: 0;
+.rol { 
+    font-size: 12px; 
+    color: #64748b; 
+    font-weight: 500;
+    text-transform: capitalize; 
+    display: block; /* Asegura que ocupe su propia línea */
+    margin-top: 2px; /* Pequeño espacio entre nombre y rol */
+}
+/* ==========================================================================
+   5. LOGICA PLEGADO (SIDEBAR COLLAPSED)
+   ========================================================================== */
+
+/* 1. Ajuste de la Sidebar: ¡IMPORTANTE! */
+body.toggle-sidebar .sidebar { 
+    width: var(--sidebar-collapsed-width); 
+    /* 🔥 VITAL: Esto permite que el submenú "salga" de la barra lateral */
+    overflow: visible !important; 
 }
 
-/* 6.Responsive Tablet */
-@media screen and (min-width:768px) and (max-width:1080px) {}
+/* Ajustes de contenido y header */
+body.toggle-sidebar .contenido { 
+    margin-left: var(--sidebar-collapsed-width); 
+    width: calc(100% - var(--sidebar-collapsed-width)); 
+}
+body.toggle-sidebar .barra-superior { 
+    left: var(--sidebar-collapsed-width); 
+    width: calc(100% - var(--sidebar-collapsed-width));
+}
 
-/* 7.Responsive Smartphone */
-@media screen and (min-width:320px) and (max-width:767px) {}
+/* 2. Ocultar textos y flechas */
+body.toggle-sidebar .logo-completo,
+body.toggle-sidebar .sidebar span,
+body.toggle-sidebar .menu-header,
+body.toggle-sidebar .toggle-submenu,
+body.toggle-sidebar .info-usuario { 
+    display: none !important; 
+}
+
+/* 3. Centrar íconos */
+body.toggle-sidebar .logo-favicon { display: block; margin: 0 auto; width: 40px; }
+body.toggle-sidebar .menu-principal { padding: 0 10px; }
+body.toggle-sidebar .menu-principal a, body.toggle-sidebar .menu-footer a {
+    justify-content: center; padding: 15px 0; border-radius: 8px;
+}
+body.toggle-sidebar .menu-principal a i { margin: 0; font-size: 1.5rem; }
+
+/* =========================================================
+   🔥 AQUÍ ESTÁ LA MAGIA DEL SUBMENÚ FLOTANTE
+   ========================================================= */
+
+/* A. Ocultar el submenú por defecto en modo plegado */
+body.toggle-sidebar .submenu {
+    display: none; /* Se oculta */
+    position: absolute; /* Se prepara para flotar */
+    left: 100%; /* Se mueve a la derecha de la barra */
+    top: 0;
+    margin-left: 10px; /* Separación de la barra */
+    width: 220px; /* Ancho cómodo para leer */
+    background-color: var(--white-color);
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Sombra elegante */
+    border: 1px solid #eef2f6;
+    padding: 10px 0;
+    z-index: 999;
+}
+
+/* B. Mostrar el submenú al pasar el mouse sobre el ÍCONO (li padre) */
+body.toggle-sidebar .has-submenu:hover .submenu {
+    display: block !important;
+    max-height: none !important; /* Ignora la animación de altura del JS */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* C. Título del submenú (Opcional: Para saber qué estás abriendo) */
+body.toggle-sidebar .has-submenu:hover .submenu::before {
+    content: attr(data-title); /* Si usaste data-title en el li */
+    display: block;
+    padding: 8px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--primary-color);
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 5px;
+}
+
+/* D. Estilo de los enlaces dentro del flotante */
+body.toggle-sidebar .submenu li a {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--dark-color);
+    justify-content: flex-start; /* Texto a la izquierda */
+    border-radius: 0;
+}
+
+body.toggle-sidebar .submenu li a:hover {
+    background-color: #f8fafc;
+    color: var(--primary-color);
+}
+
+/* 1. QUE EL ÍCONO PADRE SE PONGA AZUL CUANDO EL HIJO ESTÁ ACTIVO */
+/* Si el li tiene la clase 'active', pintamos el enlace principal también */
+.has-submenu.active > .menu-link {
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
+}
+
+/* 2. FLECHITA "CONECTORA" (Estético) */
+/* Crea un triangulito que apunta del menú flotante hacia el ícono */
+body.toggle-sidebar .has-submenu:hover .submenu::after {
+    content: "";
+    position: absolute;
+    top: 15px; /* Altura de la flecha */
+    left: -10px; /* La saca del cuadro hacia la izquierda */
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--white-color) transparent transparent; /* Triángulo apuntando izq */
+    filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.05));
+}
+/* ==========================================================================
+   6. RESPONSIVIDAD
+   ========================================================================== */
+@media screen and (max-width: 1024px) {
+    .sidebar { left: -280px; } /* Oculto por defecto en tablet */
+    .contenido { margin-left: 0; width: 100%; }
+    
+    /* Mostrar al activar */
+    body.toggle-sidebar .sidebar { left: 0; width: 280px; }
+    
+    .barra-superior { flex-direction: column; gap: 15px; padding: 15px; }
+    .buscador { width: 100%; }
+    .acciones-barra { width: 100%; justify-content: space-between; }
+}

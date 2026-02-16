@@ -98,7 +98,13 @@ switch ($request) {
         break;
 
     case '/admin/consultar-usuarios':
-        require BASE_PATH . '/app/views/dashboard/admin/dashboardTabla.php';
+        require BASE_PATH . '/app/views/dashboard/admin/consultarUsuarios.php';
+        break;
+
+    // En tu index.php
+    case '/admin/api/usuario-detalle':
+        require BASE_PATH . '/app/controllers/adminController.php';
+        obtenerDetalleUsuarioAjax();
         break;
 
     case '/admin/eliminar-usuario':
@@ -174,6 +180,21 @@ switch ($request) {
     case '/admin/calendario':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
         break;
+
+        // ... (Tus otras rutas de admin) ...
+
+    // =======================================================
+    // 🔍 RUTAS AJAX PARA MODERACIÓN DE SERVICIOS
+    // =======================================================
+
+    // 1. API para obtener el detalle del servicio (JSON)
+    // Se llama cuando das clic en el "Ojito"
+    case '/admin/api/servicio-detalle':
+        require_once BASE_PATH . '/app/controllers/moderacionController.php';
+        apiDetalleServicio();
+        break;
+
+    // ... (El resto de tus rutas) ...
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacionController.php';
         break;
@@ -238,7 +259,7 @@ switch ($request) {
 
 
     case '/proveedor/nuevas_solicitudes':
-        require BASE_PATH . '/app/views/dashboard/proveedor/nuevas_solicitudes.php';
+        require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
         break;
 
 
@@ -253,7 +274,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
 
         break;
-       
+
 
     // Acción AJAX: Actualizar estado (POST)
     case '/proveedor/actualizar-estado':
@@ -297,8 +318,8 @@ switch ($request) {
     case '/proveedor/solicitudes':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
-      
-    
+
+
 
 
     // Rutas del cliente
