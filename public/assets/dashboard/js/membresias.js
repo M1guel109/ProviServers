@@ -266,3 +266,90 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 });
+
+// Variable global para la URL (si no la tienes definida ya)
+// const BASE_URL = "http://localhost/ProviServers"; 
+
+function cargarDetalleSuscripcion(id) {
+    const modal = new bootstrap.Modal(document.getElementById('modalDetalleSuscripcion'));
+    modal.show();
+
+    // 1. Resetear UI
+    document.getElementById('loader-sub').classList.remove('d-none');
+    document.getElementById('contenido-sub').classList.add('d-none');
+
+    // 2. Petición AJAX (Ajusta la URL a tu estructura de rutas)
+    // Opción A: Si usas rutas amigables
+    // const url = `${BASE_URL}/admin/api/suscripcion-detalle?id=${id}`;
+    // Opción B: Si usas parámetros GET en controlador principal
+    const url = `${BASE_URL}/app/controllers/SuscripcionController.php?action=detalle&id=${id}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                Swal.fire('Error', data.error, 'error');
+                return;
+            }
+            
+            llenarModalSuscripcion(data);
+
+            document.getElementById('loader-sub').classList.add('d-none');
+            document.getElementById('contenido-sub').classList.remove('d-none');
+        })
+        .catch(error => {
+            console.error(error);
+            Swal.fire('Error', 'No se pudo cargar la información', 'error');
+        });
+}
+
+function llenarModalSuscripcion(data) {
+    // Foto y Datos Proveedor
+    const rutaFoto = `${BASE_URL}/public/uploads/usuarios/${data.foto_proveedor || 'default_user.png'}`;
+    document.getElementById('modal-sub-foto').src = rutaFoto;
+    document.getElementById('modal-sub-proveedor').textContent = data.nombre_proveedor;
+    document.getElementById('modal-sub-email').textContent = data.email;
+
+    // Estado Badge
+    const badge = document.getElementById('modal-sub-estado-badge');
+    badge.textContent = data.estado.toUpperCase();
+    badge.className = 'badge rounded-pill px-3 py-2 fs-6'; // Reset clases
+    
+    if (data.estado.toLowerCase() === 'activa') {
+        badge.classList.add('bg-success');
+    } else if (data.estado.toLowerCase() === 'vencida') {
+        badge.classList.add('bg-danger');
+    } else {
+        badge.classList.add('bg-secondary');
+    }
+
+    // Datos del Plan
+    document.getElementById('modal-sub-plan').textContent = data.nombre_plan;
+    document.getElementById('modal-sub-id').textContent = `#${data.id}`;
+    
+    // Formato Moneda COP
+    const formatoMoneda = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+    document.getElementById('modal-sub-costo').textContent = formatoMoneda.format(data.costo);
+
+    // Fechas
+    document.getElementById('modal-sub-inicio').textContent = data.fecha_inicio;
+    const divFin = document.getElementById('modal-sub-fin');
+    divFin.textContent = data.fecha_fin;
+
+    // Cálculo Días Restantes
+    const fechaFin = new Date(data.fecha_fin_raw); // Usamos la fecha cruda (YYYY-MM-DD)
+    const hoy = new Date();
+    const diffTime = fechaFin - hoy;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    const spanRestante = document.getElementById('modal-sub-restante');
+    if (diffDays < 0) {
+        spanRestante.textContent = `Venció hace ${Math.abs(diffDays)} días`;
+        spanRestante.className = 'badge bg-danger text-white px-3 py-2 rounded-pill';
+        divFin.classList.add('text-danger');
+    } else {
+        spanRestante.textContent = `Quedan ${diffDays} días`;
+        spanRestante.className = 'badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill';
+        divFin.classList.remove('text-danger');
+    }
+}

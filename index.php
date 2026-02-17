@@ -181,7 +181,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
         break;
 
-        // ... (Tus otras rutas de admin) ...
+    case '/admin/consultar-suscripciones':
+        require BASE_PATH . '/app/views/dashboard/admin/suscripcionesActivas.php';
+        break;
+
+    // ... (Tus otras rutas de admin) ...
 
     // =======================================================
     // 🔍 RUTAS AJAX PARA MODERACIÓN DE SERVICIOS
