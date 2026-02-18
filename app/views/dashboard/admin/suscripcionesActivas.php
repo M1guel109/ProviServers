@@ -6,14 +6,27 @@ require_once BASE_PATH . '/app/controllers/SuscripcionController.php';
 $suscripciones = listarSuscripciones();
 
 // Helper para calcular días restantes visualmente
+// Función corregida para ignorar horas y minutos
 function calcularDiasRestantes($fecha_fin)
 {
-    $hoy = new DateTime();
+    // 'today' fuerza la hora a las 00:00:00
+    $hoy = new DateTime('today');
     $fin = new DateTime($fecha_fin);
+
+    // Aseguramos que la fecha fin también sea a las 00:00:00
+    $fin->setTime(0, 0, 0);
+
+    // Invertimos la lógica: $fin - $hoy para saber si es negativo (vencido)
+    // %r imprime el signo '-' si es negativo
     $diferencia = $hoy->diff($fin);
 
-    if ($fin < $hoy) return -1; // Vencida
-    return $diferencia->days; // Días que faltan
+    // Convertimos a entero. Si ya pasó, days es positivo pero invertimos el signo manualmente
+    // o usamos logica simple:
+    if ($hoy > $fin) {
+        return -1 * $diferencia->days; // Retorna negativo si venció
+    }
+
+    return $diferencia->days; // Retorna días positivos
 }
 ?>
 
@@ -70,14 +83,14 @@ function calcularDiasRestantes($fecha_fin)
                 </li>
                 <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#acciones-pane">
-                        <i class="bi bi-file-earmark-arrow-down"></i> Exportar
+                        <i class="bi bi-file-earmark-arrow-down"></i> Exportar Datos
                     </button>
                 </li>
             </ul>
 
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="tabla-pane">
+            <div class="tab-content" id="tablaTabsContent">
 
+                <div class="tab-pane fade show active" id="tabla-pane" role="tabpanel">
                     <div class="table-responsive">
                         <table id="tabla" class="display nowrap" style="width:100%">
                             <thead>
@@ -96,12 +109,7 @@ function calcularDiasRestantes($fecha_fin)
                                     <?php foreach ($suscripciones as $sub) : ?>
                                         <?php
                                         $dias = calcularDiasRestantes($sub['fecha_fin']);
-
-                                        // Convertimos a mayúsculas lo que viene de la BD para asegurar la comparación
-                                        // Y verificamos si es 'ACTIVA' (que es como suele estar en tu enum 'activa')
                                         $estado_normalizado = strtoupper($sub['estado']);
-
-                                        // Ahora comparamos contra 'ACTIVA' (femenino, singular)
                                         $es_activo = ($estado_normalizado === 'ACTIVA' && $dias >= 0);
                                         ?>
                                         <tr>
@@ -109,16 +117,13 @@ function calcularDiasRestantes($fecha_fin)
                                                 <i class="bi bi-person-circle me-1 text-muted"></i>
                                                 <?= htmlspecialchars($sub['nombre_proveedor']) ?>
                                             </td>
-
                                             <td>
                                                 <span class="badge bg-light text-dark border">
                                                     <?= htmlspecialchars($sub['nombre_plan']) ?>
                                                 </span>
                                             </td>
-
                                             <td><?= date('d/m/Y', strtotime($sub['fecha_inicio'])) ?></td>
                                             <td class="fw-bold"><?= date('d/m/Y', strtotime($sub['fecha_fin'])) ?></td>
-
                                             <td>
                                                 <?php if ($es_activo): ?>
                                                     <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 rounded-pill">Activa</span>
@@ -130,7 +135,6 @@ function calcularDiasRestantes($fecha_fin)
                                                     <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-3 rounded-pill"><?= ucfirst($sub['estado']) ?></span>
                                                 <?php endif; ?>
                                             </td>
-
                                             <td>
                                                 <?php if ($dias < 0): ?>
                                                     <span class="text-danger fw-bold">Expirado</span>
@@ -140,20 +144,13 @@ function calcularDiasRestantes($fecha_fin)
                                                     <span class="text-success"><?= $dias ?> días</span>
                                                 <?php endif; ?>
                                             </td>
-
                                             <td>
                                                 <div class="action-buttons">
-                                                    <button type="button"
-                                                        class="btn-action btn-view"
-                                                        onclick="cargarDetalleSuscripcion(<?= $sub['id'] ?>)">
+                                                    <button type="button" class="btn-action btn-view" onclick="cargarDetalleSuscripcion(<?= $sub['id'] ?>)">
                                                         <i class="bi bi-eye"></i>
                                                     </button>
-
                                                     <?php if ($es_activo): ?>
-                                                        <button type="button"
-                                                            class="btn-action btn-delete text-danger border-0 bg-transparent"
-                                                            title="Cancelar Suscripción"
-                                                            onclick="confirmarCancelacion(<?= $sub['id'] ?>)">
+                                                        <button type="button" class="btn-action btn-delete text-danger border-0 bg-transparent" title="Cancelar" onclick="confirmarCancelacion(<?= $sub['id'] ?>)">
                                                             <i class="bi bi-x-circle"></i>
                                                         </button>
                                                     <?php endif; ?>
@@ -165,15 +162,48 @@ function calcularDiasRestantes($fecha_fin)
                             </tbody>
                         </table>
                     </div>
-
                 </div>
 
-                <div class="tab-pane fade" id="acciones-pane">
-                    <div class="p-4 text-center text-muted border rounded bg-light">
-                        <i class="bi bi-table display-4 mb-3 d-block"></i>
-                        <p>Utiliza los botones de la tabla principal para exportar a Excel, PDF o Imprimir.</p>
+                <div class="tab-pane fade" id="acciones-pane" role="tabpanel">
+                    <div class="p-3">
+                        <div class="alert alert-light border mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Esta tabla está optimizada para copiar y exportar datos rápidamente.
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="tabla-1" class="display nowrap" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>Proveedor</th>
+                                        <th>Email</th>
+                                        <th>Plan</th>
+                                        <th>Costo</th>
+                                        <th>Inicio</th>
+                                        <th>Fin</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (!empty($suscripciones)) : ?>
+                                        <?php foreach ($suscripciones as $sub) : ?>
+                                            <tr>
+                                                <td><?= $sub['nombre_proveedor'] ?></td>
+                                                <td><?= $sub['email'] ?></td>
+                                                <td><?= $sub['nombre_plan'] ?></td>
+                                                <td><?= number_format($sub['costo'], 0, ',', '.') ?></td>
+                                                <td><?= $sub['fecha_inicio'] ?></td>
+                                                <td><?= $sub['fecha_fin'] ?></td>
+                                                <td><?= ucfirst($sub['estado']) ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </section>
 

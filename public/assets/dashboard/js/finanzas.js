@@ -1,209 +1,219 @@
-// ==================== ESPERAR A QUE EL DOM ESTÉ LISTO ====================
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     
-    // Datos para diferentes períodos - INGRESOS POR MEMBRESÍAS
-    const dataMensual = {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-        ingresos: [1850000, 2100000, 1950000, 2300000, 2450000, 2200000, 2600000, 2750000, 2500000, 2650000, 2800000, 2845320]
-    };
-
-    const dataTrimestral = {
-        labels: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'],
-        ingresos: [5900000, 6950000, 7850000, 8295320]
-    };
-
-    const dataAnual = {
-        labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
-        ingresos: [8500000, 12000000, 16500000, 21000000, 26000000, 28995320]
-    };
-
-    // ==================== VERIFICAR QUE LOS CANVAS EXISTAN ====================
-    const lineChartElement = document.getElementById('lineChart');
-    const pieChartElement = document.getElementById('pieChart');
-    const periodoSelectElement = document.getElementById('periodoSelect');
-
-    if (!lineChartElement || !pieChartElement) {
-        console.error('❌ Error: No se encontraron los elementos canvas');
+    // 1. VERIFICACIONES DE SEGURIDAD
+    // Verificamos que ApexCharts esté cargado y que tengamos datos del backend
+    if (typeof ApexCharts === 'undefined') {
+        console.error('❌ Error: ApexCharts no está cargado.');
         return;
     }
 
-    if (typeof Chart === 'undefined') {
-        console.error('❌ Error: Chart.js no está cargado');
-        return;
+    const lineChartEl = document.querySelector("#lineChart");
+    const pieChartEl = document.querySelector("#pieChart");
+    const periodoSelect = document.querySelector("#periodoSelect");
+
+    // Datos por defecto (si PHP no envía nada, evitamos que rompa)
+    let datosIngresos = (typeof dashboardData !== 'undefined') ? dashboardData.ingresos : [];
+    let datosPlanes = (typeof dashboardData !== 'undefined') ? dashboardData.planes : [];
+
+    // =============================================================
+    // 2. PREPARACIÓN DE DATOS (Mapeo de PHP a Arrays JS)
+    // =============================================================
+    
+    // A. Datos para Gráfico de Línea (Ingresos)
+    let labelsMeses = datosIngresos.map(item => item.mes); 
+    let dataMontos = datosIngresos.map(item => parseFloat(item.total));
+
+    // Si no hay datos, ponemos placeholders para que se vea algo bonito
+    if (labelsMeses.length === 0) {
+        labelsMeses = ['Sin datos'];
+        dataMontos = [0];
     }
 
-    // ==================== GRÁFICO DE LÍNEA - INGRESOS POR MEMBRESÍAS ====================
-    const ctxLine = lineChartElement.getContext('2d');
-    let lineChart = new Chart(ctxLine, {
-        type: 'line',
-        data: {
-            labels: dataMensual.labels,
-            datasets: [{
-                label: 'Ingresos por Membresías',
-                data: dataMensual.ingresos,
-                borderColor: '#0066FF',
-                backgroundColor: 'rgba(0, 102, 255, 0.1)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointBackgroundColor: '#0066FF',
-                pointBorderColor: '#FFFFFF',
-                pointBorderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            family: 'Poppins',
-                            size: 13
-                        },
-                        padding: 15,
-                        usePointStyle: true
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    titleFont: {
-                        family: 'Roboto',
-                        size: 14
-                    },
-                    bodyFont: {
-                        family: 'Poppins',
-                        size: 13
-                    },
-                    callbacks: {
-                        label: function(context) {
-                            return 'Ingresos: $' + context.parsed.y.toLocaleString('es-CO');
-                        }
+    // B. Datos para Gráfico Circular (Planes)
+    let labelsPlanes = datosPlanes.map(item => item.tipo);
+    let dataCantidad = datosPlanes.map(item => parseInt(item.cantidad));
+
+    if (labelsPlanes.length === 0) {
+        labelsPlanes = ['Sin datos'];
+        dataCantidad = [1]; // Valor dummy
+    }
+
+    // =============================================================
+    // 3. GRÁFICO DE LÍNEA / ÁREA (Evolución de Ingresos)
+    // =============================================================
+    let chartLine; // Variable global para poder actualizarla luego
+
+    if (lineChartEl) {
+        const optionsLine = {
+            series: [{
+                name: "Ingresos",
+                data: dataMontos
+            }],
+            chart: {
+                height: 350,
+                type: 'area', // 'area' se ve más moderno que 'line'
+                fontFamily: 'Segoe UI, sans-serif',
+                toolbar: { show: false }, // Ocultar menú hamburguesa del gráfico
+                zoom: { enabled: false }
+            },
+            dataLabels: { enabled: false },
+            stroke: {
+                curve: 'smooth', // Curvas suaves
+                width: 3,
+                colors: ['#0066FF']
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.6,
+                    opacityTo: 0.1,
+                    stops: [0, 90, 100],
+                    colorStops: [
+                        { offset: 0, color: "#0066FF", opacity: 0.5 },
+                        { offset: 100, color: "#0066FF", opacity: 0.1 }
+                    ]
+                }
+            },
+            xaxis: {
+                categories: labelsMeses,
+                axisBorder: { show: false },
+                axisTicks: { show: false },
+                labels: { style: { colors: '#9ca3af' } }
+            },
+            yaxis: {
+                labels: {
+                    style: { colors: '#9ca3af' },
+                    formatter: (value) => { 
+                        // Formato abreviado (Ej: $1.2M o $500K) para que no ocupe mucho espacio
+                        if(value >= 1000000) return "$" + (value/1000000).toFixed(1) + "M";
+                        if(value >= 1000) return "$" + (value/1000).toFixed(0) + "K";
+                        return "$" + value;
                     }
                 }
             },
-            scales: {
+            tooltip: {
+                theme: 'dark',
                 y: {
-                    beginAtZero: true,
-                    ticks: {
-                        font: {
-                            family: 'Poppins',
-                            size: 12
-                        },
-                        callback: function(value) {
-                            return '$' + (value / 1000000).toFixed(1) + 'M';
-                        }
-                    },
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    }
-                },
-                x: {
-                    ticks: {
-                        font: {
-                            family: 'Poppins',
-                            size: 12
-                        }
-                    },
-                    grid: {
-                        display: false
+                    formatter: function (val) {
+                        // Formato completo en el tooltip: $ 1.200.000
+                        return "$ " + val.toLocaleString('es-CO');
                     }
                 }
-            }
-        }
-    });
+            },
+            grid: {
+                borderColor: '#f3f4f6',
+                strokeDashArray: 4,
+            },
+            colors: ['#0066FF']
+        };
 
-    console.log('✅ Gráfico de ingresos creado correctamente');
+        chartLine = new ApexCharts(lineChartEl, optionsLine);
+        chartLine.render();
+    }
 
-    // ==================== GRÁFICO CIRCULAR - DISTRIBUCIÓN POR PLAN ====================
-    const ctxPie = pieChartElement.getContext('2d');
-    const pieChart = new Chart(ctxPie, {
-        type: 'doughnut',
-        data: {
-            labels: ['Premium', 'Basic', 'Free'],
-            datasets: [{
-                data: [45, 72, 30], // Cantidad de proveedores por plan
-                backgroundColor: [
-                    '#0066FF', // Premium - Azul
-                    '#10B981', // Basic - Verde
-                    '#6B7280'  // Free - Gris
-                ],
-                borderWidth: 0,
-                hoverOffset: 10
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                        font: {
-                            family: 'Poppins',
-                            size: 13
-                        },
-                        padding: 15,
-                        usePointStyle: true
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    padding: 12,
-                    titleFont: {
-                        family: 'Roboto',
-                        size: 14
-                    },
-                    bodyFont: {
-                        family: 'Poppins',
-                        size: 13
-                    },
-                    callbacks: {
-                        label: function(context) {
-                            const label = context.label || '';
-                            const value = context.parsed;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((value / total) * 100).toFixed(1);
-                            return label + ': ' + value + ' proveedores (' + percentage + '%)';
+    // =============================================================
+    // 4. GRÁFICO DE DONA (Distribución de Planes)
+    // =============================================================
+    if (pieChartEl) {
+        const optionsPie = {
+            series: dataCantidad,
+            labels: labelsPlanes,
+            chart: {
+                type: 'donut',
+                height: 350,
+                fontFamily: 'Segoe UI, sans-serif'
+            },
+            // Colores personalizados (Azul, Verde, Gris, Violeta, Cyan)
+            colors: ['#0066FF', '#10B981', '#6B7280', '#8B5CF6', '#06B6D4'], 
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%', // Grosor del anillo
+                        labels: {
+                            show: true,
+                            name: { show: true },
+                            value: {
+                                show: true,
+                                formatter: function (val) {
+                                    return parseInt(val);
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                color: '#373d3f',
+                                formatter: function (w) {
+                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                }
+                            }
                         }
                     }
                 }
             },
-            cutout: '65%'
-        }
-    });
-
-    console.log('✅ Gráfico de distribución creado correctamente');
-
-    // ==================== CAMBIO DE PERÍODO ====================
-    if (periodoSelectElement) {
-        periodoSelectElement.addEventListener('change', function(e) {
-            let newData;
-            
-            switch(e.target.value) {
-                case 'trimestral':
-                    newData = dataTrimestral;
-                    break;
-                case 'anual':
-                    newData = dataAnual;
-                    break;
-                default:
-                    newData = dataMensual;
+            dataLabels: { enabled: false }, // Ocultamos números sobre el gráfico para limpieza
+            stroke: { show: false }, // Sin bordes blancos entre secciones
+            legend: {
+                position: 'bottom',
+                horizontalAlign: 'center', 
+            },
+            tooltip: {
+                enabled: true,
+                y: {
+                    formatter: function(val) {
+                        return val + " proveedores";
+                    }
+                }
             }
-            
-            // Actualizar datos del gráfico
-            lineChart.data.labels = newData.labels;
-            lineChart.data.datasets[0].data = newData.ingresos;
-            lineChart.update('active');
+        };
 
-            console.log('✅ Período cambiado a:', e.target.value);
+        const chartPie = new ApexCharts(pieChartEl, optionsPie);
+        chartPie.render();
+    }
+
+    // =============================================================
+    // 5. LÓGICA DEL SELECTOR DE PERIODO (Simulación)
+    // =============================================================
+    // Nota: Como tu backend actual solo devuelve los últimos 6 meses reales,
+    // aquí simulamos los datos trimestrales/anuales estáticos para mantener tu funcionalidad visual.
+    // En el futuro, esto debería hacer un fetch() a la API con ?periodo=anual.
+
+    if (periodoSelect && chartLine) {
+        
+        // Datos Estáticos para demostración (Replica tu lógica anterior)
+        const dataSimulada = {
+            mensual: {
+                cats: labelsMeses, // Usamos los reales de la BD
+                data: dataMontos   // Usamos los reales de la BD
+            },
+            trimestral: {
+                cats: ['Q1 2025', 'Q2 2025', 'Q3 2025', 'Q4 2025'],
+                data: [5900000, 6950000, 7850000, 8295320]
+            },
+            anual: {
+                cats: ['2021', '2022', '2023', '2024', '2025'],
+                data: [12000000, 16500000, 21000000, 26000000, 28995320]
+            }
+        };
+
+        periodoSelect.addEventListener('change', function(e) {
+            const periodo = e.target.value;
+            const seleccion = dataSimulada[periodo] || dataSimulada.mensual;
+
+            console.log(`🔄 Actualizando gráfico a periodo: ${periodo}`);
+
+            // ACTUALIZAR APEXCHARTS
+            // 1. Actualizamos los datos (Series)
+            chartLine.updateSeries([{
+                data: seleccion.data
+            }]);
+
+            // 2. Actualizamos las categorías (Eje X)
+            chartLine.updateOptions({
+                xaxis: {
+                    categories: seleccion.cats
+                }
+            });
         });
     }
-
-    console.log('✅ JavaScript de Finanzas cargado correctamente');
 });
