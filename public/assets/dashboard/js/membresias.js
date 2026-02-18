@@ -291,7 +291,7 @@ function cargarDetalleSuscripcion(id) {
                 Swal.fire('Error', data.error, 'error');
                 return;
             }
-            
+
             llenarModalSuscripcion(data);
 
             document.getElementById('loader-sub').classList.add('d-none');
@@ -314,7 +314,7 @@ function llenarModalSuscripcion(data) {
     const badge = document.getElementById('modal-sub-estado-badge');
     badge.textContent = data.estado.toUpperCase();
     badge.className = 'badge rounded-pill px-3 py-2 fs-6'; // Reset clases
-    
+
     if (data.estado.toLowerCase() === 'activa') {
         badge.classList.add('bg-success');
     } else if (data.estado.toLowerCase() === 'vencida') {
@@ -326,7 +326,7 @@ function llenarModalSuscripcion(data) {
     // Datos del Plan
     document.getElementById('modal-sub-plan').textContent = data.nombre_plan;
     document.getElementById('modal-sub-id').textContent = `#${data.id}`;
-    
+
     // Formato Moneda COP
     const formatoMoneda = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
     document.getElementById('modal-sub-costo').textContent = formatoMoneda.format(data.costo);
@@ -336,20 +336,27 @@ function llenarModalSuscripcion(data) {
     const divFin = document.getElementById('modal-sub-fin');
     divFin.textContent = data.fecha_fin;
 
-    // Cálculo Días Restantes
-    const fechaFin = new Date(data.fecha_fin_raw); // Usamos la fecha cruda (YYYY-MM-DD)
+    // ... código anterior ...
+
+    // --- CORRECCIÓN DE FECHAS Y TIEMPO RESTANTE ---
+    // 1. Crear fechas
+    // Asegúrate de que el formato sea compatible (YYYY-MM-DD)
+    // Agregamos 'T00:00:00' para asegurar hora local medianoche si es string ISO
+    const fechaFin = new Date(data.fecha_fin_raw + 'T00:00:00');
     const hoy = new Date();
+
+    // 2. RESETEAR HORAS (Truco para precisión exacta)
+    // Ponemos ambas fechas a las 00:00:00 horas
+    fechaFin.setHours(0, 0, 0, 0);
+    hoy.setHours(0, 0, 0, 0);
+
+    // 3. Calcular diferencia en milisegundos
     const diffTime = fechaFin - hoy;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    // 4. Convertir a días (Math.round es mejor aquí porque ya quitamos las horas)
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
     const spanRestante = document.getElementById('modal-sub-restante');
-    if (diffDays < 0) {
-        spanRestante.textContent = `Venció hace ${Math.abs(diffDays)} días`;
-        spanRestante.className = 'badge bg-danger text-white px-3 py-2 rounded-pill';
-        divFin.classList.add('text-danger');
-    } else {
-        spanRestante.textContent = `Quedan ${diffDays} días`;
-        spanRestante.className = 'badge bg-success bg-opacity-10 text-success border border-success px-3 py-2 rounded-pill';
-        divFin.classList.remove('text-danger');
-    }
+
+    // ... resto de tu lógica de colores ...
 }

@@ -170,7 +170,7 @@ switch ($request) {
         break;
 
     case '/admin/finanzas':
-        require BASE_PATH . '/app/views/dashboard/admin/dashboardFinanzas.php';
+        require BASE_PATH . '/app/views/dashboard/admin/finanzas.php';
         break;
 
     case '/admin/consultar-servicios':
