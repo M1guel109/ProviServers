@@ -250,6 +250,137 @@ ul { list-style: none; }
     cursor: pointer;
     transition: 0.2s;
 }
+
+/* ==================== NOTIFICACIONES & DROPDOWNS (HEADER) ==================== */
+
+/* Ajuste del Dropdown de Notificaciones */
+.notifications {
+    width: 320px;
+    padding: 0;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.notifications .dropdown-header {
+    background-color: #fff;
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+.notifications .dropdown-footer {
+    background-color: #f8fafc;
+    padding: 10px;
+    text-align: center;
+    font-size: 13px;
+}
+
+/* Scroll interno para cuando hay muchas notificaciones */
+.notificaciones-scroll {
+    max-height: 350px;
+    overflow-y: auto;
+    /* Estilizar scrollbar para que sea sutil */
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+.notificaciones-scroll::-webkit-scrollbar {
+    width: 4px;
+}
+.notificaciones-scroll::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+/* Ítem individual de notificación */
+.notification-item {
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    padding: 15px;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    border-bottom: 1px solid #f8fafc;
+}
+
+.notification-item:hover {
+    background-color: #f1f5f9; /* Color suave al pasar mouse */
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item h4, 
+.notification-item h6 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--dark-color);
+}
+
+.notification-item p {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+/* --- ESTILOS DE ICONOS SUAVES (Pills) --- */
+/* Esto hace que el icono tenga ese fondo de color clarito */
+
+.notification-item i {
+    font-size: 1.2rem;
+}
+
+/* Contenedor del icono (Círculo) */
+.notification-item div:first-child {
+    min-width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Colores de Fondo Suaves (Light) */
+.bg-primary-light {
+    background-color: rgba(13, 110, 253, 0.12); /* Azul suave */
+    color: #0d6efd;
+}
+
+.bg-success-light {
+    background-color: rgba(16, 185, 129, 0.12); /* Verde suave */
+    color: #10B981;
+}
+
+.bg-warning-light {
+    background-color: rgba(245, 158, 11, 0.12); /* Naranja suave */
+    color: #d97706;
+}
+
+.bg-danger-light {
+    background-color: rgba(239, 68, 68, 0.12); /* Rojo suave */
+    color: #dc2626;
+}
+
+.bg-info-light {
+    background-color: rgba(6, 182, 212, 0.12); /* Cyan suave */
+    color: #0891b2;
+}
+
+/* Badge numérico en la campana */
+.badge-number {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    background-color: #dc2626;
+    color: white;
+    border: 2px solid white;
+}
 .item-barra:hover { background-color: #f1f5f9; }
 
 /* Usuario */
@@ -404,6 +535,8 @@ body.toggle-sidebar .has-submenu:hover .submenu::after {
     border-color: transparent var(--white-color) transparent transparent; /* Triángulo apuntando izq */
     filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.05));
 }
+
+
 /* ==========================================================================
    6. RESPONSIVIDAD
    ========================================================================== */
