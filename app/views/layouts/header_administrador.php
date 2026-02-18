@@ -2,37 +2,36 @@
 // 1. Carga de dependencias y datos
 require_once BASE_PATH . '/app/controllers/perfilController.php';
 require_once BASE_PATH . '/app/helpers/admin_notificaciones.php';
+require_once BASE_PATH . '/app/helpers/lang_helper.php'; // <--- IMPORTANTE: Helper de idioma
 
 // Validar sesión para evitar errores
 $id_usuario = $_SESSION['user']['id'] ?? 0;
 
 // Obtener datos del perfil
 $usuarioP = mostrarPerfilAdmin($id_usuario);
-// Fallback por si la imagen viene vacía
 $fotoPerfil = !empty($usuarioP['foto']) ? $usuarioP['foto'] : 'default_user.png';
 $nombrePerfil = $usuarioP['nombres'] ?? 'Usuario';
 $rolPerfil = ($usuarioP['rol'] === 'admin' || $usuarioP['rol'] === 'superadmin') ? 'Administrador' : ucfirst($usuarioP['rol'] ?? 'Staff');
 
 // Obtener notificaciones
-$misNotificaciones = obtenerNotificacionesAdmin(); // Asumimos que esto devuelve un array
+$misNotificaciones = obtenerNotificacionesAdmin();
 $cantidadNotif = count($misNotificaciones);
 
+// Datos del Idioma Actual
+$idiomaActual = obtenerIdiomaActual(); // Viene del lang_helper.php
+$imgBandera = ($idiomaActual === 'es') ? 'es.png' : 'us.png';
+$txtIdioma = ($idiomaActual === 'es') ? 'Español' : 'English';
+
 /**
- * Helper rápido para definir estilos según el tipo de notificación
- * Tipos esperados: 'pago', 'alerta', 'nuevo_usuario', 'info'
+ * Helper visual para estilos de notificación
  */
 function obtenerEstiloNotificacion($tipo) {
     switch ($tipo) {
-        case 'pago':
-            return ['icon' => 'bi-cash-coin', 'color' => 'text-success', 'bg' => 'bg-success-light'];
-        case 'alerta':
-            return ['icon' => 'bi-exclamation-triangle', 'color' => 'text-warning', 'bg' => 'bg-warning-light'];
-        case 'error':
-            return ['icon' => 'bi-x-circle', 'color' => 'text-danger', 'bg' => 'bg-danger-light'];
-        case 'nuevo_usuario':
-            return ['icon' => 'bi-person-plus', 'color' => 'text-primary', 'bg' => 'bg-primary-light'];
-        default: // 'info'
-            return ['icon' => 'bi-info-circle', 'color' => 'text-info', 'bg' => 'bg-info-light'];
+        case 'pago': return ['icon' => 'bi-cash-coin', 'color' => 'text-success', 'bg' => 'bg-success-light'];
+        case 'alerta': return ['icon' => 'bi-exclamation-triangle', 'color' => 'text-warning', 'bg' => 'bg-warning-light'];
+        case 'error': return ['icon' => 'bi-x-circle', 'color' => 'text-danger', 'bg' => 'bg-danger-light'];
+        case 'nuevo_usuario': return ['icon' => 'bi-person-plus', 'color' => 'text-primary', 'bg' => 'bg-primary-light'];
+        default: return ['icon' => 'bi-info-circle', 'color' => 'text-info', 'bg' => 'bg-info-light'];
     }
 }
 ?>
@@ -46,7 +45,7 @@ function obtenerEstiloNotificacion($tipo) {
 
         <div class="buscador d-none d-md-flex align-items-center bg-light rounded-pill px-3 py-1 border">
             <i class="bi bi-search text-muted me-2"></i>
-            <input type="text" class="form-control border-0 bg-transparent shadow-none p-1" placeholder="Buscar...">
+            <input type="text" class="form-control border-0 bg-transparent shadow-none p-1" placeholder="<?= __('header_buscar') ?>">
         </div>
     </div>
 
@@ -65,19 +64,18 @@ function obtenerEstiloNotificacion($tipo) {
             <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications p-0 shadow border-0" style="width: 320px;">
                 <li class="dropdown-header p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
                     <span class="fw-bold text-dark">Notificaciones</span>
-                    <a href="<?= BASE_URL ?>/admin/notificaciones" class="badge bg-primary text-decoration-none">Ver todas</a>
+                    <a href="<?= BASE_URL ?>/admin/notificaciones" class="badge bg-primary text-decoration-none"><?= __('header_ver_todas') ?></a>
                 </li>
 
                 <div class="notificaciones-scroll" style="max-height: 300px; overflow-y: auto;">
                     <?php if ($cantidadNotif > 0): ?>
                         <?php foreach ($misNotificaciones as $notif): ?>
                             <?php 
-                                // Definimos el estilo dinámicamente
-                                $tipo = $notif['tipo'] ?? 'info'; // Asegúrate que tu DB traiga este campo
+                                $tipo = $notif['tipo'] ?? 'info';
                                 $estilo = obtenerEstiloNotificacion($tipo); 
                             ?>
                             <li class="notification-item d-flex align-items-start p-3 border-bottom hover-bg">
-                                <div class="me-3 fs-4 <?= $estilo['color'] ?>">
+                                <div class="me-3 fs-4 <?= $estilo['color'] ?> <?= $estilo['bg'] ?> rounded-circle d-flex align-items-center justify-content-center" style="width:40px; height:40px;">
                                     <i class="bi <?= $estilo['icon'] ?>"></i>
                                 </div>
                                 <div>
@@ -92,7 +90,7 @@ function obtenerEstiloNotificacion($tipo) {
                     <?php else: ?>
                         <li class="p-4 text-center text-muted">
                             <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
-                            No tienes notificaciones nuevas
+                            <?= __('header_sin_notif') ?>
                         </li>
                     <?php endif; ?>
                 </div>
@@ -105,13 +103,30 @@ function obtenerEstiloNotificacion($tipo) {
 
         <div class="nav-item dropdown d-none d-sm-block">
             <a class="nav-link d-flex align-items-center gap-2 text-dark text-decoration-none" href="#" data-bs-toggle="dropdown">
-                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/bandera-idioma.png" alt="ES" height="20">
+                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/<?= $imgBandera ?>" alt="<?= $txtIdioma ?>" height="20" class="rounded-1 border">
+                <span class="d-none d-lg-block small fw-bold"><?= $txtIdioma ?></span>
+                <i class="bi bi-chevron-down small text-muted"></i>
             </a>
-            </div>
+            
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-1" style="min-width: 140px;">
+                <li>
+                    <a class="dropdown-item d-flex align-items-center rounded-2 py-2 <?= $idiomaActual == 'es' ? 'active' : '' ?>" 
+                       href="<?= BASE_URL ?>/app/controllers/idiomaController.php?lang=es">
+                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/es.png" height="16" class="me-2"> Español
+                    </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex align-items-center rounded-2 py-2 <?= $idiomaActual == 'en' ? 'active' : '' ?>" 
+                       href="<?= BASE_URL ?>/app/controllers/idiomaController.php?lang=en">
+                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/us.png" height="16" class="me-2"> English
+                    </a>
+                </li>
+            </ul>
+        </div>
 
         <div class="nav-item dropdown">
             <a class="nav-link d-flex align-items-center gap-2 ps-2" href="#" data-bs-toggle="dropdown">
-                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $fotoPerfil ?>" alt="Perfil" class="rounded-circle border" width="38" height="38" style="object-fit: cover;">
+                <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= $fotoPerfil ?>" alt="Perfil" class="rounded-circle border shadow-sm" width="38" height="38" style="object-fit: cover;">
                 <div class="d-none d-md-block text-start lh-1">
                     <span class="d-block fw-bold text-dark" style="font-size: 0.9rem;"><?= htmlspecialchars($nombrePerfil) ?></span>
                     <span class="text-muted" style="font-size: 0.75rem;"><?= $rolPerfil ?></span>
@@ -119,24 +134,24 @@ function obtenerEstiloNotificacion($tipo) {
                 <i class="bi bi-chevron-down small text-muted"></i>
             </a>
 
-            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile shadow border-0 pt-0">
-                <li class="dropdown-header text-center bg-primary bg-opacity-10 py-3">
+            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile shadow border-0 pt-0" style="min-width: 200px;">
+                <li class="dropdown-header text-center bg-primary bg-opacity-10 py-3 mb-2">
                     <h6 class="mb-0 text-primary fw-bold"><?= htmlspecialchars($nombrePerfil) ?></h6>
                     <small class="text-muted"><?= $rolPerfil ?></small>
                 </li>
 
                 <li><a class="dropdown-item d-flex align-items-center py-2" href="<?= BASE_URL ?>/admin/perfil">
-                    <i class="bi bi-person me-2 text-secondary"></i> Mi Perfil
+                    <i class="bi bi-person me-2 text-secondary"></i> <?= __('header_perfil') ?>
                 </a></li>
                 
                 <li><a class="dropdown-item d-flex align-items-center py-2" href="<?= BASE_URL ?>/admin/configuracion">
-                    <i class="bi bi-gear me-2 text-secondary"></i> Configuración
+                    <i class="bi bi-gear me-2 text-secondary"></i> <?= __('header_config') ?>
                 </a></li>
                 
-                <li><hr class="dropdown-divider m-0"></li>
+                <li><hr class="dropdown-divider my-2"></li>
                 
                 <li><a class="dropdown-item d-flex align-items-center py-2 text-danger fw-bold" href="<?= BASE_URL ?>/cerrar-sesion">
-                    <i class="bi bi-box-arrow-right me-2"></i> Cerrar Sesión
+                    <i class="bi bi-box-arrow-right me-2"></i> <?= __('header_salir') ?>
                 </a></li>
             </ul>
         </div>
