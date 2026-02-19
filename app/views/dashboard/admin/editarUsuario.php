@@ -10,7 +10,7 @@ if (!isset($_GET['id'])) {
 $id = $_GET['id'];
 
 // 2. Obtener datos completos
-$usuario = mostrarUsuarioId($id); 
+$usuario = mostrarUsuarioId($id);
 
 if (!$usuario) {
     echo "Usuario no encontrado.";
@@ -18,12 +18,8 @@ if (!$usuario) {
 }
 
 // 3. Preparar datos para la vista
-$categorias_bd = [
-    ['nombre' => 'Plomería'], ['nombre' => 'Electricidad'], 
-    ['nombre' => 'Carpintería'], ['nombre' => 'Limpieza'], 
-    ['nombre' => 'Jardinería'], ['nombre' => 'Clases'],
-    ['nombre' => 'Mantenimiento'], ['nombre' => 'Transporte']
-];
+$modeloUsuario = new Usuario(); // Instanciamos para usar el método
+$categorias_bd = $modeloUsuario->obtenerTodasCategorias();
 
 // Si es proveedor, convertimos sus categorías a string para el JS
 $categorias_actuales_str = "";
@@ -34,20 +30,34 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Editar Usuario</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
-    
+
     <style>
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
@@ -73,9 +83,9 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
 
         <section id="formulario-usuarios">
             <div class="contenedor-formulario">
-                
+
                 <form action="<?= BASE_URL ?>/admin/actualizar-usuario" method="post" class="formulario-usuario" enctype="multipart/form-data">
-                    
+
                     <input type="hidden" name="accion" value="actualizar">
                     <input type="hidden" name="id" value="<?= $usuario['id'] ?>">
                     <input type="hidden" name="foto_actual" value="<?= $usuario['foto'] ?? 'default_user.png' ?>">
@@ -93,8 +103,10 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                     </div>
 
                     <div class="row g-3">
-                        
-                        <div class="col-12"><h6 class="text-primary border-bottom pb-2">Datos Personales</h6></div>
+
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2">Datos Personales</h6>
+                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Nombres</label>
@@ -117,7 +129,9 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                             <input type="text" class="form-control" name="ubicacion" required value="<?= $usuario['ubicacion'] ?>">
                         </div>
 
-                        <div class="col-12 mt-4"><h6 class="text-primary border-bottom pb-2">Cuenta</h6></div>
+                        <div class="col-12 mt-4">
+                            <h6 class="text-primary border-bottom pb-2">Cuenta</h6>
+                        </div>
 
                         <div class="col-md-6">
                             <label class="form-label">Correo</label>
@@ -150,7 +164,7 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                             <div class="card bg-light border-0">
                                 <div class="card-body">
                                     <h5 class="card-title text-dark mb-4"><i class="bi bi-briefcase"></i> Gestión Profesional</h5>
-                                    
+
                                     <div class="mb-4">
                                         <label class="form-label fw-bold">Habilidades / Categorías</label>
                                         <input type="hidden" name="lista_categorias" id="lista_categorias" value="<?= $categorias_actuales_str ?>">
@@ -158,7 +172,7 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                                         <div class="d-flex gap-2 mb-2">
                                             <select class="form-select" id="select-categoria">
                                                 <option value="">Seleccionar habilidad...</option>
-                                                <?php foreach($categorias_bd as $cat): ?>
+                                                <?php foreach ($categorias_bd as $cat): ?>
                                                     <option value="<?= $cat['nombre'] ?>"><?= $cat['nombre'] ?></option>
                                                 <?php endforeach; ?>
                                                 <option value="nueva" class="text-primary fw-bold">+ Nueva</option>
@@ -173,7 +187,7 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
 
                                     <div>
                                         <label class="form-label fw-bold border-bottom pb-2 w-100 mb-3">Documentación</label>
-                                        
+
                                         <?php if (!empty($usuario['documentos'])): ?>
                                             <div class="mb-4">
                                                 <h6 class="text-muted small text-uppercase fw-bold">Archivos actuales:</h6>
@@ -190,25 +204,49 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
                                                             <?php foreach ($usuario['documentos'] as $doc): ?>
                                                                 <tr>
                                                                     <td class="text-uppercase small fw-bold">
-                                                                        <?= $doc['tipo_documento'] ?>
-                                                                        <br>
-                                                                        <a href="<?= BASE_URL ?>/public/uploads/documentos/<?= $doc['archivo'] ?>" target="_blank" class="fw-normal text-decoration-none small">
-                                                                            <i class="bi bi-eye"></i> Ver
-                                                                        </a>
+                                                                        <div class="d-flex align-items-center">
+                                                                            <i class="bi bi-file-earmark-text fs-5 text-secondary me-2"></i>
+                                                                            <div>
+                                                                                <?= $doc['tipo_documento'] ?>
+                                                                                <br>
+                                                                                <a href="<?= BASE_URL ?>/public/uploads/documentos/<?= $doc['archivo'] ?>" target="_blank" class="fw-normal text-decoration-none small">
+                                                                                    <i class="bi bi-eye"></i> Ver archivo
+                                                                                </a>
+                                                                            </div>
+                                                                        </div>
                                                                     </td>
+
                                                                     <td>
-                                                                        <?php 
+                                                                        <div id="doc-status-<?= $doc['id'] ?>">
+                                                                            <?php
                                                                             $badge = 'bg-secondary';
-                                                                            if($doc['estado']=='aprobado') $badge='bg-success';
-                                                                            if($doc['estado']=='rechazado') $badge='bg-danger';
-                                                                            if($doc['estado']=='pendiente') $badge='bg-warning text-dark';
-                                                                        ?>
-                                                                        <span class="badge <?= $badge ?>"><?= $doc['estado'] ?></span>
+                                                                            if ($doc['estado'] == 'aprobado') $badge = 'bg-success';
+                                                                            if ($doc['estado'] == 'rechazado') $badge = 'bg-danger';
+                                                                            if ($doc['estado'] == 'pendiente') $badge = 'bg-warning text-dark';
+                                                                            ?>
+                                                                            <span class="badge <?= $badge ?>"><?= ucfirst($doc['estado']) ?></span>
+                                                                        </div>
                                                                     </td>
+
                                                                     <td>
-                                                                        <div class="btn-group btn-group-sm">
-                                                                            <button type="button" class="btn btn-outline-success" onclick="cambiarEstadoDoc(<?= $doc['id'] ?>, 'aprobado')" title="Aprobar"><i class="bi bi-check-lg"></i></button>
-                                                                            <button type="button" class="btn btn-outline-danger" onclick="cambiarEstadoDoc(<?= $doc['id'] ?>, 'rechazado')" title="Rechazar"><i class="bi bi-x-lg"></i></button>
+                                                                        <div class="btn-group btn-group-sm" id="doc-actions-<?= $doc['id'] ?>">
+
+                                                                            <?php if ($doc['estado'] !== 'aprobado'): ?>
+                                                                                <button type="button" class="btn btn-outline-success"
+                                                                                    onclick="cambiarEstadoDoc(<?= $doc['id'] ?>, 'aprobado', this)"
+                                                                                    title="Aprobar">
+                                                                                    <i class="bi bi-check-lg"></i>
+                                                                                </button>
+                                                                            <?php endif; ?>
+
+                                                                            <?php if ($doc['estado'] !== 'rechazado'): ?>
+                                                                                <button type="button" class="btn btn-outline-danger"
+                                                                                    onclick="cambiarEstadoDoc(<?= $doc['id'] ?>, 'rechazado', this)"
+                                                                                    title="Rechazar">
+                                                                                    <i class="bi bi-x-lg"></i>
+                                                                                </button>
+                                                                            <?php endif; ?>
+
                                                                         </div>
                                                                     </td>
                                                                 </tr>
@@ -269,8 +307,10 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
 
 
 
-    <script> const BASE_URL = "<?= BASE_URL ?>"; </script>
-    
+    <script>
+        const BASE_URL = "<?= BASE_URL ?>";
+    </script>
+
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script> -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
@@ -279,4 +319,5 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
+
 </html>

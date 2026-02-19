@@ -20,6 +20,31 @@ class Usuario
         throw new Exception("Rol no válido: " . $rol);
     }
 
+    // ... dentro de class Usuario ...
+
+    // 1. Función para aprobar/rechazar documentos individualmente
+    public function actualizarEstadoDocumento($id_doc, $estado)
+    {
+        try {
+            $sql = "UPDATE documentos_proveedor SET estado = :estado, fecha_revision = NOW() WHERE id = :id";
+            $stmt = $this->conexion->prepare($sql);
+            return $stmt->execute([':estado' => $estado, ':id' => $id_doc]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    // 2. Función para traer todas las categorías de la BD
+    public function obtenerTodasCategorias()
+    {
+        try {
+            $stmt = $this->conexion->query("SELECT * FROM categorias ORDER BY nombre ASC");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }   
+
     public function registrar($data)
     {
         try {

@@ -1,7 +1,7 @@
-/* editarUsuario.js - Lógica corregida */
+/* editarUsuario.js - Versión Final con AJAX Real */
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("Script editarUsuario.js cargado correctamente.");
+    console.log("Script editarUsuario.js cargado.");
 
     // =======================================================
     // 1. PREVISUALIZACIÓN DE FOTO
@@ -30,12 +30,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const btnAdd = document.getElementById('btn-add-categoria');
     const contenedorTags = document.getElementById('contenedor-tags');
 
-    let categorias = [];
+    // Variable global para usarla en eliminarCategoria
+    window.categorias = [];
 
-    // A. Inicializar
+    // A. Inicializar datos existentes
     if (inputHidden && inputHidden.value) {
         const valores = inputHidden.value.split(',').filter(c => c.trim() !== '');
-        categorias = valores;
+        window.categorias = valores;
         renderizarTags();
     }
 
@@ -65,22 +66,18 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!valor) return;
 
             // Validación duplicados
-            if (categorias.some(c => c.toLowerCase() === valor.toLowerCase())) {
-                if(typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Repetida',
-                        text: 'Esta categoría ya está agregada.',
-                        toast: true, position: 'top-end', timer: 2000, showConfirmButton: false
-                    });
-                } else {
-                    alert('Categoría repetida');
-                }
+            if (window.categorias.some(c => c.toLowerCase() === valor.toLowerCase())) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Repetida',
+                    text: 'Esta categoría ya está agregada.',
+                    toast: true, position: 'top-end', timer: 2000, showConfirmButton: false
+                });
                 return;
             }
 
             // Agregar y Renderizar
-            categorias.push(valor);
+            window.categorias.push(valor);
             renderizarTags();
 
             // Resetear UI
@@ -92,19 +89,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // D. Función Renderizar (Local)
+    // D. Función Renderizar
     function renderizarTags() {
         if(!contenedorTags) return;
         contenedorTags.innerHTML = '';
         
-        if(categorias.length === 0) {
+        if(window.categorias.length === 0) {
             contenedorTags.innerHTML = '<span class="text-muted small">Sin categorías asignadas.</span>';
         }
 
-        categorias.forEach(cat => {
+        window.categorias.forEach(cat => {
             const tag = document.createElement('div');
-            tag.className = 'badge-categoria'; 
-            tag.style.cssText = 'background: #e3f2fd; color: #0d47a1; padding: 5px 10px; border-radius: 20px; font-size: 0.9em; display: inline-flex; align-items: center; gap: 5px; border: 1px solid #bbdefb;';
+            tag.className = 'badge bg-light text-primary border border-primary p-2 d-flex align-items-center gap-2';
             tag.innerHTML = `
                 ${cat}
                 <i class="bi bi-x-circle-fill text-danger" style="cursor:pointer" onclick="eliminarCategoria('${cat}')"></i>
@@ -112,76 +108,100 @@ document.addEventListener('DOMContentLoaded', function () {
             contenedorTags.appendChild(tag);
         });
 
-        if(inputHidden) inputHidden.value = categorias.join(',');
+        if(inputHidden) inputHidden.value = window.categorias.join(',');
     }
 
     // E. Función Eliminar (Global)
     window.eliminarCategoria = function(nombre) {
-        categorias = categorias.filter(c => c !== nombre);
+        window.categorias = window.categorias.filter(c => c !== nombre);
         renderizarTags();
     };
 
+
     // =======================================================
-    // 3. LÓGICA DE CAMBIO DE ROL (MOSTRAR/OCULTAR)
+    // 3. LÓGICA DE CAMBIO DE ROL
     // =======================================================
     const rolSelect = document.getElementById('rol');
     const camposProveedor = document.getElementById('campos-proveedor');
 
     if (rolSelect && camposProveedor) {
-        
         function toggleCamposProveedor() {
-            console.log("Cambio de rol detectado: " + rolSelect.value);
             if (rolSelect.value === 'proveedor') {
                 camposProveedor.classList.remove('d-none');
-                camposProveedor.classList.add('fade-in'); 
+                setTimeout(() => camposProveedor.classList.add('fade-in'), 10);
             } else {
                 camposProveedor.classList.add('d-none');
                 camposProveedor.classList.remove('fade-in');
             }
         }
-
         rolSelect.addEventListener('change', toggleCamposProveedor);
-        
-        // Ejecutar al inicio para establecer estado correcto
-        toggleCamposProveedor();
-    } else {
-        console.warn("No se encontraron los elementos 'rol' o 'campos-proveedor'");
+        toggleCamposProveedor(); // Ejecutar al inicio
     }
-
 });
 
+
 // =======================================================
-// 4. CAMBIAR ESTADO DE DOCUMENTO (FUERA DEL DOMCONTENTLOADED)
+// 4. CAMBIAR ESTADO DOCUMENTO (AJAX REAL)
 // =======================================================
-// Al estar aquí afuera, el HTML onclick="cambiarEstadoDoc(...)" sí puede verla.
-window.cambiarEstadoDoc = function(docId, nuevoEstado) {
+window.cambiarEstadoDoc = async function(idDoc, nuevoEstado, btnElement) {
     
-    const accion = nuevoEstado === 'aprobado' ? 'Aprobar' : 'Rechazar';
-    const color = nuevoEstado === 'aprobado' ? '#198754' : '#dc3545';
+    // Obtener contenedor de botones para poner spinner
+    // Si se pasa 'this' desde el HTML, usamos ese elemento, si no, buscamos el evento
+    const btn = btnElement || event.target.closest('button');
+    const btnGroup = btn.closest('.btn-group');
+    const originalHtml = btnGroup.innerHTML;
 
-    if(typeof Swal === 'undefined') {
-        if(confirm(`¿${accion} documento?`)) {
-            alert(`Simulación: Documento ${docId} ${nuevoEstado}`);
-        }
-        return;
-    }
+    // Feedback visual (Cargando...)
+    btnGroup.innerHTML = '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>';
 
-    Swal.fire({
-        title: `¿${accion} documento?`,
-        text: "El estado cambiará inmediatamente.",
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: color,
-        confirmButtonText: `Sí, ${accion}`,
-        cancelButtonText: 'Cancelar'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // AQUÍ IRÍA TU FETCH REAL
+    try {
+        const formData = new FormData();
+        formData.append('accion', 'cambiar_estado_documento');
+        formData.append('id_doc', idDoc);
+        formData.append('nuevo_estado', nuevoEstado);
+
+        // Usamos la variable global BASE_URL definida en la vista PHP
+        const url = `${BASE_URL}/app/controllers/adminController.php`;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        const res = await response.json();
+
+        if (res.success) {
+            
+            // 1. Actualizar visualmente la fila (Badge y Botones)
+            const tr = btnGroup.closest('tr');
+            const celdaEstado = tr.querySelector('td:nth-child(2)'); // Columna Estado
+
+            if (nuevoEstado === 'aprobado') {
+                celdaEstado.innerHTML = '<span class="badge bg-success">aprobado</span>';
+                // Dejar solo botón rechazar
+                btnGroup.innerHTML = `<button type="button" class="btn btn-outline-danger" onclick="cambiarEstadoDoc(${idDoc}, 'rechazado', this)" title="Rechazar"><i class="bi bi-x-lg"></i></button>`;
+            } else {
+                celdaEstado.innerHTML = '<span class="badge bg-danger">rechazado</span>';
+                // Dejar botón aprobar
+                btnGroup.innerHTML = `<button type="button" class="btn btn-outline-success" onclick="cambiarEstadoDoc(${idDoc}, 'aprobado', this)" title="Aprobar"><i class="bi bi-check-lg"></i></button>`;
+            }
+
+            // 2. Alerta Bonita
             Swal.fire({
                 icon: 'success',
-                title: 'Simulación Exitosa',
-                text: `Se enviaría ID: ${docId} con Estado: ${nuevoEstado} al servidor.`
+                title: 'Actualizado',
+                text: `Documento marcado como ${nuevoEstado}`,
+                toast: true, position: 'top-end', showConfirmButton: false, timer: 3000
             });
+
+        } else {
+            Swal.fire('Error', res.message || 'Error al actualizar', 'error');
+            btnGroup.innerHTML = originalHtml; // Restaurar si falla
         }
-    });
+
+    } catch (error) {
+        console.error(error);
+        Swal.fire('Error', 'Fallo de conexión', 'error');
+        btnGroup.innerHTML = originalHtml;
+    }
 };
