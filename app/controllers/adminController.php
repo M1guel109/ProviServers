@@ -13,10 +13,13 @@ switch ($method) {
 
         if ($accion === 'actualizar') {
             actualizarUsuario();
+        }
+        // AGREGAR ESTE NUEVO CASO
+        elseif ($accion === 'cambiar_estado_documento') {
+            procesarEstadoDocumento();
         } else {
             registrarUsuario();
         }
-
         break;
     case 'GET':
         $accion = $_GET['accion'] ?? '';
@@ -278,8 +281,8 @@ function actualizarUsuario()
         }
 
         // Validación: Si es proveedor, debe tener al menos 3 categorías (incluso al editar)
-        if (count($lista_categorias) < 3) {
-            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 3 categorías.');
+        if (count($lista_categorias) < 1) {
+            mostrarSweetAlert('error', 'Perfil incompleto', 'El proveedor debe tener asignadas al menos 1 categoría.');
             exit();
         }
 
@@ -415,4 +418,18 @@ function obtenerDetalleUsuarioAjax()
         echo json_encode(['error' => 'Usuario no encontrado']);
     }
     exit;
+}
+
+function procesarEstadoDocumento() {
+    $id_doc = $_POST['id_doc'] ?? null;
+    $nuevo_estado = $_POST['nuevo_estado'] ?? null;
+
+    if ($id_doc && $nuevo_estado) {
+        $modelo = new Usuario();
+        $res = $modelo->actualizarEstadoDocumento($id_doc, $nuevo_estado);
+        echo json_encode(['success' => $res]);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Faltan datos']);
+    }
+    exit; // Importante para detener la ejecución aquí
 }
