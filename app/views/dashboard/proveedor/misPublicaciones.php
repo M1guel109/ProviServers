@@ -66,108 +66,143 @@ if ($usuarioId) {
         </section>
 
         <!-- Tabla de publicaciones -->
-        <section id="tabla-arriba" class="mt-3">
-            <table id="tabla-publicaciones" class="display nowrap">
-                <thead>
-                    <tr>
-                        <th>Título publicación</th>
-                        <th>Servicio base</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Estado</th>
-                        <th>Creada el</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (!empty($publicaciones)) : ?>
-                        <?php foreach ($publicaciones as $pub) : ?>
-                            <?php
-                            $estado = $pub['estado_publicacion'] ?? '';
-                            $badgeClass = 'bg-secondary';
-                            $estadoTexto = ucfirst($estado);
+        <section id="cards-publicaciones" class="mt-3">
 
-                            switch ($estado) {
-                                case 'pendiente':
-                                    $badgeClass  = 'bg-warning text-dark';
-                                    $estadoTexto = 'Pendiente de aprobación';
-                                    break;
-                                case 'aprobado': // 🔹 antes tenías 'activa'
-                                    $badgeClass  = 'bg-success';
-                                    $estadoTexto = 'Publicada';
-                                    break;
-                                case 'pausada':
-                                    $badgeClass  = 'bg-info text-dark';
-                                    $estadoTexto = 'Pausada';
-                                    break;
-                                case 'rechazada':
-                                    $badgeClass  = 'bg-danger';
-                                    $estadoTexto = 'Rechazada';
-                                    break;
-                                default:
-                                    $badgeClass  = 'bg-secondary';
-                                    $estadoTexto = ucfirst($estado);
-                                    break;
-                            }
+            <?php if (empty($publicaciones)) : ?>
+                <div class="empty-state">
+                    <h5 class="text-muted mb-1">Todavía no tienes publicaciones</h5>
+                    <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                        Crea un servicio desde
+                        <a href="<?= BASE_URL ?>/proveedor/registrar-servicio">“Registrar servicio”</a>
+                        y se generará una publicación pendiente de aprobación.
+                    </p>
+                </div>
+            <?php else : ?>
 
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
 
-                            $precio = isset($pub['precio']) ? number_format((float)$pub['precio'], 2) : '0.00';
-                            ?>
-                            <tr>
-                                <td><?= htmlspecialchars($pub['titulo'] ?? '') ?></td>
-                                <td><?= htmlspecialchars($pub['servicio_nombre'] ?? 'Sin nombre') ?></td>
-                                <td><?= htmlspecialchars($pub['categoria_nombre'] ?? 'Sin categoría') ?></td>
-                                <td>$ <?= $precio ?></td>
-                                <td>
-                                    <span class="badge <?= $badgeClass ?>">
-                                        <?= $estadoTexto ?>
-                                    </span>
-                                </td>
-                                <td><?= htmlspecialchars($pub['publicacion_created_at'] ?? '') ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <!-- Ver detalle (placeholder, luego lo conectas) -->
-                                        <a href="#" class="btn-action btn-view" title="Ver detalle">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
+                    <?php foreach ($publicaciones as $pub) : ?>
+                        <?php
+                        $estado = $pub['estado_publicacion'] ?? 'pendiente';
 
-                                        <!-- Editar servicio base (por ahora voy directo al editar servicio) -->
-                                        <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $pub['servicio_id'] ?>"
-                                            class="btn-action btn-edit"
-                                            title="Editar servicio">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
+                        // Badge / texto por estado
+                        switch ($estado) {
+                            case 'pendiente':
+                                $badgeClass  = 'bg-warning text-dark';
+                                $estadoTexto = 'Pendiente de aprobación';
+                                break;
+                            case 'aprobado':
+                                $badgeClass  = 'bg-success';
+                                $estadoTexto = 'Publicada';
+                                break;
+                            case 'pausada':
+                                $badgeClass  = 'bg-info text-dark';
+                                $estadoTexto = 'Pausada';
+                                break;
+                            case 'rechazada':
+                                $badgeClass  = 'bg-danger';
+                                $estadoTexto = 'Rechazada';
+                                break;
+                            default:
+                                $badgeClass  = 'bg-secondary';
+                                $estadoTexto = ucfirst((string)$estado);
+                                break;
+                        }
 
-                                        <!-- A futuro: botones de pausar / reactivar publicación -->
-                                        <!--
-                                        <?php if ($estado === 'activa') : ?>
-                                            <a href="#" class="btn-action btn-warning" title="Pausar publicación">
-                                                <i class="bi bi-pause-circle"></i>
-                                            </a>
-                                        <?php elseif ($estado === 'pausada') : ?>
-                                            <a href="#" class="btn-action btn-success" title="Reactivar publicación">
-                                                <i class="bi bi-play-circle"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                        -->
+                        $titulo   = (string)($pub['titulo'] ?? '');
+                        $servName = (string)($pub['servicio_nombre'] ?? 'Sin nombre');
+                        $catName  = (string)($pub['categoria_nombre'] ?? 'Sin categoría');
+
+                        $precio = isset($pub['precio']) ? number_format((float)$pub['precio'], 2) : '0.00';
+                        $fecha  = (string)($pub['publicacion_created_at'] ?? '');
+
+                        $servicioId = (int)($pub['servicio_id'] ?? 0);
+
+                        // Opcional: descripción corta del título (si quieres recortar)
+                        $tituloShort = $titulo;
+                        if (mb_strlen($tituloShort) > 60) $tituloShort = mb_substr($tituloShort, 0, 60) . '...';
+                        ?>
+
+                        <div class="col">
+                            <div class="card card-publicacion h-100 border-0 shadow-sm">
+
+                                <!-- Barra superior como tus servicios -->
+                                <div class="card-servicio-topbar"></div>
+
+                                <div class="card-body">
+
+                                    <!-- Estado + Precio -->
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                        <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($estadoTexto) ?></span>
+                                        <span class="badge bg-dark">$ <?= $precio ?></span>
                                     </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else : ?>
-                        <tr>
-                            <td colspan="7" class="text-center py-4">
-                                <h5 class="text-muted mb-0">Todavía no tienes publicaciones</h5>
-                                <p class="text-muted mb-0" style="font-size: 0.9rem;">
-                                    Crea un servicio desde
-                                    <a href="<?= BASE_URL ?>/proveedor/registrar-servicio">“Registrar servicio”</a>
-                                    y se generará una publicación pendiente de aprobación.
-                                </p>
-                            </td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+
+                                    <!-- Título publicación -->
+                                    <h5 class="card-title fw-bold mb-2">
+                                        <?= htmlspecialchars($tituloShort) ?>
+                                    </h5>
+
+                                    <!-- Servicio base -->
+                                    <div class="text-muted small mb-2">
+                                        <i class="bi bi-box-seam"></i>
+                                        <strong>Servicio base:</strong> <?= htmlspecialchars($servName) ?>
+                                    </div>
+
+                                    <!-- Categoría -->
+                                    <div class="text-muted small mb-3">
+                                        <i class="bi bi-tag"></i>
+                                        <strong>Categoría:</strong> <?= htmlspecialchars($catName) ?>
+                                    </div>
+
+                                    <!-- Fecha -->
+                                    <div class="meta-row text-muted small">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span>Creada: <?= htmlspecialchars($fecha) ?></span>
+                                    </div>
+
+                                </div>
+
+                                <!-- Acciones -->
+                                <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                                    <div class="d-flex gap-2 flex-wrap">
+
+                                        <!-- Ver detalle (placeholder) -->
+                                        <button type="button"
+                                            class="btn btn-sm btn-outline-primary flex-fill"
+                                            title="Ver detalle (pendiente de conectar)">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </button>
+
+                                        <!-- Editar servicio base -->
+                                        <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
+                                            class="btn btn-sm btn-outline-success flex-fill"
+                                            title="Editar servicio">
+                                            <i class="bi bi-pencil-square"></i> Editar
+                                        </a>
+
+                                        <!-- Placeholder pause/reactivar según estado (si lo vas a usar luego) -->
+                                        <?php if ($estado === 'aprobado') : ?>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" title="Pausar (placeholder)">
+                                                <i class="bi bi-pause-circle"></i> Pausar
+                                            </button>
+                                        <?php elseif ($estado === 'pausada') : ?>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" title="Reactivar (placeholder)">
+                                                <i class="bi bi-play-circle"></i> Reactivar
+                                            </button>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php endif; ?>
+
         </section>
 
     </main>
