@@ -1,115 +1,128 @@
-/* ================================
-   MIS SERVICIOS (Cards + Modal)
-   CSS independiente (pégalo tal cual)
-   ================================ */
+/* ========================================= */
+/* MODAL SERVICIO (similar a modalDetalleUsuario) */
+/* ========================================= */
 
-/* Card base */
-.card-servicio {
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-/* Meta row (icon + text) */
-.card-servicio .meta-row {
-  display: flex;
+/* 1. Cabecera del Modal */
+#modalServicio .modal-header {
+  background: var(--primary-color);
+  color: var(--white-color);
+  border-bottom: none;
+  padding: 20px 30px;
   align-items: center;
-  gap: 0.5rem;
 }
 
-.card-servicio .meta-row i {
-  opacity: 0.8;
-}
-
-/* Badges de disponibilidad */
-.badge-disponibilidad {
-  padding: 0.35rem 0.6rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+/* Título */
+#modalServicio .modal-title {
+  font-family: var(--font-title);
   font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
+  font-size: 1.25rem;
 }
 
-.badge-disponible {
-  background: #e8f4ff;
-  color: #0b5ed7;
+/* Botón cerrar blanco */
+#modalServicio .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+  opacity: 0.9;
 }
+#modalServicio .btn-close:hover { opacity: 1; }
 
-.badge-no-disponible {
-  background: #f2f2f2;
-  color: #333;
-}
-
-/* Estado publicación */
-.estado-publicacion {
-  padding: 0.35rem 0.6rem;
+/* 2. Badges del header (estado / disponibilidad) */
+#modalServicioEstado,
+#modalServicioDisponibilidad {
+  font-size: 0.8rem;
+  padding: 7px 12px;
   border-radius: 999px;
-  font-size: 0.75rem;
   font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
+  letter-spacing: .2px;
 }
 
-/* Estados */
-.estado-activa {
-  background: #e9f7ef;
-  color: #198754;
+/* 3. Body spacing similar */
+#modalServicio .modal-body {
+  padding: 1.5rem 1.875rem; /* ~24px 30px */
 }
 
-.estado-rechazada {
-  background: #fdecec;
-  color: #dc3545;
-}
-
-.estado-pausada {
-  background: #efefef;
-  color: #6c757d;
-}
-
-.estado-pendiente {
-  background: #fff3cd;
-  color: #664d03;
-}
-
-/* Empty state */
-.empty-state {
-  border: 1px dashed rgba(0, 0, 0, 0.15);
-  border-radius: 14px;
-  padding: 2rem;
-  text-align: center;
-}
-
-/* Modal: contenedor de imagen */
-.modal-img-wrap {
+/* 4. Imagen del servicio con estilo "foto grande" */
+#modalServicio .modal-img-wrap {
   aspect-ratio: 4 / 3;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  background: #f3f4f6;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-.modal-img-wrap img {
+#modalServicioImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-/* Ajustes visuales del modal */
-#modalServicio .modal-header {
-  align-items: flex-start;
+/* 5. Texto principal */
+#modalServicioTitulo {
+  font-family: var(--font-title);
+  font-weight: 700;
+  letter-spacing: .2px;
 }
 
-#modalServicio .modal-title {
-  line-height: 1.2;
+/* Categoría y fecha: “chips” suaves como el rol */
+#modalServicioCategoria,
+#modalServicioFecha {
+  color: #64748b;
 }
 
-/* Botones: que respiren mejor en mobile */
+/* Mejorar la línea de categoría / fecha */
+#modalServicio .text-muted.small {
+  color: #64748b !important;
+}
+
+/* 6. Subtítulo "Descripción" estilo similar a h6 primary del otro modal */
+#modalServicio h6.fw-bold {
+  font-family: var(--font-title);
+  color: var(--primary-color);
+  font-weight: 700 !important;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  margin-bottom: 12px !important;
+}
+
+/* Descripción con scroll si es larga */
+#modalServicioDesc {
+  color: #64748b;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+/* 7. Footer similar (bg-light, borde) */
+#modalServicio .modal-footer {
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 15px 30px;
+}
+
+/* Meta del footer */
+#modalServicioMeta {
+  font-style: italic;
+  color: #94a3b8 !important;
+}
+
+/* 8. Botones: look más “clean” */
+#modalServicio .btn {
+  border-radius: 10px;
+}
+
+/* 9. Responsive */
 @media (max-width: 575.98px) {
-  .card-footer .btn.flex-fill,
-  .modal-footer .btn {
+  #modalServicio .modal-header,
+  #modalServicio .modal-body,
+  #modalServicio .modal-footer {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  #modalServicio .modal-footer .btn {
     width: 100%;
   }
 }
