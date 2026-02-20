@@ -1,128 +1,118 @@
 /* ========================================= */
-/* MODAL SERVICIO (similar a modalDetalleUsuario) */
+/* MODAL DETALLE DE SERVICIO                 */
 /* ========================================= */
 
 /* 1. Cabecera del Modal */
-#modalServicio .modal-header {
-  background: var(--primary-color);
-  color: var(--white-color);
-  border-bottom: none;
-  padding: 20px 30px;
-  align-items: center;
+#modalDetalleServicio .modal-header {
+    background: var(--primary-color);
+    color: var(--white-color);
+    border-bottom: none;
+    padding: 20px 30px;
 }
 
-/* Título */
-#modalServicio .modal-title {
-  font-family: var(--font-title);
-  font-weight: 600;
-  font-size: 1.25rem;
+#modalDetalleServicio .modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.25rem;
 }
 
-/* Botón cerrar blanco */
-#modalServicio .btn-close {
-  filter: invert(1) grayscale(100%) brightness(200%);
-  opacity: 0.9;
-}
-#modalServicio .btn-close:hover { opacity: 1; }
-
-/* 2. Badges del header (estado / disponibilidad) */
-#modalServicioEstado,
-#modalServicioDisponibilidad {
-  font-size: 0.8rem;
-  padding: 7px 12px;
-  border-radius: 999px;
-  font-weight: 600;
-  letter-spacing: .2px;
+#modalDetalleServicio .btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-/* 3. Body spacing similar */
-#modalServicio .modal-body {
-  padding: 1.5rem 1.875rem; /* ~24px 30px */
-}
-
-/* 4. Imagen del servicio con estilo "foto grande" */
-#modalServicio .modal-img-wrap {
-  aspect-ratio: 4 / 3;
-  border-radius: 14px;
-  overflow: hidden;
-  background-color: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-#modalServicioImg {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* 5. Texto principal */
-#modalServicioTitulo {
-  font-family: var(--font-title);
-  font-weight: 700;
-  letter-spacing: .2px;
-}
-
-/* Categoría y fecha: “chips” suaves como el rol */
-#modalServicioCategoria,
-#modalServicioFecha {
-  color: #64748b;
-}
-
-/* Mejorar la línea de categoría / fecha */
-#modalServicio .text-muted.small {
-  color: #64748b !important;
-}
-
-/* 6. Subtítulo "Descripción" estilo similar a h6 primary del otro modal */
-#modalServicio h6.fw-bold {
-  font-family: var(--font-title);
-  color: var(--primary-color);
-  font-weight: 700 !important;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 10px;
-  margin-bottom: 12px !important;
-}
-
-/* Descripción con scroll si es larga */
-#modalServicioDesc {
-  color: #64748b;
-  white-space: pre-wrap;
-  word-break: break-word;
-  max-height: 240px;
-  overflow: auto;
-  padding-right: 4px;
-}
-
-/* 7. Footer similar (bg-light, borde) */
-#modalServicio .modal-footer {
-  background-color: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-  padding: 15px 30px;
-}
-
-/* Meta del footer */
-#modalServicioMeta {
-  font-style: italic;
-  color: #94a3b8 !important;
-}
-
-/* 8. Botones: look más “clean” */
-#modalServicio .btn {
-  border-radius: 10px;
-}
-
-/* 9. Responsive */
-@media (max-width: 575.98px) {
-  #modalServicio .modal-header,
-  #modalServicio .modal-body,
-  #modalServicio .modal-footer {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  #modalServicio .modal-footer .btn {
+/* 2. Banner de Imagen del Servicio */
+.servicio-img-wrap {
+    position: relative;
     width: 100%;
-  }
+    height: 220px; /* Tamaño tipo banner */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background-color: #f1f5f9;
+}
+
+#modal-servicio-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+/* Efecto sutil al pasar el mouse por la imagen */
+.servicio-img-wrap:hover #modal-servicio-img {
+    transform: scale(1.03);
+}
+
+/* Overlay para los Badges sobre la imagen */
+.servicio-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px;
+    /* Degradado oscuro arriba para que resalten los badges */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+}
+
+.servicio-img-overlay .badge {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px); /* Toque moderno */
+}
+
+/* 3. Título e ID del Servicio */
+#modal-servicio-nombre {
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    font-size: 1.5rem;
+}
+
+#modal-servicio-id {
+    color: #64748b; 
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    background-color: #f1f5f9;
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+/* 4. Tarjetas de Información (Gris claro) */
+#modalDetalleServicio .bg-light {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+#modalDetalleServicio .bg-light:hover {
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transform: translateY(-2px);
+}
+
+#modalDetalleServicio h6.text-primary {
+    color: var(--primary-color) !important;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+}
+
+/* 5. Loader (Círculo de carga) */
+#loader-detalle-servicio {
+    min-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajustes de texto interno en tarjetas */
+#modal-servicio-categoria {
+    font-weight: 500;
+    color: var(--dark-color) !important;
+}
+
+#modal-servicio-descripcion {
+    line-height: 1.6;
+    font-size: 0.95rem;
 }

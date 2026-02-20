@@ -33,10 +33,9 @@ if ($usuarioId) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- css de tablas / dashboard -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/listar-servicio.css">
+
 
 
 </head>
