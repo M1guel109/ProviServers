@@ -282,6 +282,87 @@ $totalCompletadas = count($serviciosCompletados);
   </div>
 </div>
 
+<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="offcanvasSeguimiento" aria-labelledby="offcanvasSeguimientoLabel" style="width: 550px;">
+    
+    <div class="offcanvas-header bg-primary text-white pb-4">
+        <div>
+            <h5 class="offcanvas-title fw-bold mb-1" id="offcanvasSeguimientoLabel">
+                <i class="bi bi-clipboard-pulse me-2"></i> Seguimiento del Servicio
+            </h5>
+            <small class="text-white-50" id="seg-servicio-nombre">Cargando...</small>
+            <br>
+            <small class="text-white-50"><i class="bi bi-person me-1"></i> Cliente: <span id="seg-cliente-nombre"></span></small>
+        </div>
+        <button type="button" class="btn-close btn-close-white align-self-start" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+
+    <div class="offcanvas-body p-0 bg-light d-flex flex-column">
+        
+        <ul class="nav nav-tabs px-3 pt-3 bg-white border-bottom" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-bold" data-bs-toggle="tab" data-bs-target="#tab-historial" type="button" role="tab">
+                    <i class="bi bi-clock-history me-1"></i> Historial
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-bold text-success" data-bs-toggle="tab" data-bs-target="#tab-nuevo-avance" type="button" role="tab">
+                    <i class="bi bi-plus-circle me-1"></i> Añadir Avance
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content flex-grow-1 overflow-auto p-4">
+            
+            <div class="tab-pane fade show active" id="tab-historial" role="tabpanel">
+                <div class="timeline" id="contenedor-timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-secondary"><i class="bi bi-play-fill text-white"></i></div>
+                        <div class="timeline-content card border-0 shadow-sm p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <h6 class="fw-bold text-dark mb-0">Servicio Iniciado</h6>
+                                <small class="text-muted" style="font-size: 0.75rem;">Generado automáticamente</small>
+                            </div>
+                            <p class="text-secondary small mb-0">El proveedor aceptó la solicitud y el servicio comenzó.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-nuevo-avance" role="tabpanel">
+                <form id="formSeguimiento">
+                    <input type="hidden" id="seg-contrato-id" name="contrato_id">
+                    
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Estado del Servicio</label>
+                        <select class="form-select bg-white" name="estado_actual" id="seg-estado">
+                            <option value="en_proceso" selected>🔵 Mantener en Proceso</option>
+                            <option value="finalizado">✅ Marcar como Finalizado</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Título del Avance</label>
+                        <input type="text" class="form-control bg-white" name="titulo" placeholder="Ej: Compra de materiales..." required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Detalles / Comentarios</label>
+                        <textarea class="form-control bg-white" name="descripcion" rows="4" placeholder="Explica qué se hizo hoy..." required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">Archivo Adjunto <span class="text-muted fw-normal">(Opcional)</span></label>
+                        <input type="file" class="form-control bg-white" name="archivo">
+                        <div class="form-text">Fotos del avance o recibos (Max 5MB).</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold"><i class="bi bi-send me-2"></i> Publicar Avance</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>

@@ -76,8 +76,8 @@ $stats_en_proceso = count($servicios);
 
                 <div class="proceso-cliente">
                     <img src="<?= BASE_URL . '/public/uploads/usuarios/' . $avatar ?>"
-                         alt="Cliente"
-                         class="cliente-avatar">
+                        alt="Cliente"
+                        class="cliente-avatar">
                     <div class="cliente-info">
                         <div class="cliente-nombre"><?= htmlspecialchars($servicio['cliente_nombre'] ?? 'Cliente') ?></div>
                         <div class="cliente-contacto">
@@ -98,8 +98,14 @@ $stats_en_proceso = count($servicios);
                 </div>
 
                 <div class="proceso-acciones">
-                    <button class="btn-accion btn-actualizar">
-                        <i class="bi bi-arrow-clockwise"></i> Actualizar Estado
+                    <button type="button" class="btn-accion btn-actualizar"
+                        onclick='abrirSeguimiento(
+                                <?= (int)($servicio['contrato_id'] ?? 0) ?>, 
+                                "<?= htmlspecialchars($servicio['servicio_nombre'] ?? $servicio['solicitud_titulo'] ?? 'Servicio en proceso', ENT_QUOTES) ?>", 
+                                "<?= htmlspecialchars($estadoKey) ?>",
+                                "<?= htmlspecialchars($servicio['cliente_nombre'] ?? 'Cliente', ENT_QUOTES) ?>"
+                            )'>
+                        <i class="bi bi-clipboard-pulse"></i> Hacer Seguimiento
                     </button>
 
                     <button class="btn-accion btn-contactar">
