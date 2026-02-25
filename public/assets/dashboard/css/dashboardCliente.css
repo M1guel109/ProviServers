@@ -200,6 +200,17 @@ body {
     transform: none;
 }
 
+.contenido {
+    margin-left: 285px; /* ancho normal del sidebar */
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar.plegado ~ .contenido {
+    margin-left: 80px; /* ancho reducido cuando está plegado */
+}
+
+
+
 /* ========================================
    CONTENIDO PRINCIPAL
    ======================================== */
