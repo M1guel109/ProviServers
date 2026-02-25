@@ -53,8 +53,24 @@ const btnToggle = document.getElementById("btn-toggle-menu");
 const sidebar = document.querySelector(".sidebar");
 
 if (btnToggle && sidebar) {
+  // ✅ Al cargar la página, revisa si hay estado guardado
+  const estadoGuardado = localStorage.getItem("sidebarEstado");
+  if (estadoGuardado === "plegado") {
+    sidebar.classList.add("plegado");
+  }
+
   btnToggle.addEventListener("click", () => {
-    sidebar.classList.toggle("collapsed");
+    sidebar.classList.toggle("plegado");
+
+    // ✅ Guarda el estado actual en localStorage
+    if (sidebar.classList.contains("plegado")) {
+      localStorage.setItem("sidebarEstado", "plegado");
+    } else {
+      localStorage.setItem("sidebarEstado", "expandido");
+    }
   });
 }
+
+
+
 

@@ -200,6 +200,17 @@ body {
     transform: none;
 }
 
+.contenido {
+    margin-left: 285px; /* ancho normal del sidebar */
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar.plegado ~ .contenido {
+    margin-left: 80px; /* ancho reducido cuando está plegado */
+}
+
+
+
 /* ========================================
    CONTENIDO PRINCIPAL
    ======================================== */
@@ -209,7 +220,7 @@ body {
     flex-direction: column;
     padding: 25px;
     overflow-y: auto;
-    background-color: #f8fafc;
+    background-color: #fcf8f8;
 }
 
 /* ========================================
@@ -243,12 +254,12 @@ body {
 
 /* Sidebar plegable */
 .sidebar {
-  width: 250px;
+  width: 300px;
   transition: all 0.3s ease;
 }
 
 .sidebar.collapsed {
-  margin-left: -250px; /* lo oculta hacia la izquierda */
+  margin-left: -300px; /* lo oculta hacia la izquierda */
 }
 
 /* Ajusta el contenido principal cuando el sidebar está oculto */
