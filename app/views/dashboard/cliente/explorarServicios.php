@@ -34,7 +34,7 @@
     <!-- HEADER -->
     <?php include_once __DIR__ . '/../../layouts/header_cliente.php'; ?>
 
-    <section id="explorar">
+    <section id="p-3">
       <div class="section-hero mb-4">
         <p class="breadcrumb">Inicio &gt; Explorar Servicios</p>
         <h1>Explorar Servicios</h1>
