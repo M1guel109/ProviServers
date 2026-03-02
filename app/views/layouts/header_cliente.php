@@ -23,10 +23,12 @@ $usuarioC = [
 
 
     <!-- Buscador -->
-    <div class="buscador">
+    <form class="buscador" method="GET" action="<?= BASE_URL ?>/buscar">
         <i class="bi bi-search"></i>
-        <input type="text" placeholder="Buscar">
-    </div>
+        <input type="text" name="q" placeholder="Buscar servicios o funcionalidades">
+    </form>
+
+
 
     <div class="acciones-barra">
         <div class="notificaciones item-barra">
