@@ -150,7 +150,7 @@ function obtenerEstiloNotificacion($tipo) {
                 
                 <li><hr class="dropdown-divider my-2"></li>
                 
-                <li><a class="dropdown-item d-flex align-items-center py-2 text-danger fw-bold" href="<?= BASE_URL ?>/cerrar-sesion">
+                <li><a class="dropdown-item d-flex align-items-center py-2 text-danger fw-bold" href="<?= BASE_URL ?>/cerrar-sesion?accion=cerrar_sesion">
                     <i class="bi bi-box-arrow-right me-2"></i> <?= __('header_salir') ?>
                 </a></li>
             </ul>
