@@ -31,7 +31,9 @@
             <section id="login">
                 <h1>Inicia Sesión</h1>
                 <p>Accede a tu cuenta para encontrar o fofrecer servicios locales</p>
-                <form id="loginForm" action="iniciar-sesion" method="POST">
+                <form id="loginForm" action="<?= BASE_URL ?>/iniciar-sesion" method="POST">
+                    
+                    <input type="hidden" name="accion" value="iniciar_sesion">
                     <div class="form-group">
                         <label for="email">Correo Electrónico</label>
                         <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com" required>

@@ -1,143 +1,141 @@
 document.addEventListener("DOMContentLoaded", function () {
+    const pasos = document.querySelectorAll(".wizard-step");
 
-  const pasos = document.querySelectorAll(".wizard-step");
-
-  function mostrarPaso(idPaso) {
-    pasos.forEach(paso => paso.classList.add("d-none"));
-    document.getElementById(idPaso).classList.remove("d-none");
-  }
-
-  // =============================
-  //   BOTÓN SIGUIENTE
-  // =============================
-  document.querySelectorAll(".btn-next").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const next = this.dataset.next;
-
-      const current = this.closest(".wizard-step");
-      const inputs = current.querySelectorAll("input[required], select[required]");
-
-      for (let i of inputs) {
-        if (!i.value.trim()) {
-          i.classList.add("is-invalid");
-          return;
-        } else {
-          i.classList.remove("is-invalid");
-        }
-      }
-
-      // =============================
-      //  VALIDAR CONTRASEÑAS EN PASO 1
-      // =============================
-      if (current.id === "paso-1") {
-        const passInput = document.getElementById("contrasena");
-        const confirmInput = document.getElementById("confirmar");
-
-        // Elemento donde se muestra el error (lo crearemos en el HTML)
-        const errorFeedback = document.getElementById("feedback-confirmar");
-
-        if (passInput.value !== confirmInput.value) {
-          confirmInput.classList.add("is-invalid");
-          // Mostrar mensaje de error
-          if (errorFeedback) {
-            errorFeedback.textContent = "⚠️ Las contraseñas no coinciden.";
-          }
-          return; // Detiene el flujo para que el usuario corrija
-        } else {
-          confirmInput.classList.remove("is-invalid");
-          // Limpiar mensaje de error
-          if (errorFeedback) {
-            errorFeedback.textContent = "";
-          }
-        }
-      }
-
-      // Si el usuario es cliente, saltar paso 3
-      if (next === "paso-3") {
-        const rol = document.getElementById("rol").value;
-        if (rol === "cliente") {
-          generarResumen();
-          mostrarPaso("paso-4");
-          return;
-        }
-      }
-
-      // Si va a paso 4, generar resumen
-      if (next === "paso-4") {
-        generarResumen();
-      }
-
-      mostrarPaso(next);
-    });
-  });
-
-
-  // =============================
-  //     BOTÓN ATRÁS
-  // =============================
-  document.querySelectorAll(".btn-prev").forEach(btn => {
-    btn.addEventListener("click", function () {
-      const prev = this.dataset.prev;
-
-      const rol = document.getElementById("rol").value;
-
-      // Si es cliente, regresar directo a paso 1
-      if (prev === "paso-3" && rol === "cliente") {
-        mostrarPaso("paso-1");
-        return;
-      }
-
-      mostrarPaso(prev);
-    });
-  });
-
-  // =============================
-  //     MOSTRAR DOCUMENTOS
-  // =============================
-  document.getElementById("rol").addEventListener("change", function () {
-    const docs = document.getElementById("docs-proveedor");
-    docs.style.display = this.value === "proveedor" ? "block" : "none";
-  });
-
-  // =============================
-  //  GENERAR RESUMEN EN PASO 4
-  // =============================
-  function generarResumen() {
-    const resumen = document.getElementById("resumen-registro");
-
-    let html = `
-            <p><strong>Documento:</strong> ${document.getElementById("documento").value}</p>
-            <p><strong>Email:</strong> ${document.getElementById("email").value}</p>
-            <p><strong>Rol:</strong> ${document.getElementById("rol").value}</p>
-            <hr>
-            <p><strong>Nombres:</strong> ${document.getElementById("nombres").value}</p>
-            <p><strong>Apellidos:</strong> ${document.getElementById("apellidos").value}</p>
-            <p><strong>Teléfono:</strong> ${document.getElementById("telefono").value}</p>
-            <p><strong>Ubicación:</strong> ${document.getElementById("ubicacion").value}</p>
-        `;
-
-    if (document.getElementById("rol").value === "proveedor") {
-      html += `
-                <hr>
-                <p>Cédula: ${document.getElementById("doc-cedula").files.length ? "Sí" : "No"}</p>
-                <p>Selfie: ${document.getElementById("doc-selfie").files.length ? "Sí" : "No"}</p>
-                <p>Antecedentes: ${document.getElementById("doc-antecedentes").files.length ? "Sí" : "No"}</p>
-                <p>Certificado: ${document.getElementById("doc-certificado").files.length ? "Sí" : "No"}</p>
-            `;
+    function mostrarPaso(idPaso) {
+        pasos.forEach(paso => paso.classList.add("d-none"));
+        document.getElementById(idPaso).classList.remove("d-none");
     }
 
-    resumen.innerHTML = html;
-  }
+    document.querySelectorAll(".btn-next").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const next = this.dataset.next;
+            const current = this.closest(".wizard-step");
+            const inputs = current.querySelectorAll("input[required], select[required]");
 
-  // =============================
-  //           SUBMIT FINAL
-  // =============================
-  document.getElementById("registro-wizard").addEventListener("submit", function (e) {
-    // e.preventDefault();
+            for (let i of inputs) {
+                if (!i.value.trim()) {
+                    i.classList.add("is-invalid");
+                    return;
+                } else {
+                    i.classList.remove("is-invalid");
+                }
+            }
 
-    // alert("Formulario listo para enviar al backend vía POST ✔");
+            if (current.id === "paso-1") {
+                const passInput = document.getElementById("contrasena");
+                const confirmInput = document.getElementById("confirmar");
+                const errorFeedback = document.getElementById("feedback-confirmar");
+                if (passInput.value !== confirmInput.value) {
+                    confirmInput.classList.add("is-invalid");
+                    if (errorFeedback) errorFeedback.textContent = "⚠️ Las contraseñas no coinciden.";
+                    return;
+                }
+            }
 
-    // // Aquí puedes hacer fetch() si ya tienes la ruta backend
-  });
+            const rol = document.getElementById("rol").value;
 
+            if (current.id === "paso-2" && rol === "cliente") {
+                generarResumen();
+                mostrarPaso("paso-5");
+                return;
+            }
+
+            if (next === "paso-5") {
+                generarResumen();
+            }
+
+            mostrarPaso(next);
+        });
+    });
+
+    document.querySelectorAll(".btn-prev").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const prev = this.dataset.prev;
+            const current = this.closest(".wizard-step");
+            const rol = document.getElementById("rol").value;
+            if (current.id === "paso-5" && rol === "cliente") {
+                mostrarPaso("paso-2");
+                return;
+            }
+            mostrarPaso(prev);
+        });
+    });
+
+    // LÓGICA DE HABILIDADES
+    const selectCategoria = document.getElementById('select-categoria');
+    const inputNuevaCatContainer = document.getElementById('input-nueva-cat-container');
+    const inputNuevaCategoria = document.getElementById('input-nueva-categoria');
+    const btnAddCategoria = document.getElementById('btn-add-categoria');
+    const contenedorTags = document.getElementById('contenedor-tags');
+    const inputListaCategorias = document.getElementById('lista_categorias');
+    let habilidadesSeleccionadas = [];
+
+    if (selectCategoria) {
+        selectCategoria.addEventListener('change', function () {
+            inputNuevaCatContainer.classList.toggle('d-none', this.value !== 'nueva');
+            if (this.value === 'nueva') inputNuevaCategoria.focus();
+        });
+    }
+
+    if (btnAddCategoria) {
+        btnAddCategoria.addEventListener('click', function () {
+            let nuevaHabilidad = selectCategoria.value === 'nueva' ? inputNuevaCategoria.value.trim() : selectCategoria.value;
+            if (nuevaHabilidad && !habilidadesSeleccionadas.includes(nuevaHabilidad) && nuevaHabilidad !== "nueva") {
+                habilidadesSeleccionadas.push(nuevaHabilidad);
+                actualizarDOMHabilidades();
+                selectCategoria.value = "";
+                inputNuevaCategoria.value = "";
+                inputNuevaCatContainer.classList.add('d-none');
+            }
+        });
+    }
+
+    function actualizarDOMHabilidades() {
+        contenedorTags.innerHTML = '';
+        habilidadesSeleccionadas.forEach((habilidad, index) => {
+            const tag = document.createElement('span');
+            tag.className = 'badge bg-primary p-2 d-flex align-items-center gap-2';
+            tag.innerHTML = `${habilidad} <i class="bi bi-x-circle" style="cursor: pointer;" data-index="${index}"></i>`;
+            contenedorTags.appendChild(tag);
+        });
+        inputListaCategorias.value = JSON.stringify(habilidadesSeleccionadas);
+        document.querySelectorAll('#contenedor-tags .bi-x-circle').forEach(btn => {
+            btn.addEventListener('click', function () {
+                habilidadesSeleccionadas.splice(this.getAttribute('data-index'), 1);
+                actualizarDOMHabilidades();
+            });
+        });
+    }
+
+    function generarResumen() {
+        const resumen = document.getElementById("resumen-registro");
+        const rol = document.getElementById("rol").value;
+        let html = `
+            <p><strong>Documento:</strong> ${document.getElementById("documento").value}</p>
+            <p><strong>Email:</strong> ${document.getElementById("email").value}</p>
+            <p><strong>Rol:</strong> <span class="text-capitalize">${rol}</span></p>
+            <hr>
+            <p><strong>Nombres:</strong> ${document.getElementById("nombres").value}</p>
+            <p><strong>Teléfono:</strong> ${document.getElementById("telefono").value}</p>
+        `;
+
+        if (rol === "proveedor") {
+            const cedula = document.getElementById("doc-cedula")?.files.length ? "✅" : "❌";
+            const selfie = document.getElementById("doc-selfie")?.files.length ? "✅" : "❌";
+            const ant = document.getElementById("doc-antecedentes")?.files.length ? "✅" : "❌";
+            html += `
+                <hr><p><strong>Docs:</strong> Cédula ${cedula}, Selfie ${selfie}, Antecedentes ${ant}</p>
+                <hr><p><strong>Habilidades:</strong> ${habilidadesSeleccionadas.length > 0 ? habilidadesSeleccionadas.join(', ') : '<span class="text-danger">Ninguna</span>'}</p>
+            `;
+        }
+        resumen.innerHTML = html;
+    }
+
+    document.getElementById("registro-wizard").addEventListener("submit", function (e) {
+        if (document.getElementById("rol").value === "proveedor" && habilidadesSeleccionadas.length === 0) {
+            e.preventDefault();
+            alert("Debes seleccionar al menos una habilidad.");
+            mostrarPaso("paso-4");
+        }
+    });
 });

@@ -1,4 +1,7 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 // index.php - Router Principal 
 
 require_once __DIR__ . '/config/config.php';
@@ -36,6 +39,10 @@ switch ($request) {
 
     // ...
     // Inicio rutas que sean necesarias para el login
+// ==========================================
+    // RUTAS DE AUTENTICACIÓN (NUEVAS)
+    // ==========================================
+    // 1. Mostrar las Vistas HTML
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
         break;
@@ -44,26 +51,25 @@ switch ($request) {
         require BASE_PATH . '/app/views/auth/registro.php';
         break;
 
-    case '/registro-usuario':
-        require BASE_PATH . '/app/controllers/registroController.php';
+    case '/reestablecer-contrasena':
+        require BASE_PATH . '/app/views/auth/reestablecer-Contrasena.php';
         break;
 
+    // 2. Procesar Datos (Llaman al AuthController)
     case '/iniciar-sesion':
-        require BASE_PATH . '/app/controllers/loginController.php';
+        require BASE_PATH . '/app/controllers/AuthController.php';
         break;
 
-    case '/cerrar-sesion':
-        require BASE_PATH . '/app/controllers/cerrarSesionController.php';
-        $controller = new cerrarSesionController();
-        $controller->index();
+    case '/registro-usuario':
+        require BASE_PATH . '/app/controllers/AuthController.php';
         break;
 
     case '/generar-clave':
-        require BASE_PATH . '/app/controllers/passwordController.php';
+        require BASE_PATH . '/app/controllers/AuthController.php';
         break;
 
-    case '/reestablecer-contrasena':
-        require BASE_PATH . '/app/views/auth/reestablecer-Contrasena.php';
+    case '/cerrar-sesion':
+        require BASE_PATH . '/app/controllers/AuthController.php';
         break;
     // Fin de rutas login
 

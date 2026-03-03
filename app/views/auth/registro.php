@@ -27,7 +27,7 @@
 
       <!-- WIZARD -->
       <form action="<?= BASE_URL ?>/registro-usuario" method="post" id="registro-wizard" enctype="multipart/form-data">
-
+        <input type="hidden" name="accion" value="registrar">
         <!-- PASO 1 -->
         <div class="wizard-step" id="paso-1">
           <h2 class="titulo-paso">Información básica</h2>
@@ -81,86 +81,65 @@
           </div>
         </div>
 
-        <!-- PASO 3 (solo proveedor) - CON TOOLTIPS -->
         <div class="wizard-step d-none" id="paso-3">
-
-          <h2 class="titulo-paso">Documentación</h2>
-          <!-- <p class="text-muted">Esta sección es obligatoria solo para proveedores.</p> -->
-
+          <h2 class="titulo-paso">Documentación de Seguridad</h2>
+          <p class="text-muted">Sube tus documentos para verificar tu cuenta.</p>
           <div id="docs-proveedor">
-
-            <!-- Cédula -->
-            <div class="input-group-tooltip">
-              <div class="d-flex align-items-center mb-1">
-                <label class="form-label mb-0 me-2">Cédula (PDF o imagen)</label>
-                <span class="info-icon"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Sube una copia legible de tu documento de identidad por ambos lados.">
-                  <i class="bi bi-question-circle-fill"></i>
-                </span>
-              </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Cédula (PDF o imagen) <span class="text-danger">*</span></label>
               <input type="file" id="doc-cedula" name="doc-cedula" accept="image/*,.pdf" class="form-control">
             </div>
-
-            <!-- Selfie -->
-            <div class="input-group-tooltip">
-              <div class="d-flex align-items-center mb-1">
-                <label class="form-label mb-0 me-2">Selfie de verificación</label>
-                <span class="info-icon"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Una foto tuya sosteniendo la cédula junto a tu rostro para verificar tu identidad.">
-                  <i class="bi bi-question-circle-fill"></i>
-                </span>
-              </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Selfie de verificación <span class="text-danger">*</span></label>
               <input type="file" id="doc-selfie" name="doc-foto" accept="image/*" class="form-control">
             </div>
-
-            <!-- Antecedentes -->
-            <div class="input-group-tooltip">
-              <div class="d-flex align-items-center mb-1">
-                <label class="form-label mb-0 me-2">Antecedentes judiciales (PDF)</label>
-                <span class="info-icon"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Certificado de antecedentes penales actualizado (máximo 30 días de antigüedad).">
-                  <i class="bi bi-question-circle-fill"></i>
-                </span>
-              </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Antecedentes judiciales (PDF) <span class="text-danger">*</span></label>
               <input type="file" id="doc-antecedentes" name="doc-antecedentes" accept=".pdf" class="form-control">
             </div>
-
-            <!-- Certificado (Opcional) -->
-            <div class="input-group-tooltip">
-              <div class="d-flex align-items-center mb-1">
-                <label class="form-label mb-0 me-2">Certificado de habilidades (opcional)</label>
-                <span class="info-icon"
-                  data-bs-toggle="tooltip"
-                  data-bs-placement="top"
-                  title="Documentos que acrediten tus habilidades o experiencia en el servicio que ofreces.">
-                  <i class="bi bi-question-circle-fill"></i>
-                </span>
-              </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold">Certificado de habilidades (Opcional)</label>
               <input type="file" id="doc-certificado" name="doc-certificado" accept="image/*,.pdf" class="form-control">
             </div>
           </div>
-
-          <div class="wizard-nav">
+          <div class="wizard-nav mt-4">
             <button type="button" class="btn-prev" data-prev="paso-2">Atrás</button>
             <button type="button" class="btn-next" data-next="paso-4">Siguiente</button>
           </div>
         </div>
 
-        <!-- PASO 4 -->
         <div class="wizard-step d-none" id="paso-4">
+          <h2 class="titulo-paso">¿En qué eres experto?</h2>
+          <p class="text-muted">Selecciona tus habilidades. Si no encuentras la tuya, puedes crearla.</p>
+          <div class="input-group mb-3">
+            <select id="select-categoria" class="form-select">
+              <option value="" disabled selected>Busca tu oficio...</option>
+              <?php foreach ($categorias_bd as $cat): ?>
+                <option value="<?= $cat['nombre'] ?>"><?= $cat['nombre'] ?></option>
+              <?php endforeach; ?>
+              <option value="nueva" class="fw-bold text-primary">+ Sugerir nueva habilidad</option>
+            </select>
+            <button type="button" class="btn btn-primary" id="btn-add-categoria">Agregar</button>
+          </div>
+          <div class="mt-2 d-none" id="input-nueva-cat-container">
+            <input type="text" class="form-control" id="input-nueva-categoria" placeholder="Escribe tu habilidad específica...">
+          </div>
+          <div id="contenedor-tags" class="mb-4 d-flex flex-wrap gap-2 mt-3"></div>
+          <input type="hidden" name="lista_categorias" id="lista_categorias">
+          <div class="wizard-nav mt-4">
+            <button type="button" class="btn-prev" data-prev="paso-3">Atrás</button>
+            <button type="button" class="btn-next" data-next="paso-5">Siguiente</button>
+          </div>
+        </div>
+
+        <div class="wizard-step d-none" id="paso-5">
           <h2 class="titulo-paso">Confirmación</h2>
           <p class="text-muted">Revisa que toda la información sea correcta.</p>
-
-          <div id="resumen-registro"></div>
-
-          <button id="btn-finalizar" type="submit">Crear cuenta</button>
-          <button type="button" class="btn-prev mt-2" data-prev="paso-3">Atrás</button>
+          <div id="resumen-registro" class="p-3 bg-light rounded mb-3"></div>
+          <div class="wizard-nav">
+            <button type="button" class="btn-prev" data-prev="paso-4">Atrás</button>
+            <button id="btn-finalizar" type="submit" class="btn btn-success w-100 mt-2">Crear cuenta</button>
+          </div>
         </div>
 
       </form>

@@ -41,7 +41,8 @@
                     ¡Nueva contraseña temporal enviada! Revisa tu correo electrónico.
                 </div>
 
-                <form action="<?= BASE_URL ?>/generar-clave" id="resetPasswordForm" method="post" enctype="multipart/form-data">
+                <form action="<?= BASE_URL ?>/generar-clave" id="resetPasswordForm" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="accion" value="recuperar_password">
                     <div class="form-group">
                         <label for="reset-email">Correo Electrónico</label>
                         <input type="email" name="correo" id="reset-email" placeholder="usuario@ejemplo.com" required>
