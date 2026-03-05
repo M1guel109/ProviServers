@@ -26,16 +26,17 @@ class Servicio
     {
         try {
             $sql = "INSERT INTO servicios 
-                        (nombre, descripcion, id_categoria, imagen, disponibilidad)
-                    VALUES
-                        (:nombre, :descripcion, :id_categoria, :imagen, :disponibilidad)";
+                    (nombre, descripcion, precio, id_categoria, imagen, disponibilidad)
+                VALUES
+                    (:nombre, :descripcion, :precio, :id_categoria, :imagen, :disponibilidad)";
 
             $stmt = $this->conexion->prepare($sql);
 
-            $stmt->bindParam(':nombre',        $data['nombre']);
-            $stmt->bindParam(':descripcion',   $data['descripcion']);
-            $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
-            $stmt->bindParam(':imagen',        $data['imagen']);
+            $stmt->bindParam(':nombre', $data['nombre']);
+            $stmt->bindParam(':descripcion', $data['descripcion']);
+            $stmt->bindParam(':precio', $data['precio']);
+            $stmt->bindParam(':id_categoria', $data['id_categoria'], PDO::PARAM_INT);
+            $stmt->bindParam(':imagen', $data['imagen']);
             $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
 
             return $stmt->execute();
@@ -60,8 +61,7 @@ class Servicio
                 INNER JOIN categorias c ON c.id = s.id_categoria
                 LEFT JOIN publicaciones pub ON pub.servicio_id = s.id
                 LEFT JOIN proveedores p ON p.id = pub.proveedor_id
-                ORDER BY s.created_at DESC"
-            ;
+                ORDER BY s.created_at DESC";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute();
@@ -151,7 +151,6 @@ class Servicio
             // 3. Confirmamos
             $this->conexion->commit();
             return true;
-
         } catch (PDOException $e) {
             // Revertimos todo si algo falla
             $this->conexion->rollBack();
@@ -219,11 +218,10 @@ class Servicio
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$resultado) {
-                return []; 
+                return [];
             }
 
             return $resultado;
-
         } catch (PDOException $e) {
             return ['error' => 'Error SQL: ' . $e->getMessage()];
         }

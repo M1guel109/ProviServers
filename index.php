@@ -2,47 +2,53 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-// index.php - Router Principal 
+
+// ======================================================
+// Router principal
+// ======================================================
 
 require_once __DIR__ . '/config/config.php';
 
-//Obtener la URL actual (por ejemplo, /vetwiling/login)
+// Obtener la URL actual
 $requestUri = $_SERVER['REQUEST_URI'];
 
-//Quita el prefijo de la carpeta del proyecto
+// Quitar el prefijo de la carpeta del proyecto
 $request = str_replace('/ProviServers', '', $requestUri);
 
-//Quitar parametros tipo id=123
+// Quitar parámetros tipo ?id=123
 $request = strtok($request, '?');
 
-// Quitar la barra final (Si exixte)
+// Quitar barra final si existe
 $request = rtrim($request, '/');
 
-// Si la ruta queda vacia, se interactua como "/"
-if ($request === '') $request = '/';
+// Si queda vacío, tomar como raíz
+if ($request === '') {
+    $request = '/';
+}
 
+// ======================================================
+// Enrutamiento básico
+// ======================================================
 
-
-
-//Enrutaminento basico
 switch ($request) {
+
+    // ==================================================
+    // RUTAS PÚBLICAS
+    // ==================================================
     case '/':
         require BASE_PATH . '/app/views/website/index.php';
         break;
-
-    // ... otros casos ...
 
     case '/contacto/enviar':
         require_once BASE_PATH . '/app/controllers/ContactoController.php';
         procesarContacto();
         break;
 
-    // ...
-    // Inicio rutas que sean necesarias para el login
-// ==========================================
-    // RUTAS DE AUTENTICACIÓN (NUEVAS)
-    // ==========================================
-    // 1. Mostrar las Vistas HTML
+    // ==================================================
+    // RUTAS DE AUTENTICACIÓN
+    // ==================================================
+
+    // Vistas
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
         break;
@@ -55,7 +61,7 @@ switch ($request) {
         require BASE_PATH . '/app/views/auth/reestablecer-Contrasena.php';
         break;
 
-    // 2. Procesar Datos (Llaman al AuthController)
+    // Procesos
     case '/iniciar-sesion':
         require BASE_PATH . '/app/controllers/AuthController.php';
         break;
@@ -71,9 +77,10 @@ switch ($request) {
     case '/cerrar-sesion':
         require BASE_PATH . '/app/controllers/AuthController.php';
         break;
-    // Fin de rutas login
 
-    // Rutas del admin
+    // ==================================================
+    // RUTAS DEL ADMIN
+    // ==================================================
     case '/admin/dashboard':
         require BASE_PATH . '/app/views/dashboard/admin/dashboardAdmin.php';
         break;
@@ -107,7 +114,6 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/consultarUsuarios.php';
         break;
 
-    // En tu index.php
     case '/admin/api/usuario-detalle':
         require BASE_PATH . '/app/controllers/adminController.php';
         obtenerDetalleUsuarioAjax();
@@ -191,27 +197,19 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/suscripcionesActivas.php';
         break;
 
-    // ... (Tus otras rutas de admin) ...
-
-    // =======================================================
-    // 🔍 RUTAS AJAX PARA MODERACIÓN DE SERVICIOS
-    // =======================================================
-
-    // 1. API para obtener el detalle del servicio (JSON)
-    // Se llama cuando das clic en el "Ojito"
+    // Moderación de servicios
     case '/admin/api/servicio-detalle':
         require_once BASE_PATH . '/app/controllers/moderacionController.php';
         apiDetalleServicio();
         break;
 
-    // ... (El resto de tus rutas) ...
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacionController.php';
         break;
 
-    // Fin de rutas admin
-
-    // Rutas del proveedor
+    // ==================================================
+    // RUTAS DEL PROVEEDOR
+    // ==================================================
     case '/proveedor/dashboard':
         require BASE_PATH . '/app/views/dashboard/proveedor/dashboardProveedor.php';
         break;
@@ -223,83 +221,78 @@ switch ($request) {
     case '/proveedor/guardar-servicio':
         require BASE_PATH . '/app/controllers/proveedorController.php';
         break;
+
     case '/proveedor/listar-servicio':
         require BASE_PATH . '/app/views/dashboard/proveedor/misServicios.php';
         break;
+
     case '/proveedor/publicaciones':
         require BASE_PATH . '/app/views/dashboard/proveedor/misPublicaciones.php';
         break;
+
     case '/proveedor/editar-servicio':
         require BASE_PATH . '/app/views/dashboard/proveedor/editarServicio.php';
         break;
-    // Rutas del proveedor
+
     case '/proveedor/reporte':
         require BASE_PATH . '/app/controllers/reportesPdfController.php';
         reportesPdfController();
         break;
-      case '/proveedor/calendarioProveedor':
+
+    case '/proveedor/calendarioProveedor':
         require BASE_PATH . '/app/views/dashboard/proveedor/calendarioProveedor.php';
-        break;    
+        break;
+
     case '/proveedor/configuracion':
         require BASE_PATH . '/app/views/dashboard/proveedor/configuracionProveedor.php';
         break;
+
     case '/proveedor/guardar-perfil-profesional':
         require BASE_PATH . '/app/controllers/proveedorPerfilController.php';
         break;
 
-    // ✅ Endpoints de Cuenta y Seguridad
+    // Cuenta y seguridad
     case '/proveedor/actualizar-credenciales':
     case '/proveedor/actualizar-seguridad':
     case '/proveedor/cerrar-sesiones':
         require BASE_PATH . '/app/controllers/proveedorCuentaController.php';
         break;
+
     case '/proveedor/guardar-disponibilidad':
         require BASE_PATH . '/app/controllers/proveedorDisponibilidadController.php';
         break;
+
     case '/proveedor/guardar-notificaciones':
         require BASE_PATH . '/app/controllers/proveedorNotificacionesController.php';
         break;
+
     case '/proveedor/guardar-pagos':
         require BASE_PATH . '/app/controllers/proveedorPagosController.php';
         break;
+
     case '/proveedor/guardar-politicas':
         require BASE_PATH . '/app/controllers/proveedorPoliticasController.php';
         break;
-
-
 
     case '/proveedor/nuevas_solicitudes':
         require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
         break;
 
-
-    // Vista: Ver lista de trabajos en proceso
     case '/proveedor/en-proceso':
         require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
-        // Nota: Como tu controlador ejecuta lógica al cargarse (el switch interno), 
-        // solo con requerirlo ya funcionaría si el REQUEST_METHOD es GET.
-        // Pero para ser limpios, tu vista 'en-proceso.php' debería llamar a mostrarServiciosContratadosProveedor().
-
-        // Lo ideal es que aquí cargues la VISTA:
         require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
-
         break;
 
-
-    // Acción AJAX: Actualizar estado (POST)
     case '/proveedor/actualizar-estado':
         require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
-        // Al requerir el archivo, tu switch interno detectará REQUEST_METHOD = POST
-        // y llamará a actualizarEstadoServicio(). ¡Magia!
         break;
+
     case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
 
     case '/proveedor/oportunidades':
-        // 1. Llamas al CONTROLADOR
         require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
-        // 2. Ejecutas la FUNCIÓN que busca los datos y luego carga la vista
         mostrarOportunidades();
         break;
 
@@ -309,10 +302,7 @@ switch ($request) {
         break;
 
     case '/proveedor/resenas':
-        // 1. Cargamos el Controlador (el "Cocinero")
         require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
-
-        // 2. Ejecutamos la función que prepara los datos y luego llama a la vista
         mostrarResenasProveedor();
         break;
 
@@ -329,60 +319,52 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
 
-
-
-
-    // Rutas del cliente
+    // ==================================================
+    // RUTAS DEL CLIENTE
+    // ==================================================
     case '/cliente/dashboard':
         require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
         break;
 
-    // Catálogo público de servicios (explorar)
+    // Catálogo público de servicios
     case '/cliente/explorar-servicios':
-        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        require BASE_PATH . '/app/controllers/PublicacionController.php';
+        require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
         mostrarCatalogoPublico();
         break;
 
-    // Alias opcional: /cliente/explorar -> redirige al mismo catálogo
     case '/cliente/explorar':
         require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
         mostrarCatalogoPublico();
         break;
 
-    // case '/cliente/servicios-contratados':
-    //     require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
-    //     break;
-
-
+    // Servicios contratados (controlador unificado)
     case '/cliente/servicios-contratados':
-        require BASE_PATH . '/app/controllers/clienteServiciosContratadosController.php';
+        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
-
 
     case '/cliente/servicios-contratados/calificar':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-        require BASE_PATH . '/app/controllers/clienteCalificarServicioContratadoController.php';
+        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
 
-
     case '/cliente/servicios-contratados/cancelar':
-        // Recomendado: asegurar que sea POST
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-
-        require BASE_PATH . '/app/controllers/clienteCancelarServicioContratadoController.php';
+        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
 
+    // OJO: esta también venía del módulo viejo que unificaste
     case '/cliente/mis-solicitudes':
-        require BASE_PATH . '/app/controllers/clienteMisSolicitudesController.php';
+        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
 
-
+    // Vistas varias del cliente
     case '/cliente/mensajes':
         require BASE_PATH . '/app/views/dashboard/cliente/mensajes.php';
         break;
@@ -398,15 +380,17 @@ switch ($request) {
     case '/cliente/perfil':
         require BASE_PATH . '/app/controllers/perfilController.php';
 
-        if (session_status() === PHP_SESSION_NONE) session_start();
-        $id = (int)($_SESSION['user']['id'] ?? 0);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $id = (int) ($_SESSION['user']['id'] ?? 0);
 
         if ($id <= 0) {
             header('Location: ' . BASE_URL . '/login');
             exit;
         }
 
-        // ✅ Carga el perfil con llaves compatibles con la vista
         $usuario = mostrarPerfilCliente($id);
 
         require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
@@ -417,39 +401,27 @@ switch ($request) {
         cambiarContrasenaUsuario('/cliente/perfil');
         break;
 
-
-
     case '/cliente/ayuda':
         require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
         break;
-
-
-    // case '/cliente/dashboard':
-    //     require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
-    //     break;
-
-    // case '/cliente/explorar-servicios':
-    //     require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
-    //     break;
 
     case '/cliente/publicacion':
         require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';
         break;
 
-    // Cliente - solicitar servicio (vista formulario)
+    // Solicitar servicio (vista)
     case '/cliente/solicitar-servicio':
         require BASE_PATH . '/app/views/dashboard/cliente/solicitarServicio.php';
         break;
 
+    // Esta queda pendiente de confirmar si también fue absorbida por un controlador nuevo
     case '/cliente/guardar-solicitud':
         require BASE_PATH . '/app/controllers/solicitudController.php';
         break;
 
-
-
-    // Cliente - Necesidades
+    // Necesidades (controlador unificado)
     case '/cliente/necesidades':
-        require BASE_PATH . '/app/controllers/clienteNecesidadesController.php';
+        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
         break;
 
     case '/cliente/necesidades/crear':
@@ -457,7 +429,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/dashboard');
             exit;
         }
-        require BASE_PATH . '/app/controllers/clienteNecesidadesCrearController.php';
+        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
         break;
 
     case '/cliente/necesidades/aceptar-cotizacion':
@@ -465,10 +437,9 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/necesidades');
             exit;
         }
-        require BASE_PATH . '/app/controllers/clienteNecesidadesAceptarCotizacionController.php';
+        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
         break;
-
-    //case necesarios para mensajes 📩
+    // Mensajes
     case 'cliente/mensajes':
         require BASE_PATH . '/app/controllers/MensajesController.php';
         (new MensajesController())->inbox();
@@ -494,8 +465,9 @@ switch ($request) {
         (new MensajesController())->poll();
         break;
 
-
-
+    // ==================================================
+    // 404
+    // ==================================================
     default:
         http_response_code(404);
         require BASE_PATH . '/app/views/auth/error404.php';

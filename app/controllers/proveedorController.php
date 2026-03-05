@@ -137,7 +137,7 @@ function registrarServicio()
         try {
             $publicacionModel = new Publicacion();
 
-            $publicacionModel->crearParaServicioDeProveedor(
+            $publicacionCreada = $publicacionModel->crearParaServicioDeProveedor(
                 $usuarioId,
                 $servicioId,
                 [
@@ -146,6 +146,10 @@ function registrarServicio()
                     'precio'      => $dataServicio['precio']
                 ]
             );
+
+            if (!$publicacionCreada) {
+                error_log("No se pudo crear la publicación del servicio {$servicioId}");
+            }
         } catch (Exception $e) {
             error_log("Error al crear publicación para el servicio {$servicioId}: " . $e->getMessage());
         }
@@ -166,7 +170,6 @@ function registrarServicio()
 
     exit();
 }
-
 
 function mostrarServicios()
 {

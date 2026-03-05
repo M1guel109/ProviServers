@@ -65,7 +65,7 @@ if ($usuarioId) {
             </nav>
         </section>
 
-        <!-- Tabla de publicaciones -->
+
         <section id="cards-publicaciones" class="mt-3">
 
             <?php if (empty($publicaciones)) : ?>
@@ -83,112 +83,117 @@ if ($usuarioId) {
 
                     <?php foreach ($publicaciones as $pub) : ?>
                         <?php
-                        $estado = $pub['estado_publicacion'] ?? 'pendiente';
+                        // Estado real de la publicación
+                        $estado = $pub['estado'] ?? $pub['estado_publicacion'] ?? 'pendiente';
 
-                        // Badge / texto por estado
                         switch ($estado) {
                             case 'pendiente':
                                 $badgeClass  = 'bg-warning text-dark';
                                 $estadoTexto = 'Pendiente de aprobación';
                                 break;
+
                             case 'aprobado':
                                 $badgeClass  = 'bg-success';
                                 $estadoTexto = 'Publicada';
                                 break;
-                            case 'pausada':
-                                $badgeClass  = 'bg-info text-dark';
-                                $estadoTexto = 'Pausada';
-                                break;
-                            case 'rechazada':
+
+                            case 'rechazado':
                                 $badgeClass  = 'bg-danger';
                                 $estadoTexto = 'Rechazada';
                                 break;
+
                             default:
                                 $badgeClass  = 'bg-secondary';
                                 $estadoTexto = ucfirst((string)$estado);
                                 break;
                         }
 
-                        $titulo   = (string)($pub['titulo'] ?? '');
+                        $titulo = trim((string)($pub['titulo'] ?? ''));
                         $servName = (string)($pub['servicio_nombre'] ?? 'Sin nombre');
                         $catName  = (string)($pub['categoria_nombre'] ?? 'Sin categoría');
 
-                        $precio = isset($pub['precio']) ? number_format((float)$pub['precio'], 2) : '0.00';
-                        $fecha  = (string)($pub['publicacion_created_at'] ?? '');
+                        if ($titulo === '') {
+                            $titulo = $servName !== '' ? $servName : 'Servicio ofertado';
+                        }
 
-                        $servicioId = (int)($pub['servicio_id'] ?? 0);
-
-                        // Opcional: descripción corta del título (si quieres recortar)
                         $tituloShort = $titulo;
-                        if (mb_strlen($tituloShort) > 60) $tituloShort = mb_substr($tituloShort, 0, 60) . '...';
+                        if (mb_strlen($tituloShort) > 60) {
+                            $tituloShort = mb_substr($tituloShort, 0, 60) . '...';
+                        }
+
+                        $precioValor = isset($pub['precio']) ? (float)$pub['precio'] : 0;
+                        $precio = number_format($precioValor, 2, ',', '.');
+
+                        $fechaRaw = $pub['fecha_publicacion'] ?? $pub['publicacion_created_at'] ?? $pub['created_at'] ?? '';
+                        if (!empty($fechaRaw) && strtotime($fechaRaw)) {
+                            $fecha = date('d/m/Y h:i A', strtotime($fechaRaw));
+                        } else {
+                            $fecha = 'Sin fecha';
+                        }
+
+                        $motivoRechazo = trim((string)($pub['motivo_rechazo'] ?? ''));
+                        $servicioId = (int)($pub['servicio_id'] ?? 0);
                         ?>
 
                         <div class="col">
                             <div class="card card-publicacion h-100 border-0 shadow-sm">
 
-                                <!-- Barra superior como tus servicios -->
                                 <div class="card-servicio-topbar"></div>
 
                                 <div class="card-body">
 
-                                    <!-- Estado + Precio -->
                                     <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                                        <span class="badge <?= $badgeClass ?>"><?= htmlspecialchars($estadoTexto) ?></span>
-                                        <span class="badge bg-dark">$ <?= $precio ?></span>
+                                        <span class="badge <?= $badgeClass ?>">
+                                            <?= htmlspecialchars($estadoTexto) ?>
+                                        </span>
+                                        <span class="badge bg-dark">
+                                            $ <?= htmlspecialchars($precio) ?>
+                                        </span>
                                     </div>
 
-                                    <!-- Título publicación -->
                                     <h5 class="card-title fw-bold mb-2">
                                         <?= htmlspecialchars($tituloShort) ?>
                                     </h5>
 
-                                    <!-- Servicio base -->
                                     <div class="text-muted small mb-2">
                                         <i class="bi bi-box-seam"></i>
                                         <strong>Servicio base:</strong> <?= htmlspecialchars($servName) ?>
                                     </div>
 
-                                    <!-- Categoría -->
                                     <div class="text-muted small mb-3">
                                         <i class="bi bi-tag"></i>
                                         <strong>Categoría:</strong> <?= htmlspecialchars($catName) ?>
                                     </div>
 
-                                    <!-- Fecha -->
-                                    <div class="meta-row text-muted small">
+                                    <div class="meta-row text-muted small mb-2">
                                         <i class="bi bi-calendar3"></i>
-                                        <span>Creada: <?= htmlspecialchars($fecha) ?></span>
+                                        <span>Publicada: <?= htmlspecialchars($fecha) ?></span>
                                     </div>
+
+                                    <?php if ($estado === 'rechazado' && $motivoRechazo !== '') : ?>
+                                        <div class="alert alert-danger py-2 px-3 small mb-0">
+                                            <strong>Motivo del rechazo:</strong><br>
+                                            <?= nl2br(htmlspecialchars($motivoRechazo)) ?>
+                                        </div>
+                                    <?php endif; ?>
 
                                 </div>
 
-                                <!-- Acciones -->
                                 <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
                                     <div class="d-flex gap-2 flex-wrap">
 
-                                        <!-- Ver detalle (placeholder) -->
                                         <button type="button"
                                             class="btn btn-sm btn-outline-primary flex-fill"
                                             title="Ver detalle (pendiente de conectar)">
                                             <i class="bi bi-eye"></i> Ver
                                         </button>
 
-                                        <!-- Editar servicio base -->
-                                        <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
-                                            class="btn btn-sm btn-outline-success flex-fill"
-                                            title="Editar servicio">
-                                            <i class="bi bi-pencil-square"></i> Editar
-                                        </a>
-
-                                        <!-- Placeholder pause/reactivar según estado (si lo vas a usar luego) -->
-                                        <?php if ($estado === 'aprobado') : ?>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" title="Pausar (placeholder)">
-                                                <i class="bi bi-pause-circle"></i> Pausar
-                                            </button>
-                                        <?php elseif ($estado === 'pausada') : ?>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary flex-fill" title="Reactivar (placeholder)">
-                                                <i class="bi bi-play-circle"></i> Reactivar
-                                            </button>
+                                        <?php if ($servicioId > 0) : ?>
+                                            <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
+                                                class="btn btn-sm btn-outline-success flex-fill"
+                                                title="Editar servicio">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
                                         <?php endif; ?>
 
                                     </div>
