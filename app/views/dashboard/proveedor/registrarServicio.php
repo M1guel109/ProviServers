@@ -56,8 +56,7 @@ $categorias = $categoriaModel->mostrar();
                             <div class="seccion-foto">
                                 <div class="tarjeta-foto">
                                     <div class="foto-servicio">
-                                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Imagen del servicio"
-                                            id="foto-preview">
+                                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Imagen del servicio" id="foto-preview">
                                     </div>
                                     <label for="foto-input" class="btn-agregar-foto">
                                         <i class="bi bi-camera"></i> Agregar imagen
@@ -90,18 +89,25 @@ $categorias = $categoriaModel->mostrar();
                         </div>
 
                         <div class="col-md-6">
+                            <label for="precio" class="form-label">Precio *</label>
+                            <input type="number" class="form-control" id="precio" name="precio"
+                                placeholder="Ej: 50000" min="0" step="0.01" required>
+                            <div class="form-text">Ingresa el valor del servicio</div>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label">Disponibilidad *</label>
                             <div class="disponibilidad-opciones pt-2">
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="disponibilidad" id="disponible" value="1" checked>
                                     <label class="form-check-label" for="disponible">
-                                        <i> Disponible
+                                        <i class="bi bi-check-circle"></i> Disponible
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="disponibilidad" id="no-disponible" value="0">
                                     <label class="form-check-label" for="no-disponible">
-                                        <i> No disponible
+                                        <i class="bi bi-x-circle"></i> No disponible
                                     </label>
                                 </div>
                             </div>

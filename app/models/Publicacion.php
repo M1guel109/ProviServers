@@ -41,49 +41,46 @@ class Publicacion
         int $servicioId,
         array $data = []
     ): bool {
-        // 1. Resolver proveedor_id a partir del usuario logueado
         $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
 
         if (!$proveedorId) {
             throw new Exception("No se encontró proveedor asociado al usuario {$usuarioId}");
         }
 
-        // 2. Normalizar datos
-        $titulo      = $data['nombre']       ?? $data['titulo'] ?? 'Servicio ofertado';
-        $descripcion = $data['descripcion']  ?? null;
+        $titulo      = $data['nombre'] ?? $data['titulo'] ?? 'Servicio ofertado';
+        $descripcion = $data['descripcion'] ?? null;
         $precio      = isset($data['precio']) ? (float)$data['precio'] : 0.00;
 
         $tipoPublicacion = 'proveedor';
-        $estado          = 'pendiente'; // el admin luego lo cambiará a 'aprobado'
+        $estado          = 'pendiente';
 
-        // 3. Insert
         $sql = "INSERT INTO publicaciones (
-                    tipo_publicacion,
-                    proveedor_id,
-                    servicio_id,
-                    titulo,
-                    descripcion,
-                    precio,
-                    estado
-                ) VALUES (
-                    :tipo_publicacion,
-                    :proveedor_id,
-                    :servicio_id,
-                    :titulo,
-                    :descripcion,
-                    :precio,
-                    :estado
-                )";
+                tipo_publicacion,
+                proveedor_id,
+                servicio_id,
+                titulo,
+                descripcion,
+                precio,
+                estado
+            ) VALUES (
+                :tipo_publicacion,
+                :proveedor_id,
+                :servicio_id,
+                :titulo,
+                :descripcion,
+                :precio,
+                :estado
+            )";
 
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->bindParam(':tipo_publicacion', $tipoPublicacion);
-        $stmt->bindParam(':proveedor_id',    $proveedorId, PDO::PARAM_INT);
-        $stmt->bindParam(':servicio_id',     $servicioId,  PDO::PARAM_INT);
-        $stmt->bindParam(':titulo',          $titulo);
-        $stmt->bindParam(':descripcion',     $descripcion);
-        $stmt->bindParam(':precio',          $precio);
-        $stmt->bindParam(':estado',          $estado);
+        $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
+        $stmt->bindParam(':servicio_id', $servicioId, PDO::PARAM_INT);
+        $stmt->bindParam(':titulo', $titulo);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':precio', $precio);
+        $stmt->bindParam(':estado', $estado);
 
         return $stmt->execute();
     }
@@ -102,36 +99,36 @@ class Publicacion
     public function listarPorProveedorUsuario(int $usuarioId): array
     {
         try {
-            // 1. Obtener el proveedor_id desde el usuario
             $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
 
             if (!$proveedorId) {
                 return [];
             }
 
-            // 2. Consulta de publicaciones + servicio + categoría
             $sql = "
-                SELECT 
-                    pub.id                              AS publicacion_id,
-                    pub.servicio_id                     AS servicio_id,
-                    pub.titulo                          AS publicacion_titulo,
-                    pub.descripcion                     AS publicacion_descripcion,
-                    pub.precio                          AS publicacion_precio,
-                    pub.estado                          AS estado_publicacion,
-                    pub.created_at                      AS publicacion_created_at,
+            SELECT 
+                pub.id                  AS publicacion_id,
+                pub.servicio_id         AS servicio_id,
+                pub.titulo              AS titulo,
+                pub.descripcion         AS descripcion,
+                pub.precio              AS precio,
+                pub.estado              AS estado,
+                pub.motivo_rechazo      AS motivo_rechazo,
+                pub.fecha_publicacion   AS fecha_publicacion,
+                pub.created_at          AS publicacion_created_at,
 
-                    s.nombre                            AS servicio_nombre,
-                    s.descripcion                       AS servicio_descripcion,
-                    s.imagen                            AS servicio_imagen,
-                    s.disponibilidad                    AS servicio_disponible,
+                s.nombre                AS servicio_nombre,
+                s.descripcion           AS servicio_descripcion,
+                s.imagen                AS servicio_imagen,
+                s.disponibilidad        AS servicio_disponible,
 
-                    c.nombre                            AS categoria_nombre
-                FROM publicaciones AS pub
-                INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
-                LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
-                WHERE pub.proveedor_id = :proveedor_id
-                ORDER BY pub.created_at DESC
-            ";
+                c.nombre                AS categoria_nombre
+            FROM publicaciones AS pub
+            INNER JOIN servicios  AS s ON pub.servicio_id = s.id
+            LEFT JOIN categorias  AS c ON s.id_categoria = c.id
+            WHERE pub.proveedor_id = :proveedor_id
+            ORDER BY pub.fecha_publicacion DESC, pub.id DESC
+        ";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
@@ -267,8 +264,8 @@ class Publicacion
     }
 
     public function listarPublicacionesAprobadasParaSolicitudes(): array
-{
-    $sql = "
+    {
+        $sql = "
         SELECT
             p.id,
             p.titulo,
@@ -283,9 +280,8 @@ class Publicacion
         ORDER BY p.fecha_publicacion DESC, p.id DESC
     ";
 
-    $stmt = $this->conexion->prepare($sql);
-    $stmt->execute();
-    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-}
-
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
 }
