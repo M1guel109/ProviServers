@@ -349,36 +349,275 @@
 }
 
 /* ==========================================================================
-   7. RESPONSIVE (Solo ajustes específicos del proveedor)
+   MENÚ HAMBURGUESA - SISTEMA COMPLETO
    ========================================================================== */
-@media screen and (min-width:768px) and (max-width:1080px) {
-    #tarjetas-superiores,
-    #tarjetas-inferiores {
-        grid-template-columns: repeat(2, 1fr);
+
+/* Botón hamburguesa - visible solo en móvil/tablet */
+#btn-toggle-menu {
+    display: none; /* Oculto por defecto en desktop */
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 1001;
+    padding: 0;
+}
+
+#btn-toggle-menu i {
+    font-size: 24px;
+    transition: transform 0.3s ease;
+}
+
+#btn-toggle-menu:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+#btn-toggle-menu.active i {
+    transform: rotate(90deg);
+}
+
+/* Overlay para cuando el menú está abierto */
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+.menu-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+/* ==========================================================================
+   RESPONSIVE - MEDIA QUERIES
+   ========================================================================== */
+
+/* Tablet Landscape (hasta 1200px) */
+@media screen and (max-width: 1200px) {
+    #btn-toggle-menu {
+        display: flex;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        bottom: 0;
+        width: 280px;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.mobile-open {
+        left: 0;
+    }
+
+    .contenido {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Ajustes del header */
+    .barra-superior {
+        position: sticky;
+        top: 0;
+        z-index: 99;
+        background: white;
+        margin: 0;
+        border-radius: 0 0 12px 12px;
+        padding: 12px 20px;
+    }
+
+    /* Buscador se oculta en tablet/móvil */
+    .buscador.d-none.d-md-flex {
+        display: none !important;
     }
 }
 
-@media screen and (min-width:320px) and (max-width:767px) {
-    #titulo-principal h1 {
-        font-size: var(--fs-title2);
+/* Tablet Portrait (hasta 992px) */
+@media screen and (max-width: 992px) {
+    .contenido {
+        padding: 20px 15px;
     }
 
-    #grafica-principal {
-        padding: 20px;
+    .barra-superior {
+        padding: 10px 15px;
     }
 
-    .grafica-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
+    .acciones-barra {
+        gap: 12px;
     }
 
-    #periodo {
-        width: 100%;
+    /* Ocultar texto del usuario en móvil */
+    .d-none.d-md-block {
+        display: none !important;
     }
-    
-    #tarjetas-superiores,
-    #tarjetas-inferiores {
-        grid-template-columns: 1fr;
+
+    .usuario img {
+        width: 40px;
+        height: 40px;
+    }
+
+    /* Ajustar el badge de notificaciones */
+    .nav-link.position-relative .badge {
+        font-size: 0.55rem !important;
+        padding: 3px 5px !important;
+    }
+}
+
+/* Móvil (hasta 768px) */
+@media screen and (max-width: 768px) {
+    .contenido {
+        padding: 15px 12px;
+    }
+
+    #btn-toggle-menu {
+        width: 38px;
+        height: 38px;
+    }
+
+    #btn-toggle-menu i {
+        font-size: 20px;
+    }
+
+    .barra-superior {
+        padding: 8px 12px;
+    }
+
+    .acciones-barra {
+        gap: 8px;
+    }
+
+    /* Ocultar selector de idioma en móvil */
+    .nav-item.dropdown.d-none.d-sm-block {
+        display: none !important;
+    }
+
+    /* Ocultar plan gold en móvil */
+    .d-none.d-lg-flex {
+        display: none !important;
+    }
+
+    .usuario img {
+        width: 38px;
+        height: 38px;
+    }
+
+    .dropdown-menu {
+        position: fixed !important;
+        top: auto !important;
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 10px !important;
+        width: auto !important;
+        max-height: 90vh;
+        overflow-y: auto;
+        border-radius: 16px !important;
+        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .sidebar {
+        width: 85%;
+        max-width: 300px;
+    }
+}
+
+/* Móvil pequeño (hasta 480px) */
+@media screen and (max-width: 480px) {
+    .contenido {
+        padding: 12px 10px;
+    }
+
+    #btn-toggle-menu {
+        width: 35px;
+        height: 35px;
+    }
+
+    #btn-toggle-menu i {
+        font-size: 18px;
+    }
+
+    .barra-superior {
+        padding: 6px 10px;
+    }
+
+    .acciones-barra {
+        gap: 5px;
+    }
+
+    .usuario img {
+        width: 35px;
+        height: 35px;
+    }
+
+    .nav-link.nav-icon i {
+        font-size: 1.3rem !important;
+    }
+
+    .sidebar {
+        width: 90%;
+    }
+
+    /* Dropdown a pantalla completa en móvil muy pequeño */
+    .dropdown-menu {
+        left: 5px !important;
+        right: 5px !important;
+        bottom: 5px !important;
+        padding: 10px 0 !important;
+    }
+
+    .dropdown-header {
+        padding: 12px !important;
+    }
+
+    .dropdown-item {
+        padding: 12px 15px !important;
+        font-size: 0.9rem;
+    }
+}
+
+/* Ajuste para pantallas muy pequeñas (hasta 360px) */
+@media screen and (max-width: 360px) {
+    .contenido {
+        padding: 10px 8px;
+    }
+
+    #btn-toggle-menu {
+        width: 32px;
+        height: 32px;
+    }
+
+    .usuario img {
+        width: 32px;
+        height: 32px;
+    }
+
+    .acciones-barra {
+        gap: 3px;
+    }
+
+    .nav-link.nav-icon {
+        padding: 5px !important;
+    }
+
+    .nav-link.nav-icon i {
+        font-size: 1.2rem !important;
     }
 }
