@@ -224,14 +224,7 @@ function guardarSolicitud()
     $fecha         = trim($_POST['fecha_preferida'] ?? '');
     $franja        = trim($_POST['franja_horaria'] ?? '');
     
-    $presupuestoRaw = $_POST['presupuesto_estimado'] ?? ($_POST['presupuesto'] ?? null);
-    $presupuesto = null;
-    if ($presupuestoRaw !== null) {
-        $presupuestoRaw = trim((string)$presupuestoRaw);
-        if ($presupuestoRaw !== '') {
-            $presupuesto = (float)$presupuestoRaw;
-        }
-    }
+
 
     if (!$publicacionId || !$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha) {
         mostrarSweetAlert('error', 'Campos incompletos', 'Completa los campos obligatorios.');
@@ -308,7 +301,6 @@ function guardarSolicitud()
         'zona'                 => $zona,
         'fecha_servicio'       => $fecha,
         'franja_horaria'       => $franja,
-        'presupuesto_estimado' => $presupuesto,
         'adjuntos'             => $adjuntos_guardados
     ];
 

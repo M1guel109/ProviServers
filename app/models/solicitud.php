@@ -58,7 +58,6 @@ class Solicitud
                         zona,
                         fecha_preferida,
                         franja_horaria,
-                        presupuesto_estimado,
                         estado
                     ) VALUES (
                         :cliente_id,
@@ -71,7 +70,6 @@ class Solicitud
                         :zona,
                         :fecha_preferida,
                         :franja_horaria,
-                        :presupuesto_estimado,
                         'pendiente'
                     )";
 
@@ -87,8 +85,7 @@ class Solicitud
                 ':ciudad'               => $data['ciudad'],
                 ':zona'                 => $data['zona'],
                 ':fecha_preferida'      => $data['fecha_servicio'] ?? $data['fecha_preferida'] ?? null,
-                ':franja_horaria'       => $data['franja_horaria'],
-                ':presupuesto_estimado' => $data['presupuesto_estimado']
+                ':franja_horaria'       => $data['franja_horaria']
             ]);
 
             $solicitudId = $this->conexion->lastInsertId();
