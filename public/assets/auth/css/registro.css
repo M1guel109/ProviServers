@@ -3,7 +3,6 @@
 :root {
     --primary-color: #3A86FF;
     --dark-color: #2A2A2A;
-    --secondary-color: #8338EC;
     --text-muted: #6c757d;
     --bg-light: #f8f9fa;
     --transition: all 0.3s ease;
@@ -266,6 +265,11 @@ main {
     color: var(--primary-color);
     text-decoration: none;
     font-weight: 700;
+}
+
+.register-link a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
 }
 
 /* ---------- COLUMNA DERECHA: CARRUSEL (Igual al Login) ---------- */
