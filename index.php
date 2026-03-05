@@ -316,7 +316,7 @@ switch ($request) {
         break;
 
     case '/proveedor/solicitudes':
-        require BASE_PATH . '/app/controllers/solicitudController.php';
+        require BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
         break;
 
     // ==================================================
