@@ -77,12 +77,22 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Asegúrate de que esta parte en tu registro.js esté así:
     if (btnAddCategoria) {
         btnAddCategoria.addEventListener('click', function () {
-            let nuevaHabilidad = selectCategoria.value === 'nueva' ? inputNuevaCategoria.value.trim() : selectCategoria.value;
+            let nuevaHabilidad = "";
+
+            if (selectCategoria.value === 'nueva') {
+                nuevaHabilidad = inputNuevaCategoria.value.trim();
+            } else {
+                nuevaHabilidad = selectCategoria.value;
+            }
+
             if (nuevaHabilidad && !habilidadesSeleccionadas.includes(nuevaHabilidad) && nuevaHabilidad !== "nueva") {
                 habilidadesSeleccionadas.push(nuevaHabilidad);
-                actualizarDOMHabilidades();
+                actualizarDOMHabilidades(); // Esta función ya la tienes y llena el input hidden
+
+                // Resetear campos
                 selectCategoria.value = "";
                 inputNuevaCategoria.value = "";
                 inputNuevaCatContainer.classList.add('d-none');

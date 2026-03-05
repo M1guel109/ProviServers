@@ -50,15 +50,15 @@ switch ($request) {
 
     // Vistas
     case '/login':
-        require BASE_PATH . '/app/views/auth/login.php';
+        require BASE_PATH . '/app/views/auth/Login.php';
         break;
 
     case '/registro':
-        require BASE_PATH . '/app/views/auth/registro.php';
+        require BASE_PATH . '/app/views/auth/Registro.php';
         break;
 
     case '/reestablecer-contrasena':
-        require BASE_PATH . '/app/views/auth/reestablecer-Contrasena.php';
+        require BASE_PATH . '/app/views/auth/ReestablecerContrasena.php';
         break;
 
     // Procesos
@@ -470,6 +470,6 @@ switch ($request) {
     // ==================================================
     default:
         http_response_code(404);
-        require BASE_PATH . '/app/views/auth/error404.php';
+        require BASE_PATH . '/app/views/auth/Error404.php';
         break;
 }

@@ -14,14 +14,11 @@ switch ($method) {
 
         if ($accion === 'iniciar_sesion') {
             iniciarSesion();
-        } 
-        elseif ($accion === 'registrar') {
+        } elseif ($accion === 'registrar') {
             registrarUsuario();
-        } 
-        elseif ($accion === 'recuperar_password') {
+        } elseif ($accion === 'recuperar_password') {
             recuperarPassword();
-        } 
-        else {
+        } else {
             http_response_code(400);
             echo "Acción no válida";
         }
@@ -33,7 +30,11 @@ switch ($method) {
         if ($accion === 'cerrar_sesion') {
             cerrarSesion();
         } 
-        else {
+        else if ($accion === 'ver_registro') { 
+            // Llamamos a la función que busca las categorías en la BD
+            $categorias_bd = cargarPaginaRegistro();
+            // Después de esto, tu sistema cargará la vista y el foreach funcionará.
+        } else{
             http_response_code(400);
             echo "Acción no válida";
         }
@@ -134,6 +135,17 @@ function iniciarSesion()
     exit();
 }
 
+// Esta función sirve para CARGAR la página (Ver las categorías en el select)
+function cargarPaginaRegistro() {
+    $objAuth = new Auth();
+    // Traemos las categorías de la BD antes de que se muestre el HTML
+    $categorias_bd = $objAuth->obtenerTodasCategorias();
+    
+    // Aquí es donde tu sistema de rutas cargaría la vista.
+    // Al haber definido $categorias_bd arriba, el foreach del HTML funcionará.
+    return $categorias_bd; 
+}
+
 function registrarUsuario()
 {
     // 1. CAPTURA Y VALIDACIÓN BÁSICA DE DATOS
@@ -149,7 +161,13 @@ function registrarUsuario()
     $rol = $_POST['rol'] ?? '';
 
     // CAPTURAR HABILIDADES
-    $habilidades = isset($_POST['lista_categorias']) ? json_decode($_POST['lista_categorias'], true) : [];
+    $habilidades = !empty($_POST['lista_categorias']) ? json_decode($_POST['lista_categorias'], true) : [];
+
+    // Validación de cantidad de habilidades (opcional pero recomendado)
+    if ($rol === 'proveedor' && count($habilidades) < 1) {
+        mostrarSweetAlert('error', 'Habilidades requeridas', 'Debes seleccionar al menos una habilidad en el Paso 4.');
+        exit();
+    }
 
     // Validamos campos obligatorios
     if (empty($documento) || empty($email) || empty($clave) || empty($confirmar) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($ubicacion) || empty($rol)) {
@@ -171,7 +189,7 @@ function registrarUsuario()
         $file = $_FILES['foto'];
 
         // Usamos la función auxiliar, cambiando el prefijo de 'foto_perfil' a 'usuario'
-        $ruta_foto_perfil = subirArchivo($file, '/public/uploads/usuarios/', ['png', 'jpg', 'jpeg'], 2 * 1024 * 1024, 'usuario'); 
+        $ruta_foto_perfil = subirArchivo($file, '/public/uploads/usuarios/', ['png', 'jpg', 'jpeg'], 2 * 1024 * 1024, 'usuario');
 
         if ($ruta_foto_perfil === false) {
             mostrarSweetAlert('error', 'Error de Foto', 'Hubo un problema al cargar la foto de perfil o el formato es incorrecto (Max 2MB).');
@@ -295,9 +313,14 @@ function cerrarSesion()
     // Eliminar cookie de sesión (opcional pero recomendado)
     if (ini_get("session.use_cookies")) {
         $params = session_get_cookie_params();
-        setcookie(session_name(), '', time() - 42000,
-            $params["path"], $params["domain"],
-            $params["secure"], $params["httponly"]
+        setcookie(
+            session_name(),
+            '',
+            time() - 42000,
+            $params["path"],
+            $params["domain"],
+            $params["secure"],
+            $params["httponly"]
         );
     }
 

@@ -1,307 +1,478 @@
-/* ============ VARIABLES ============ */
+/* public/assets/auth/css/registro.css - Versión Definitiva sin Scroll */
+
 :root {
-  --primary-color: #3A86FF;
-  --secondary-color: #8338EC;
-  --accent-color: #FF006E;
-  --light-color: #FB5607;
-  --dark-color: #2A2A2A;
+    --primary-color: #3A86FF;
+    --dark-color: #2A2A2A;
+    --text-muted: #6c757d;
+    --bg-light: #f8f9fa;
+    --transition: all 0.3s ease;
 }
 
-/* ============ RESET ============ */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background-color: #f5f5f5;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-#contenedor {
-  width: 100%;
-  max-width: 1200px;
-  height: 700px;
-  margin: auto;
-  background: white;
-  display: flex;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  border-radius: 20px;
+/* ---------- HEADER (Idéntico al Login) ---------- */
+header {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 100;
+    background: white;
 }
 
-/* ============ COLUMNAS ============ */
-.columna {
-  flex: 1;
-  padding: 50px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.izquierda h1 {
-  font-size: 34px;
-  font-weight: 700;
-  color: var(--dark-color);
-  margin-bottom: 10px;
-  text-align: center;
+.header-logo {
+    height: 80px;
+    width: auto;
+    transition: var(--transition);
 }
 
-.izquierda p {
-  color: #666;
-  text-align: center;
-  /* margin-bottom: 30px; */
+/* ---------- MAIN & CONTAINER ---------- */
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
 
-.titulo-paso {
-  text-align: center;
-  /* margin-bottom: 40px; */
+.custom-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 85vh; /* Altura relativa a la ventana */
+    max-height: 800px; /* Límite máximo */
+    min-height: 650px; /* Altura mínima */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-radius: 24px;
+    overflow: hidden;
+    background-color: white;
 }
 
-
-.fila-botones {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* ---------- COLUMNA IZQUIERDA: FORMULARIO ---------- */
+#registro {
+    flex: 1.2;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Scroll SOLO si es necesario */
+    scrollbar-width: thin; /* Scroll más elegante en Firefox */
+    scrollbar-color: var(--primary-color) #e9ecef;
 }
 
-
-.olvido-pass {
-  text-align: left;
-  margin-top: 5px;
-  font-size: 14px;
+/* Estilizar scrollbar para Chrome/Safari */
+#registro::-webkit-scrollbar {
+    width: 6px;
 }
 
-
-/* ============ FORMULARIO DEL WIZARD ============ */
-#registro-wizard {
-  width: 100%;
+#registro::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 10px;
 }
 
+#registro::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+#registro h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 0.25rem;
+    text-align: center;
+}
+
+#registro .registro-header p {
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Estilo de los Pasos del Wizard */
 .wizard-step {
-  animation: fadeIn 0.3s ease;
+    animation: fadeIn 0.4s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* Inputs */
+.titulo-paso {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 1rem;
+    padding-bottom: 5px;
+    border-bottom: 3px solid var(--primary-color);
+    display: inline-block;
+    width: 50%;
+}
+
+/* ---------- INPUTS Y FORM GROUP (más compactos) ---------- */
+.form-group {
+    margin-bottom: 0.9rem;
+    padding: 5px 5px; /* Más compacto verticalmente */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.85rem;
+}
+
 #registro-wizard input,
-#registro-wizard select {
-  width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 18px;
-  font-size: 15px;
-  transition: 0.3s;
+#registro-wizard .form-select-custom,
+#registro-wizard .form-control {
+    width: 100%;
+    padding: 10px 14px; /* Más compacto */
+    border: 1.5px solid #e9ecef;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background-color: var(--bg-light);
+    transition: var(--transition);
 }
 
 #registro-wizard input:focus,
-#registro-wizard select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
-  outline: none;
+#registro-wizard .form-select-custom:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
 }
 
-/* Botones del wizard */
-.btn-next,
-.btn-prev,
-#btn-finalizar {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  transition: 0.3s;
+/* Inputs de archivo más pequeños */
+#registro-wizard .form-control-sm {
+    padding: 8px 12px;
+    font-size: 0.85rem;
 }
 
-/* Botón principal */
-.btn-next,
-#btn-finalizar {
-  background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
-  color: white;
+/* Texto de ayuda más pequeño */
+.text-muted.small {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
 }
 
-.btn-next:hover,
-#btn-finalizar:hover {
-  background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
-  transform: translateY(-2px);
+/* ---------- BOTONES MEJORADOS (Atrás con mismo estilo que Siguiente) ---------- */
+.btn-login {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 8px 20px rgba(58, 134, 255, 0.3);
+    
+    /* Para botones individuales (como en paso 1) */
+    width: 40%;
+    display: block;
+    margin: 30px auto 0 auto;
 }
 
-/* Botón atrás */
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(58, 134, 255, 0.4);
+    background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
+}
+
+/* Botón Atrás - EXACTAMENTE igual al de siguiente pero con colores invertidos */
 .btn-prev {
-  background: #ddd;
+    background: white;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(58, 134, 255, 0.15);
+    
+    /* Para botones individuales (aunque atrás siempre va acompañado) */
+    width: 100%;
 }
 
 .btn-prev:hover {
-  background: #c4c4c4;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(58, 134, 255, 0.25);
+    background: #f0f7ff; /* Un azul muy clarito al hacer hover */
+    border-color: var(--secondary-color);
+    color: var(--secondary-color);
 }
 
-/* NAV botones */
-.wizard-nav {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+/* Cuando los botones van juntos en un flex (pasos 2,3,4,5) */
+.d-flex.gap-2 .btn-login,
+.d-flex.gap-2 .btn-prev {
+    flex: 1; /* Mismo ancho para ambos */
+    margin: 0; /* Reseteamos el margin del btn-login individual */
+    width: auto; /* Ancho automático para que flex funcione */
 }
 
-/* Resumen final */
-#resumen-registro {
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+/* Clase .btn-outline-custom la mantenemos pero no es necesaria para atrás */
+.btn-outline-custom {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: var(--transition);
+    font-size: 0.95rem;
 }
 
-/* ============ CARRUSEL DERECHA ============ */
-/* ============ CARRUSEL DERECHA (Estilos del Login) ============ */
-.derecha {
-  flex: 1;
-  padding: 0;
-  position: relative;
-
-  /* ESTILOS DE FONDO DEL LOGIN */
-  background: url(../img/Rectangle\ 4.png);
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  border-radius: 20px;
+.btn-outline-custom:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(58, 134, 255, 0.3);
 }
 
-/* Contenedor principal del carrusel */
-#carouselRegistro {
-  width: 100%;
-  height: 100%;
+.register-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
 }
 
-/* Contenedor de las diapositivas */
-.derecha .carousel-inner {
-  height: 100%;
-  position: relative;
-  /* Asegura que los ítems se posicionen correctamente */
+.register-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 700;
 }
 
-/* Ítems del Carrusel */
+.register-link a:hover {
+    color: var(--secondary-color);
+    text-decoration: underline;
+}
+
+/* ---------- COLUMNA DERECHA: CARRUSEL (Igual al Login) ---------- */
+.info-section {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    overflow: hidden;
+}
+
+#infoCarousel {
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-inner,
 .carousel-item {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  /* CORRECCIÓN CLAVE: Ocultar completamente los ítems no activos */
-  visibility: hidden;
-  opacity: 0;
-  position: absolute;
-  /* Superponer todos los ítems */
-  top: 0;
-  left: 0;
-  width: 100%;
-  transition: opacity 0.6s ease-in-out, visibility 0.6s ease-in-out;
-}
-
-/* Ítem activo */
-.carousel-item.active {
-  visibility: visible;
-  /* Mostrar el activo */
-  opacity: 1;
-  position: relative;
-  /* Restaurar el flujo para el activo */
-}
-
-/* Estilo de la Tarjeta de Texto (Simulando text-card del login) */
-.contenido-derecha {
-  height: auto;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-
-  /* Estilos de la tarjeta de texto para que el contenido destaque */
-  background: transparent;
-  backdrop-filter: blur(20px);
-  border-radius: 20px;
-  color: white;
-  width: 80%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.contenido-derecha h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: white;
-  line-height: 1.3;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  margin-bottom: 20px;
-}
-
-.imagen-persona {
-  width: 80%;
-  max-width: 380px;
-  margin: 20px auto 0 auto;
-  /* box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); */
-}
-
-.derecha .carousel-inner {
-  height: 100%;
+    height: 100%;
 }
 
 .carousel-item {
-  height: 100%;
-  backdrop-filter: blur(4px);
-  background-size: cover;
-  background-position: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
 
-/* ============ RESPONSIVE ============ */
-@media (max-width: 992px) {
-  #contenedor {
+.carousel-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.3) 100%);
+    z-index: 1;
+}
+
+.carousel-caption-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 350px;
+    text-align: center;
+    color: white;
+    z-index: 2;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.carousel-caption-content h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    animation: fadeInUp 0.8s ease;
+}
+
+.carousel-caption-content p {
+    font-size: 1rem;
+    opacity: 0.9;
+    animation: fadeInUp 1s ease;
+}
+
+/* Animación para el texto */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ---------- MEJORAS PARA EL WIZARD ---------- */
+/* Hacer que los pasos ocupen todo el espacio disponible */
+.wizard-step {
+    flex: 1;
+    display: flex;
     flex-direction: column;
-    height: auto;
-  }
+}
 
-  .derecha {
-    height: 350px;
-  }
+/* El último elemento (botones) se empuja hacia abajo */
+.wizard-step .d-flex:last-child,
+.wizard-step > button:last-child {
+    margin-top: auto;
+}
 
-  .contenido-derecha h2 {
-    font-size: 22px;
-  }
+/* Para los pasos que tienen botones al final */
+#paso-1,
+#paso-2,
+#paso-3,
+#paso-4,
+#paso-5 {
+    display: flex;
+    flex-direction: column;
+    padding-top: 30px;
+}
 
-  .imagen-persona {
-    width: 60%;
-  }
+/* Contenedor de tags más compacto */
+#contenedor-tags {
+    min-height: 35px;
+    margin-bottom: 0.5rem;
+}
+
+#contenedor-tags .badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Resumen final más compacto */
+#resumen-registro {
+    font-size: 0.85rem;
+    padding: 0.8rem !important;
+    margin-bottom: 0.8rem !important;
+}
+
+/* ---------- RESPONSIVE (Idéntico al Login) ---------- */
+@media (max-width: 992px) {
+    main {
+        padding: 10px;
+    }
+    
+    .custom-container {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+        max-height: none;
+    }
+    
+    /* En tablets, el carrusel se muestra pero más pequeño */
+    .info-section {
+        height: 250px;
+        order: -1; /* Carrusel arriba */
+    }
+    
+    #registro {
+        padding: 25px;
+        max-height: none;
+        overflow-y: visible; /* Sin scroll en móviles */
+    }
+    
+    .carousel-caption-content h2 {
+        font-size: 1.8rem;
+    }
 }
 
 @media (max-width: 576px) {
-  .izquierda {
-    padding: 30px;
-  }
+    #registro {
+        padding: 20px;
+    }
+    
+    #registro h1 {
+        font-size: 1.8rem;
+    }
+    
+    .titulo-paso {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0.7rem;
+    }
+    
+    .form-group label {
+        font-size: 0.8rem;
+    }
+    
+    #registro-wizard input,
+    #registro-wizard .form-select-custom {
+        padding: 8px 12px;
+        font-size: 0.85rem;
+    }
+    
+    .btn-login,
+    .btn-outline-custom {
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .info-section {
+        height: 200px;
+    }
+    
+    .carousel-caption-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .carousel-caption-content p {
+        font-size: 0.9rem;
+    }
+}
 
-  .derecha {
-    height: 300px;
-  }
-
-  .contenido-derecha h2 {
-    font-size: 18px;
-  }
+/* Para pantallas muy pequeñas, ocultar carrusel (como en login) */
+@media (max-width: 480px) {
+    .info-section {
+        display: none;
+    }
 }

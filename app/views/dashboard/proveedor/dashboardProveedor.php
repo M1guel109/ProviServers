@@ -227,6 +227,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- tu javaScript -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardProveedor.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 
 </html>
