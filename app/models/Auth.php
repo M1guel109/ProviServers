@@ -12,6 +12,17 @@ class Auth
         $this->conexion = $db->getConexion();
     }
 
+        // 2. Función para traer todas las categorías de la BD
+    public function obtenerTodasCategorias()
+    {
+        try {
+            $stmt = $this->conexion->query("SELECT * FROM categorias ORDER BY nombre ASC");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }  
+
     // ======================================================================
     // 1. MÉTODOS DE AUTENTICACIÓN (LOGIN)
     // ======================================================================

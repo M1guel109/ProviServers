@@ -53,7 +53,7 @@
 
           // Si NO hay foto o viene la default, usamos la default
           $fotoUrl = (empty($foto) || $foto === 'default_user.png')
-            ? BASE_URL . '/public/uploads/default_user.png'
+            ? BASE_URL . '/public/uploads/usuarios/default_user.png'
             : BASE_URL . '/public/uploads/usuarios/' . $foto;
           ?>
 
@@ -119,7 +119,7 @@
 
                   <!-- Editar Perfil -->
                   <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-                    <form>
+                    <form >
                       <div class="row g-3">
                         <div class="col-md-6">
                           <label class="form-label">Nombre completo</label>
