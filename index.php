@@ -416,7 +416,7 @@ switch ($request) {
 
     // Esta queda pendiente de confirmar si también fue absorbida por un controlador nuevo
     case '/cliente/guardar-solicitud':
-        require BASE_PATH . '/app/controllers/solicitudController.php';
+        require BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
         break;
 
     // Necesidades (controlador unificado)

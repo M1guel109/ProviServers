@@ -36,6 +36,7 @@ $imagenUrl = (!empty($imagen))
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -83,6 +84,7 @@ $imagenUrl = (!empty($imagen))
 
                         <form action="<?= BASE_URL ?>/cliente/guardar-solicitud" method="POST" enctype="multipart/form-data">
 
+                            <input type="hidden" name="accion" value="guardar_solicitud_cliente">
                             <!-- Publicación a la que se asocia la solicitud -->
                             <input type="hidden" name="publicacion_id" value="<?= (int)$publicacionId ?>">
 
@@ -181,25 +183,6 @@ $imagenUrl = (!empty($imagen))
                                     </select>
                                 </div>
                             </div>
-
-                            <!-- Presupuesto opcional -->
-                            <div class="mb-3">
-                                <label class="form-label">Presupuesto estimado (opcional)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input
-                                        type="number"
-                                        name="presupuesto"
-                                        class="form-control"
-                                        min="0"
-                                        step="1000"
-                                        placeholder="Ej: 80000">
-                                </div>
-                                <small class="text-muted">
-                                    Si tienes una idea de cuánto puedes pagar, ayuda a filtrar expectativas.
-                                </small>
-                            </div>
-
                             <!-- Adjuntos opcionales -->
                             <div class="mb-3">
                                 <label class="form-label">Adjuntar fotos o archivos (opcional)</label>
@@ -276,4 +259,5 @@ $imagenUrl = (!empty($imagen))
     <!-- JS propio -->
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
 </body>
+
 </html>
