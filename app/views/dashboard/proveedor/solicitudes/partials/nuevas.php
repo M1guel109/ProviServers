@@ -113,21 +113,21 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
                         <div class="card-footer bg-white border-0 pt-0">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-outline-primary flex-fill"
-                                        title="Ver Detalle"
-                                        onclick='verDetalle(<?= $payload ?>)'>
+                                    title="Ver Detalle"
+                                    onclick='verDetalle(<?= $payload ?>)'>
                                     <i class="bi bi-eye"></i> Ver
                                 </button>
 
-                                <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar&id=<?= (int)($solicitud['id'] ?? 0) ?>&tab=nuevas"
-                                   class="btn btn-sm btn-outline-success flex-fill"
-                                   title="Aceptar">
+                                <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar_solicitud&id=<?= (int)($solicitud['id'] ?? 0) ?>&tab=nuevas"
+                                    class="btn btn-sm btn-outline-success flex-fill"
+                                    title="Aceptar">
                                     <i class="bi bi-check-lg"></i> Aceptar
                                 </a>
 
                                 <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar&id=<?= (int)($solicitud['id'] ?? 0) ?>&tab=nuevas"
-                                   class="btn btn-sm btn-outline-danger flex-fill"
-                                   title="Rechazar"
-                                   onclick="return confirm('¿Rechazar esta solicitud?')">
+                                    class="btn btn-sm btn-outline-danger flex-fill"
+                                    title="Rechazar"
+                                    onclick="return confirm('¿Rechazar esta solicitud?')">
                                     <i class="bi bi-x-lg"></i> Rechazar
                                 </a>
                             </div>
