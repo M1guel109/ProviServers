@@ -1,9 +1,85 @@
 document.addEventListener("DOMContentLoaded", function () {
   const navbarCollapse = document.getElementById("navbarNav");
+  const navbarToggler = document.querySelector(".navbar-toggler");
+  const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
   const navList = navbarCollapse.querySelector(".navbar-nav");
 
-  if (!navbarCollapse || !navList) return;
+  if (!navbarCollapse || !navList || !navbarToggler) return;
 
+  // ===== Funciones para abrir/cerrar =====
+  function openMenu() {
+    navbarCollapse.classList.add('show');
+    navbarToggler.classList.add('collapsed');
+    navbarToggler.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    navList.classList.add("show-items");
+  }
+
+  function closeMenu() {
+    navbarCollapse.classList.remove('show');
+    navbarToggler.classList.remove('collapsed');
+    navbarToggler.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+    navList.classList.remove("show-items");
+  }
+
+  // ===== Evento del botón hamburguesa =====
+  navbarToggler.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (navbarCollapse.classList.contains('show')) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+
+  // ===== Cerrar al hacer clic en la X (pseudo-elemento) =====
+  navbarCollapse.addEventListener('click', (e) => {
+    // Detectamos si el clic fue en la X (esquina superior derecha)
+    const rect = navbarCollapse.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Área donde está la X (30px desde arriba, 30px desde derecha, radio 20px)
+    const closeBtnX = rect.width - 60; // 30px from right
+    const closeBtnY = 30;
+    
+    // Si el clic está en el área del botón X (círculo de 40px)
+    if (navbarCollapse.classList.contains('show')) {
+      if (x > rect.width - 70 && x < rect.width - 30 && y > 10 && y < 50) {
+        closeMenu();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  });
+
+  // ===== Cerrar al hacer clic en cualquier link del menú =====
+  navLinks.forEach((link) => {
+    link.addEventListener('click', (e) => {
+      if (!link.classList.contains('btn')) {
+        closeMenu();
+      }
+    });
+  });
+
+  // ===== Cerrar con tecla ESC =====
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && navbarCollapse.classList.contains('show')) {
+      closeMenu();
+    }
+  });
+
+  // ===== Cerrar al hacer clic fuera del menú =====
+  document.addEventListener('click', (e) => {
+    if (navbarCollapse.classList.contains('show')) {
+      if (!navbarCollapse.contains(e.target) && !navbarToggler.contains(e.target)) {
+        closeMenu();
+      }
+    }
+  });
+
+  // ===== Eventos de Bootstrap collapse =====
   navbarCollapse.addEventListener("shown.bs.collapse", function () {
     navList.classList.add("show-items");
   });
@@ -11,122 +87,40 @@ document.addEventListener("DOMContentLoaded", function () {
   navbarCollapse.addEventListener("hidden.bs.collapse", function () {
     navList.classList.remove("show-items");
   });
-});
 
-document.addEventListener("DOMContentLoaded", () => {
+  // ===== Actualizar link activo al hacer scroll =====
   const sections = document.querySelectorAll("section[id]");
-  const navLinks = document.querySelectorAll(".navbar .nav-link");
   const navbarHeight = document.querySelector(".navbar").offsetHeight;
 
   function updateActiveLink() {
     let index = sections.length;
-
     while (--index && window.scrollY + navbarHeight < sections[index].offsetTop) {}
     
     navLinks.forEach((link) => link.classList.remove("active"));
-    const activeLink = document.querySelector(`.navbar .nav-link[href="#${sections[index].id}"]`);
+    const activeLink = document.querySelector(`.navbar .nav-link[href="#${sections[index]?.id}"]`);
     if (activeLink) activeLink.classList.add("active");
   }
 
   updateActiveLink();
   window.addEventListener("scroll", updateActiveLink);
 
-  // Scroll suave
+  // ===== Scroll suave =====
   navLinks.forEach((link) => {
     link.addEventListener("click", (e) => {
-      e.preventDefault();
-      const target = document.querySelector(link.getAttribute("href"));
-      if (!target) return;
+      if (link.getAttribute('href')?.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute("href"));
+        if (!target) return;
 
-      window.scrollTo({
-        top: target.offsetTop - navbarHeight,
-        behavior: "smooth",
-      });
+        closeMenu();
+
+        setTimeout(() => {
+          window.scrollTo({
+            top: target.offsetTop - navbarHeight,
+            behavior: "smooth",
+          });
+        }, 300);
+      }
     });
   });
 });
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const images = document.querySelectorAll(".hero-carousel img");
-  let current = 0;
-
-  function changeImage() {
-    images[current].classList.remove("active");
-    current = (current + 1) % images.length;
-    images[current].classList.add("active");
-  }
-
-  setInterval(changeImage, 5000); // cambia cada 5 segundos
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const toggleButtons = document.querySelectorAll(".toggle-btn");
-  const prices = document.querySelectorAll(".plan-price");
-
-  // Valores originales y anuales
-  const planData = {
-    mensual: [
-      { price: "Gratis", period: "/Mensual" },
-      { price: "25.000", period: "/Mensual" },
-      { price: "49.000", period: "/Mensual" },
-    ],
-    anual: [
-      { price: "0", period: "/Anual" },
-      { price: "250.000", period: "/Anual" },
-      { price: "490.000", period: "/Anual" },
-    ],
-  };
-
-  toggleButtons.forEach((btn, index) => {
-    btn.addEventListener("click", () => {
-      // Cambiar estado activo
-      toggleButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      const tipo = btn.textContent.trim().toLowerCase(); // mensual o anual
-
-      // Cambiar precios en pantalla
-      prices.forEach((priceEl, i) => {
-        const price = priceEl.querySelector(".price");
-        const period = priceEl.querySelector(".period");
-        price.textContent = planData[tipo][i].price;
-        period.textContent = planData[tipo][i].period;
-      });
-    });
-  });
-});
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-  const cards = document.querySelectorAll(".testimonial-card");
-  const prevBtn = document.querySelector(".arrow-btn.prev");
-  const nextBtn = document.querySelector(".arrow-btn.next");
-  let currentIndex = 0;
-
-  function showTestimonial(index) {
-    cards.forEach((card, i) => {
-      card.classList.toggle("active", i === index);
-    });
-  }
-
-  prevBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-    showTestimonial(currentIndex);
-  });
-
-  nextBtn.addEventListener("click", () => {
-    currentIndex = (currentIndex + 1) % cards.length;
-    showTestimonial(currentIndex);
-  });
-
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % cards.length;
-    showTestimonial(currentIndex);
-  }, 5000);
-  
-  showTestimonial(currentIndex);
-});
-
