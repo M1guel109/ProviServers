@@ -83,8 +83,8 @@
                     </div>
 
                     <div class="contenedor-superpuesto">
-                        <img src="public/assets/webSite/img/Servicios2.png" data-aos="fade-down" data-aos-duration="1000" alt="Persona mayor sonriendo" class="img-servicio-base">
-                        <img src="public/assets/webSite/img/Servicios.png" data-aos="fade-up" data-aos-duration="1500" alt="Persona usando taladro" class="img-servicio-superpuesta">
+                        <img src="public/assets/webSite/img/Servicios2.png" data-aos="fade-right" data-aos-duration="1000" alt="Persona mayor sonriendo" class="img-servicio-base">
+                        <img src="public/assets/webSite/img/Servicios.png" data-aos="fade-left" data-aos-duration="1500" data-aos-delay="200" alt="Persona usando taladro" class="img-servicio-superpuesta">
                     </div>
                 </div>
             </div>
@@ -244,46 +244,7 @@
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-image">
-                            <img src="public/assets/webSite/img/team3.png" alt="Ivonne Lozada">
-                        </div>
-                        <div class="card-content">
-                            <div class="card-info">
-                                <h3 class="card-name">Ivonne Lozada</h3>
-                                <div class="stars">
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </div>
-                                <p class="card-description">
-                                    Es un miembro experto que transforma las ideas en experiencias visuales, desarrollando interfaces interactivas y accesibles que garantizan una navegación fluida y atractiva para el usuario.
-                                </p>
-                            </div>
-                            <div class="social-icons">
-                                <a href="https://github.com/IvoBeltran" target="_blank" class="social-link" aria-label="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
-                        3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
-                        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
-                        -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 
-                        1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 
-                        .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 
-                        0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 
-                        0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 
-                        c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 
-                        3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 
-                        1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 
-                        5.922.43.372.823 1.102.823 2.222 0 1.606-.015 
-                        2.896-.015 3.286 0 .317.218.687.825.57C20.565 
-                        22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
 
                 <div class="cards-row cards-row-centered">
