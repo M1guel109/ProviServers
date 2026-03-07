@@ -4,6 +4,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const navLinks = document.querySelectorAll(".navbar-nav .nav-link");
   const navList = navbarCollapse.querySelector(".navbar-nav");
 
+  const btm = document.getElementById('btn-mensual');
+  const bta = document.getElementById('btn-anual');
+  const pMonthly = document.getElementById('pricing-monthly');
+  const pYearly = document.getElementById('pricing-yearly');
+
   if (!navbarCollapse || !navList || !navbarToggler) return;
 
   // ===== Funciones para abrir/cerrar =====
@@ -39,11 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const rect = navbarCollapse.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     // Área donde está la X (30px desde arriba, 30px desde derecha, radio 20px)
     const closeBtnX = rect.width - 60; // 30px from right
     const closeBtnY = 30;
-    
+
     // Si el clic está en el área del botón X (círculo de 40px)
     if (navbarCollapse.classList.contains('show')) {
       if (x > rect.width - 70 && x < rect.width - 30 && y > 10 && y < 50) {
@@ -94,8 +99,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function updateActiveLink() {
     let index = sections.length;
-    while (--index && window.scrollY + navbarHeight < sections[index].offsetTop) {}
-    
+    while (--index && window.scrollY + navbarHeight < sections[index].offsetTop) { }
+
     navLinks.forEach((link) => link.classList.remove("active"));
     const activeLink = document.querySelector(`.navbar .nav-link[href="#${sections[index]?.id}"]`);
     if (activeLink) activeLink.classList.add("active");
@@ -123,4 +128,56 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+
+
+  btm.addEventListener('click', () => {
+    btm.classList.add('active');
+    bta.classList.remove('active');
+    pMonthly.classList.remove('d-none');
+    pYearly.classList.add('d-none');
+  });
+
+  bta.addEventListener('click', () => {
+    bta.classList.add('active');
+    btm.classList.remove('active');
+    pMonthly.classList.add('d-none');
+    pYearly.classList.remove('d-none');
+  });
+
+  // ===== TESTIMONIALS CAROUSEL =====
+  const testimonialCards = document.querySelectorAll(".testimonial-card");
+  const prevBtn = document.querySelector(".arrow-btn.prev");
+  const nextBtn = document.querySelector(".arrow-btn.next");
+  let currentTestimonial = 0;
+
+  if (testimonialCards.length > 0 && prevBtn && nextBtn) {
+    function showTestimonial(index) {
+      testimonialCards.forEach((card, i) => {
+        if (i === index) {
+          card.classList.add("active");
+        } else {
+          card.classList.remove("active");
+        }
+      });
+    }
+
+    prevBtn.addEventListener("click", () => {
+      currentTestimonial = (currentTestimonial - 1 + testimonialCards.length) % testimonialCards.length;
+      showTestimonial(currentTestimonial);
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
+      showTestimonial(currentTestimonial);
+    });
+
+    // Autoplay opcional (cada 5 segundos)
+    setInterval(() => {
+      currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
+      showTestimonial(currentTestimonial);
+    }, 5000);
+  }
 });
+
+

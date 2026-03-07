@@ -118,7 +118,9 @@
                                 necesidades de los clientes, con compromiso, responsabilidad y precisión
                                 en cada servicio.
                             </p>
-                            <a href="#" class="btn-role">Conoce más <i class="bi bi-arrow-up-right"></i></a>
+                            <a href="<?= BASE_URL ?>/registro?rol=proveedor" class="btn-role">
+                                Únete como Proveedor <i class="bi bi-arrow-up-right"></i>
+                            </a>
                         </div>
                     </article>
 
@@ -130,7 +132,9 @@
                                 Es el usuario que busca resolver necesidades cotidianas de forma segura
                                 y rápida, conectando con expertos confiables desde una sola plataforma.
                             </p>
-                            <a href="#" class="btn-role blue">Conoce más <i class="bi bi-arrow-up-right"></i></a>
+                            <a href="<?= BASE_URL ?>/registro?rol=cliente" class="btn-role blue">
+                                Regístrate como Cliente <i class="bi bi-arrow-up-right"></i>
+                            </a>
                         </div>
                     </article>
                 </div>
@@ -151,7 +155,9 @@
 
                 <div class="divider"></div>
 
-                <div class="cards-row">
+                <!-- NUEVO: Grid con todas las tarjetas -->
+                <div class="team-cards-grid">
+                    <!-- Tarjeta 1 - Karen -->
                     <div class="card">
                         <div class="card-image">
                             <img src="public/assets/webSite/img/team1.png" alt="Karen Heredia">
@@ -173,20 +179,7 @@
                             <div class="social-icons">
                                 <a href="https://github.com/KarenHeredia1621" target="_blank" class="social-link" aria-label="GitHub">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
-                        3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
-                        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
-                        -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 
-                        1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 
-                        .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 
-                        0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 
-                        0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 
-                        c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 
-                        3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 
-                        1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 
-                        5.922.43.372.823 1.102.823 2.222 0 1.606-.015 
-                        2.896-.015 3.286 0 .317.218.687.825.57C20.565 
-                        22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
                                     </svg>
                                 </a>
                                 <a href="https://www.linkedin.com/in/karen-heredia-07bb04368/" target="_blank" class="social-link" aria-label="LinkedIn">
@@ -198,7 +191,8 @@
                         </div>
                     </div>
 
-                    <div class="card card-bordered">
+                    <!-- Tarjeta 2 - Schneider (con borde) -->
+                    <div class="card ">
                         <div class="card-image">
                             <img src="public/assets/webSite/img/team2.png" alt="Schneider Manrrique">
                         </div>
@@ -219,20 +213,7 @@
                             <div class="social-icons">
                                 <a href="https://github.com/SchDEv-spn" target="_blank" class="social-link" aria-label="GitHub">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
-                        3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
-                        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
-                        -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 
-                        1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 
-                        .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 
-                        0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 
-                        0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 
-                        c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 
-                        3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 
-                        1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 
-                        5.922.43.372.823 1.102.823 2.222 0 1.606-.015 
-                        2.896-.015 3.286 0 .317.218.687.825.57C20.565 
-                        22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
                                     </svg>
                                 </a>
                                 <a href="https://co.linkedin.com/in/schneider-manrique-osorio" target="_blank" class="social-link" aria-label="LinkedIn">
@@ -244,10 +225,7 @@
                         </div>
                     </div>
 
-
-                </div>
-
-                <div class="cards-row cards-row-centered">
+                    <!-- Tarjeta 3 - Miguel -->
                     <div class="card">
                         <div class="card-image">
                             <img src="public/assets/webSite/img/team5.png" alt="Miguel Lozano">
@@ -269,20 +247,7 @@
                             <div class="social-icons">
                                 <a href="https://github.com/M1guel109" target="_blank" class="social-link" aria-label="GitHub">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
-                        3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
-                        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
-                        -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 
-                        1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 
-                        .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 
-                        0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 
-                        0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 
-                        c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 
-                        3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 
-                        1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 
-                        5.922.43.372.823 1.102.823 2.222 0 1.606-.015 
-                        2.896-.015 3.286 0 .317.218.687.825.57C20.565 
-                        22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
                                     </svg>
                                 </a>
                                 <a href="https://www.linkedin.com/in/miguel-lozano-716522358?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-link" aria-label="LinkedIn">
@@ -294,6 +259,7 @@
                         </div>
                     </div>
 
+                    <!-- Tarjeta 4 - Juanita -->
                     <div class="card">
                         <div class="card-image">
                             <img src="public/assets/webSite/img/team4.png" alt="Juanita Jimenez">
@@ -315,20 +281,7 @@
                             <div class="social-icons">
                                 <a href="https://github.com/JuanitaJimenez09" target="_blank" class="social-link" aria-label="GitHub">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 
-                        3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 
-                        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 
-                        -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 
-                        1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 
-                        .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 
-                        0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 
-                        0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 
-                        c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 
-                        3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 
-                        1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 
-                        5.922.43.372.823 1.102.823 2.222 0 1.606-.015 
-                        2.896-.015 3.286 0 .317.218.687.825.57C20.565 
-                        22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
                                     </svg>
                                 </a>
                                 <a href="https://www.linkedin.com/in/juanita-tolosa-32a21a349?trk=contact-info" target="_blank" class="social-link" aria-label="LinkedIn">
@@ -355,11 +308,11 @@
                 </div>
 
                 <div class="pricing-toggle">
-                    <button class="toggle-btn active">Mensual</button>
-                    <button class="toggle-btn">Anual</button>
+                    <button id="btn-mensual" class="toggle-btn active">Mensual</button>
+                    <button id="btn-anual" class="toggle-btn">Anual</button>
                 </div>
 
-                <div class="pricing-cards">
+                <div id="pricing-monthly" class="pricing-cards">
                     <div class="pricing-card">
                         <div class="card-header">
                             <h3 class="plan-name">PAQUETE BÁSICO</h3>
@@ -372,12 +325,12 @@
                         <ul class="plan-features">
                             <li>Crear perfil profesional básico</li>
                             <li>Publicar hasta 3 servicios</li>
-                            <li>Acceso a solicitudes de clientes cercanos</li>
+                            <li>Acceso a solicitudes cercanas</li>
                             <li>Calificaciones visibles</li>
                             <li>Chat limitado con clientes</li>
                             <li>Soporte por correo electrónico</li>
                         </ul>
-                        <a href="#" class="btn-plan btn-primary">Reserva ahora</a>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-primary">Reserva ahora</a>
                     </div>
 
                     <div class="pricing-card featured">
@@ -392,11 +345,11 @@
                         <ul class="plan-features">
                             <li>Todo lo del Paquete Básico</li>
                             <li>Publicar hasta 10 servicios</li>
-                            <li>Acceso a clientes sin límite de zona</li>
+                            <li>Clientes sin límite de zona</li>
                             <li>Chat directo y sin restricciones</li>
-                            <li>Perfil profesional optimizado con verificación y métricas básicas</li>
+                            <li>Perfil optimizado y verificado</li>
                         </ul>
-                        <a href="#" class="btn-plan btn-secondary">Reserva ahora</a>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-secondary">Reserva ahora</a>
                     </div>
 
                     <div class="pricing-card">
@@ -411,12 +364,75 @@
                         <ul class="plan-features">
                             <li>Todo lo del Paquete Crecimiento</li>
                             <li>Publicaciones ilimitadas</li>
-                            <li>Prioridad en resultados de búsqueda</li>
+                            <li>Prioridad en búsquedas</li>
                             <li>Sello de proveedor destacado</li>
-                            <li>Exposición preferencial en campañas y clientes destacados</li>
+                            <li>Exposición preferencial</li>
                             <li>Soporte prioritario</li>
                         </ul>
-                        <a href="#" class="btn-plan btn-secondary">Reserva ahora</a>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-secondary">Reserva ahora</a>
+                    </div>
+                </div>
+
+                <div id="pricing-yearly" class="pricing-cards d-none">
+                    <div class="pricing-card">
+                        <div class="card-header">
+                            <h3 class="plan-name">PAQUETE BÁSICO</h3>
+                            <div class="plan-price">
+                                <span class="currency">$</span>
+                                <span class="price">Gratis</span>
+                                <span class="period">/Anual</span>
+                            </div>
+                        </div>
+                        <ul class="plan-features">
+                            <li>Perfil profesional básico</li>
+                            <li>Publicar hasta 3 servicios</li>
+                            <li>Acceso a solicitudes cercanas</li>
+                            <li>Calificaciones visibles</li>
+                            <li>Chat limitado</li>
+                            <li>Soporte estándar</li>
+                        </ul>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-primary">Reserva ahora</a>
+                    </div>
+
+                    <div class="pricing-card featured">
+                        <div class="card-header">
+                            <h3 class="plan-name">ANUAL CRECIMIENTO</h3>
+                            <div class="plan-price">
+                                <span class="currency">$</span>
+                                <span class="price">250.000</span>
+                                <span class="period">/Anual</span>
+                            </div>
+                            <small style="color: #fff; background: #28a745; padding: 2px 8px; border-radius: 10px;">¡Ahorra 2 meses!</small>
+                        </div>
+                        <ul class="plan-features">
+                            <li>Todo lo del Paquete Básico</li>
+                            <li>Hasta 15 servicios (Bonus Anual)</li>
+                            <li>Clientes sin límite de zona</li>
+                            <li>Chat directo ilimitado</li>
+                            <li>Perfil verificado</li>
+                        </ul>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-secondary">Reserva ahora</a>
+                    </div>
+
+                    <div class="pricing-card">
+                        <div class="card-header">
+                            <h3 class="plan-name">ANUAL PRÉMIUM</h3>
+                            <div class="plan-price">
+                                <span class="currency">$</span>
+                                <span class="price">490.000</span>
+                                <span class="period">/Anual</span>
+                            </div>
+                            <small style="color: #28a745; font-weight: bold;">Precio Especial Anual</small>
+                        </div>
+                        <ul class="plan-features">
+                            <li>Todo lo del Paquete Crecimiento</li>
+                            <li>Servicios ilimitados</li>
+                            <li>Máxima prioridad en búsquedas</li>
+                            <li>Sello Destacado Permanente</li>
+                            <li>Campaña de marketing trimestral</li>
+                            <li>Soporte VIP 24/7</li>
+                        </ul>
+                        <a href="<?= BASE_URL ?>/login" class="btn-plan btn-secondary">Reserva ahora</a>
                     </div>
                 </div>
             </div>
