@@ -8,6 +8,11 @@ $isActive = function (string $path) use ($currentPath): string {
 ?>
 
 <aside class="sidebar">
+
+    <!-- Botón cerrar para móvil -->
+    <button class="close-menu-mobile" id="closeMenuMobile">
+        <i class="bi bi-x"></i>
+    </button>
     <div class="logo">
         <a href="#">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers" class="logo-completo">
