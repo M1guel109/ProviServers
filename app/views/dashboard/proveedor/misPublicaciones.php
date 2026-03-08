@@ -33,7 +33,7 @@ if ($usuarioId) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- css de tablas / dashboard -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardTable.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/publicaciones.css">
 </head>
 
 <body>
@@ -183,8 +183,10 @@ if ($usuarioId) {
                                     <div class="d-flex gap-2 flex-wrap">
 
                                         <button type="button"
-                                            class="btn btn-sm btn-outline-primary flex-fill"
-                                            title="Ver detalle (pendiente de conectar)">
+                                            class="btn btn-sm btn-outline-primary flex-fill btn-ver-detalle-publicacion"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDetallePublicacion"
+                                            data-publicacion-id="<?= $pub['id'] ?? '' ?>">
                                             <i class="bi bi-eye"></i> Ver
                                         </button>
 
@@ -212,20 +214,102 @@ if ($usuarioId) {
 
     </main>
 
+    <!-- Modal de Detalle de Publicación -->
+    <div class="modal fade" id="modalDetallePublicacion" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-text me-2"></i>Detalle de la Publicación
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    <!-- Loader (efecto visual) -->
+                    <div id="loader-detalle-publicacion" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
+
+                    <!-- Contenido (se muestra después del loader) -->
+                    <div id="contenido-detalle-publicacion" class="d-none">
+
+                        <!-- Cabecera con título y estado -->
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-4">
+                            <div>
+                                <h3 id="modal-publicacion-titulo" class="fw-bold mb-2 text-dark"></h3>
+                                <span id="modal-publicacion-estado" class="badge"></span>
+                            </div>
+                            <div class="text-end">
+                                <span id="modal-publicacion-precio" class="badge bg-dark fs-6 p-3"></span>
+                            </div>
+                        </div>
+
+                        <!-- Información del servicio base -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <h6 class="text-primary fw-bold mb-3">
+                                        <i class="bi bi-box-seam me-2"></i>Servicio Base
+                                    </h6>
+                                    <p class="mb-1 fw-medium" id="modal-publicacion-servicio"></p>
+                                    <p class="mb-0 text-muted small" id="modal-publicacion-categoria"></p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded h-100">
+                                    <h6 class="text-primary fw-bold mb-3">
+                                        <i class="bi bi-calendar3 me-2"></i>Fecha de Publicación
+                                    </h6>
+                                    <p class="mb-0" id="modal-publicacion-fecha"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="p-3 bg-light rounded mb-4">
+                            <h6 class="text-primary fw-bold mb-3">
+                                <i class="bi bi-card-text me-2"></i>Descripción de la Publicación
+                            </h6>
+                            <p class="mb-0 text-muted" id="modal-publicacion-descripcion">Sin descripción</p>
+                        </div>
+
+                        <!-- Motivo de rechazo (solo visible si aplica) -->
+                        <div id="modal-publicacion-rechazo-container" class="p-3 bg-danger bg-opacity-10 rounded mb-4 d-none">
+                            <h6 class="text-danger fw-bold mb-3">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Motivo del Rechazo
+                            </h6>
+                            <p class="mb-0 text-danger" id="modal-publicacion-rechazo"></p>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="d-flex gap-2 flex-wrap mt-4">
+                            <a id="modal-link-editar-publicacion" href="#" class="btn btn-outline-success">
+                                <i class="bi bi-pencil-square"></i> Editar Servicio
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <footer>
         <!-- Enlaces / Información -->
     </footer>
 
-    <!-- Datatables export -->
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.dataTables.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.print.min.js"></script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -236,39 +320,8 @@ if ($usuarioId) {
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/detallePublicacion.js"></script>
 
-    <script>
-        // Inicializar DataTable
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#tabla-publicaciones').DataTable({
-                responsive: true,
-                // language: {
-                //     url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                // }
-            });
-
-            // Submenús del sidebar (si los usas)
-            const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-
-            toggleSubmenuButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const contenedor = this.closest('.has-submenu');
-                    if (!contenedor) return;
-
-                    const submenu = contenedor.querySelector('.submenu');
-                    contenedor.classList.toggle('active');
-
-                    if (submenu) {
-                        if (contenedor.classList.contains('active')) {
-                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
-                        } else {
-                            submenu.style.maxHeight = '0';
-                        }
-                    }
-                });
-            });
-        });
-    </script>
 
 </body>
 
