@@ -519,7 +519,7 @@ body.toggle-sidebar .contenido {
 
 body.toggle-sidebar .barra-superior {
     left: var(--sidebar-collapsed-width);
-    width: calc(100% - var(--sidebar-collapsed-width));
+    /* width: calc(100% - var(--sidebar-collapsed-width)); */
 }
 
 /* 2. Ocultar textos y flechas */
@@ -656,6 +656,11 @@ body.toggle-sidebar .has-submenu:hover .submenu::after {
    ========================================================================== */
 @media screen and (max-width: 1024px) {
 
+    .contenido {
+        margin-left: 0;
+
+    }
+
     /* Sidebar oculto por defecto fuera de la pantalla */
     .sidebar {
         position: fixed;
@@ -764,6 +769,11 @@ body.toggle-sidebar .has-submenu:hover .submenu::after {
     .sidebar .close-menu-mobile:hover {
         background: var(--primary-color);
         color: white;
+    }
+
+
+    .logo img {
+        display: none;
     }
 
     /* Animación para los items del menú (como landing) */
