@@ -1,11 +1,264 @@
-/* ========================================= */
-/* MODAL DETALLE DE SERVICIO                 */
-/* ========================================= */
+/* ==========================================================================
+   LISTAR SERVICIOS - Estilos específicos
+   ========================================================================== */
 
-/* 1. Cabecera del Modal */
-#modalDetalleServicio .modal-header {
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL (Igual que dashboard-proveedor)
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .col-md-8 > a.btn {
+    width: 50%;
+    margin-right: auto ;
     background: var(--primary-color);
-    color: var(--white-color);
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* Botón de reporte */
+#titulo-principal .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    transition: all 0.25s ease;
+}
+
+#titulo-principal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: transparent;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   2. TARJETAS DE SERVICIOS (Igual que dashboard-proveedor)
+   ========================================================================== */
+#cards-servicios {
+    margin-top: 20px;
+}
+
+.card-servicio {
+    background-color: var(--white-color);
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.card-servicio:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.card-servicio .card-body {
+    padding: 20px;
+}
+
+/* Estados de publicación (como en dashboard-proveedor) */
+.estado-publicacion {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.estado-activa {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.estado-pendiente {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.estado-rechazada {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.estado-pausada {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: #64748b;
+}
+
+/* Badges de disponibilidad */
+.badge-disponibilidad {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-disponible {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.badge-no-disponible {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+/* Título del servicio */
+.card-servicio .card-title {
+    font-size: 1.1rem;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+/* Categoría */
+.card-servicio .text-muted i {
+    color: var(--primary-color);
+    margin-right: 4px;
+}
+
+/* Descripción */
+.card-servicio .card-text {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #64748b;
+    margin-bottom: 15px;
+}
+
+/* Meta información (fecha) */
+.card-servicio .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.card-servicio .meta-row i {
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   3. BOTONES DE ACCIÓN (Igual que dashboard-proveedor)
+   ========================================================================== */
+.card-servicio .btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1.5px solid transparent;
+}
+
+.card-servicio .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.card-servicio .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+.card-servicio .btn-outline-success {
+    border-color: #27ae60;
+    color: #27ae60;
+    background-color: transparent;
+}
+
+.card-servicio .btn-outline-success:hover {
+    background-color: #27ae60;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.card-servicio .btn-outline-danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background-color: transparent;
+}
+
+.card-servicio .btn-outline-danger:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.card-servicio .btn-outline-secondary {
+    border-color: #94a3b8;
+    color: #64748b;
+    background-color: transparent;
+}
+
+.card-servicio .btn-outline-secondary:hover {
+    background-color: #64748b;
+    border-color: #64748b;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   4. MODAL DE DETALLE (Mejorado)
+   ========================================================================== */
+#modalDetalleServicio .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+#modalDetalleServicio .modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
     border-bottom: none;
     padding: 20px 30px;
 }
@@ -14,105 +267,233 @@
     font-family: var(--font-title);
     font-weight: 600;
     font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#modalDetalleServicio .btn-close-white {
-    filter: invert(1) grayscale(100%) brightness(200%);
+#modalDetalleServicio .btn-close {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.25s ease;
 }
 
-/* 2. Banner de Imagen del Servicio */
+#modalDetalleServicio .btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Imagen banner */
 .servicio-img-wrap {
     position: relative;
     width: 100%;
-    height: 220px; /* Tamaño tipo banner */
-    border-radius: 12px;
+    height: 250px;
+    border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background-color: #f1f5f9;
+    margin-bottom: 20px;
 }
 
 #modal-servicio-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease;
 }
 
-/* Efecto sutil al pasar el mouse por la imagen */
 .servicio-img-wrap:hover #modal-servicio-img {
-    transform: scale(1.03);
+    transform: scale(1.05);
 }
 
-/* Overlay para los Badges sobre la imagen */
+/* Overlay para badges */
 .servicio-img-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    padding: 15px;
-    /* Degradado oscuro arriba para que resalten los badges */
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%);
+    padding: 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .servicio-img-overlay .badge {
+    padding: 8px 16px;
     font-size: 0.85rem;
-    padding: 8px 12px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    backdrop-filter: blur(4px); /* Toque moderno */
+    font-weight: 600;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px);
 }
 
-/* 3. Título e ID del Servicio */
+/* Nombre del servicio en modal */
 #modal-servicio-nombre {
-    font-family: var(--font-title);
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--dark-color);
-    font-size: 1.5rem;
+    line-height: 1.2;
 }
 
 #modal-servicio-id {
-    color: #64748b; 
-    letter-spacing: 0.5px;
+    color: #64748b;
     font-size: 0.85rem;
     background-color: #f1f5f9;
     padding: 4px 12px;
     border-radius: 20px;
     display: inline-block;
-    margin-top: 5px;
 }
 
-/* 4. Tarjetas de Información (Gris claro) */
+/* Tarjetas de información */
 #modalDetalleServicio .bg-light {
     background-color: #f8fafc !important;
     border: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.25s ease;
+    height: 100%;
 }
 
 #modalDetalleServicio .bg-light:hover {
-    background-color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background-color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     transform: translateY(-2px);
 }
 
 #modalDetalleServicio h6.text-primary {
     color: var(--primary-color) !important;
+    font-weight: 700;
+    font-size: 1rem;
     border-bottom: 1px solid #e2e8f0;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
 }
 
-/* 5. Loader (Círculo de carga) */
+/* Loader */
 #loader-detalle-servicio {
-    min-height: 250px;
+    min-height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Ajustes de texto interno en tarjetas */
-#modal-servicio-categoria {
-    font-weight: 500;
-    color: var(--dark-color) !important;
+.spinner-border.text-primary {
+    color: var(--primary-color) !important;
+    width: 3rem;
+    height: 3rem;
 }
 
-#modal-servicio-descripcion {
-    line-height: 1.6;
+/* ==========================================================================
+   5. EMPTY STATE (Cuando no hay servicios)
+   ========================================================================== */
+.empty-state {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 60px 30px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--text-muted);
     font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE (Igual que dashboard-proveedor)
+   ========================================================================== */
+
+/* Tablet Landscape */
+@media screen and (max-width: 1200px) {
+    #cards-servicios .row {
+        --bs-gutter-y: 20px;
+    }
+}
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    #cards-servicios .row {
+        --bs-gutter-x: 15px;
+        --bs-gutter-y: 15px;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #titulo-principal div {
+        width: 100%;
+    }
+    
+    #titulo-principal .text-muted {
+        max-width: 100%;
+    }
+    
+    #titulo-principal .btn-primary {
+        width: 100%;
+    }
+    
+    .breadcrumb {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .card-servicio .card-footer .d-flex {
+        flex-direction: column;
+    }
+    
+    .card-servicio .btn {
+        width: 100%;
+    }
+    
+    /* Modal en móvil */
+    .servicio-img-wrap {
+        height: 180px;
+    }
+    
+    #modal-servicio-nombre {
+        font-size: 1.4rem;
+    }
+    
+    #modalDetalleServicio .bg-light {
+        padding: 15px;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .card-servicio .card-body {
+        padding: 15px;
+    }
+    
+    .servicio-img-wrap {
+        height: 150px;
+    }
+    
+    .servicio-img-overlay {
+        padding: 12px;
+    }
+    
+    .servicio-img-overlay .badge {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+    }
+    
+    #modal-servicio-nombre {
+        font-size: 1.2rem;
+    }
 }
