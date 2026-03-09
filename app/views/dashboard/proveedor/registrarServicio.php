@@ -34,16 +34,17 @@ $categorias = $categoriaModel->mostrar();
         ?>
 
 
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
+        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap mb-4">
             <div>
-                <h1 class="mb-1">Registrar Servicio</h1>
-                <p class="text-muted mb-0">
-                    Registra tu nuevo servicio para que sea visible en la plataforma bueno.
+                <h1 class="mb-2">Registrar Servicio</h1>
+                <p class="text-muted mb-0" style="max-width: 600px;">
+                    Registra tu nuevo servicio para que sea visible en la plataforma.
+                    Completa todos los campos obligatorios para que los clientes puedan encontrarte fácilmente.
                 </p>
             </div>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
+                <ol id="breadcrumb" class="breadcrumb mb-0 mt-2 mt-md-0"></ol>
             </nav>
         </section>
 

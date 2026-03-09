@@ -1,0 +1,1507 @@
+/* ==========================================================================
+   SOLICITUDES - Estilos específicos
+   Basado en listar-servicio.css y dashboard-proveedor.css
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL
+   ========================================================================== */
+#titulo-principal {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #9e9e9e;
+  padding-bottom: 15px;
+}
+
+#titulo-principal h1 {
+  font-size: var(--fs-title1);
+  font-weight: 700;
+  color: var(--dark-color);
+  font-family: var(--font-title);
+  margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+/* Breadcrumb (si aplica) */
+.breadcrumb {
+  background: transparent;
+  padding: 0.5rem 0;
+}
+
+.breadcrumb-item a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.breadcrumb-item a:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   2. FILTROS - VERSIÓN MÁS COMPACTA
+   ========================================================================== */
+.filtros-container {
+  background-color: var(--white-color);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  /* Reducido de 1.5rem a 1rem */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  /* Reducido de 2rem a 1.5rem */
+}
+
+/* Hacer los selects más compactos */
+.filtros-container .form-control,
+.filtros-container .form-select {
+  padding: 0.4rem 0.8rem;
+  /* Reducido de 0.6rem a 0.4rem */
+  font-size: 0.9rem;
+  /* Reducido de 0.95rem a 0.9rem */
+  height: auto;
+  min-height: 38px;
+}
+
+/* Input group más compacto */
+.filtros-container .input-group-text {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
+}
+
+/* Botón más compacto */
+.filtros-container .btn-primary {
+  padding: 0.4rem 1rem;
+  /* Reducido */
+  font-size: 0.9rem;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+
+}
+
+/* Reducir gap entre columnas */
+.filtros-container .row {
+  --bs-gutter-x: 1rem;
+  /* Reducido de 1.5rem */
+  --bs-gutter-y: 0.5rem;
+}
+
+
+.tarjeta-estadistica {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.25s ease;
+}
+
+.tarjeta-estadistica:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* ==========================================================================
+   3. TABS (Nuevas, En proceso, Completadas)
+   ========================================================================== */
+.nav-tabs {
+  border-bottom: 1px solid #e2e8f0;
+  gap: 5px;
+}
+
+.nav-tabs .nav-link {
+  border: 1px solid transparent;
+  border-radius: 8px 8px 0 0;
+  color: #64748b;
+  font-weight: 600;
+  padding: 10px 20px;
+  transition: all 0.25s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--primary-color);
+  background-color: #f8fafc;
+  border-color: #e2e8f0 #e2e8f0 transparent #e2e8f0;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  background: white;
+  border-color: #e2e8f0 #e2e8f0 white #e2e8f0;
+  font-weight: 700;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.nav-tabs .badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 6px;
+  padding: 4px 8px;
+}
+
+/* ==========================================================================
+   4. TAB CONTENT
+   ========================================================================== */
+.tab-content {
+  background-color: var(--white-color);
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   5. CARDS DE SOLICITUDES (Igual que servicios/publicaciones)
+   ========================================================================== */
+#cards-solicitudes {
+  margin-top: 1rem;
+}
+
+#cards-solicitudes .card {
+  background-color: var(--white-color);
+  border-radius: 12px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+#cards-solicitudes .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  border-color: var(--primary-color) !important;
+}
+
+#cards-solicitudes .card-body {
+  padding: 20px;
+}
+
+/* Badges de estado (igual que en servicios) */
+#cards-solicitudes .badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.bg-warning {
+  background-color: rgba(243, 156, 18, 0.1) !important;
+  color: #f39c12;
+}
+
+.bg-primary {
+  background-color: rgba(0, 102, 255, 0.1) !important;
+  color: var(--primary-color);
+}
+
+.bg-primary-detalle {
+  background-color: var(--primary-color) !important;
+  color: var(--primary-color);
+}
+
+.bg-success {
+  background-color: rgba(39, 174, 96, 0.1) !important;
+  color: #27ae60;
+}
+
+.bg-danger {
+  background-color: rgba(231, 76, 60, 0.1) !important;
+  color: #e74c3c;
+}
+
+.bg-secondary {
+  background-color: rgba(100, 116, 139, 0.1) !important;
+  color: #64748b;
+}
+
+/* Título de la solicitud */
+#cards-solicitudes .card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+/* Información de cliente y contacto */
+#cards-solicitudes .text-muted i {
+  color: var(--primary-color);
+  margin-right: 4px;
+  font-size: 0.8rem;
+}
+
+#cards-solicitudes .text-muted small {
+  font-size: 0.85rem;
+}
+
+/* Meta información (fecha, etc) */
+#cards-solicitudes .meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+#cards-solicitudes .meta-row i {
+  color: var(--primary-color);
+}
+
+/* ==========================================================================
+   6. BOTONES DE ACCIÓN (Igual que servicios)
+   ========================================================================== */
+#cards-solicitudes .btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 1.5px solid transparent;
+}
+
+#cards-solicitudes .btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background-color: transparent;
+}
+
+#cards-solicitudes .btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+#cards-solicitudes .btn-outline-success {
+  border-color: #27ae60;
+  color: #27ae60;
+  background-color: transparent;
+}
+
+#cards-solicitudes .btn-outline-success:hover {
+  background-color: #27ae60;
+  color: white;
+  transform: translateY(-2px);
+}
+
+#cards-solicitudes .btn-outline-danger {
+  border-color: #e74c3c;
+  color: #e74c3c;
+  background-color: transparent;
+}
+
+#cards-solicitudes .btn-outline-danger:hover {
+  background-color: #e74c3c;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   7. MODAL DE DETALLE (Igual que servicios)
+   ========================================================================== */
+#modalDetalleSolicitud .modal-content {
+  border-radius: 20px;
+  overflow: hidden;
+  border: none;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+#modalDetalleSolicitud .modal-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+  color: white;
+  border-bottom: none;
+  padding: 15px 20px;
+}
+
+#modalDetalleSolicitud .modal-title {
+  font-family: var(--font-title);
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#modalDetalleSolicitud .btn-close-white {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  padding: 8px;
+  opacity: 1;
+  transition: all 0.25s ease;
+}
+
+#modalDetalleSolicitud .btn-close-white:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: rotate(90deg);
+}
+
+#modalDetalleSolicitud .modal-body {
+  padding: 20px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+#modalDetalleSolicitud .bg-light {
+  background-color: #f8fafc !important;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.25s ease;
+}
+
+#modalDetalleSolicitud .bg-light:hover {
+  background-color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+#modalDetalleSolicitud h6.text-primary {
+  color: var(--primary-color) !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   8. EMPTY STATE
+   ========================================================================== */
+.empty-state {
+  background-color: var(--white-color);
+  border-radius: 12px;
+  padding: 60px 30px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state h5 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  margin-bottom: 10px;
+}
+
+.empty-state p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.empty-state a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.empty-state a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   9. OFFCANVAS DE SEGUIMIENTO
+   ========================================================================== */
+.offcanvas {
+  border-radius: 20px 0 0 20px;
+  border: none;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+}
+
+.offcanvas-header {
+  background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+  color: white;
+  padding: 20px;
+}
+
+.offcanvas-header h5 {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.offcanvas-header small {
+  opacity: 0.9;
+  font-size: 0.85rem;
+}
+
+.offcanvas-body {
+  padding: 0;
+}
+
+.offcanvas .nav-tabs {
+  background: white;
+  padding: 15px 15px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.offcanvas .nav-tabs .nav-link {
+  padding: 10px 15px;
+  font-size: 0.9rem;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding: 20px 0;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 20px;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 28px;
+  bottom: -20px;
+  width: 2px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-content {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.25s ease;
+}
+
+.timeline-content:hover {
+  transform: translateX(5px);
+  border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   EN PROCESO - Estilos específicos
+   Basado en el diseño de nuevas solicitudes
+   ========================================================================== */
+
+/* ==========================================================================
+   1. ESTADÍSTICAS (Igual que nuevas)
+   ========================================================================== */
+#estadisticas-proceso {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin: 20px 0 30px;
+}
+
+#estadisticas-proceso .tarjeta-estadistica {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 20px 18px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    min-height: 100px;
+}
+
+#estadisticas-proceso .tarjeta-estadistica:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#estadisticas-proceso .icono-stat {
+    font-size: 36px;
+    color: var(--primary-color);
+    background-color: rgba(0, 102, 255, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+#estadisticas-proceso .stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#estadisticas-proceso .stat-numero {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    line-height: 1;
+}
+
+#estadisticas-proceso .stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   2. FILTROS (Estilo oportunidades)
+   ========================================================================== */
+#filtros-proceso {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+#filtros-proceso .contenedor-filtros {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+#filtros-proceso .grupo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#filtros-proceso .grupo-filtro label {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+}
+
+#filtros-proceso .grupo-filtro select {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+    min-height: 38px;
+    min-width: 180px;
+}
+
+#filtros-proceso .grupo-filtro select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: white;
+}
+
+/* ==========================================================================
+   3. LISTA DE PROCESOS
+   ========================================================================== */
+#lista-procesos {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 22px;
+}
+
+/* ==========================================================================
+   4. TARJETA DE PROCESO
+   ========================================================================== */
+.tarjeta-proceso {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.tarjeta-proceso:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   5. HEADER DE LA TARJETA
+   ========================================================================== */
+.tarjeta-proceso .proceso-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 20px 10px;
+    gap: 15px;
+}
+
+.tarjeta-proceso .proceso-titulo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.tarjeta-proceso .proceso-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Badge categoría (igual que en nuevas) */
+.tarjeta-proceso .badge-categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    color: white;
+    background-color: #6b7280;
+}
+
+.tarjeta-proceso .proceso-fecha {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-proceso .proceso-fecha i {
+    color: var(--primary-color);
+}
+
+/* Badge de estado/prioridad */
+.tarjeta-proceso .badge-prioridad {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-block;
+}
+
+/* Clases de estado (igual que en nuevas) */
+.tarjeta-proceso .media {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.tarjeta-proceso .alta {
+    background-color: rgba(0, 102, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.tarjeta-proceso .completado {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+/* ==========================================================================
+   6. INFORMACIÓN DEL CLIENTE
+   ========================================================================== */
+.tarjeta-proceso .proceso-cliente {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tarjeta-proceso .cliente-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    flex-shrink: 0;
+}
+
+.tarjeta-proceso .cliente-info {
+    flex: 1;
+}
+
+.tarjeta-proceso .cliente-nombre {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+.tarjeta-proceso .cliente-contacto {
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-proceso .cliente-contacto i {
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   7. PROGRESO DEL SERVICIO
+   ========================================================================== */
+.tarjeta-proceso .proceso-progreso {
+    padding: 15px 20px 10px;
+}
+
+.tarjeta-proceso .progreso-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.tarjeta-proceso .progreso-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.tarjeta-proceso .progreso-porcentaje {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.tarjeta-proceso .barra-progreso {
+    width: 100%;
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.tarjeta-proceso .barra-progreso-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #60a5fa);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+/* ==========================================================================
+   8. BOTONES DE ACCIÓN
+   ========================================================================== */
+.tarjeta-proceso .proceso-acciones {
+    padding: 20px;
+    border-top: 2px solid #f1f5f9;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tarjeta-proceso .btn-accion {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    flex: 1;
+    min-width: 120px;
+}
+
+/* Botón actualizar (igual que btn-outline-primary) */
+.tarjeta-proceso .btn-actualizar {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.tarjeta-proceso .btn-actualizar:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+/* Botón contactar (igual que btn-outline-success) */
+.tarjeta-proceso .btn-contactar {
+    border-color: #27ae60;
+    color: #27ae60;
+    background-color: transparent;
+}
+
+.tarjeta-proceso .btn-contactar:hover {
+    background-color: #27ae60;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   9. RESPONSIVE (Igual que nuevas)
+   ========================================================================== */
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    #estadisticas-proceso {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #lista-procesos {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .tarjeta-proceso .proceso-acciones {
+        flex-direction: column;
+    }
+
+    .tarjeta-proceso .btn-accion {
+        width: 100%;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #estadisticas-proceso {
+        grid-template-columns: 1fr;
+    }
+
+    #lista-procesos {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .tarjeta-proceso .proceso-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tarjeta-proceso .cliente-avatar {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .tarjeta-proceso .proceso-header,
+    .tarjeta-proceso .proceso-cliente,
+    .tarjeta-proceso .proceso-progreso {
+        padding: 15px;
+    }
+
+    .tarjeta-proceso .proceso-acciones {
+        padding: 15px;
+    }
+}
+
+/* ==========================================================================
+   COMPLETADAS - Estilos específicos
+   Basado en el diseño de nuevas y en proceso
+   ========================================================================== */
+
+/* ==========================================================================
+   1. ESTADÍSTICAS (Igual que nuevas y en proceso)
+   ========================================================================== */
+#estadisticas-completadas {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 20px 0 30px;
+}
+
+#estadisticas-completadas .tarjeta-estadistica {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 20px 18px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    min-height: 100px;
+}
+
+#estadisticas-completadas .tarjeta-estadistica:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#estadisticas-completadas .icono-estadistica {
+    font-size: 36px;
+    color: var(--primary-color);
+    background-color: rgba(0, 102, 255, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+#estadisticas-completadas .stat-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#estadisticas-completadas .stat-numero {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    line-height: 1;
+}
+
+#estadisticas-completadas .stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   2. FILTROS (Estilo oportunidades)
+   ========================================================================== */
+#filtros-completadas {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+#filtros-completadas .contenedor-filtros {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+#filtros-completadas .grupo-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#filtros-completadas .grupo-filtro label {
+    font-size: 14px;
+    color: #374151;
+    font-weight: 600;
+}
+
+#filtros-completadas .grupo-filtro select,
+#filtros-completadas .grupo-filtro input {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+    min-height: 38px;
+    min-width: 180px;
+}
+
+#filtros-completadas .grupo-filtro select:focus,
+#filtros-completadas .grupo-filtro input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: white;
+}
+
+#filtros-completadas .busqueda-filtro input {
+    min-width: 250px;
+}
+
+/* ==========================================================================
+   3. LISTA DE COMPLETADAS
+   ========================================================================== */
+#lista-completadas,
+.grid-completadas {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 22px;
+}
+
+/* ==========================================================================
+   4. TARJETA DE COMPLETADA
+   ========================================================================== */
+.tarjeta-completada {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.tarjeta-completada:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   5. HEADER DE LA TARJETA
+   ========================================================================== */
+.tarjeta-completada .completada-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 20px 10px;
+    gap: 15px;
+}
+
+.tarjeta-completada .completada-titulo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.tarjeta-completada .completada-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Badge categoría (igual que en proceso) */
+.tarjeta-completada .badge-categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-size: 13px;
+    color: white;
+    background-color: #6b7280;
+}
+
+.tarjeta-completada .completada-fecha {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-completada .completada-fecha i {
+    color: var(--primary-color);
+}
+
+/* Badge de estado completado */
+.tarjeta-completada .badge-completado {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.tarjeta-completada .badge-completado.bg-success {
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    color: #27ae60;
+}
+
+/* ==========================================================================
+   6. INFORMACIÓN DEL CLIENTE
+   ========================================================================== */
+.tarjeta-completada .completada-cliente {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tarjeta-completada .cliente-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    flex-shrink: 0;
+}
+
+.tarjeta-completada .cliente-info {
+    flex: 1;
+}
+
+.tarjeta-completada .cliente-nombre {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 5px;
+}
+
+.tarjeta-completada .cliente-contacto {
+    font-size: 14px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tarjeta-completada .cliente-contacto i {
+    color: var(--primary-color);
+}
+
+/* ==========================================================================
+   7. DETALLES DEL SERVICIO
+   ========================================================================== */
+.tarjeta-completada .completada-detalles {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 15px 20px;
+}
+
+.tarjeta-completada .detalle-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tarjeta-completada .detalle-item i {
+    font-size: 20px;
+    color: var(--primary-color);
+}
+
+.tarjeta-completada .detalle-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-completada .detalle-label {
+    font-size: 13px;
+    color: #777;
+}
+
+.tarjeta-completada .detalle-valor {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+/* ==========================================================================
+   8. CALIFICACIÓN
+   ========================================================================== */
+.tarjeta-completada .completada-calificacion {
+    padding: 15px 20px;
+    background-color: #fafafa;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tarjeta-completada .calificacion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.tarjeta-completada .calificacion-titulo {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.tarjeta-completada .estrellas {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.tarjeta-completada .estrellas i {
+    color: #f1c40f;
+    font-size: 16px;
+}
+
+.tarjeta-completada .calificacion-numero {
+    margin-left: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--dark-color);
+}
+
+.tarjeta-completada .calificacion-comentario {
+    font-size: 14px;
+    color: #555;
+    font-style: italic;
+    line-height: 1.5;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #e2e8f0;
+}
+
+/* ==========================================================================
+   9. BOTONES DE ACCIÓN
+   ========================================================================== */
+.tarjeta-completada .completada-acciones {
+    padding: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.tarjeta-completada .btn-accion {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1.5px solid transparent;
+    cursor: pointer;
+    flex: 1;
+    min-width: 100px;
+}
+
+/* Botón ver detalles (igual que btn-outline-primary) */
+.tarjeta-completada .btn-ver-detalles {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.tarjeta-completada .btn-ver-detalles:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+/* Botón descargar (estilo especial azul) */
+.tarjeta-completada .btn-descargar {
+    background-color: #0984e3;
+    color: white;
+    border: none;
+}
+
+.tarjeta-completada .btn-descargar:hover {
+    background-color: #076bb6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
+}
+
+/* Botón contactar (igual que btn-outline-success) */
+.tarjeta-completada .btn-contactar {
+    border-color: #27ae60;
+    color: #27ae60;
+    background-color: transparent;
+}
+
+.tarjeta-completada .btn-contactar:hover {
+    background-color: #27ae60;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   10. RESPONSIVE (Igual que nuevas y en proceso)
+   ========================================================================== */
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    #estadisticas-completadas {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #lista-completadas,
+    .grid-completadas {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+    }
+
+    .tarjeta-completada .completada-acciones {
+        flex-direction: column;
+    }
+
+    .tarjeta-completada .btn-accion {
+        width: 100%;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #estadisticas-completadas {
+        grid-template-columns: 1fr;
+    }
+
+    #lista-completadas,
+    .grid-completadas {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .tarjeta-completada .completada-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tarjeta-completada .completada-detalles {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .tarjeta-completada .cliente-avatar {
+        width: 45px;
+        height: 45px;
+    }
+
+    .tarjeta-completada .calificacion-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .tarjeta-completada .completada-header,
+    .tarjeta-completada .completada-cliente,
+    .tarjeta-completada .completada-detalles,
+    .tarjeta-completada .completada-calificacion {
+        padding: 15px;
+    }
+
+    .tarjeta-completada .completada-acciones {
+        padding: 15px;
+    }
+}
+
+/* ==========================================================================
+   10. RESPONSIVE (Igual que servicios/publicaciones)
+   ========================================================================== */
+
+/* Tablet Landscape */
+@media screen and (max-width: 1200px) {
+  #cards-solicitudes .row {
+    --bs-gutter-y: 20px;
+  }
+}
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+  #cards-solicitudes .row {
+    --bs-gutter-x: 15px;
+    --bs-gutter-y: 15px;
+  }
+
+
+  .filtros-container .col-md-3,
+  .filtros-container .col-md-2 {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .filtros-container .col-md-3 {
+    min-width: 140px;
+  }
+
+  .filtros-container .col-md-2 {
+    min-width: 120px;
+  }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+  #titulo-principal {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  #titulo-principal div {
+    width: 100%;
+  }
+
+  #titulo-principal .text-muted {
+    max-width: 100%;
+  }
+
+  .breadcrumb {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .filtros-container {
+    padding: 1rem;
+  }
+
+  .nav-tabs {
+    flex-wrap: wrap;
+  }
+
+  .nav-tabs .nav-link {
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+  }
+
+  #cards-solicitudes .card-footer .d-flex {
+    flex-direction: column;
+  }
+
+  #cards-solicitudes .btn {
+    width: 100%;
+  }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+  #cards-solicitudes .card-body {
+    padding: 15px;
+  }
+
+  .empty-state {
+    padding: 40px 20px;
+  }
+}

@@ -348,61 +348,7 @@
     font-style: italic;
 }
 
-/* ==========================================================================
-   MENÚ HAMBURGUESA - SISTEMA COMPLETO
-   ========================================================================== */
 
-/* Botón hamburguesa - visible solo en móvil/tablet */
-#btn-toggle-menu {
-    display: none; /* Oculto por defecto en desktop */
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    z-index: 1001;
-    padding: 0;
-}
-
-#btn-toggle-menu i {
-    font-size: 24px;
-    transition: transform 0.3s ease;
-}
-
-#btn-toggle-menu:hover {
-    background: var(--primary-hover);
-    transform: scale(1.05);
-}
-
-#btn-toggle-menu.active i {
-    transform: rotate(90deg);
-}
-
-/* Overlay para cuando el menú está abierto */
-.menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(2px);
-}
-
-.menu-overlay.active {
-    display: block;
-    opacity: 1;
-}
 
 /* ==========================================================================
    RESPONSIVE - MEDIA QUERIES
@@ -465,10 +411,7 @@
         gap: 12px;
     }
 
-    /* Ocultar texto del usuario en móvil */
-    .d-none.d-md-block {
-        display: none !important;
-    }
+
 
     .usuario img {
         width: 40px;

@@ -34,9 +34,22 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
         ?>
 
         <!-- Secciones -->
-        <!-- titulo -->
+        <!-- titulo con breadcrumb y explicación -->
         <section id="titulo-principal">
-            <h1>Panel de Proveedor</h1>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>Panel de Proveedor</h1>
+                    <p class="text-muted mb-0">
+                        Bienvenido a tu panel de control. Aquí puedes gestionar tus servicios, revisar solicitudes,
+                        dar seguimiento a tus ingresos y mantener actualizada tu información profesional.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <!-- Tarjetas de estadísticas principales -->

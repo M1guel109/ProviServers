@@ -16,11 +16,11 @@
     --dark-color: #0E1116;
     --white-color: #FFFFFF;
     --bg-body: #f5f7fb;
-    
+
     /* Tipografías */
     --font-title: 'Roboto', sans-serif;
     --font-text: 'Poppins', sans-serif;
-    
+
     /* Tamaños */
     --fs-title1: 42px;
     --fs-title2: 32px;
@@ -28,7 +28,7 @@
     --fs-title4: 18px;
     --fs-text: 16px;
     --fs-small: 14px;
-    
+
     /* Layout */
     --sidebar-width: 300px;
     --sidebar-collapsed-width: 80px;
@@ -38,7 +38,11 @@
 /* ==========================================================================
    3. RESET Y BASES
    ========================================================================== */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: var(--font-text);
@@ -49,9 +53,24 @@ body {
     overflow-x: hidden;
 }
 
-h1, h2, h3, h4, h5, h6 { font-family: var(--font-title); }
-a { text-decoration: none; color: inherit; transition: 0.25s ease; }
-ul { list-style: none; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-title);
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: 0.25s ease;
+}
+
+ul {
+    list-style: none;
+}
 
 /* ==========================================================================
    4. LAYOUT PRINCIPAL (Sidebar + Header + Main)
@@ -60,7 +79,9 @@ ul { list-style: none; }
 /* --- SIDEBAR --- */
 .sidebar {
     position: fixed;
-    top: 0; left: 0; bottom: 0;
+    top: 0;
+    left: 0;
+    bottom: 0;
     width: var(--sidebar-width);
     background: var(--white-color);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -81,21 +102,30 @@ ul { list-style: none; }
 /* Logo */
 .logo {
     padding: 20px;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
     align-items: center;
 }
-.logo img { max-width: 100%; height: auto; }
-.logo-favicon { display: none; }
 
-/* Menú Principal */
-.menu-principal { 
-    padding: 0 15px 0 0 ; flex: 1; 
+.logo img {
+    max-width: 100%;
+    height: auto;
 }
 
-.menu-principal a, .menu-link {
+.logo-favicon {
+    display: none;
+}
+
+/* Menú Principal */
+.menu-principal {
+    padding: 0 15px 0 0;
+    flex: 1;
+}
+
+.menu-principal a,
+.menu-link {
     display: flex;
     align-items: center;
     padding: 12px 15px;
@@ -109,15 +139,19 @@ ul { list-style: none; }
     justify-content: flex-start;
 }
 
-.menu-principal a i, .menu-link i {
+.menu-principal a i,
+.menu-link i {
     margin-right: 12px;
     font-size: 1.2rem;
-    min-width: 24px; /* Para alinear íconos */
+    min-width: 24px;
+    /* Para alinear íconos */
     text-align: center;
 }
 
 /* Hover y Activo */
-.menu-principal a:hover, .menu-link:hover, .submenu-link:hover {
+.menu-principal a:hover,
+.menu-link:hover,
+.submenu-link:hover {
     background-color: var(--primary-color);
     color: var(--white-color);
     transform: translateX(5px);
@@ -135,7 +169,8 @@ ul { list-style: none; }
 .menu-principal a.active::before {
     content: "";
     position: absolute;
-    left: -30px; /* Ajustado al padding del contenedor */
+    left: -30px;
+    /* Ajustado al padding del contenedor */
     top: 50%;
     transform: translateY(-50%);
     width: 5px;
@@ -147,14 +182,17 @@ ul { list-style: none; }
 /* Footer del Menú */
 .menu-footer {
     padding: 20px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
 /* --- LOGICA SUBMENÚS --- */
-.has-submenu { position: relative; }
+.has-submenu {
+    position: relative;
+}
+
 .toggle-submenu {
     position: absolute;
     right: 10px;
@@ -164,6 +202,7 @@ ul { list-style: none; }
     cursor: pointer;
     color: var(--dark-color);
 }
+
 .submenu {
     max-height: 0;
     overflow: hidden;
@@ -173,9 +212,20 @@ ul { list-style: none; }
     margin-left: 10px;
     border-left: 2px solid var(--primary-color);
 }
-.has-submenu.active .submenu { max-height: 300px; }
-.has-submenu.active .toggle-icon { transform: rotate(180deg); color: var(--primary-color); }
-.submenu li a { font-size: 0.9rem; padding: 10px 10px 10px 15px; }
+
+.has-submenu.active .submenu {
+    max-height: 300px;
+}
+
+.has-submenu.active .toggle-icon {
+    transform: rotate(180deg);
+    color: var(--primary-color);
+}
+
+.submenu li a {
+    font-size: 0.9rem;
+    padding: 10px 10px 10px 15px;
+}
 
 /* --- CONTENIDO PRINCIPAL --- */
 .contenido {
@@ -215,11 +265,12 @@ ul { list-style: none; }
 }
 
 .btn-toggle i {
-    font-size: 24px; /* Tamaño grande */
+    font-size: 24px;
+    /* Tamaño grande */
 }
 
 .btn-toggle:hover {
-    color:var(--dark-color) ;
+    color: var(--dark-color);
 }
 
 /* Buscador */
@@ -232,17 +283,28 @@ ul { list-style: none; }
     width: 350px;
     border: 1px solid #e2e8f0;
 }
+
 .buscador:focus-within {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
 }
+
 .buscador input {
-    border: none; background: transparent; outline: none; width: 100%;
-    margin-left: 10px; font-size: var(--fs-text);
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    margin-left: 10px;
+    font-size: var(--fs-text);
 }
 
 /* Acciones Barra */
-.acciones-barra { display: flex; align-items: center; gap: 20px; }
+.acciones-barra {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
 .item-barra {
     position: relative;
     padding: 8px;
@@ -258,7 +320,7 @@ ul { list-style: none; }
     width: 320px;
     padding: 0;
     border: 1px solid #f1f5f9;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
 .notifications .dropdown-header {
@@ -287,6 +349,7 @@ ul { list-style: none; }
 .notificaciones-scroll::-webkit-scrollbar {
     width: 4px;
 }
+
 .notificaciones-scroll::-webkit-scrollbar-thumb {
     background-color: #cbd5e1;
     border-radius: 4px;
@@ -304,14 +367,15 @@ ul { list-style: none; }
 }
 
 .notification-item:hover {
-    background-color: #f1f5f9; /* Color suave al pasar mouse */
+    background-color: #f1f5f9;
+    /* Color suave al pasar mouse */
 }
 
 .notification-item:last-child {
     border-bottom: none;
 }
 
-.notification-item h4, 
+.notification-item h4,
 .notification-item h6 {
     font-size: 14px;
     font-weight: 600;
@@ -345,27 +409,32 @@ ul { list-style: none; }
 
 /* Colores de Fondo Suaves (Light) */
 .bg-primary-light {
-    background-color: rgba(13, 110, 253, 0.12); /* Azul suave */
+    background-color: rgba(13, 110, 253, 0.12);
+    /* Azul suave */
     color: #0d6efd;
 }
 
 .bg-success-light {
-    background-color: rgba(16, 185, 129, 0.12); /* Verde suave */
+    background-color: rgba(16, 185, 129, 0.12);
+    /* Verde suave */
     color: #10B981;
 }
 
 .bg-warning-light {
-    background-color: rgba(245, 158, 11, 0.12); /* Naranja suave */
+    background-color: rgba(245, 158, 11, 0.12);
+    /* Naranja suave */
     color: #d97706;
 }
 
 .bg-danger-light {
-    background-color: rgba(239, 68, 68, 0.12); /* Rojo suave */
+    background-color: rgba(239, 68, 68, 0.12);
+    /* Rojo suave */
     color: #dc2626;
 }
 
 .bg-info-light {
-    background-color: rgba(6, 182, 212, 0.12); /* Cyan suave */
+    background-color: rgba(6, 182, 212, 0.12);
+    /* Cyan suave */
     color: #0891b2;
 }
 
@@ -381,67 +450,76 @@ ul { list-style: none; }
     color: white;
     border: 2px solid white;
 }
-.item-barra:hover { background-color: #f1f5f9; }
+
+.item-barra:hover {
+    background-color: #f1f5f9;
+}
 
 /* Usuario */
-.usuario { 
-    display: flex; 
-    align-items: center; 
-    gap: 12px; 
-    text-decoration: none; 
+.usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
     color: var(--dark-color);
 }
 
 .usuario img {
-    width: 40px; 
+    width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #e2e8f0;
 }
 
-.info-usuario { 
+.info-usuario {
     /* 🔥 Usamos !important para anular el "d-md-block" de Bootstrap */
-    display: flex !important; 
-    flex-direction: column !important; /* Fuerza verticalidad */
+    display: flex !important;
+    flex-direction: column !important;
+    /* Fuerza verticalidad */
     justify-content: center;
-    line-height: 1.2; 
+    line-height: 1.2;
     text-align: left;
 }
 
-.nombre { 
-    font-weight: 600; 
+.nombre {
+    font-weight: 600;
     font-size: var(--fs-text);
-    display: block; /* Asegura que ocupe su propia línea */
+    display: block;
+    /* Asegura que ocupe su propia línea */
 }
 
-.rol { 
-    font-size: 12px; 
-    color: #64748b; 
+.rol {
+    font-size: 12px;
+    color: #64748b;
     font-weight: 500;
-    text-transform: capitalize; 
-    display: block; /* Asegura que ocupe su propia línea */
-    margin-top: 2px; /* Pequeño espacio entre nombre y rol */
+    text-transform: capitalize;
+    display: block;
+    /* Asegura que ocupe su propia línea */
+    margin-top: 2px;
+    /* Pequeño espacio entre nombre y rol */
 }
+
 /* ==========================================================================
    5. LOGICA PLEGADO (SIDEBAR COLLAPSED)
    ========================================================================== */
 
 /* 1. Ajuste de la Sidebar: ¡IMPORTANTE! */
-body.toggle-sidebar .sidebar { 
-    width: var(--sidebar-collapsed-width); 
+body.toggle-sidebar .sidebar {
+    width: var(--sidebar-collapsed-width);
     /* 🔥 VITAL: Esto permite que el submenú "salga" de la barra lateral */
-    overflow: visible !important; 
+    overflow: visible !important;
 }
 
 /* Ajustes de contenido y header */
-body.toggle-sidebar .contenido { 
-    margin-left: var(--sidebar-collapsed-width); 
-    width: calc(100% - var(--sidebar-collapsed-width)); 
-}
-body.toggle-sidebar .barra-superior { 
-    left: var(--sidebar-collapsed-width); 
+body.toggle-sidebar .contenido {
+    margin-left: var(--sidebar-collapsed-width);
     width: calc(100% - var(--sidebar-collapsed-width));
+}
+
+body.toggle-sidebar .barra-superior {
+    left: var(--sidebar-collapsed-width);
+    /* width: calc(100% - var(--sidebar-collapsed-width)); */
 }
 
 /* 2. Ocultar textos y flechas */
@@ -449,17 +527,32 @@ body.toggle-sidebar .logo-completo,
 body.toggle-sidebar .sidebar span,
 body.toggle-sidebar .menu-header,
 body.toggle-sidebar .toggle-submenu,
-body.toggle-sidebar .info-usuario { 
-    display: none !important; 
+body.toggle-sidebar .info-usuario {
+    display: none !important;
 }
 
 /* 3. Centrar íconos */
-body.toggle-sidebar .logo-favicon { display: block; margin: 0 auto; width: 40px; }
-body.toggle-sidebar .menu-principal { padding: 0 10px; }
-body.toggle-sidebar .menu-principal a, body.toggle-sidebar .menu-footer a {
-    justify-content: center; padding: 15px 0; border-radius: 8px;
+body.toggle-sidebar .logo-favicon {
+    display: block;
+    margin: 0 auto;
+    width: 40px;
 }
-body.toggle-sidebar .menu-principal a i { margin: 0; font-size: 1.5rem; }
+
+body.toggle-sidebar .menu-principal {
+    padding: 0 10px;
+}
+
+body.toggle-sidebar .menu-principal a,
+body.toggle-sidebar .menu-footer a {
+    justify-content: center;
+    padding: 15px 0;
+    border-radius: 8px;
+}
+
+body.toggle-sidebar .menu-principal a i {
+    margin: 0;
+    font-size: 1.5rem;
+}
 
 /* =========================================================
    🔥 AQUÍ ESTÁ LA MAGIA DEL SUBMENÚ FLOTANTE
@@ -467,15 +560,21 @@ body.toggle-sidebar .menu-principal a i { margin: 0; font-size: 1.5rem; }
 
 /* A. Ocultar el submenú por defecto en modo plegado */
 body.toggle-sidebar .submenu {
-    display: none; /* Se oculta */
-    position: absolute; /* Se prepara para flotar */
-    left: 100%; /* Se mueve a la derecha de la barra */
+    display: none;
+    /* Se oculta */
+    position: absolute;
+    /* Se prepara para flotar */
+    left: 100%;
+    /* Se mueve a la derecha de la barra */
     top: 0;
-    margin-left: 10px; /* Separación de la barra */
-    width: 220px; /* Ancho cómodo para leer */
+    margin-left: 10px;
+    /* Separación de la barra */
+    width: 220px;
+    /* Ancho cómodo para leer */
     background-color: var(--white-color);
     border-radius: 8px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1); /* Sombra elegante */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    /* Sombra elegante */
     border: 1px solid #eef2f6;
     padding: 10px 0;
     z-index: 999;
@@ -484,14 +583,16 @@ body.toggle-sidebar .submenu {
 /* B. Mostrar el submenú al pasar el mouse sobre el ÍCONO (li padre) */
 body.toggle-sidebar .has-submenu:hover .submenu {
     display: block !important;
-    max-height: none !important; /* Ignora la animación de altura del JS */
+    max-height: none !important;
+    /* Ignora la animación de altura del JS */
     opacity: 1;
     visibility: visible;
 }
 
 /* C. Título del submenú (Opcional: Para saber qué estás abriendo) */
 body.toggle-sidebar .has-submenu:hover .submenu::before {
-    content: attr(data-title); /* Si usaste data-title en el li */
+    content: attr(data-title);
+    /* Si usaste data-title en el li */
     display: block;
     padding: 8px 20px;
     font-weight: 700;
@@ -506,7 +607,8 @@ body.toggle-sidebar .submenu li a {
     padding: 10px 20px;
     font-size: 14px;
     color: var(--dark-color);
-    justify-content: flex-start; /* Texto a la izquierda */
+    justify-content: flex-start;
+    /* Texto a la izquierda */
     border-radius: 0;
 }
 
@@ -517,7 +619,7 @@ body.toggle-sidebar .submenu li a:hover {
 
 /* 1. QUE EL ÍCONO PADRE SE PONGA AZUL CUANDO EL HIJO ESTÁ ACTIVO */
 /* Si el li tiene la clase 'active', pintamos el enlace principal también */
-.has-submenu.active > .menu-link {
+.has-submenu.active>.menu-link {
     background-color: var(--primary-color);
     color: var(--white-color);
     box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
@@ -528,26 +630,239 @@ body.toggle-sidebar .submenu li a:hover {
 body.toggle-sidebar .has-submenu:hover .submenu::after {
     content: "";
     position: absolute;
-    top: 15px; /* Altura de la flecha */
-    left: -10px; /* La saca del cuadro hacia la izquierda */
+    top: 15px;
+    /* Altura de la flecha */
+    left: -10px;
+    /* La saca del cuadro hacia la izquierda */
     border-width: 5px;
     border-style: solid;
-    border-color: transparent var(--white-color) transparent transparent; /* Triángulo apuntando izq */
-    filter: drop-shadow(-2px 0 2px rgba(0,0,0,0.05));
+    border-color: transparent var(--white-color) transparent transparent;
+    /* Triángulo apuntando izq */
+    filter: drop-shadow(-2px 0 2px rgba(0, 0, 0, 0.05));
+}
+
+/* El botón X debe estar sobre el logo pero no taparlo */
+.sidebar .close-menu-mobile {
+    display: none;
+    /* Mayor que el logo pero no lo tapa porque está a la derecha */
 }
 
 
 /* ==========================================================================
    6. RESPONSIVIDAD
    ========================================================================== */
+/* ==========================================================================
+   6. RESPONSIVIDAD - MENÚ TIPO LANDING
+   ========================================================================== */
 @media screen and (max-width: 1024px) {
-    .sidebar { left: -280px; } /* Oculto por defecto en tablet */
-    .contenido { margin-left: 0; width: 100%; }
-    
-    /* Mostrar al activar */
-    body.toggle-sidebar .sidebar { left: 0; width: 280px; }
-    
-    .barra-superior { flex-direction: column; gap: 15px; padding: 15px; }
-    .buscador { width: 100%; }
-    .acciones-barra { width: 100%; justify-content: space-between; }
+
+    .contenido {
+        margin-left: 0;
+
+    }
+
+    /* Sidebar oculto por defecto fuera de la pantalla */
+    .sidebar {
+        position: fixed;
+        left: -100%;
+        width: 85%;
+        max-width: 320px;
+        height: 100vh;
+        background: white;
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
+        z-index: 1050;
+        padding: 20px 0;
+        overflow-y: auto;
+    }
+
+    /* Sidebar visible */
+    body.toggle-sidebar .sidebar {
+        left: 0;
+        width: 100%;
+    }
+
+    /* Overlay oscuro detrás del menú */
+    body.toggle-sidebar::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        z-index: 1040;
+        animation: fadeIn 0.3s ease;
+    }
+
+    /* Ajuste del contenido cuando el menú está abierto */
+    body.toggle-sidebar .contenido {
+        margin-left: 0;
+    }
+
+
+
+    /* El botón X debe estar sobre el logo pero no taparlo */
+    .sidebar .close-menu-mobile {
+        z-index: 10;
+        /* Mayor que el logo pero no lo tapa porque está a la derecha */
+    }
+
+
+    /* Mostrar los textos SIEMPRE (como en landing) */
+    .menu-principal a span,
+    .menu-footer a span {
+        display: inline-block !important;
+    }
+
+    /* Anulamos la lógica de plegado que oculta textos */
+    body.toggle-sidebar .sidebar span {
+        display: inline-block !important;
+    }
+
+    /* Estilo de los enlaces en móvil (igual que landing) */
+    .menu-principal a,
+    .menu-footer a {
+        justify-content: flex-start !important;
+        padding: 14px 20px !important;
+        font-size: 1rem !important;
+        width: 100%;
+        text-align: left;
+        border-radius: 0;
+    }
+
+    /* Hover effect como en landing */
+    .menu-principal a:hover,
+    .menu-footer a:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateX(5px);
+    }
+
+    /* Iconos al lado del texto */
+    .menu-principal a i,
+    .menu-footer a i {
+        margin-right: 15px !important;
+        font-size: 1.3rem !important;
+        min-width: 24px;
+    }
+
+    /* Botón cerrar (X) - visible en móvil */
+    .sidebar .close-menu-mobile {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        background: #f0f0f0;
+        border: none;
+        border-radius: 50%;
+        color: var(--dark-color);
+        font-size: 1.3rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1060;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .sidebar .close-menu-mobile:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+
+    .logo img {
+        display: none;
+    }
+
+    /* Animación para los items del menú (como landing) */
+    .menu-principal li {
+        opacity: 0;
+        transform: translateX(30px);
+        transition: all 0.4s ease;
+        transition-delay: calc(0.1s * var(--item-index, 1));
+    }
+
+    body.toggle-sidebar .menu-principal li {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    /* Asignar índices para animación escalonada */
+    .menu-principal li:nth-child(1) {
+        --item-index: 1;
+    }
+
+    .menu-principal li:nth-child(2) {
+        --item-index: 2;
+    }
+
+    .menu-principal li:nth-child(3) {
+        --item-index: 3;
+    }
+
+    .menu-principal li:nth-child(4) {
+        --item-index: 4;
+    }
+
+    .menu-principal li:nth-child(5) {
+        --item-index: 5;
+    }
+
+    .menu-principal li:nth-child(6) {
+        --item-index: 6;
+    }
+
+    .menu-principal li:nth-child(7) {
+        --item-index: 7;
+    }
+
+    .menu-principal li:nth-child(8) {
+        --item-index: 8;
+    }
+
+    .menu-principal li:nth-child(9) {
+        --item-index: 9;
+    }
+
+    .menu-principal li:nth-child(10) {
+        --item-index: 10;
+    }
+
+    .menu-principal li:nth-child(11) {
+        --item-index: 11;
+    }
+
+    .menu-principal li:nth-child(12) {
+        --item-index: 12;
+    }
+
+    .menu-principal li:nth-child(13) {
+        --item-index: 13;
+    }
+
+    .menu-principal li:nth-child(14) {
+        --item-index: 14;
+    }
+
+    /* Prevenir scroll del body cuando el menú está abierto */
+    body.toggle-sidebar {
+        overflow: hidden;
+    }
+
+    /* Ocultar elementos que no van en móvil */
+    .buscador {
+        display: none;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

@@ -1,0 +1,267 @@
+/* ==========================================================================
+   PUBLICACIONES - Estilos específicos (basado en listar-servicio.css)
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+    background: transparent;
+    padding: 0.5rem 0;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   2. TARJETAS DE PUBLICACIONES
+   ========================================================================== */
+#cards-publicaciones {
+    margin-top: 20px;
+}
+
+.card-publicacion {
+    background-color: var(--white-color);
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.card-publicacion:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border-color: var(--primary-color) !important;
+}
+
+.card-publicacion .card-body {
+    padding: 20px;
+}
+
+/* Badges de estado */
+.card-publicacion .badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Badge de precio */
+.card-publicacion .badge.bg-dark {
+    background-color: var(--dark-color) !important;
+    color: white;
+}
+
+/* Título de la publicación */
+.card-publicacion .card-title {
+    font-size: 1.1rem;
+    color: var(--dark-color);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+/* Información de servicio base y categoría */
+.card-publicacion .text-muted i {
+    color: var(--primary-color);
+    margin-right: 4px;
+    font-size: 0.8rem;
+}
+
+.card-publicacion .text-muted small {
+    font-size: 0.85rem;
+}
+
+/* Meta información (fecha) */
+.card-publicacion .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.card-publicacion .meta-row i {
+    color: var(--primary-color);
+}
+
+/* Alerta de motivo de rechazo */
+.card-publicacion .alert-danger {
+    background-color: rgba(231, 76, 60, 0.05);
+    border: 1px solid rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-top: 10px;
+}
+
+.card-publicacion .alert-danger strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* ==========================================================================
+   3. BOTONES DE ACCIÓN
+   ========================================================================== */
+.card-publicacion .btn {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    border: 1.5px solid transparent;
+}
+
+.card-publicacion .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.card-publicacion .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+.card-publicacion .btn-outline-success {
+    border-color: #27ae60;
+    color: #27ae60;
+    background-color: transparent;
+}
+
+.card-publicacion .btn-outline-success:hover {
+    background-color: #27ae60;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   4. EMPTY STATE
+   ========================================================================== */
+.empty-state {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 60px 30px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.empty-state h5 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.empty-state a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.empty-state a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   5. RESPONSIVE
+   ========================================================================== */
+
+/* Tablet Landscape */
+@media screen and (max-width: 1200px) {
+    #cards-publicaciones .row {
+        --bs-gutter-y: 20px;
+    }
+}
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    #cards-publicaciones .row {
+        --bs-gutter-x: 15px;
+        --bs-gutter-y: 15px;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #titulo-principal div {
+        width: 100%;
+    }
+    
+    #titulo-principal .text-muted {
+        max-width: 100%;
+    }
+    
+    .breadcrumb {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .card-publicacion .card-footer .d-flex {
+        flex-direction: column;
+    }
+    
+    .card-publicacion .btn {
+        width: 100%;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .card-publicacion .card-body {
+        padding: 15px;
+    }
+}

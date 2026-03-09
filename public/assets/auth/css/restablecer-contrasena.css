@@ -3,206 +3,341 @@
 /* --------------------------------------------- */
 
 :root {
-    --primary-color: #3A86FF;
+    --primary-color: #0066FF;
     --secondary-color: #8338EC;
-    --accent-color: #FF006E;
-    --light-color: #FB5607;
-    --dark-color: #2A2A2A;
+    --dark-color: #0E1116;
+    --white-color: #FFFFFF;
+    --text-muted: #6c757d;
+    --bg-light: #f8f9fa;
+    --border-color: #e2e8f0;
+}
+
+/* --------------------------------------------- */
+/* RESTABLECER CONTRASEÑA - ESTILO INDEPENDIENTE */
+/* --------------------------------------------- */
+
+/* ===== RESET BÁSICO (tomado de registro.css) ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER (copiado de registro.css) ===== */
+header {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 100;
+    background: white;
+}
+
+.header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header-logo {
+    height: 80px;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+/* ===== MAIN (copiado de registro.css) ===== */
+main {
+    flex: 1;
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    /* padding: 20px; */
+}
+
+/* ===== TUS VARIABLES ===== */
+:root {
+    --primary-color: #0066FF;
+    --secondary-color: #8338EC;
+    --dark-color: #0E1116;
+    --white-color: #FFFFFF;
+    --text-muted: #6c757d;
+    --bg-light: #f8f9fa;
+    --border-color: #e2e8f0;
+}
+
+/* ===== RESTO DE TUS ESTILOS ===== */
+/* (todo lo que ya tienes debajo) */
+
+/* CONTENEDOR PRINCIPAL - SIN ALTURA FIJA */
+.custom-container {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    height: 85vh; 
+    min-height: 0; /* Eliminamos altura mínima */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-radius: 24px;
+    overflow: hidden;
+    background-color: white;
+    margin: 20px auto; /* Centrado con margen */
 }
 
 /* CONTENEDOR PRINCIPAL */
 #reset-password {
     flex: 1;
-    padding: 50px;
-    display: flex;
+    padding: 60px 50px;
+    /* display: flex; */
     flex-direction: column;
     justify-content: center;
     animation: fadeIn 0.6s ease;
+    background: white;
 }
 
 #reset-password h1 {
-    font-size: 32px;
+    font-size: 2.2rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 0.75rem;
     color: var(--dark-color);
     text-align: center;
 }
 
 #reset-password > p {
-    color: #666;
-    margin-bottom: 30px;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
     text-align: center;
-    font-size: 15px;
+    font-size: 1rem;
 }
 
 /* -------- CAJA DE PASOS ---------- */
-
 .reset-steps {
-    margin-bottom: 35px;
-    padding: 22px;
-    background: #fefefe;
-    border-radius: 12px;
-    border-left: 4px solid var(--primary-color);
-    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
-    transition: transform 0.25s ease;
-}
-
-.reset-steps:hover {
-    transform: translateY(-4px);
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-light);
+    border-radius: 16px;
+    border-left: 5px solid var(--primary-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
 .reset-steps h3 {
-    font-size: 19px;
-    font-weight: 600;
-    margin-bottom: 12px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
     color: var(--dark-color);
 }
 
 .reset-steps ol {
-    padding-left: 20px;
-    color: #555;
+    padding-left: 1.5rem;
+    margin-bottom: 0;
+    color: var(--text-muted);
 }
 
 .reset-steps li {
-    margin-bottom: 8px;
-    line-height: 1.5;
-    font-size: 15px;
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.reset-steps li:last-child {
+    margin-bottom: 0;
 }
 
 /* -------- FORMULARIO ---------- */
-
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.95rem;
 }
 
-.form-group input,
-.form-group textarea {
+.form-group input {
     width: 100%;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    transition: 0.3s;
-    resize: none;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: var(--bg-light);
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.form-group input:focus {
     border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+    box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1);
+    background-color: white;
 }
 
 /* -------- BOTÓN ---------- */
-
 .btn-reset {
     background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-size: 16px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.3s ease;
+    transition: all 0.3s ease;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 0.5rem;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
 }
 
 .btn-reset:hover {
     background: linear-gradient(135deg, var(--dark-color), var(--primary-color));
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
-}
-
-/* -------- MENSAJES ---------- */
-
-.success-message,
-.error-message {
-    display: none;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-size: 15px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.success-message {
-    background: #d3f6e4;
-    color: #117a43;
-    border: 1px solid #95e3c3;
-}
-
-.error-message {
-    background: #fde2e2;
-    color: #a8272c;
-    border: 1px solid #f4b5b5;
-}
-
-.success-message i,
-.error-message i {
-    font-size: 18px;
-}
-
-/* -------- LOADING ---------- */
-
-.loading {
-    display: none;
-    text-align: center;
-    margin: 15px 0;
-}
-
-.loading-spinner {
-    border: 3px solid #eee;
-    border-top: 3px solid var(--primary-color);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    margin: auto;
-    animation: spin 1s linear infinite;
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
 }
 
 /* -------- LINK VOLVER ---------- */
-
 .back-to-login {
     text-align: center;
-    font-size: 14px;
-    margin-top: 20px;
+    font-size: 0.95rem;
+    margin-top: 2rem;
 }
 
 .back-to-login a {
     color: var(--primary-color);
-    font-weight: 600;
+    font-weight: 500;
     text-decoration: none;
-    transition: 0.25s;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .back-to-login a:hover {
-    color: var(--secondary-color);
+    color: var(--dark-color);
     text-decoration: underline;
 }
 
+.back-to-login a i {
+    font-size: 0.9rem;
+    transition: transform 0.3s ease;
+}
+
+.back-to-login a:hover i {
+    transform: translateX(-3px);
+}
+
+/* -------- SECCIÓN DERECHA (IGUAL AL LOGIN) ---------- */
+.info-section {
+    flex: 1;
+    position: relative;
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.info-card {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: white;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.info-card h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 0.5rem; /* REDUCE EL ESPACIO DEBAJO DEL TEXTO */
+    margin-top: 200px; /* AJUSTE FINO PARA SUBIR O BAJAR MÁS EL TEXTO */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    margin-left: -230px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.image-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 20px;
+    margin-top: -200px; /* ACERCA LA IMAGEN AL TEXTO */
+}
+
+.info-image {
+    max-width: 80%;
+    height: auto;
+    filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.3));
+    animation: float 3s ease-in-out infinite;
+    margin-right: -10px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
 /* -------- ANIMACIONES ---------- */
-
 @keyframes fadeIn {
-    0% { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-@keyframes spin {
-    100% { transform: rotate(360deg); }
+/* -------- RESPONSIVE (SIN SCROLL) ---------- */
+@media (max-width: 992px) {
+    .custom-container {
+        flex-direction: column;
+        min-height: auto;
+        height: auto;
+    }
+    
+    .info-section {
+        display: none; /* Se oculta en tablet/móvil como en login */
+    }
+    
+    #reset-password {
+        padding: 50px 40px;
+        min-height: auto;
+    }
 }
 
-/* -------- RESPONSIVE ---------- */
+@media (max-width: 768px) {
+    #reset-password {
+        padding: 40px 30px;
+    }
+    
+    #reset-password h1 {
+        font-size: 2rem;
+    }
+}
 
 @media (max-width: 576px) {
     #reset-password {
@@ -210,18 +345,18 @@
     }
 
     #reset-password h1 {
-        font-size: 28px;
+        font-size: 1.8rem;
     }
 
     .reset-steps {
-        padding: 18px;
+        padding: 1.2rem;
     }
 
     .reset-steps h3 {
-        font-size: 17px;
+        font-size: 1rem;
     }
 
     .reset-steps li {
-        font-size: 14px;
+        font-size: 0.9rem;
     }
 }

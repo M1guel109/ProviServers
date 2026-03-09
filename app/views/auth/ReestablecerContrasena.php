@@ -11,13 +11,18 @@
 
     <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/login.css">
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/registro.css"> -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/restablecer-contrasena.css">
 </head>
 
 <body>
     <header>
-        <!-- Navbar / Logo / hero -->
+        <div class="header-container">
+            <a href="<?= BASE_URL ?>/">
+                <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Proviservers - Plataforma de servicios locales"
+                    class="header-logo">
+            </a>
+        </div>
     </header>
 
     <main>

@@ -8,6 +8,11 @@ $isActive = function (string $path) use ($currentPath): string {
 ?>
 
 <aside class="sidebar">
+
+    <!-- Botón cerrar para móvil -->
+    <button class="close-menu-mobile" id="closeMenuMobile">
+        <i class="bi bi-x"></i>
+    </button>
     <div class="logo">
         <a href="#">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/LOGO PRINCIPAL.png" alt="Logo Proviservers" class="logo-completo">
@@ -82,7 +87,7 @@ $isActive = function (string $path) use ($currentPath): string {
                 </a>
             </li>
 
-            <li><a href="<?= BASE_URL ?>/proveedor/calendarioProveedor" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
+            <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
             <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
             <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
             <li>

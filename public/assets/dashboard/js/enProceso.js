@@ -1,14 +1,15 @@
 /* ======================================================
    enProceso.js - Lógica para el Panel de Seguimiento
+   (Versión con MODAL centrado)
 ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Script de Seguimiento (En Proceso) cargado.");
 
-    // Escuchar el envío del formulario de nuevo avance
-    const formSeguimiento = document.getElementById('formSeguimiento');
-    if (formSeguimiento) {
-        formSeguimiento.addEventListener('submit', function (e) {
+    // Escuchar el envío del formulario de nuevo avance (versión modal)
+    const formSeguimientoModal = document.getElementById('formSeguimientoModal');
+    if (formSeguimientoModal) {
+        formSeguimientoModal.addEventListener('submit', function (e) {
             e.preventDefault();
             guardarNuevoAvance(this);
         });
@@ -16,44 +17,66 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * Función para abrir el panel lateral de seguimiento
+ * Función para abrir el modal centrado de seguimiento
  * Se llama desde el HTML: onclick="abrirSeguimiento(id, nombre, estado, cliente)"
  */
 window.abrirSeguimiento = function(idContrato, nombreServicio, estadoActual, nombreCliente) {
+    console.log('abrirSeguimiento llamado', {idContrato, nombreServicio, estadoActual, nombreCliente});
+    
     if (!idContrato || idContrato === 0) {
         Swal.fire('Error', 'No se encontró el ID del contrato.', 'error');
         return;
     }
 
-    // 1. Llenar la cabecera del Offcanvas
-    document.getElementById('seg-contrato-id').value = idContrato;
-    document.getElementById('seg-servicio-nombre').textContent = nombreServicio;
-    document.getElementById('seg-cliente-nombre').textContent = nombreCliente;
+    // 1. Llenar la información en el MODAL (versión modal con "-modal")
+    const inputContrato = document.getElementById('seg-contrato-id-modal');
+    const spanServicio = document.getElementById('seg-servicio-nombre');
+    const spanCliente = document.getElementById('seg-cliente-nombre');
+    const selectEstado = document.getElementById('seg-estado-modal');
     
-    // 2. Pre-seleccionar el estado en el select del formulario
-    const selectEstado = document.getElementById('seg-estado');
+    // Verificar que los elementos existen
+    if (!inputContrato || !spanServicio || !spanCliente) {
+        console.error('Elementos del modal no encontrados:', {
+            inputContrato: !!inputContrato,
+            spanServicio: !!spanServicio,
+            spanCliente: !!spanCliente
+        });
+        Swal.fire('Error', 'No se pudo abrir el modal de seguimiento', 'error');
+        return;
+    }
+    
+    inputContrato.value = idContrato;
+    spanServicio.textContent = nombreServicio || 'Servicio en proceso';
+    spanCliente.textContent = nombreCliente || 'Cliente';
+    
+    // 2. Pre-seleccionar el estado en el select del modal
     if(selectEstado) {
-        // Asegurarse de que el option existe antes de asignarlo
         if(selectEstado.querySelector(`option[value="${estadoActual}"]`)) {
             selectEstado.value = estadoActual;
         }
     }
 
-    // 3. (AQUÍ HAREMOS EL FETCH PARA CARGAR EL HISTORIAL REAL LUEGO)
-    // cargarHistorial(idContrato);
-
-    // 4. Mostrar el Offcanvas
-    const offcanvasEl = document.getElementById('offcanvasSeguimiento');
-    const offcanvas = new bootstrap.Offcanvas(offcanvasEl);
-    
-    // Forzar que siempre abra en la pestaña de Historial
-    const tabHistorial = document.querySelector('#offcanvasSeguimiento .nav-link[data-bs-target="#tab-historial"]');
-    if(tabHistorial) {
-        let tab = new bootstrap.Tab(tabHistorial);
-        tab.show();
+    // 3. Mostrar el MODAL centrado
+    const modalElement = document.getElementById('modalSeguimiento');
+    if (modalElement) {
+        try {
+            const modal = new bootstrap.Modal(modalElement);
+            
+            // Forzar que siempre abra en la pestaña de Historial
+            const tabHistorial = document.querySelector('#modalSeguimiento .nav-link[data-bs-target="#tab-historial-modal"]');
+            if(tabHistorial) {
+                let tab = new bootstrap.Tab(tabHistorial);
+                tab.show();
+            }
+            
+            modal.show();
+        } catch (e) {
+            console.error('Error al abrir modal:', e);
+            Swal.fire('Error', 'Error al abrir el modal', 'error');
+        }
+    } else {
+        console.error('Modal no encontrado');
     }
-
-    offcanvas.show();
 };
 
 /**
@@ -91,10 +114,10 @@ async function guardarNuevoAvance(formulario) {
 
             // Limpiar formulario y recargar historial
             formulario.reset();
-            // cargarHistorial(formData.get('contrato_id'));
+            // cargarHistorial(formData.get('contrato_id')); // Descomentar cuando implementes
 
             // Cambiar a la pestaña de historial automáticamente
-            const tabHistorial = document.querySelector('#offcanvasSeguimiento .nav-link[data-bs-target="#tab-historial"]');
+            const tabHistorial = document.querySelector('#modalSeguimiento .nav-link[data-bs-target="#tab-historial-modal"]');
             if(tabHistorial) {
                 let tab = new bootstrap.Tab(tabHistorial);
                 tab.show();

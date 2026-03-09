@@ -2,7 +2,7 @@
 <?php
 $servicios = $serviciosCompletados ?? [];
 
-// Stats básicas (ajústalas si ya tienes métricas reales)
+// Stats básicas
 $totalCompletados = count($servicios);
 $esteMes = count(array_filter($servicios, function($s){
     if (empty($s['fecha_fin']) && empty($s['updated_at'])) return false;
@@ -10,42 +10,41 @@ $esteMes = count(array_filter($servicios, function($s){
     return date('Y-m', strtotime($f)) === date('Y-m');
 }));
 
-// Si tienes calificación, promedia; si no, muestra N/A
 $ratings = array_values(array_filter(array_map(fn($s) => $s['calificacion'] ?? null, $servicios), fn($v) => $v !== null && $v !== ''));
 $promedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings), 2) : null;
 
-// Ingresos: si tienes campo monto_total o monto, suma; si no, N/A
 $montos = array_values(array_filter(array_map(fn($s) => $s['monto'] ?? $s['monto_total'] ?? null, $servicios), fn($v) => is_numeric($v)));
 $ingresos = !empty($montos) ? array_sum($montos) : null;
 ?>
 
-<section id="estadisticas-completadas" class="mb-3">
-    <div class="tarjeta-stat">
-        <i class="bi bi-check-circle icono-stat"></i>
+<!-- Estadísticas (igual que en nuevas.php y en_proceso.php) -->
+<section id="estadisticas-completadas">
+    <div class="tarjeta-estadistica">
+        <i class="bi bi-check-circle icono-estadistica"></i>
         <div class="stat-info">
             <div class="stat-numero"><?= $totalCompletados ?></div>
             <div class="stat-label">Total Completados</div>
         </div>
     </div>
 
-    <div class="tarjeta-stat">
-        <i class="bi bi-calendar-month icono-stat"></i>
+    <div class="tarjeta-estadistica">
+        <i class="bi bi-calendar-month icono-estadistica"></i>
         <div class="stat-info">
             <div class="stat-numero"><?= $esteMes ?></div>
             <div class="stat-label">Este Mes</div>
         </div>
     </div>
 
-    <div class="tarjeta-stat">
-        <i class="bi bi-star-fill icono-stat"></i>
+    <div class="tarjeta-estadistica">
+        <i class="bi bi-star-fill icono-estadistica"></i>
         <div class="stat-info">
             <div class="stat-numero"><?= $promedio !== null ? $promedio : 'N/A' ?></div>
             <div class="stat-label">Calificación Promedio</div>
         </div>
     </div>
 
-    <div class="tarjeta-stat">
-        <i class="bi bi-cash-coin icono-stat"></i>
+    <div class="tarjeta-estadistica">
+        <i class="bi bi-cash-coin icono-estadistica"></i>
         <div class="stat-info">
             <div class="stat-numero">
                 <?= $ingresos !== null ? ('$' . number_format($ingresos, 0, ',', '.')) : 'N/A' ?>
@@ -55,12 +54,13 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
     </div>
 </section>
 
-<section id="filtros-completadas" class="mb-3">
+<!-- Filtros (estilo oportunidades) -->
+<section id="filtros-completadas">
     <div class="contenedor-filtros">
         <div class="grupo-filtro">
             <label for="filtro-categoria">Categoría</label>
             <select id="filtro-categoria">
-                <option value="">Todas las categorías</option>
+                <option value="">Todas</option>
                 <option value="plomeria">Plomería</option>
                 <option value="electricidad">Electricidad</option>
                 <option value="limpieza">Limpieza</option>
@@ -87,6 +87,7 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
     </div>
 </section>
 
+<!-- Listado en tarjetas -->
 <section id="lista-completadas" class="grid-completadas">
     <?php if (!empty($servicios)) : ?>
         <?php foreach ($servicios as $s) : ?>
@@ -105,6 +106,7 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
 
             <div class="tarjeta-completada">
 
+                <!-- Header con título y estado -->
                 <div class="completada-header">
                     <div class="completada-info-principal">
                         <h3 class="completada-titulo">
@@ -117,23 +119,25 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                                 <?= htmlspecialchars($s['solicitud_titulo'] ?? 'Solicitud') ?>
                             </span>
 
-                            <span class="completada-feja">
+                            <span class="completada-fecha">
                                 <i class="bi bi-calendar-check"></i>
-                                Completado:
-                                <?= $fechaFin ? date('d M Y', strtotime($fechaFin)) : 'N/A' ?>
+                                Completado: <?= $fechaFin ? date('d M Y', strtotime($fechaFin)) : 'N/A' ?>
                             </span>
                         </div>
                     </div>
 
                     <div class="completada-estado">
-                        <span class="badge-completado">
+                        <span class="badge-completado bg-success">
                             <i class="bi bi-check-circle-fill"></i> Completado
                         </span>
                     </div>
                 </div>
 
+                <!-- Información del cliente (igual que en proceso) -->
                 <div class="completada-cliente">
-                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . $avatar ?>" class="cliente-avatar" alt="Cliente">
+                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . $avatar ?>" 
+                         alt="Cliente" 
+                         class="cliente-avatar">
                     <div class="cliente-info">
                         <div class="cliente-nombre"><?= htmlspecialchars($s['cliente_nombre'] ?? 'Cliente') ?></div>
                         <div class="cliente-contacto">
@@ -142,11 +146,12 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     </div>
                 </div>
 
+                <!-- Detalles del servicio (fecha inicio y monto) -->
                 <div class="completada-detalles">
                     <div class="detalle-item">
                         <i class="bi bi-calendar3"></i>
                         <div class="detalle-info">
-                            <span class="detalle-label">Fecha de inicio</span>
+                            <span class="detalle-label">Fecha inicio</span>
                             <span class="detalle-valor"><?= $fechaInicio ? date('d M Y', strtotime($fechaInicio)) : 'N/A' ?></span>
                         </div>
                     </div>
@@ -162,6 +167,7 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     </div>
                 </div>
 
+                <!-- Calificación -->
                 <div class="completada-calificacion">
                     <div class="calificacion-header">
                         <span class="calificacion-titulo">Calificación del cliente</span>
@@ -181,17 +187,18 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     <?php endif; ?>
                 </div>
 
+                <!-- Acciones (botones) -->
                 <div class="completada-acciones">
                     <button class="btn-accion btn-ver-detalles" type="button">
-                        <i class="bi bi-eye"></i> Ver Detalles Completos
+                        <i class="bi bi-eye"></i> Ver Detalles
                     </button>
 
                     <button class="btn-accion btn-descargar" type="button">
-                        <i class="bi bi-download"></i> Descargar Factura
+                        <i class="bi bi-download"></i> Factura
                     </button>
 
                     <button class="btn-accion btn-contactar" type="button">
-                        <i class="bi bi-chat-dots"></i> Contactar Cliente
+                        <i class="bi bi-chat-dots"></i> Contactar
                     </button>
                 </div>
 
@@ -199,6 +206,8 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
 
         <?php endforeach; ?>
     <?php else : ?>
-        <p class="text-muted text-center p-5">Aún no tienes servicios completados.</p>
+        <div class="empty-state">
+            <p class="text-muted">No tienes servicios completados aún.</p>
+        </div>
     <?php endif; ?>
 </section>
