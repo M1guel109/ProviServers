@@ -415,31 +415,34 @@ $totalCompletadas = count($serviciosCompletados);
             <div class="text-muted"><i class="bi bi-telephone"></i> ${escapeHtml(data.telefono_cliente ?? data.cliente_telefono ?? 'N/A')}</div>
           </div>
         </div>
+      </div>
 
-        <div class="col-md-6">
-          <div class="p-3 bg-light rounded">
-            <div class="fw-semibold text-dark mb-1">Servicio</div>
-            <div>${escapeHtml(data.servicio_nombre ?? data.publicacion_titulo ?? data.solicitud_titulo ?? 'N/A')}</div>
-            <div class="text-muted">Estado: ${escapeHtml(data.estado ?? 'pendiente')}</div>
-          </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Servicio</div>
+          <div>${escapeHtml(data.servicio_nombre ?? data.publicacion_titulo ?? data.solicitud_titulo ?? 'N/A')}</div>
+          <div class="text-muted">Estado: ${escapeHtml(data.estado ?? 'pendiente')}</div>
         </div>
+      </div>
 
-        <div class="col-md-6">
-          <div class="p-3 bg-light rounded">
-            <div class="fw-semibold text-dark mb-1">Fecha / horario</div>
-            <div><i class="bi bi-calendar3"></i> ${escapeHtml(data.fecha_preferida ?? data.fecha_solicitud ?? data.fecha_inicio ?? 'Sin fecha')}</div>
-            <div class="text-muted"><i class="bi bi-clock"></i> ${escapeHtml(data.franja_horaria ?? 'N/A')}</div>
-          </div>
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Fecha / horario</div>
+          <div><i class="bi bi-calendar3"></i> ${escapeHtml(data.fecha_preferida ?? data.fecha_solicitud ?? data.fecha_inicio ?? 'Sin fecha')}</div>
+          <div class="text-muted"><i class="bi bi-clock"></i> ${escapeHtml(data.franja_horaria ?? 'N/A')}</div>
         </div>
+      </div>
 
-        <div class="col-md-6">
-          <div class="p-3 bg-light rounded">
-            <div class="fw-semibold text-dark mb-1">Detalles</div>
-            <div>${escapeHtml(data.descripcion ?? data.mensaje ?? 'Sin detalles adicionales')}</div>
+      <!-- NUEVO: Ubicación -->
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Ubicación</div>
+          <div><i class="bi bi-geo-alt"></i> ${escapeHtml(data.direccion ?? data.direccion_servicio ?? 'N/A')}</div>
+          <div class="text-muted">
+            ${escapeHtml(data.ciudad ?? 'N/A')}${(data.zona ?? '').toString().trim() ? ' · ' + escapeHtml(data.zona) : ''}
           </div>
         </div>
       </div>
-    `;
 
       const modal = new bootstrap.Modal(document.getElementById('modalDetalleSolicitud'));
       modal.show();
