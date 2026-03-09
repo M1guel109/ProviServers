@@ -337,13 +337,14 @@
   <!-- Modal Calificar -->
   <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
-      <form method="POST" action="<?= BASE_URL ?>/cliente/servicios-contratados/calificar" class="modal-content">
+      <form method="POST" action="<?= rtrim(BASE_URL, '/') ?>/cliente/servicios-contratados/calificar" class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Calificar servicio</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
+          <input type="hidden" name="accion" value="calificar_servicio">
           <input type="hidden" name="contrato_id" id="calificar_contrato_id" value="">
 
           <div class="mb-3">
@@ -367,9 +368,7 @@
 
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-          <button type="submit" class="btn btn-success">
-            Guardar calificación
-          </button>
+          <button type="submit" class="btn btn-success">Guardar calificación</button>
         </div>
       </form>
     </div>
