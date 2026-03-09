@@ -1,6 +1,13 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_cliente.php';
+
+require_once BASE_PATH . '/app/models/categoria.php';
+
+$objCategoria = new Categoria();
+$categorias = $objCategoria->mostrar() ?: [];
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -371,18 +378,20 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
 
                     <div class="modal-body">
 
-                        <div class="mb-3">
-                            <label class="form-label">Categoría <span class="text-danger">*</span></label>
-                            <select class="form-select" name="categoria" id="categoria_nec" required>
-                                <option value="">Selecciona una categoría</option>
-                                <option value="Salud">Salud</option>
-                                <option value="Educación">Educación</option>
-                                <option value="Tecnología">Tecnología</option>
-                                <option value="Hogar">Hogar</option>
-                                <option value="Otros">Otros</option>
-                            </select>
-                            <div class="invalid-feedback">Selecciona una categoría.</div>
-                        </div>
+                        <select class="form-select" name="categoria_id" id="categoria_nec" required>
+                            <option value="">Selecciona una categoría</option>
+
+                            <?php if (!empty($categorias)): ?>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option
+                                        value="<?= (int)$cat['id'] ?>"
+                                        data-nombre="<?= htmlspecialchars($cat['nombre']) ?>">
+                                        <?= htmlspecialchars($cat['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <div class="invalid-feedback">Selecciona una categoría.</div>
 
                         <div class="mb-3 d-none" id="categoriaOtroWrapper_nec">
                             <label class="form-label">Especifica la categoría <span class="text-danger">*</span></label>
