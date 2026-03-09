@@ -33,7 +33,6 @@ if ($usuarioId) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- css de tablas / dashboard -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/listar-servicio.css">
 
 
@@ -58,15 +57,16 @@ if ($usuarioId) {
                 <p class="text-muted mb-0">
                     Aquí puedes ver tus servicios publicados, su estado y gestionar sus acciones.
                 </p>
+                <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor" target="_blank" class="btn btn-primary mt-3">
+                    <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
+                </a>
             </div>
 
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
                 <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
             </nav>
 
-            <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor" target="_blank" class="btn btn-primary mt-3">
-                <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
-            </a>
+
         </section>
 
         <!-- Tabla de servicios / publicaciones -->
@@ -262,7 +262,7 @@ if ($usuarioId) {
                                             <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicioId ?>"
                                                 class="btn btn-sm btn-outline-danger flex-fill"
                                                 title="Eliminar servicio"
-                                                onclick="return confirm('¿Eliminar este servicio?');">
+                                                >
                                                 <i class="bi bi-trash3"></i> Eliminar
                                             </a>
 
@@ -403,16 +403,7 @@ if ($usuarioId) {
         <!-- Enlaces / Información -->
     </footer>
 
-    <!-- Datatables export -->
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.dataTables.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.2.5/js/buttons.print.min.js"></script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
@@ -423,42 +414,6 @@ if ($usuarioId) {
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardProveedor.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-
-    <script>
-        // Inicializar DataTable
-        $(document).ready(function() {
-            $('#tabla-1').DataTable({
-                responsive: true,
-                // language: {
-                //     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                // }
-            });
-        });
-
-        // Submenús del sidebar (si no lo tienes ya centralizado)
-        document.addEventListener('DOMContentLoaded', function() {
-            const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-
-            toggleSubmenuButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const contenedor = this.closest('.has-submenu');
-                    if (!contenedor) return;
-
-                    const submenu = contenedor.querySelector('.submenu');
-                    contenedor.classList.toggle('active');
-
-                    if (submenu) {
-                        if (contenedor.classList.contains('active')) {
-                            submenu.style.maxHeight = submenu.scrollHeight + 'px';
-                        } else {
-                            submenu.style.maxHeight = '0';
-                        }
-                    }
-                });
-            });
-        });
-    </script>
-
 
 
 

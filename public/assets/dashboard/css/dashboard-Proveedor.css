@@ -411,10 +411,7 @@
         gap: 12px;
     }
 
-    /* Ocultar texto del usuario en móvil */
-    .d-none.d-md-block {
-        display: none !important;
-    }
+
 
     .usuario img {
         width: 40px;
