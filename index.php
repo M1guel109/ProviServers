@@ -297,8 +297,7 @@ switch ($request) {
         break;
 
     case '/proveedor/oportunidades/enviar-cotizacion':
-        require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
-        enviarCotizacion();
+        require_once BASE_PATH . '/app/controllers/proveedorOperacionController.php';
         break;
 
     case '/proveedor/resenas':

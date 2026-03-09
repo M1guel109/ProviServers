@@ -367,9 +367,10 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                     class="needs-validation"
                     novalidate>
 
+                    <input type="hidden" name="accion" value="crear_necesidad">
+
                     <div class="modal-body">
 
-                        <!-- Categoría (si no la guardas en BD, no afecta el INSERT) -->
                         <div class="mb-3">
                             <label class="form-label">Categoría <span class="text-danger">*</span></label>
                             <select class="form-select" name="categoria" id="categoria_nec" required>
@@ -383,7 +384,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             <div class="invalid-feedback">Selecciona una categoría.</div>
                         </div>
 
-                        <!-- Categoría otros -->
                         <div class="mb-3 d-none" id="categoriaOtroWrapper_nec">
                             <label class="form-label">Especifica la categoría <span class="text-danger">*</span></label>
                             <input type="text"
@@ -394,7 +394,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             <div class="invalid-feedback">Especifica la categoría.</div>
                         </div>
 
-                        <!-- Título -->
                         <div class="mb-3">
                             <label class="form-label">Título <span class="text-danger">*</span></label>
                             <input type="text"
@@ -406,7 +405,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             <div class="invalid-feedback">El título es obligatorio.</div>
                         </div>
 
-                        <!-- Descripción -->
                         <div class="mb-3">
                             <label class="form-label">Descripción <span class="text-danger">*</span></label>
                             <textarea class="form-control"
@@ -417,7 +415,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             <div class="invalid-feedback">La descripción es obligatoria.</div>
                         </div>
 
-                        <!-- Presupuesto -->
                         <div class="mb-3">
                             <label class="form-label">Presupuesto estimado (COP)</label>
                             <input type="number"
@@ -428,7 +425,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                                 step="1000">
                         </div>
 
-                        <!-- Fecha / Franja horaria -->
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">Fecha deseada <span class="text-danger">*</span></label>
@@ -456,7 +452,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             </div>
                         </div>
 
-                        <!-- Hora exacta (opcional) -->
                         <div class="mb-3">
                             <label class="form-label">Hora exacta (opcional)</label>
                             <input type="time"
@@ -465,7 +460,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                                 id="hora_nec">
                         </div>
 
-                        <!-- Ubicación -->
                         <div class="mb-3">
                             <label class="form-label">Dirección <span class="text-danger">*</span></label>
                             <input type="text"
@@ -495,7 +489,6 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                             </div>
                         </div>
 
-                        <!-- Adjuntos (opcional) - si no los procesas en backend no afecta el INSERT -->
                         <div class="mb-3">
                             <label class="form-label">Adjuntos (opcional)</label>
                             <input type="file"
