@@ -361,6 +361,7 @@ switch ($request) {
 
     // OJO: esta también venía del módulo viejo que unificaste
     case '/cliente/mis-solicitudes':
+        $_GET['accion'] = 'ver_solicitudes';
         require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
 
