@@ -4,9 +4,10 @@ $servicios = $serviciosEnProceso ?? [];
 $stats_en_proceso = count($servicios);
 ?>
 
-<section id="estadisticas-proceso" class="mb-3">
-    <div class="tarjeta-stat">
-        <i class="bi bi-hourglass-split icono-stat"></i>
+<!-- Tarjetas de estadísticas -->
+<section id="estadisticas-proceso">
+    <div class="tarjeta-estadistica">
+        <i class="bi bi-hourglass-split icono-estadistica"></i>
         <div class="stat-info">
             <div class="stat-numero"><?= $stats_en_proceso ?></div>
             <div class="stat-label">En Proceso</div>
@@ -14,7 +15,8 @@ $stats_en_proceso = count($servicios);
     </div>
 </section>
 
-<section id="filtros-proceso" class="mb-3">
+<!-- Filtros -->
+<section id="filtros-proceso">
     <div class="contenedor-filtros">
         <div class="grupo-filtro">
             <label for="filtro-categoria">Categoría</label>
@@ -30,6 +32,7 @@ $stats_en_proceso = count($servicios);
     </div>
 </section>
 
+<!-- Listado en tarjetas -->
 <section id="lista-procesos">
     <?php if (!empty($servicios)) : ?>
         <?php foreach ($servicios as $servicio) : ?>
@@ -116,6 +119,8 @@ $stats_en_proceso = count($servicios);
             </div>
         <?php endforeach; ?>
     <?php else : ?>
-        <p class="text-muted text-center p-5">No tienes servicios en proceso actualmente.</p>
+        <div class="empty-state">
+            No tienes servicios en proceso actualmente.
+        </div>
     <?php endif; ?>
 </section>
