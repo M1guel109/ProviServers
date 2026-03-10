@@ -239,8 +239,8 @@ switch ($request) {
         reportesPdfController();
         break;
 
-    case '/proveedor/calendarioProveedor':
-        require BASE_PATH . '/app/views/dashboard/proveedor/calendarioProveedor.php';
+    case '/proveedor/calendario':
+        require BASE_PATH . '/app/views/dashboard/proveedor/calendario.php';
         break;
 
     case '/proveedor/configuracion':

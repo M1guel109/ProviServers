@@ -8,10 +8,11 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Servicios Completados</title>
+    <title>Proviservers | Mi Agenda de Trabajo</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -22,89 +23,90 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- CSS Específico -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/calendarioProveedor.css">
-   
 </head>
 
 <body>
-
     <!-- Sidebar Proveedor -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
 
     <main class="contenido">
-
         <!-- Header Proveedor -->
         <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
 
-        <!-- TÍTULO -->
+        <!-- TÍTULO CON BREADCRUMB (IGUAL QUE DASHBOARD) -->
         <section id="titulo-principal">
-            <h1>Mi Agenda de Trabajo</h1>
-            <p class="text-muted mb-3">
-                Administra tus reservas, disponibilidad y controla tus ingresos diarios.
-            </p>
-
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item">
-                        <a href="<?= BASE_URL ?>/proveedor/dashboard/calendarioProveedor">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item active">Mi Calendario</li>
-                </ol>
-            </nav>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>Mi Agenda de Trabajo</h1>
+                    <p class="text-muted mb-0">
+                        Administra tus reservas, disponibilidad y controla tus ingresos diarios.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Mi Calendario</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
-        <!-- CARDS DIFERENTES A ADMIN -->
+        <!-- CARDS DE ESTADÍSTICAS (estilo tarjetas) -->
         <section class="row g-4 mb-4">
-
             <div class="col-md-3">
-                <div class="card shadow-sm p-3">
-                    <h6 class="text-muted">Servicios Hoy</h6>
-                    <h3>4</h3>
-                    <small class="text-success">
-                        <i class="bi bi-arrow-up"></i> 2 más que ayer
-                    </small>
+                <div class="tarjeta-estadistica">
+                    <i class="bi bi-calendar-check icono-estadistica text-primary"></i>
+                    <div>
+                        <div class="valor-estadistica">4</div>
+                        <div class="etiqueta-estadistica">Servicios Hoy</div>
+                        <small class="text-success">
+                            <i class="bi bi-arrow-up"></i> 2 más que ayer
+                        </small>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card shadow-sm p-3">
-                    <h6 class="text-muted">Solicitudes Pendientes</h6>
-                    <h3>3</h3>
-                    <small class="text-warning">
-                        Requieren confirmación
-                    </small>
+                <div class="tarjeta-estadistica">
+                    <i class="bi bi-clock-history icono-estadistica text-warning"></i>
+                    <div>
+                        <div class="valor-estadistica">3</div>
+                        <div class="etiqueta-estadistica">Solicitudes Pendientes</div>
+                        <small class="text-warning">Requieren confirmación</small>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card shadow-sm p-3">
-                    <h6 class="text-muted">Ingresos Hoy</h6>
-                    <h3>$320.000</h3>
-                    <small class="text-primary">
-                        Confirmados
-                    </small>
+                <div class="tarjeta-estadistica">
+                    <i class="bi bi-cash-coin icono-estadistica text-success"></i>
+                    <div>
+                        <div class="valor-estadistica">$320k</div>
+                        <div class="etiqueta-estadistica">Ingresos Hoy</div>
+                        <small class="text-primary">Confirmados</small>
+                    </div>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="card shadow-sm p-3">
-                    <h6 class="text-muted">Días Bloqueados</h6>
-                    <h3>2</h3>
-                    <small class="text-danger">
-                        No disponibles
-                    </small>
+                <div class="tarjeta-estadistica">
+                    <i class="bi bi-calendar-x icono-estadistica text-danger"></i>
+                    <div>
+                        <div class="valor-estadistica">2</div>
+                        <div class="etiqueta-estadistica">Días Bloqueados</div>
+                        <small class="text-danger">No disponibles</small>
+                    </div>
                 </div>
             </div>
-
         </section>
 
         <!-- NUEVA ESTRUCTURA DIFERENTE -->
         <section class="row">
-
             <!-- CALENDARIO PRINCIPAL -->
             <div class="col-lg-8">
-
                 <div class="card shadow-sm">
-
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div>
                             <button class="btn btn-light btn-sm" id="prevMonth">
@@ -126,13 +128,12 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                             </button>
 
                             <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#bloquearDiaModal">
-                                Bloquear Día
+                                <i class="bi bi-calendar-x"></i> Bloquear Día
                             </button>
                         </div>
                     </div>
 
                     <div class="card-body">
-
                         <!-- Encabezados -->
                         <div class="row text-center fw-bold border-bottom pb-2">
                             <div class="col">Dom</div>
@@ -148,16 +149,12 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <div id="calendarDays" class="mt-3">
                             <!-- Se llenará con JS -->
                         </div>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- PANEL DERECHO COMPLETAMENTE DIFERENTE -->
+            <!-- PANEL DERECHO -->
             <div class="col-lg-4">
-
                 <!-- SERVICIOS DEL DÍA -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header">
@@ -199,49 +196,44 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <strong>Instalación Eléctrica - Mañana 8:00 AM</strong>
                     </div>
                 </div>
-
             </div>
-
         </section>
 
     </main>
 
-    <!-- MODAL BLOQUEAR DÍA -->
-    <div class="modal fade" id="bloquearDiaModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <div class="modal-header">
-                    <h5 class="modal-title">Bloquear Día</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- MODAL BLOQUEAR DÍA (centrado) -->
+    <div class="modal fade" id="bloquearDiaModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-calendar-x me-2"></i>Bloquear Día
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                <div class="modal-body p-4">
+                    <label class="form-label fw-bold">Selecciona la fecha</label>
+                    <input type="date" class="form-control mb-3">
 
-                <div class="modal-body">
-                    <label class="form-label">Selecciona la fecha</label>
-                    <input type="date" class="form-control">
-
-                    <label class="form-label mt-3">Motivo (opcional)</label>
-                    <textarea class="form-control"></textarea>
+                    <label class="form-label fw-bold">Motivo (opcional)</label>
+                    <textarea class="form-control" rows="3" placeholder="Ej: Descanso, mantenimiento, etc."></textarea>
                 </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">
-                        Cancelar
-                    </button>
-                    <button class="btn btn-danger">
-                        Confirmar Bloqueo
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger">
+                        <i class="bi bi-calendar-x me-2"></i>Confirmar Bloqueo
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 
-    <!-- JS personalizado -->
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/calendario_proveedor.js"></script>
-
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/calendario.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 </html>
