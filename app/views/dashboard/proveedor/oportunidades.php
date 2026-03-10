@@ -16,23 +16,38 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/oportunidades.css">
 </head>
 
 <body>
     <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
 
-    <main class="contenido">
+    <main class="contenido oportunidades-page">
         <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
 
         <section class="mb-4">
-            <h1 class="fw-bold mb-2">Explorar Oportunidades </h1>
-            <p class="text-muted">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+
+        </section>
+
+        <!-- Título con breadcrumb y explicación (IGUAL QUE DASHBOARD) -->
+        <section id="titulo-principal">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+
+                    <h1 class="fw-bold mb-2">Oportunidades</h1>
+                    <p class="text-muted mb-0">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <section class="filtros-container">
-            <form action="" method="GET" class="row g-3">
+            <form action="<?= BASE_URL ?>/proveedor/oportunidades" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
@@ -211,6 +226,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/oportunidades.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 
 </html>

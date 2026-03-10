@@ -70,7 +70,7 @@ $isActive = function (string $path) use ($currentPath): string {
 
             <!-- OPORTUNIDADES -->
             <li>
-                <a href="<?= BASE_URL ?>/proveedor/oportunidades"
+                <a href="<?= BASE_URL ?>/proveedor/oportunidades?accion=mostrar_oportunidades"
                     class="<?= $isActive('/proveedor/oportunidades') ?>"
                     data-title="Oportunidades">
                     <i class="bi bi-binoculars"></i>
