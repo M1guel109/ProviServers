@@ -299,6 +299,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/finanzas.php';
         break;
 
+    case '/proveedor/facturacion':
+        require BASE_PATH . '/app/views/dashboard/proveedor/facturacion.php';
+        break;
+
     case '/proveedor/membresia':
         require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
         break;
