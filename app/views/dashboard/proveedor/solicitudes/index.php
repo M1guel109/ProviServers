@@ -507,8 +507,7 @@ $totalCompletadas = count($serviciosCompletados);
             </div>
           </div>
         </div>
-      </div>
-    `;
+      </div>`
 
       const modal = new bootstrap.Modal(document.getElementById('modalDetalleSolicitud'));
       modal.show();
