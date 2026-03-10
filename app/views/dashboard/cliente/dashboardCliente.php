@@ -1,6 +1,13 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session_cliente.php';
+
+require_once BASE_PATH . '/app/models/categoria.php';
+
+$objCategoria = new Categoria();
+$categorias = $objCategoria->mostrar() ?: [];
 ?>
+
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -131,14 +138,22 @@ require_once BASE_PATH . '/app/helpers/session_cliente.php';
                     <div class="col-md-4">
                         <input type="text" class="form-control" placeholder="¿Qué servicio necesitas?">
                     </div>
-                    <div class="col-md-3">
-                        <select class="form-select">
-                            <option>Todas las categorías</option>
-                            <option>Jardinería</option>
-                            <option>Plomería</option>
-                            <option>Belleza</option>
-                            <option>Mascotas</option>
+                    <div class="mb-3">
+                        <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                        <select class="form-select" name="categoria" id="categoria_nec" required>
+                            <option value="">Selecciona una categoría</option>
+
+                            <?php if (!empty($categorias)): ?>
+                                <?php foreach ($categorias as $cat): ?>
+                                    <option value="<?= htmlspecialchars($cat['nombre']) ?>">
+                                        <?= htmlspecialchars($cat['nombre']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+
+                            <option value="Otros">Otros</option>
                         </select>
+                        <div class="invalid-feedback">Selecciona una categoría.</div>
                     </div>
                     <div class="col-md-3">
                         <input type="text" class="form-control" placeholder="Ubicación">

@@ -1,6 +1,8 @@
 <?php
-// Esta vista asume que llega $publicaciones desde el controlador
-// y que NO requiere sesión de cliente para ver el catálogo
+require_once BASE_PATH . '/app/models/categoria.php';
+
+$objCategoria = new Categoria();
+$categorias = $objCategoria->mostrar() ?: [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -62,41 +64,56 @@
       <!-- Filtros de categorías (por ahora estáticos; luego se pueden hacer dinámicos) -->
       <div class="mb-4 category-filters">
         <div class="d-flex flex-wrap gap-2">
-          <?php
-          $catActual = $_GET['cat'] ?? '';
-          ?>
+          <?php $catActual = $_GET['cat'] ?? ''; ?>
+
           <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios"
+            href="<?= rtrim(BASE_URL, '/') ?>/cliente/explorar-servicios"
             class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
             <i class="bi bi-columns-gap"></i> Todas
           </a>
 
-          <!-- Ejemplos de categorías fijas: luego puedes mapear IDs reales -->
-          <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=1"
-            class="btn btn-outline-primary <?= $catActual == '1' ? 'active' : '' ?>">
-            <i class="bi bi-house"></i> Hogar
-          </a>
-          <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=2"
-            class="btn btn-outline-primary <?= $catActual == '2' ? 'active' : '' ?>">
-            <i class="bi bi-laptop"></i> Tecnología
-          </a>
-          <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=3"
-            class="btn btn-outline-primary <?= $catActual == '3' ? 'active' : '' ?>">
-            <i class="bi bi-heart"></i> Mascotas
-          </a>
-          <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=4"
-            class="btn btn-outline-primary <?= $catActual == '4' ? 'active' : '' ?>">
-            <i class="bi bi-truck"></i> Transporte
-          </a>
-          <a
-            href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=5"
-            class="btn btn-outline-primary <?= $catActual == '5' ? 'active' : '' ?>">
-            <i class="bi bi-heart-pulse"></i> Salud
-          </a>
+          <?php if (!empty($categorias)): ?>
+            <?php foreach ($categorias as $cat): ?>
+              <?php
+              $catId = (int)($cat['id'] ?? 0);
+              $catNombre = $cat['nombre'] ?? 'Categoría';
+
+              // Ícono por defecto + mapeo simple por nombre
+              $icono = 'bi-tag';
+              switch (mb_strtolower(trim($catNombre))) {
+                case 'hogar':
+                  $icono = 'bi-house';
+                  break;
+                case 'tecnología':
+                case 'tecnologia':
+                  $icono = 'bi-laptop';
+                  break;
+                case 'mascotas':
+                  $icono = 'bi-heart';
+                  break;
+                case 'transporte':
+                  $icono = 'bi-truck';
+                  break;
+                case 'salud':
+                  $icono = 'bi-heart-pulse';
+                  break;
+                case 'educación':
+                case 'educacion':
+                  $icono = 'bi-book';
+                  break;
+                case 'otros':
+                  $icono = 'bi-three-dots';
+                  break;
+              }
+              ?>
+
+              <a
+                href="<?= rtrim(BASE_URL, '/') ?>/cliente/explorar-servicios?cat=<?= $catId ?>"
+                class="btn btn-outline-primary <?= (string)$catActual === (string)$catId ? 'active' : '' ?>">
+                <i class="bi <?= $icono ?>"></i> <?= htmlspecialchars($catNombre) ?>
+              </a>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </div>
       </div>
 

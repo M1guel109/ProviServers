@@ -18,31 +18,74 @@ class ServicioContratado
     public function listarPorProveedorUsuario(int $usuarioId): array
     {
         $sql = "
-            SELECT
-                sc.id AS contrato_id,
-                sc.estado,
-                sc.fecha_solicitud,
-                sc.fecha_ejecucion,
+        SELECT
+            sc.id AS contrato_id,
+            sc.solicitud_id,
+            sc.cotizacion_id,
+            sc.estado,
+            sc.fecha_solicitud,
+            sc.fecha_ejecucion,
+            sc.fecha_limite,
+            sc.motivo_cancelacion,
 
-                sv.nombre AS servicio_nombre,
+            sv.nombre AS servicio_nombre,
+            sv.imagen AS servicio_imagen,
 
-                s.titulo AS solicitud_titulo,
-                s.ciudad,
-                s.zona,
+            CONCAT(cl.nombres, ' ', cl.apellidos) AS cliente_nombre,
+            cl.telefono AS cliente_telefono,
+            cl.foto AS cliente_foto,
 
-                CONCAT(c.nombres, ' ', c.apellidos) AS cliente_nombre,
-                c.telefono AS cliente_telefono,
-                c.foto AS cliente_foto
+            -- Flujo por solicitud
+            sol.titulo AS solicitud_titulo,
+            sol.descripcion AS solicitud_descripcion,
+            sol.direccion AS solicitud_direccion,
+            sol.fecha_preferida AS solicitud_fecha_preferida,
+            sol.franja_horaria AS solicitud_franja_horaria,
+            sol.ciudad AS solicitud_ciudad,
+            sol.zona AS solicitud_zona,
+            sol.presupuesto_estimado AS solicitud_presupuesto_estimado,
 
-            FROM servicios_contratados sc
-            INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
-            INNER JOIN clientes c     ON sc.cliente_id = c.id
-            INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
-            INNER JOIN servicios sv   ON sc.servicio_id = sv.id
+            pub_sol.titulo AS publicacion_titulo_solicitud,
 
-            WHERE pr.usuario_id = :usuario_id
-              AND sc.estado IN ('pendiente', 'en_proceso')
-            ORDER BY sc.created_at DESC
+            -- Flujo por cotización / necesidad
+            cot.titulo AS cotizacion_titulo,
+            cot.mensaje AS cotizacion_mensaje,
+            cot.precio AS cotizacion_precio,
+            cot.tiempo_estimado AS cotizacion_tiempo_estimado,
+
+            nec.titulo AS necesidad_titulo,
+            nec.descripcion AS necesidad_descripcion,
+            nec.direccion AS necesidad_direccion,
+            nec.fecha_preferida AS necesidad_fecha_preferida,
+            nec.franja_horaria AS necesidad_franja_horaria,
+            nec.ciudad AS necesidad_ciudad,
+            nec.zona AS necesidad_zona,
+            nec.presupuesto_estimado AS necesidad_presupuesto_estimado,
+
+            pub_cot.titulo AS publicacion_titulo_cotizacion
+
+        FROM servicios_contratados sc
+        INNER JOIN proveedores prf
+            ON prf.id = sc.proveedor_id
+        INNER JOIN servicios sv
+            ON sv.id = sc.servicio_id
+        INNER JOIN clientes cl
+            ON cl.id = sc.cliente_id
+
+        LEFT JOIN solicitudes sol
+            ON sol.id = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol
+            ON pub_sol.id = sol.publicacion_id
+
+        LEFT JOIN cotizaciones cot
+            ON cot.id = sc.cotizacion_id
+        LEFT JOIN necesidades nec
+            ON nec.id = cot.necesidad_id
+        LEFT JOIN publicaciones pub_cot
+            ON pub_cot.id = cot.publicacion_id
+
+        WHERE prf.usuario_id = :usuario_id
+        ORDER BY sc.created_at DESC, sc.id DESC
         ";
 
         $stmt = $this->db->prepare($sql);
@@ -59,44 +102,83 @@ class ServicioContratado
      */
     public function listarPorClienteUsuario(int $usuarioId): array
     {
-     $sql = "
-    SELECT
-        sc.id              AS contrato_id,
-        sc.estado,
-        sc.fecha_solicitud,
-        sc.fecha_ejecucion,
+        $sql = "
+        SELECT
+            sc.id AS contrato_id,
+            sc.solicitud_id,
+            sc.cotizacion_id,
+            sc.estado,
+            sc.fecha_solicitud,
+            sc.fecha_ejecucion,
+            sc.fecha_limite,
+            sc.motivo_cancelacion,
 
-        s.titulo           AS solicitud_titulo,
-        s.descripcion      AS solicitud_descripcion,
-        s.fecha_preferida,
-        s.franja_horaria,
-        s.ciudad,
-        s.zona,
-        s.presupuesto_estimado,
+            sv.nombre AS servicio_nombre,
+            sv.imagen AS servicio_imagen,
 
-        sv.nombre          AS servicio_nombre,
-        sv.imagen          AS servicio_imagen,
+            CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
 
-        CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+            -- Flujo por solicitud
+            sol.titulo AS solicitud_titulo,
+            sol.descripcion AS solicitud_descripcion,
+            sol.fecha_preferida AS solicitud_fecha_preferida,
+            sol.franja_horaria AS solicitud_franja_horaria,
+            sol.ciudad AS solicitud_ciudad,
+            sol.zona AS solicitud_zona,
+            sol.presupuesto_estimado AS solicitud_presupuesto_estimado,
 
-        CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
-        v.calificacion AS mi_calificacion,
-        v.comentario   AS mi_comentario,
-        v.created_at   AS mi_calificado_en
+            pub_sol.titulo AS publicacion_titulo_solicitud,
 
-    FROM servicios_contratados sc
-    INNER JOIN clientes c     ON sc.cliente_id   = c.id
-    INNER JOIN usuarios u     ON c.usuario_id    = u.id
-    INNER JOIN solicitudes s  ON sc.solicitud_id = s.id
-    INNER JOIN servicios sv   ON sc.servicio_id  = sv.id
-    INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
-    LEFT JOIN valoraciones v
-      ON v.servicio_contratado_id = sc.id
-     AND v.cliente_id = sc.cliente_id
+            -- Flujo por cotización / necesidad
+            cot.titulo AS cotizacion_titulo,
+            cot.mensaje AS cotizacion_mensaje,
+            cot.precio AS cotizacion_precio,
+            cot.tiempo_estimado AS cotizacion_tiempo_estimado,
 
-    WHERE u.id = :usuario_id
-    ORDER BY sc.created_at DESC
-    ";
+            nec.titulo AS necesidad_titulo,
+            nec.descripcion AS necesidad_descripcion,
+            nec.fecha_preferida AS necesidad_fecha_preferida,
+            nec.franja_horaria AS necesidad_franja_horaria,
+            nec.ciudad AS necesidad_ciudad,
+            nec.zona AS necesidad_zona,
+            nec.presupuesto_estimado AS necesidad_presupuesto_estimado,
+
+            pub_cot.titulo AS publicacion_titulo_cotizacion,
+
+            CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
+            v.calificacion AS mi_calificacion,
+            v.comentario AS mi_comentario,
+            v.created_at AS mi_calificado_en
+
+        FROM servicios_contratados sc
+        INNER JOIN clientes c
+            ON sc.cliente_id = c.id
+        INNER JOIN usuarios u
+            ON c.usuario_id = u.id
+        INNER JOIN servicios sv
+            ON sc.servicio_id = sv.id
+        INNER JOIN proveedores pr
+            ON sc.proveedor_id = pr.id
+
+        LEFT JOIN solicitudes sol
+            ON sc.solicitud_id = sol.id
+        LEFT JOIN publicaciones pub_sol
+            ON sol.publicacion_id = pub_sol.id
+
+        LEFT JOIN cotizaciones cot
+            ON sc.cotizacion_id = cot.id
+        LEFT JOIN necesidades nec
+            ON cot.necesidad_id = nec.id
+        LEFT JOIN publicaciones pub_cot
+            ON cot.publicacion_id = pub_cot.id
+
+        LEFT JOIN valoraciones v
+            ON v.servicio_contratado_id = sc.id
+           AND v.cliente_id = sc.cliente_id
+
+        WHERE u.id = :usuario_id
+        ORDER BY sc.created_at DESC, sc.id DESC
+      ";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':usuario_id' => $usuarioId]);
