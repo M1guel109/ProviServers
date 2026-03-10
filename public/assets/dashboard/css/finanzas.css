@@ -1,0 +1,608 @@
+/* ==========================================================================
+   FINANZAS - Estilos específicos
+   Basado en el diseño de estadísticas y dashboard
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL (IGUAL QUE DASHBOARD)
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .row {
+    width: 100%;
+    margin: 0;
+}
+
+#titulo-principal .col-md-8,
+#titulo-principal .col-md-4 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. BREADCRUMB
+   ========================================================================== */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+    list-style: none;
+    background: transparent;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #6c757d;
+    content: ">";
+    font-weight: 300;
+}
+
+
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover, #0052cc);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+.justify-content-md-end {
+    justify-content: flex-end !important;
+}
+
+/* ==========================================================================
+   3. FILTROS (Igual que estadísticas)
+   ========================================================================== */
+.filtros-container {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.filtros-container .form-select-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+    min-height: 38px;
+}
+
+.filtros-container .form-select-sm:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: white;
+}
+
+.filtros-container .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    transition: all 0.25s ease;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.filtros-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
+}
+
+.filtros-container .btn-success {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+    transition: all 0.25s ease;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.filtros-container .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
+}
+
+/* ==========================================================================
+   4. TARJETAS FINANCIERAS
+   ========================================================================== */
+.tarjeta-financiera {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.tarjeta-financiera:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.icono-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bg-primary-light {
+    background-color: rgba(0, 102, 255, 0.1);
+}
+
+.bg-success-light {
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(243, 156, 18, 0.1);
+}
+
+.icono-wrapper .icono-financiero {
+    font-size: 28px;
+}
+
+.icono-wrapper .text-primary {
+    color: var(--primary-color);
+}
+
+.icono-wrapper .text-success {
+    color: #27ae60;
+}
+
+.icono-wrapper .text-danger {
+    color: #e74c3c;
+}
+
+.icono-wrapper .text-warning {
+    color: #f39c12;
+}
+
+.financiera-contenido {
+    flex: 1;
+}
+
+.financiera-etiqueta {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.financiera-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    display: block;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.financiera-tendencia {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.financiera-tendencia.positiva {
+    color: #27ae60;
+}
+
+.financiera-tendencia.negativa {
+    color: #e74c3c;
+}
+
+/* ==========================================================================
+   5. CARDS (Contenedores generales)
+   ========================================================================== */
+.card {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 15px 20px;
+}
+
+.card-header h6 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-header a{
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   6. TABLAS
+   ========================================================================== */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 15px;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table td.text-success {
+    color: #27ae60 !important;
+    font-weight: 600;
+}
+
+.table td.text-danger {
+    color: #e74c3c !important;
+    font-weight: 600;
+}
+
+.table .badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-weight: 600;
+}
+
+.table .badge.bg-success {
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    color: #27ae60;
+}
+
+.table .badge.bg-warning {
+    background-color: rgba(243, 156, 18, 0.1) !important;
+    color: #f39c12;
+}
+
+.table .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+}
+
+.table .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   7. LISTAS DE INGRESOS POR CATEGORÍA
+   ========================================================================== */
+.list-group-flush .list-group-item {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 10px 0;
+}
+
+.list-group-flush .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.list-group-flush .list-group-item span:first-child i {
+    width: 20px;
+    text-align: center;
+}
+
+.list-group-flush .list-group-item .fw-bold {
+    color: var(--dark-color);
+}
+
+/* ==========================================================================
+   8. MODAL DE EXPORTACIÓN
+   ========================================================================== */
+#modalExportar .modal-dialog-centered {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+#modalExportar .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+#modalExportar .modal-header {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+#modalExportar .modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#modalExportar .btn-close-white {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.25s ease;
+}
+
+#modalExportar .btn-close-white:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+#modalExportar .modal-body {
+    padding: 20px;
+}
+
+#modalExportar .form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+#modalExportar .form-select {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+#modalExportar .form-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+#modalExportar .form-check-input {
+    border-color: #e2e8f0;
+}
+
+#modalExportar .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+#modalExportar .modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+#modalExportar .btn-secondary {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+#modalExportar .btn-secondary:hover {
+    background-color: #e2e8f0;
+    color: var(--dark-color);
+}
+
+#modalExportar .btn-success {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(39, 174, 96, 0.3);
+    transition: all 0.25s ease;
+}
+
+#modalExportar .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(39, 174, 96, 0.4);
+}
+
+/* ==========================================================================
+   9. RESPONSIVE
+   ========================================================================== */
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    .row.g-4.mb-4 .col-md-3 {
+        width: 50%;
+    }
+    
+    .filtros-container .row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filtros-container .col-md-6 {
+        width: 100%;
+    }
+    
+    .filtros-container .d-flex {
+        justify-content: flex-start !important;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #titulo-principal .col-md-8,
+    #titulo-principal .col-md-4 {
+        width: 100%;
+    }
+    
+    #titulo-principal .text-muted {
+        max-width: 100%;
+    }
+    
+    .breadcrumb {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .row.g-4.mb-4 .col-md-3 {
+        width: 100%;
+    }
+    
+    .tarjeta-financiera {
+        padding: 15px;
+    }
+    
+    .icono-wrapper {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .icono-wrapper .icono-financiero {
+        font-size: 22px;
+    }
+    
+    .financiera-valor {
+        font-size: 1.3rem;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-group {
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        flex: 1;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .card-header .d-flex {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start !important;
+    }
+    
+    .filtros-container .d-flex {
+        flex-wrap: wrap;
+    }
+    
+    .filtros-container .btn {
+        width: 100%;
+    }
+}
