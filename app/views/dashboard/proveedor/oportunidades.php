@@ -11,28 +11,43 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Oportunidades</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    
+
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/oportunidades.css">
 </head>
 
 <body>
     <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
 
-    <main class="contenido">
+    <main class="contenido oportunidades-page">
         <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
 
         <section class="mb-4">
-            <h1 class="fw-bold mb-2">Explorar Oportunidades </h1>
-            <p class="text-muted">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+
+        </section>
+
+        <!-- Título con breadcrumb y explicación (IGUAL QUE DASHBOARD) -->
+        <section id="titulo-principal">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+
+                    <h1 class="fw-bold mb-2">Oportunidades</h1>
+                    <p class="text-muted mb-0">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <section class="filtros-container">
-            <form action="" method="GET" class="row g-3">
+            <form action="<?= BASE_URL ?>/proveedor/oportunidades" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
@@ -67,7 +82,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                     <p class="text-muted">Intenta ajustar los filtros o vuelve más tarde.</p>
                 </div>
             <?php else: ?>
-                
+
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                     <?php foreach ($necesidades as $nec): ?>
                         <div class="col">
@@ -112,33 +127,33 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="d-flex align-items-center gap-2">
 
-                                            <?php 
-                                                // 1. Calcular la ruta DE CADA cliente específico dentro del bucle
-                                                $nombreFoto = $nec['cliente_foto'] ?? 'default_user.png';
-                                                
-                                                // Si no tiene foto o es la default, usamos la de assets
-                                                if ($nombreFoto == 'default_user.png' || empty($nombreFoto)) {
-                                                    $rutaFinal = BASE_URL . '/public/uploads/usuarios/default_user.png';
-                                                } else {
-                                                    // Si tiene foto, usamos la de uploads
-                                                    $rutaFinal = BASE_URL . '/public/uploads/usuarios/' . $nombreFoto;
-                                                }
+                                            <?php
+                                            // 1. Calcular la ruta DE CADA cliente específico dentro del bucle
+                                            $nombreFoto = $nec['cliente_foto'] ?? 'default_user.png';
+
+                                            // Si no tiene foto o es la default, usamos la de assets
+                                            if ($nombreFoto == 'default_user.png' || empty($nombreFoto)) {
+                                                $rutaFinal = BASE_URL . '/public/uploads/usuarios/default_user.png';
+                                            } else {
+                                                // Si tiene foto, usamos la de uploads
+                                                $rutaFinal = BASE_URL . '/public/uploads/usuarios/' . $nombreFoto;
+                                            }
                                             ?>
 
-                                            <img src="<?= $rutaFinal ?>" 
-                                                alt="Foto Cliente" 
+                                            <img src="<?= $rutaFinal ?>"
+                                                alt="Foto Cliente"
                                                 class="avatar-cliente-mini"
-                                                style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;" 
+                                                style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;"
                                                 onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/assets/img/default_user.png';">
 
                                             <small class="text-muted"><?= htmlspecialchars($nec['cliente_nombre']) ?></small>
                                         </div>
 
                                         <button class="btn btn-sm btn-outline-primary rounded-pill px-3"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#modalCotizar"
-                                                data-id="<?= $nec['id'] ?>"
-                                                data-titulo="<?= htmlspecialchars($nec['titulo']) ?>">
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalCotizar"
+                                            data-id="<?= $nec['id'] ?>"
+                                            data-titulo="<?= htmlspecialchars($nec['titulo']) ?>">
                                             Cotizar <i class="bi bi-arrow-right-short"></i>
                                         </button>
                                     </div>
@@ -152,63 +167,65 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     </main>
 
     <div class="modal fade" id="modalCotizar" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form action="<?= BASE_URL ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Nueva Cotización</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="<?= BASE_URL ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Nueva Cotización</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="hidden" name="necesidad_id" id="modal_necesidad_id">
+
+                        <div class="alert alert-light border mb-3">
+                            <small class="text-muted d-block">Estás aplicando a:</small>
+                            <strong id="modal_titulo_necesidad" class="text-primary"></strong>
                         </div>
-                        
-                        <div class="modal-body">
-                            <input type="hidden" name="necesidad_id" id="modal_necesidad_id">
 
-                            <div class="alert alert-light border mb-3">
-                                <small class="text-muted d-block">Estás aplicando a:</small>
-                                <strong id="modal_titulo_necesidad" class="text-primary"></strong>
-                            </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Título de tu Propuesta</label>
+                            <input type="text" name="titulo" class="form-control" required
+                                placeholder="Ej: Servicio completo con repuestos incluidos" maxlength="50">
+                            <div class="form-text small">Dale un nombre corto y claro a tu oferta.</div>
+                        </div>
 
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Título de tu Propuesta</label>
-                                <input type="text" name="titulo" class="form-control" required 
-                                    placeholder="Ej: Servicio completo con repuestos incluidos" maxlength="50">
-                                <div class="form-text small">Dale un nombre corto y claro a tu oferta.</div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Tu Precio Final ($)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input type="number" name="precio_oferta" class="form-control" required 
-                                        placeholder="Ej: 75000" min="1">
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Tiempo Estimado</label>
-                                <input type="text" name="tiempo_estimado" class="form-control" 
-                                    placeholder="Ej: 2 días, 4 horas..." required maxlength="50">
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label fw-bold">Mensaje para el Cliente</label>
-                                <textarea name="mensaje" class="form-control" rows="4" 
-                                        placeholder="Hola, tengo experiencia en este tipo de trabajos. Incluyo..." required></textarea>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tu Precio Final ($)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" name="precio_oferta" class="form-control" required
+                                    placeholder="Ej: 75000" min="1">
                             </div>
                         </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">
-                                Enviar Propuesta <i class="bi bi-send-fill ms-1"></i>
-                            </button>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Tiempo Estimado</label>
+                            <input type="text" name="tiempo_estimado" class="form-control"
+                                placeholder="Ej: 2 días, 4 horas..." required maxlength="50">
                         </div>
-                    </form>
-                </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mensaje para el Cliente</label>
+                            <textarea name="mensaje" class="form-control" rows="4"
+                                placeholder="Hola, tengo experiencia en este tipo de trabajos. Incluyo..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">
+                            Enviar Propuesta <i class="bi bi-send-fill ms-1"></i>
+                        </button>
+                    </div>
+                </form>
             </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/oportunidades.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
+
 </html>

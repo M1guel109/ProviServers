@@ -1,72 +1,484 @@
-/* =========================================
-   ESTILOS PARA LA VISTA DE OPORTUNIDADES
-   ========================================= */
+/* ==========================================================================
+   OPORTUNIDADES - Estilos específicos
+   ========================================================================== */
 
-/* Contenedor de Filtros */
-.filtros-container {
-    background: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-    border: 1px solid #eef2f6;
-}
-
-/* Tarjetas (Cards) */
-.card-oportunidad {
-    border: 1px solid #eef2f6;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    background: #fff;
-    height: 100%; /* Asegura altura igual en grilla */
+/* ==========================================================================
+   BREADCRUMB - ESTILOS BASE (IGUAL QUE DASHBOARD)
+   ========================================================================== */
+.breadcrumb {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+    list-style: none;
+    background: transparent;
 }
 
-.card-oportunidad:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-    border-color: var(--primary-color);
-}
-
-.card-body {
-    flex: 1; /* Empuja el footer hacia abajo */
-}
-
-/* Elementos internos de la tarjeta */
-.badge-presupuesto {
-    background-color: #ecfdf5;
-    color: #059669;
-    font-weight: 600;
-    padding: 5px 10px;
-    border-radius: 8px;
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
     font-size: 0.9rem;
 }
 
-.meta-info {
-    font-size: 0.85rem;
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #6c757d;
+    content: ">";
+    font-weight: 300;
+}
+
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover, #0052cc);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+/* Alineación a la derecha */
+.justify-content-md-end {
+    justify-content: flex-end !important;
+}
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .row {
+    width: 100%;
+    margin: 0;
+}
+
+#titulo-principal .col-md-8,
+#titulo-principal .col-md-4 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. FILTROS (Versión compacta como en solicitudes)
+   ========================================================================== */
+.filtros-container {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.filtros-container .input-group-text {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
     color: #64748b;
+}
+
+.filtros-container .form-control,
+.filtros-container .form-select {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+    min-height: 38px;
+}
+
+.filtros-container .form-control:focus,
+.filtros-container .form-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: white;
+}
+
+.filtros-container .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    transition: all 0.25s ease;
+    min-height: 38px;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 5px;
 }
 
-.avatar-cliente-mini {
-    width: 24px;
-    height: 24px;
+.filtros-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
+}
+
+.filtros-container .row {
+    --bs-gutter-x: 1rem;
+    --bs-gutter-y: 0.5rem;
+}
+
+/* ==========================================================================
+   3. TARJETAS DE OPORTUNIDADES
+   ========================================================================== */
+.card-oportunidad {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-oportunidad:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.card-oportunidad .card-body {
+    padding: 20px;
+}
+
+/* ==========================================================================
+   4. BADGES DE CATEGORÍA
+   ========================================================================== */
+.card-oportunidad .badge-categoria {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: rgba(0, 102, 255, 0.1);
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.card-oportunidad .badge-categoria i {
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   5. TÍTULO Y DESCRIPCIÓN
+   ========================================================================== */
+.card-oportunidad .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.card-oportunidad .card-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #64748b;
+    margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   6. INFORMACIÓN DE UBICACIÓN
+   ========================================================================== */
+.card-oportunidad .text-muted {
+    font-size: 0.85rem;
+}
+
+.card-oportunidad .text-muted i {
+    color: var(--primary-color);
+}
+
+.card-oportunidad .bi-geo-alt-fill {
+    color: #ef4444 !important;
+}
+
+/* ==========================================================================
+   7. PRESUPUESTO
+   ========================================================================== */
+.card-oportunidad .bg-success.bg-opacity-10 {
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    border-radius: 8px;
+}
+
+.card-oportunidad .text-success {
+    color: #27ae60 !important;
+}
+
+.card-oportunidad .fw-bold.text-dark {
+    font-size: 1.1rem;
+}
+
+/* ==========================================================================
+   8. CLIENTE Y BOTÓN
+   ========================================================================== */
+.card-oportunidad .cliente-avatar-mini {
+    width: 35px;
+    height: 35px;
     border-radius: 50%;
     object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
+.card-oportunidad .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+    padding: 6px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 30px;
+    transition: all 0.25s ease;
+}
+
+.card-oportunidad .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+.card-footer hr {
+    margin: 15px 0;
+    opacity: 0.15;
+}
+
+/* ==========================================================================
+   9. MODAL DE COTIZACIÓN
+   ========================================================================== */
+#modalCotizar .modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: calc(100% - 3.5rem);
+}
+
+#modalCotizar .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+#modalCotizar .modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+#modalCotizar .modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#modalCotizar .btn-close-white {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.25s ease;
+}
+
+#modalCotizar .btn-close-white:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+#modalCotizar .modal-body {
+    padding: 20px;
+}
+
+#modalCotizar .bg-light {
+    background-color: #f8fafc !important;
     border: 1px solid #e2e8f0;
+    border-radius: 12px;
 }
 
-/* Estado Vacío */
+#modalCotizar .form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+#modalCotizar .form-control {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+#modalCotizar .form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+#modalCotizar .input-group-text {
+    background-color: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    color: #64748b;
+}
+
+#modalCotizar .modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+#modalCotizar .btn-secondary {
+    background-color: #f1f5f9;
+    color: #64748b;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+#modalCotizar .btn-secondary:hover {
+    background-color: #e2e8f0;
+    color: var(--dark-color);
+}
+
+#modalCotizar .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    transition: all 0.25s ease;
+}
+
+#modalCotizar .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
+}
+
+/* ==========================================================================
+   10. EMPTY STATE
+   ========================================================================== */
 .empty-state {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 60px 30px;
     text-align: center;
-    padding: 3rem 0;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.empty-state img {
-    width: 150px; 
-    opacity: 0.6;
-    margin-bottom: 1.5rem;
+.empty-state i {
+    color: #cbd5e1;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+/* ==========================================================================
+   11. RESPONSIVE
+   ========================================================================== */
+
+/* Tablet Landscape */
+@media screen and (max-width: 1200px) {
+    .row.g-4 {
+        --bs-gutter-y: 20px;
+    }
+}
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    .filtros-container .col-md-4,
+    .filtros-container .col-md-3,
+    .filtros-container .col-md-2 {
+        width: 100%;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    .contenido {
+        padding: 15px;
+    }
+    
+    .filtros-container {
+        padding: 1rem;
+    }
+    
+    .card-oportunidad .card-footer .d-flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .card-oportunidad .btn-outline-primary {
+        width: 100%;
+    }
+    
+    .card-oportunidad .cliente-avatar-mini {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .empty-state {
+        padding: 40px 20px;
+    }
+    
+    .card-oportunidad .card-body {
+        padding: 15px;
+    }
 }

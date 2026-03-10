@@ -43,7 +43,7 @@ switch ($method) {
         break;
 
     case 'GET':
-        $accion = $_GET['accion'] ?? '';
+        $accion = $_GET['accion'] ?? 'mostrar_oportunidades';
 
         if ($accion === 'mostrar_oportunidades') {
             mostrarOportunidades();
