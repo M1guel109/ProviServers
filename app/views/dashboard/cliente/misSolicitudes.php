@@ -39,7 +39,7 @@
         <?php foreach ($tabs as $key => $label): ?>
           <li class="nav-item">
             <a class="nav-link <?= ($estado === $key ? 'active' : '') ?>"
-              href="<?= BASE_URL ?>/cliente/mis-solicitudes?estado=<?= $key ?>">
+              href="<?= BASE_URL ?>/cliente/mis-solicitudes?estado=<?= urlencode($key) ?>">
               <?= $label ?>
               <span class="badge bg-secondary ms-1"><?= (int)($contadores[$key] ?? 0) ?></span>
             </a>

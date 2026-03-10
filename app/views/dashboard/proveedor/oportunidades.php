@@ -169,7 +169,8 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <div class="modal fade" id="modalCotizar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="<?= BASE_URL ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
+                <form action="<?= rtrim(BASE_URL, '/') ?>/proveedor/oportunidades/enviar-cotizacion" method="POST">
+                    <input type="hidden" name="accion" value="enviar_cotizacion">
                     <div class="modal-header">
                         <h5 class="modal-title">Nueva Cotización</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

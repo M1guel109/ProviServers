@@ -297,8 +297,7 @@ switch ($request) {
         break;
 
     case '/proveedor/oportunidades/enviar-cotizacion':
-        require_once BASE_PATH . '/app/controllers/proveedorOportunidadesController.php';
-        enviarCotizacion();
+        require_once BASE_PATH . '/app/controllers/proveedorOperacionController.php';
         break;
 
     case '/proveedor/resenas':
@@ -361,6 +360,7 @@ switch ($request) {
 
     // OJO: esta también venía del módulo viejo que unificaste
     case '/cliente/mis-solicitudes':
+        $_GET['accion'] = 'ver_solicitudes';
         require BASE_PATH . '/app/controllers/ClienteServicioController.php';
         break;
 

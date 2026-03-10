@@ -312,24 +312,89 @@ $totalCompletadas = count($serviciosCompletados);
                     </div>
                 </div>
             </div>
+
         </div>
+    </div>
+</div>
 
-    </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <footer>
-        <!-- Enlaces / Información -->
-    </footer>
+  <script>
+    // Mantener ?tab=... sincronizado al cambiar de tab (sin recargar)
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach(btn => {
+      btn.addEventListener('shown.bs.tab', () => {
+        const tabValue = btn.getAttribute('data-tab');
+        const url = new URL(window.location.href);
+        url.searchParams.set('tab', tabValue);
+        window.history.replaceState({}, '', url);
+        // también actualiza el hidden del formulario, para que al filtrar no pierdas el tab
+        const hiddenTab = document.querySelector('form input[name="tab"]');
+        if (hiddenTab) hiddenTab.value = tabValue;
+      });
+    });
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/enProceso.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/completadas.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script>
-        const BASE_URL = "<?= BASE_URL ?>";
-    </script>
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function verDetalle(data) {
+      const body = document.getElementById('detalleSolicitudBody');
+
+      body.innerHTML = `
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded">
+            <div class="fw-semibold text-dark mb-1">Cliente</div>
+            <div>${escapeHtml(data.nombre_cliente ?? data.cliente_nombre ?? 'N/A')}</div>
+            <div class="text-muted"><i class="bi bi-telephone"></i> ${escapeHtml(data.telefono_cliente ?? data.cliente_telefono ?? 'N/A')}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Servicio</div>
+          <div>${escapeHtml(data.servicio_nombre ?? data.publicacion_titulo ?? data.solicitud_titulo ?? 'N/A')}</div>
+          <div class="text-muted">Estado: ${escapeHtml(data.estado ?? 'pendiente')}</div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Fecha / horario</div>
+          <div><i class="bi bi-calendar3"></i> ${escapeHtml(data.fecha_preferida ?? data.fecha_solicitud ?? data.fecha_inicio ?? 'Sin fecha')}</div>
+          <div class="text-muted"><i class="bi bi-clock"></i> ${escapeHtml(data.franja_horaria ?? 'N/A')}</div>
+        </div>
+      </div>
+
+      <!-- NUEVO: Ubicación -->
+      <div class="col-md-6">
+        <div class="p-3 bg-light rounded">
+          <div class="fw-semibold text-dark mb-1">Ubicación</div>
+          <div><i class="bi bi-geo-alt"></i> ${escapeHtml(data.direccion ?? data.direccion_servicio ?? 'N/A')}</div>
+          <div class="text-muted">
+            ${escapeHtml(data.ciudad ?? 'N/A')}${(data.zona ?? '').toString().trim() ? ' · ' + escapeHtml(data.zona) : ''}
+          </div>
+        </div>
+      </div>
+
+      const modal = new bootstrap.Modal(document.getElementById('modalDetalleSolicitud'));
+      modal.show();
+    }
+
+    // Tus JS específicos (deben validar que existan elementos antes de operar)
+    const BASE_URL = "<?= BASE_URL ?>";
+  </script>
+
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/enProceso.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/completadas.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+
 </body>
 
 </html>
