@@ -29,14 +29,11 @@ switch ($method) {
 
         if ($accion === 'enviar_cotizacion') {
             enviarCotizacion();
-        } 
-        elseif ($accion === 'actualizar_estado_servicio') {
+        } elseif ($accion === 'actualizar_estado_servicio') {
             actualizarEstadoServicio();
-        } 
-        elseif ($accion === 'guardar_solicitud_cliente') {
+        } elseif ($accion === 'guardar_solicitud_cliente') {
             guardarSolicitud(); // Esto lo hace el cliente hacia el proveedor
-        }
-        else {
+        } else {
             http_response_code(400);
             echo "Acción POST no válida";
         }
@@ -47,17 +44,13 @@ switch ($method) {
 
         if ($accion === 'mostrar_oportunidades') {
             mostrarOportunidades();
-        }
-        elseif ($accion === 'aceptar_solicitud') {
+        } elseif ($accion === 'aceptar_solicitud') {
             aceptarSolicitud($_GET['id'] ?? null);
-        }
-        elseif ($accion === 'rechazar_solicitud') {
+        } elseif ($accion === 'rechazar_solicitud') {
             rechazarSolicitud($_GET['id'] ?? null);
-        }
-        elseif ($accion === 'mostrar_servicios_contratados') {
+        } elseif ($accion === 'mostrar_servicios_contratados') {
             mostrarServiciosContratadosProveedor();
-        }
-        else {
+        } else {
             http_response_code(400);
             echo "Acción GET no válida";
         }
@@ -79,23 +72,30 @@ switch ($method) {
 
 function mostrarOportunidades()
 {
-    if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores pueden ver oportunidades.', '/ProviServers/login');
+    if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'proveedor') {
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Solo proveedores pueden ver oportunidades.',
+            '/ProviServers/login'
+        );
         exit();
     }
 
-    $modelo = new Necesidad();
     $usuarioId = (int)$_SESSION['user']['id'];
 
     $filtros = [
-        'busqueda'  => $_GET['q'] ?? '',
-        'ciudad'    => $_GET['ciudad'] ?? '',
-        'categoria' => $_GET['categoria'] ?? ''
+        'busqueda'  => trim($_GET['q'] ?? ''),
+        'ciudad'    => trim($_GET['ciudad'] ?? ''),
+        'categoria' => trim($_GET['categoria'] ?? '')
     ];
 
-    $necesidades = $modelo->obtenerOportunidades($usuarioId, $filtros);
+    $modelo = new Necesidad();
+    $cotizacionModel = new Cotizacion();
 
-    // Cargar la vista
+    $necesidades = $modelo->obtenerOportunidades($usuarioId, $filtros);
+    $publicacionesProveedor = $cotizacionModel->obtenerPublicacionesAprobadasPorProveedorUsuario($usuarioId);
+
     require_once BASE_PATH . '/app/views/dashboard/proveedor/oportunidades.php';
     exit();
 }
@@ -103,40 +103,61 @@ function mostrarOportunidades()
 function enviarCotizacion()
 {
     if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores pueden enviar cotizaciones.', '/ProviServers/login');
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Solo proveedores pueden enviar cotizaciones.',
+            '/ProviServers/login'
+        );
         exit();
     }
 
-    $usuarioId   = (int)$_SESSION['user']['id'];
-    $necesidadId = (int)($_POST['necesidad_id'] ?? 0);
-    
-    // Mapeo de datos (Combinación de ambas lógicas que me enviaste)
+    $usuarioId     = (int)$_SESSION['user']['id'];
+    $necesidadId   = (int)($_POST['necesidad_id'] ?? 0);
+    $publicacionId = (int)($_POST['publicacion_id'] ?? 0);
+
     $titulo  = trim($_POST['titulo'] ?? '');
     $mensaje = trim($_POST['mensaje'] ?? '');
-    $precio  = $_POST['precio_oferta'] ?? ($_POST['precio'] ?? null); // Compatibilidad de names
+    $precio  = $_POST['precio_oferta'] ?? ($_POST['precio'] ?? null);
     $tiempo  = trim($_POST['tiempo_estimado'] ?? '');
 
-    // Validación
-    if ($necesidadId <= 0 || $titulo === '' || empty($precio)) {
-        mostrarSweetAlert('error', 'Datos incompletos', 'Asegúrate de llenar el título y el precio.', '/ProviServers/proveedor/oportunidades');
+    if ($necesidadId <= 0 || $publicacionId <= 0 || $titulo === '' || $precio === null || $precio === '') {
+        mostrarSweetAlert(
+            'error',
+            'Datos incompletos',
+            'Debes seleccionar una publicación, escribir un título y definir un precio.',
+            '/ProviServers/proveedor/oportunidades'
+        );
         exit();
     }
 
     $datos = [
-        'titulo'          => $titulo,
-        'precio'          => $precio,
-        'tiempo_estimado' => $tiempo,
-        'mensaje'         => $mensaje
+        'publicacion_id'   => $publicacionId,
+        'titulo'           => $titulo,
+        'precio'           => $precio,
+        'tiempo_estimado'  => $tiempo,
+        'mensaje'          => $mensaje
     ];
 
     $modelo = new Cotizacion();
     $exito = $modelo->crearParaNecesidadPorProveedorUsuario($usuarioId, $necesidadId, $datos);
 
     if ($exito) {
-        mostrarSweetAlert('success', 'Oferta enviada', 'El cliente verá tu cotización.', '/ProviServers/proveedor/oportunidades');
+        mostrarSweetAlert(
+            'success',
+            'Oferta enviada',
+            'El cliente verá tu cotización.',
+            '/ProviServers/proveedor/oportunidades'
+        );
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo enviar. Es posible que ya hayas cotizado o la necesidad esté cerrada.', '/ProviServers/proveedor/oportunidades');
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo enviar. Verifica que la necesidad siga abierta y que la publicación seleccionada sea tuya y esté aprobada.',
+            '/ProviServers/proveedor/oportunidades'
+        );
     }
+
     exit();
 }
 
@@ -223,7 +244,7 @@ function guardarSolicitud()
     $zona          = trim($_POST['zona'] ?? '');
     $fecha         = trim($_POST['fecha_preferida'] ?? '');
     $franja        = trim($_POST['franja_horaria'] ?? '');
-    
+
 
 
     if (!$publicacionId || !$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha) {

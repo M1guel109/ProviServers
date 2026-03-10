@@ -36,18 +36,39 @@ class Necesidad
     public function crearParaClienteUsuario(int $usuarioId, array $data): bool
     {
         $clienteId = $this->obtenerClienteIdPorUsuario($usuarioId);
+
         if (!$clienteId) {
             error_log("Necesidad::crearParaClienteUsuario -> No existe cliente para usuario_id={$usuarioId}");
             return false;
         }
 
         $sql = "INSERT INTO necesidades (
-                    cliente_id, servicio_id, titulo, descripcion, direccion, ciudad, zona,
-                    fecha_preferida, hora_preferida, presupuesto_estimado, estado
-                ) VALUES (
-                    :cliente_id, :servicio_id, :titulo, :descripcion, :direccion, :ciudad, :zona,
-                    :fecha_preferida, :hora_preferida, :presupuesto_estimado, 'abierta'
-                )";
+                cliente_id,
+                servicio_id,
+                titulo,
+                descripcion,
+                direccion,
+                ciudad,
+                zona,
+                fecha_preferida,
+                franja_horaria,
+                hora_preferida,
+                presupuesto_estimado,
+                estado
+            ) VALUES (
+                :cliente_id,
+                :servicio_id,
+                :titulo,
+                :descripcion,
+                :direccion,
+                :ciudad,
+                :zona,
+                :fecha_preferida,
+                :franja_horaria,
+                :hora_preferida,
+                :presupuesto_estimado,
+                'abierta'
+            )";
 
         try {
             $stmt = $this->db->prepare($sql);
@@ -61,6 +82,7 @@ class Necesidad
                 ':ciudad'               => $data['ciudad'],
                 ':zona'                 => $data['zona'] ?? null,
                 ':fecha_preferida'      => $data['fecha_preferida'],
+                ':franja_horaria'       => $data['franja_horaria'] ?? null,
                 ':hora_preferida'       => $data['hora_preferida'] ?? null,
                 ':presupuesto_estimado' => $data['presupuesto_estimado'] ?? null,
             ]);
@@ -71,7 +93,6 @@ class Necesidad
             }
 
             return $ok;
-
         } catch (Throwable $e) {
             error_log("Necesidad::crearParaClienteUsuario -> " . $e->getMessage());
             return false;
@@ -215,7 +236,6 @@ class Necesidad
 
             $this->db->commit();
             return true;
-
         } catch (Throwable $e) {
             if ($this->db->inTransaction()) $this->db->rollBack();
             error_log("Necesidad::aceptarCotizacion -> " . $e->getMessage());
@@ -223,7 +243,7 @@ class Necesidad
         }
     }
 
-/* ============================
+    /* ============================
        PROVEEDOR: Obtener Oportunidades (Con filtros y datos extra)
     ============================ */
     public function obtenerOportunidades(int $usuarioId, array $filtros = []): array
@@ -249,12 +269,12 @@ class Necesidad
         ";
 
         // --- Aplicar Filtros Dinámicos ---
-        
+
         // 1. Búsqueda por texto (Título o Descripción)
         if (!empty($filtros['busqueda'])) {
             $sql .= " AND (n.titulo LIKE :busqueda OR n.descripcion LIKE :busqueda)";
         }
-        
+
         // 2. Filtro por Ciudad
         if (!empty($filtros['ciudad'])) {
             $sql .= " AND n.ciudad = :ciudad";
@@ -269,7 +289,7 @@ class Necesidad
 
         try {
             $stmt = $this->db->prepare($sql);
-            
+
             // Bind de parámetros fijos
             $stmt->bindValue(':pid', $proveedorId);
 
@@ -286,7 +306,6 @@ class Necesidad
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
             error_log("Error en obtenerOportunidades: " . $e->getMessage());
             return [];
@@ -345,7 +364,6 @@ class Necesidad
 
             $this->db->commit();
             return $ok;
-
         } catch (Throwable $e) {
             if ($this->db->inTransaction()) $this->db->rollBack();
             error_log("Necesidad::crearCotizacionParaNecesidad -> " . $e->getMessage());

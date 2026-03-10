@@ -25,8 +25,16 @@ $solicitudesNuevas = $solicitudModel->listarPorProveedor($usuarioId);
 $scModel = new ServicioContratado();
 $serviciosAll = $scModel->listarPorProveedorUsuario($usuarioId);
 
-$serviciosEnProceso = array_values(array_filter($serviciosAll, fn($s) => ($s['estado'] ?? '') === 'en_proceso'));
-$serviciosCompletados = array_values(array_filter($serviciosAll, fn($s) => ($s['estado'] ?? '') === 'finalizado'));
+// Aquí metes también los recién contratados
+$serviciosEnProceso = array_values(array_filter(
+    $serviciosAll,
+    fn($s) => in_array(($s['estado'] ?? ''), ['pendiente', 'confirmado', 'en_proceso'], true)
+));
+
+$serviciosCompletados = array_values(array_filter(
+    $serviciosAll,
+    fn($s) => ($s['estado'] ?? '') === 'finalizado'
+));
 
 /**
  * Helpers de filtrado (sin romper si faltan campos)
