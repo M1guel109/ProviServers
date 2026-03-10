@@ -299,6 +299,9 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/finanzas.php';
         break;
 
+    case '/proveedor/membresia':
+        require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
+        break;
     case '/proveedor/oportunidades':
         require_once BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
         mostrarOportunidades();
