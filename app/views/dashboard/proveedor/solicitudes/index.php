@@ -381,7 +381,7 @@ $totalCompletadas = count($serviciosCompletados);
             ${escapeHtml(data.ciudad ?? 'N/A')}${(data.zona ?? '').toString().trim() ? ' · ' + escapeHtml(data.zona) : ''}
           </div>
         </div>
-      </div>
+      </div>`
 
       const modal = new bootstrap.Modal(document.getElementById('modalDetalleSolicitud'));
       modal.show();

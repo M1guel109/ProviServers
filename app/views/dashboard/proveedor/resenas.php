@@ -2,17 +2,6 @@
 // Asegúrate de que BASE_PATH esté definido en tu config
 require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 // Las variables $resenas, $promedio, $totalResenas, $porcentajes llegan del controlador
-
-
-// echo "<pre style='background:white; color:black; z-index:9999; position:relative; padding:20px;'>";
-// echo "<h1>🔍 DIAGNÓSTICO DE DATOS</h1>";
-// echo "<strong>Total Reseñas:</strong> "; var_dump($totalResenas); echo "<br>";
-// echo "<strong>Promedio:</strong> "; var_dump($promedio); echo "<br>";
-// echo "<strong>Porcentajes:</strong> "; print_r($porcentajes); echo "<br>";
-// echo "<strong>Lista de Reseñas:</strong> "; print_r($resenas);
-// echo "</pre>";
-// die(); // Detiene la carga de la página aquí para que solo veas los datos
-
 ?>
 
 <!DOCTYPE html>
@@ -22,24 +11,47 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Reseñas y Calificaciones</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Estilos globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+
+    <!-- CSS específico -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/resenas.css">
 </head>
 
 <body>
+    <!-- SIDEBAR -->
     <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
 
     <main class="contenido">
+        <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
 
+        <!-- Título con breadcrumb (IGUAL QUE DASHBOARD) -->
         <section id="titulo-principal">
-            <h1>Reseñas y Calificaciones</h1>
-            <p class="descripcion-seccion">Gestiona las opiniones de tus clientes. Las reseñas ayudan a mejorar tu reputación.</p>
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>Reseñas y Calificaciones</h1>
+                    <p class="text-muted mb-0">
+                        Gestiona las opiniones de tus clientes. Las reseñas ayudan a mejorar tu reputación.
+                    </p>
+                </div>
+                <div class="col-md-4">
+                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
+        <!-- Tarjetas de estadísticas -->
         <section id="tarjetas-superiores">
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-star-fill icono-estadistica text-warning"></i>
@@ -63,6 +75,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             </div>
         </section>
 
+        <!-- Distribución de calificaciones -->
         <section id="distribucion-calificaciones">
             <div class="tarjeta">
                 <h3>Distribución de Calificaciones</h3>
@@ -82,6 +95,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             </div>
         </section>
 
+        <!-- Filtros -->
         <section id="filtros-resenas">
             <div class="filtros-contenedor">
                 <select id="filtro-calificacion" class="filtro-select">
@@ -96,20 +110,19 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
             </div>
         </section>
 
+        <!-- Lista de reseñas -->
         <div id="contenedor-scrollable-resenas">
             <section id="lista-resenas">
 
                 <?php if (empty($resenas)): ?>
-                    <div class="text-center py-5">
-                        <i class="bi bi-chat-square text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-3">Aún no tienes reseñas registradas.</p>
+                    <div class="empty-state">
+                        <i class="bi bi-chat-square"></i>
+                        <h4 class="text-muted">No hay reseñas disponibles</h4>
+                        <p class="text-muted">Aún no tienes reseñas registradas.</p>
                     </div>
                 <?php else: ?>
 
                     <?php foreach ($resenas as $r): ?>
-                        <!-- <pre style="background: yellow; color: black;">
-                            <?php print_r($r); ?>
-                        </pre> -->
                         <div class="tarjeta tarjeta-resena">
                             <div class="resena-header">
                                 <div class="cliente-info">
@@ -152,7 +165,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                             <div class="resena-acciones mt-3 pt-2 border-top">
                                 <?php if (empty($r['respuesta_proveedor'])): ?>
                                     <button class="btn btn-sm btn-outline-primary rounded-pill btn-abrir-modal"
-                                        data-id="<?= /* OJO: Necesitas el ID de la valoración aquí. Asegúrate que tu SELECT en el modelo traiga 'v.id' */ $r['id'] ?? '' ?>"
+                                        data-id="<?= $r['id'] ?? '' ?>"
                                         data-bs-toggle="modal"
                                         data-bs-target="#modalResponder">
                                         <i class="bi bi-reply"></i> Responder
@@ -177,36 +190,45 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     </main>
 
+    <!-- Modal de Respuesta -->
     <div class="modal fade" id="modalResponder" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-reply me-2"></i>Responder al Cliente
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <form action="<?= BASE_URL ?>/proveedor/resenas/responder" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Responder al Cliente</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
                         <input type="hidden" name="id_valoracion" id="modal_id_valoracion">
                         <div class="mb-3">
-                            <label for="texto_respuesta" class="form-label">Tu respuesta:</label>
+                            <label for="texto_respuesta" class="form-label fw-bold">Tu respuesta:</label>
                             <textarea class="form-control" name="texto_respuesta" id="texto_respuesta" rows="4" required placeholder="Escribe aquí tu agradecimiento o aclaración..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Enviar Respuesta</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Enviar Respuesta
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 
     <script>
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
     <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/resenas.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
 </body>
 
 </html>
