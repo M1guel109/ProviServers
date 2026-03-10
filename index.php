@@ -303,6 +303,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/facturacion.php';
         break;
 
+    case '/proveedor/promociones':
+        require BASE_PATH . '/app/views/dashboard/proveedor/promociones.php';
+        break;
+
     case '/proveedor/membresia':
         require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
         break;

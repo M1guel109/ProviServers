@@ -115,7 +115,7 @@ $isActive = function (string $path) use ($currentPath): string {
         <a href="#" data-title="Soporte">
             <i class="bi bi-headset"></i><span>Soporte</span>
         </a>
-        <a href="<?= BASE_URL ?>/logout" data-title="Cerrar Sesión">
+        <a href="<?= BASE_URL ?>/cerrar-sesion?accion=cerrar_sesion"  data-title="Cerrar Sesión">
             <i class="bi bi-box-arrow-right"></i><span>Cerrar Sesión</span>
         </a>
     </div>
