@@ -239,8 +239,8 @@ switch ($request) {
         reportesPdfController();
         break;
 
-    case '/proveedor/calendarioProveedor':
-        require BASE_PATH . '/app/views/dashboard/proveedor/calendarioProveedor.php';
+    case '/proveedor/calendario':
+        require BASE_PATH . '/app/views/dashboard/proveedor/calendario.php';
         break;
 
     case '/proveedor/configuracion':
@@ -291,6 +291,17 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
 
+    case '/proveedor/estadisticas':
+        require BASE_PATH . '/app/views/dashboard/proveedor/estadisticas.php';
+        break;
+
+    case '/proveedor/finanzas':
+        require BASE_PATH . '/app/views/dashboard/proveedor/finanzas.php';
+        break;
+
+    case '/proveedor/membresia':
+        require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
+        break;
     case '/proveedor/oportunidades':
         require_once BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
         mostrarOportunidades();

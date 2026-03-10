@@ -1,0 +1,569 @@
+/* ==========================================================================
+   MEMBRESÍA - Estilos específicos
+   Basado en el diseño de finanzas y estadísticas
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL (IGUAL QUE DASHBOARD)
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .row {
+    width: 100%;
+    margin: 0;
+}
+
+#titulo-principal .col-md-8,
+#titulo-principal .col-md-4 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. BREADCRUMB
+   ========================================================================== */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+    list-style: none;
+    background: transparent;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #6c757d;
+    content: ">";
+    font-weight: 300;
+}
+
+
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover, #0052cc);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+.justify-content-md-end {
+    justify-content: flex-end !important;
+}
+
+/* ==========================================================================
+   3. CARD DEL PLAN ACTUAL
+   ========================================================================== */
+.card-plan-actual {
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-plan-actual::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(0,102,255,0.03) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.card-plan-actual .plan-icono {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.card-plan-actual .plan-icono.bg-secondary {
+    background: linear-gradient(135deg, #64748b, #475569);
+}
+
+.card-plan-actual .plan-icono.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+}
+
+.card-plan-actual h2 {
+    font-size: 1.8rem;
+    color: var(--dark-color);
+}
+
+.card-plan-actual .badge {
+    font-size: 0.8rem;
+    padding: 5px 12px;
+}
+
+.card-plan-actual .plan-precio {
+    position: relative;
+    z-index: 1;
+}
+
+.card-plan-actual .plan-precio h3 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   4. CARD DE BENEFICIOS
+   ========================================================================== */
+.card {
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.25s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: white;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 15px 20px;
+}
+
+.card-header a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.card-header h6 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+/* ==========================================================================
+   5. PLANES DISPONIBLES (TARJETAS)
+   ========================================================================== */
+.card-plan {
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 30px 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    height: 100%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.card-plan:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.card-plan.destacado {
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 10px 25px rgba(0, 102, 255, 0.15);
+}
+
+.plan-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    padding: 5px 20px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+    white-space: nowrap;
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.plan-icono {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.plan-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 15px;
+}
+
+.plan-precio-card {
+    margin-bottom: 10px;
+}
+
+.plan-precio-card .precio {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.plan-precio-card .periodo {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-left: 5px;
+}
+
+.plan-body {
+    padding: 0 5px;
+}
+
+.plan-beneficios {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 25px 0;
+}
+
+.plan-beneficios li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: #475569;
+}
+
+.plan-beneficios li i {
+    color: #27ae60;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.btn-cambiar-plan {
+    padding: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-cambiar-plan:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+}
+
+/* ==========================================================================
+   6. TABLA DE HISTORIAL
+   ========================================================================== */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 15px;
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table .badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 30px;
+    font-weight: 600;
+}
+
+.table .badge.bg-success {
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    color: #27ae60;
+}
+
+.table .badge.bg-secondary {
+    background-color: rgba(100, 116, 139, 0.1) !important;
+    color: #64748b;
+}
+
+.table .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+}
+
+.table .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   7. MODALES (Cambiar plan y pago)
+   ========================================================================== */
+.modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+}
+
+.modal-header.bg-success {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+}
+
+.modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-white {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.25s ease;
+}
+
+.btn-close-white:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Lista de planes en modal */
+.list-group-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px !important;
+    margin-bottom: 10px;
+    padding: 15px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+}
+
+.list-group-item:hover {
+    background-color: #f8fafc;
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.list-group-item i {
+    font-size: 1.3rem;
+}
+
+.list-group-item strong {
+    color: var(--dark-color);
+}
+
+/* Info de pago */
+.pago-info {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 15px;
+}
+
+.pago-info p {
+    margin-bottom: 5px;
+}
+
+.pago-info strong {
+    color: var(--dark-color);
+}
+
+/* Formulario tarjeta */
+#form-tarjeta input {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 0.9rem;
+}
+
+#form-tarjeta input:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+/* ==========================================================================
+   8. RESPONSIVE
+   ========================================================================== */
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    .card-plan-actual {
+        padding: 20px;
+    }
+    
+    .card-plan-actual .plan-icono {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .card-plan-actual h2 {
+        font-size: 1.5rem;
+    }
+    
+    .card-plan-actual .plan-precio h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #titulo-principal .col-md-8,
+    #titulo-principal .col-md-4 {
+        width: 100%;
+    }
+    
+    #titulo-principal .text-muted {
+        max-width: 100%;
+    }
+    
+    .breadcrumb {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .card-plan-actual .row {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .card-plan-actual .col-md-8 {
+        margin-bottom: 20px;
+    }
+    
+    .card-plan-actual .col-md-4 {
+        text-align: center !important;
+    }
+    
+    .card-plan {
+        margin-bottom: 20px;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .card-plan-actual {
+        padding: 15px;
+    }
+    
+    .card-plan-actual .plan-icono {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .plan-icono i {
+        font-size: 1.5rem !important;
+    }
+    
+    .card-plan-actual h2 {
+        font-size: 1.3rem;
+    }
+    
+    .plan-precio-card .precio {
+        font-size: 1.8rem;
+    }
+    
+    .btn-cambiar-plan {
+        padding: 10px;
+    }
+}

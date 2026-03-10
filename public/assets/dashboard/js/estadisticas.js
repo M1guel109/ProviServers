@@ -1,22 +1,24 @@
 /* ======================================================
-   finanzas.js - Gráficas y funcionalidad de finanzas
+   estadisticas.js - Gráficas y funcionalidad de estadísticas
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Finanzas cargadas');
+    console.log('Estadísticas cargadas');
     
     // Inicializar gráficas
     initCharts();
     
     // Event listeners para filtros
     const aplicarFiltro = document.getElementById('aplicar-filtro');
-    const periodoSelect = document.getElementById('periodo-finanzas');
+    const periodoSelect = document.getElementById('periodo-estadisticas');
     
     if (aplicarFiltro) {
         aplicarFiltro.addEventListener('click', function() {
             const periodo = periodoSelect ? periodoSelect.value : 'mes';
             console.log('Filtrar por período:', periodo);
-            alert(`Filtrando datos financieros por: ${periodo}`);
+            // Aquí iría la lógica para actualizar datos según el período
+            // Por ahora solo mostramos un mensaje
+            alert(`Filtrando datos por: ${periodo}`);
         });
     }
     
@@ -33,68 +35,46 @@ document.addEventListener('DOMContentLoaded', function() {
             actualizarTipoGrafico(tipo);
         });
     });
-    
-    // Botones de exportar (simulado)
-    const btnExportar = document.querySelector('#modalExportar .btn-success');
-    if (btnExportar) {
-        btnExportar.addEventListener('click', function() {
-            alert('Reporte exportado exitosamente (simulado)');
-            const modal = bootstrap.Modal.getInstance(document.getElementById('modalExportar'));
-            if (modal) modal.hide();
-        });
-    }
 });
 
 // Variables globales para las gráficas
-let chartIngresosGastos, chartIngresosCategorias;
+let chartIngresos, chartCategorias;
 
 function initCharts() {
     // Verificar que los datos existen
-    if (typeof datosIngresos === 'undefined' || typeof datosGastos === 'undefined') {
+    if (typeof datosIngresos === 'undefined' || typeof datosCategorias === 'undefined') {
         console.error('Datos no disponibles');
         return;
     }
     
-    // Gráfica de ingresos vs gastos
-    const ctxIngresosGastos = document.getElementById('chartIngresosGastos')?.getContext('2d');
-    if (ctxIngresosGastos) {
-        chartIngresosGastos = new Chart(ctxIngresosGastos, {
-            type: 'bar',
+    // Gráfica de ingresos
+    const ctxIngresos = document.getElementById('chartIngresos')?.getContext('2d');
+    if (ctxIngresos) {
+        chartIngresos = new Chart(ctxIngresos, {
+            type: 'line',
             data: {
                 labels: datosIngresos.meses,
-                datasets: [
-                    {
-                        label: 'Ingresos',
-                        data: datosIngresos.valores,
-                        backgroundColor: 'rgba(0, 102, 255, 0.7)',
-                        borderColor: '#0066FF',
-                        borderWidth: 1,
-                        borderRadius: 6
-                    },
-                    {
-                        label: 'Gastos',
-                        data: datosGastos.valores,
-                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                        borderColor: '#e74c3c',
-                        borderWidth: 1,
-                        borderRadius: 6
-                    }
-                ]
+                datasets: [{
+                    label: 'Ingresos ($)',
+                    data: datosIngresos.valores,
+                    borderColor: '#0066FF',
+                    backgroundColor: 'rgba(0, 102, 255, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#0066FF',
+                    pointBorderColor: 'white',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    tension: 0.3,
+                    fill: true
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        position: 'top',
-                        labels: {
-                            color: '#64748b',
-                            font: {
-                                size: 12
-                            },
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
+                        display: false
                     },
                     tooltip: {
                         backgroundColor: 'white',
@@ -143,20 +123,21 @@ function initCharts() {
         });
     }
     
-    // Gráfica de ingresos por categoría (pastel)
-    const ctxCategorias = document.getElementById('chartIngresosCategorias')?.getContext('2d');
+    // Gráfica de categorías (pastel)
+    const ctxCategorias = document.getElementById('chartCategorias')?.getContext('2d');
     if (ctxCategorias) {
-        chartIngresosCategorias = new Chart(ctxCategorias, {
+        chartCategorias = new Chart(ctxCategorias, {
             type: 'doughnut',
             data: {
-                labels: ['Plomería', 'Electricidad', 'Pintura', 'Jardinería', 'Limpieza'],
+                labels: datosCategorias.categorias,
                 datasets: [{
-                    data: [1250000, 980000, 720000, 450000, 380000],
+                    data: datosCategorias.valores,
                     backgroundColor: [
                         '#0066FF',
-                        '#f39c12',
                         '#27ae60',
+                        '#f39c12',
                         '#9b59b6',
+                        '#e74c3c',
                         '#3498db'
                     ],
                     borderColor: 'white',
@@ -169,7 +150,15 @@ function initCharts() {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            font: {
+                                size: 12
+                            },
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
                     },
                     tooltip: {
                         backgroundColor: 'white',
@@ -183,7 +172,7 @@ function initCharts() {
                                 const value = context.raw || 0;
                                 const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                 const percentage = Math.round((value / total) * 100);
-                                return `${label}: $${value.toLocaleString('es-CO')} (${percentage}%)`;
+                                return `${label}: ${value} servicios (${percentage}%)`;
                             }
                         }
                     }
@@ -195,39 +184,44 @@ function initCharts() {
 }
 
 function actualizarTipoGrafico(tipo) {
-    if (!chartIngresosGastos) return;
+    if (!chartIngresos) return;
     
-    chartIngresosGastos.config.type = tipo;
-    chartIngresosGastos.update();
-}
-
-// Función para formatear moneda
-function formatearMoneda(valor) {
-    return new Intl.NumberFormat('es-CO', {
-        style: 'currency',
-        currency: 'COP',
-        minimumFractionDigits: 0
-    }).format(valor);
+    chartIngresos.config.type = tipo;
+    chartIngresos.update();
+    
+    // Cambiar opciones según el tipo
+    if (tipo === 'bar') {
+        chartIngresos.data.datasets[0].fill = false;
+        chartIngresos.data.datasets[0].tension = 0;
+    } else {
+        chartIngresos.data.datasets[0].fill = true;
+        chartIngresos.data.datasets[0].tension = 0.3;
+    }
 }
 
 // Función para actualizar datos (cuando se implemente el backend)
-function actualizarFinanzas(periodo) {
+function actualizarEstadisticas(periodo) {
     // Aquí iría un fetch al backend para obtener nuevos datos
-    console.log('Actualizando finanzas para período:', periodo);
+    console.log('Actualizando estadísticas para período:', periodo);
     
     // Ejemplo de actualización:
     /*
-    fetch(`${BASE_URL}/proveedor/finanzas/datos?periodo=${periodo}`)
+    fetch(`${BASE_URL}/proveedor/estadisticas/datos?periodo=${periodo}`)
         .then(response => response.json())
         .then(data => {
-            if (chartIngresosGastos) {
-                chartIngresosGastos.data.labels = data.meses;
-                chartIngresosGastos.data.datasets[0].data = data.ingresos;
-                chartIngresosGastos.data.datasets[1].data = data.gastos;
-                chartIngresosGastos.update();
+            if (chartIngresos) {
+                chartIngresos.data.labels = data.meses;
+                chartIngresos.data.datasets[0].data = data.valores;
+                chartIngresos.update();
             }
             
-            // Actualizar tarjetas financieras
+            if (chartCategorias) {
+                chartCategorias.data.labels = data.categorias;
+                chartCategorias.data.datasets[0].data = data.valoresCategorias;
+                chartCategorias.update();
+            }
+            
+            // Actualizar tarjetas de estadísticas
             actualizarTarjetas(data.resumen);
         })
         .catch(error => console.error('Error:', error));
@@ -238,7 +232,7 @@ function actualizarTarjetas(resumen) {
     // Actualizar los valores de las tarjetas principales
     // Ejemplo:
     /*
-    document.querySelectorAll('.financiera-valor').forEach((el, index) => {
+    document.querySelectorAll('.estadistica-valor').forEach((el, index) => {
         // Lógica para actualizar según el índice o usar IDs específicos
     });
     */

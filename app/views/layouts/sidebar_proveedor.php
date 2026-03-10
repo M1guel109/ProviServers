@@ -87,9 +87,9 @@ $isActive = function (string $path) use ($currentPath): string {
                 </a>
             </li>
 
-            <li><a href="#" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
-            <li><a href="#" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
-            <li><a href="#" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
+            <li><a href="<?= BASE_URL ?>/proveedor/calendario" class="<?= $isActive('/proveedor/calendario') ?>" data-title="Calendario"><i class="bi bi-calendar-event"></i><span>Calendario</span></a></li>
+            <li><a href="<?= BASE_URL ?>/proveedor/estadisticas" class="<?= $isActive('/proveedor/estadisticas') ?>" data-title="Estadísticas"><i class="bi bi-graph-up"></i><span>Estadísticas</span></a></li>
+            <li><a href="<?= BASE_URL ?>/proveedor/finanzas" class="<?= $isActive('/proveedor/finanzas') ?>" data-title="Finanzas"><i class="bi bi-cash-stack"></i><span>Finanzas</span></a></li>
             <li>
                 <a href="<?= BASE_URL ?>/proveedor/membresia"
                     class="<?= $isActive('/proveedor/membresia') ?>"
@@ -98,8 +98,8 @@ $isActive = function (string $path) use ($currentPath): string {
                     <span class="badge bg-warning text-dark ms-auto" style="font-size: 0.6rem;">Freemium</span>
                 </a>
             </li>
-            <li><a href="#" data-title="Facturación"><i class="bi bi-receipt"></i><span>Facturación</span></a></li>
-            <li><a href="#" data-title="Promociones"><i class="bi bi-megaphone"></i><span>Promociones</span></a></li>
+            <li><a href="<?= BASE_URL ?>/proveedor/facturacion" class="<?= $isActive('/proveedor/facturacion') ?>" data-title="Facturación"><i class="bi bi-receipt"></i><span>Facturación</span></a></li>
+            <li><a href="<?= BASE_URL ?>/proveedor/promociones" class="<?= $isActive('/proveedor/promociones') ?>" data-title="Promociones"><i class="bi bi-megaphone"></i><span>Promociones</span></a></li>
 
             <li>
                 <a href="<?= BASE_URL ?>/proveedor/configuracion"
