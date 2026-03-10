@@ -63,6 +63,7 @@
       </ul>
 
       <div class="tab-content" id="estadoTabsContent">
+
         <!-- En curso -->
         <div class="tab-pane fade show active" id="curso">
           <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
@@ -73,17 +74,32 @@
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
                   : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
-                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
-                $ciudad           = $srv['ciudad'] ?? '';
-                $zona             = $srv['zona'] ?? '';
+                $tituloServicio =
+                  $srv['servicio_nombre']
+                  ?? $srv['publicacion_titulo_cotizacion']
+                  ?? $srv['publicacion_titulo_solicitud']
+                  ?? $srv['cotizacion_titulo']
+                  ?? $srv['solicitud_titulo']
+                  ?? $srv['necesidad_titulo']
+                  ?? 'Servicio';
+
+                $proveedorNombre = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+
+                $fechaTexto =
+                  $srv['fecha_ejecucion']
+                  ?: ($srv['necesidad_fecha_preferida'] ?? null)
+                  ?: ($srv['solicitud_fecha_preferida'] ?? null)
+                  ?: ($srv['fecha_solicitud'] ?? null);
+
+                $ciudad = $srv['necesidad_ciudad'] ?? $srv['solicitud_ciudad'] ?? '';
+                $zona   = $srv['necesidad_zona'] ?? $srv['solicitud_zona'] ?? '';
                 ?>
                 <div class="col">
                   <div class="card service-card estado-curso">
                     <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio">
                     <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
+
                       <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
@@ -103,7 +119,6 @@
                         </p>
                       <?php endif; ?>
 
-                      <!-- Barra de progreso placeholder -->
                       <div class="progress mb-3" style="height: 20px;">
                         <div class="progress-bar bg-success"
                           role="progressbar"
@@ -138,19 +153,34 @@
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
                   : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
-                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
-                $ciudad           = $srv['ciudad'] ?? '';
-                $zona             = $srv['zona'] ?? '';
-                $estado           = $srv['estado'] ?? '';
-                $contratoId       = (int)($srv['contrato_id'] ?? 0);
+                $tituloServicio =
+                  $srv['servicio_nombre']
+                  ?? $srv['publicacion_titulo_cotizacion']
+                  ?? $srv['publicacion_titulo_solicitud']
+                  ?? $srv['cotizacion_titulo']
+                  ?? $srv['solicitud_titulo']
+                  ?? $srv['necesidad_titulo']
+                  ?? 'Servicio';
+
+                $proveedorNombre = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+
+                $fechaTexto =
+                  $srv['fecha_ejecucion']
+                  ?: ($srv['necesidad_fecha_preferida'] ?? null)
+                  ?: ($srv['solicitud_fecha_preferida'] ?? null)
+                  ?: ($srv['fecha_solicitud'] ?? null);
+
+                $ciudad = $srv['necesidad_ciudad'] ?? $srv['solicitud_ciudad'] ?? '';
+                $zona   = $srv['necesidad_zona'] ?? $srv['solicitud_zona'] ?? '';
+                $estado = $srv['estado'] ?? '';
+                $contratoId = (int)($srv['contrato_id'] ?? 0);
                 ?>
                 <div class="col">
                   <div class="card service-card estado-programado">
                     <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio programado">
                     <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
+
                       <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
@@ -172,7 +202,6 @@
 
                       <a href="#" class="btn btn-primary w-100">Ver detalles</a>
 
-                      <!-- ✅ 3.2 Acción cliente: Cancelar (solo si pendiente/confirmado) -->
                       <?php if ($contratoId > 0 && in_array($estado, ['pendiente', 'confirmado'], true)): ?>
                         <form method="POST"
                           action="<?= BASE_URL ?>/cliente/servicios-contratados/cancelar"
@@ -209,27 +238,44 @@
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
                   : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
-                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $tituloServicio =
+                  $srv['servicio_nombre']
+                  ?? $srv['publicacion_titulo_cotizacion']
+                  ?? $srv['publicacion_titulo_solicitud']
+                  ?? $srv['cotizacion_titulo']
+                  ?? $srv['solicitud_titulo']
+                  ?? $srv['necesidad_titulo']
+                  ?? 'Servicio';
+
+                $proveedorNombre = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+
+                $fechaTexto =
+                  $srv['fecha_ejecucion']
+                  ?: ($srv['necesidad_fecha_preferida'] ?? null)
+                  ?: ($srv['solicitud_fecha_preferida'] ?? null)
+                  ?: ($srv['fecha_solicitud'] ?? null);
+
+                $contratoId = (int)($srv['contrato_id'] ?? 0);
                 ?>
                 <div class="col">
                   <div class="card service-card estado-completado">
                     <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio completado">
                     <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
+
                       <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
+
                       <?php if ($fechaTexto): ?>
                         <p class="card-text">
                           <i class="bi bi-calendar-check"></i>
                           Completado el <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
-                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
 
+                      <a href="#" class="btn btn-primary w-100">Ver detalles</a>
 
                       <?php if (($srv['estado'] ?? '') === 'finalizado'): ?>
 
@@ -238,8 +284,8 @@
                             class="btn btn-success w-100 mt-2"
                             data-bs-toggle="modal"
                             data-bs-target="#modalCalificar"
-                            data-contrato-id="<?= (int)$srv['contrato_id'] ?>"
-                            data-servicio-nombre="<?= htmlspecialchars($srv['servicio_nombre'] ?? $srv['solicitud_titulo'] ?? 'Servicio') ?>">
+                            data-contrato-id="<?= $contratoId ?>"
+                            data-servicio-nombre="<?= htmlspecialchars($tituloServicio) ?>">
                             <i class="bi bi-star-fill"></i> Calificar servicio
                           </button>
                         <?php else: ?>
@@ -268,8 +314,6 @@
 
                       <?php endif; ?>
 
-
-
                     </div>
                   </div>
                 </div>
@@ -294,25 +338,50 @@
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
                   : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
 
-                $tituloServicio   = $srv['servicio_nombre'] ?? $srv['publicacion_titulo'] ?? $srv['solicitud_titulo'];
-                $proveedorNombre  = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
-                $fechaTexto       = $srv['fecha_ejecucion'] ?: $srv['fecha_preferida'] ?: $srv['fecha_solicitud'];
+                $tituloServicio =
+                  $srv['servicio_nombre']
+                  ?? $srv['publicacion_titulo_cotizacion']
+                  ?? $srv['publicacion_titulo_solicitud']
+                  ?? $srv['cotizacion_titulo']
+                  ?? $srv['solicitud_titulo']
+                  ?? $srv['necesidad_titulo']
+                  ?? 'Servicio';
+
+                $proveedorNombre = $srv['proveedor_nombre'] ?? 'Proveedor sin nombre';
+
+                $fechaTexto =
+                  $srv['fecha_ejecucion']
+                  ?: ($srv['necesidad_fecha_preferida'] ?? null)
+                  ?: ($srv['solicitud_fecha_preferida'] ?? null)
+                  ?: ($srv['fecha_solicitud'] ?? null);
+
+                $motivoCancelacion = trim((string)($srv['motivo_cancelacion'] ?? ''));
                 ?>
                 <div class="col">
                   <div class="card service-card estado-cancelado">
                     <img src="<?= $imagen ?>" class="card-img-top" alt="Servicio cancelado">
                     <div class="card-body">
                       <h5 class="card-title"><?= htmlspecialchars($tituloServicio) ?></h5>
+
                       <p class="card-subtitle text-muted">
                         <i class="bi bi-person-fill"></i>
                         <?= htmlspecialchars($proveedorNombre) ?>
                       </p>
+
                       <?php if ($fechaTexto): ?>
                         <p class="card-text">
                           <i class="bi bi-calendar-x"></i>
                           Cancelado el <?= htmlspecialchars($fechaTexto) ?>
                         </p>
                       <?php endif; ?>
+
+                      <?php if ($motivoCancelacion !== ''): ?>
+                        <p class="card-text small text-muted">
+                          <i class="bi bi-exclamation-circle"></i>
+                          <?= htmlspecialchars($motivoCancelacion) ?>
+                        </p>
+                      <?php endif; ?>
+
                       <a href="#" class="btn btn-primary w-100">Ver detalles</a>
                     </div>
                   </div>
@@ -327,6 +396,7 @@
             <?php endif; ?>
           </div>
         </div>
+
       </div>
     </section>
 

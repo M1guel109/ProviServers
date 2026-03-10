@@ -1,10 +1,8 @@
-<!-- app/views/dashboard/proveedor/solicitudes/partials/en_proceso.php -->
 <?php
 $servicios = $serviciosEnProceso ?? [];
 $stats_en_proceso = count($servicios);
 ?>
 
-<!-- Tarjetas de estadísticas -->
 <section id="estadisticas-proceso">
     <div class="tarjeta-estadistica">
         <i class="bi bi-hourglass-split icono-estadistica"></i>
@@ -15,7 +13,6 @@ $stats_en_proceso = count($servicios);
     </div>
 </section>
 
-<!-- Filtros -->
 <section id="filtros-proceso">
     <div class="contenedor-filtros">
         <div class="grupo-filtro">
@@ -32,40 +29,69 @@ $stats_en_proceso = count($servicios);
     </div>
 </section>
 
-<!-- Listado en tarjetas -->
 <section id="lista-procesos">
     <?php if (!empty($servicios)) : ?>
         <?php foreach ($servicios as $servicio) : ?>
 
             <?php
             $estadoMap = [
-                'pendiente'  => ['label' => 'Pendiente',   'class' => 'media',      'progress' => 25],
-                'en_proceso' => ['label' => 'En proceso',  'class' => 'alta',       'progress' => 60],
-                'finalizado' => ['label' => 'Finalizado',  'class' => 'completado', 'progress' => 100],
+                'pendiente'   => ['label' => 'Pendiente',   'class' => 'media',      'progress' => 25],
+                'confirmado'  => ['label' => 'Confirmado',  'class' => 'media',      'progress' => 40],
+                'en_proceso'  => ['label' => 'En proceso',  'class' => 'alta',       'progress' => 60],
+                'finalizado'  => ['label' => 'Finalizado',  'class' => 'completado', 'progress' => 100],
             ];
+
             $estadoKey = $servicio['estado'] ?? 'pendiente';
             $estado = $estadoMap[$estadoKey] ?? $estadoMap['pendiente'];
 
-            $clienteFoto = $servicio['cliente_foto'] ?? '';
-            $avatar = $clienteFoto ? $clienteFoto : 'default_user.png';
+            $clienteFoto = trim((string)($servicio['cliente_foto'] ?? ''));
+            $avatar = $clienteFoto !== '' ? $clienteFoto : 'default_user.png';
+
+            $tituloServicio =
+                $servicio['servicio_nombre']
+                ?? $servicio['publicacion_titulo_cotizacion']
+                ?? $servicio['publicacion_titulo_solicitud']
+                ?? $servicio['cotizacion_titulo']
+                ?? $servicio['solicitud_titulo']
+                ?? $servicio['necesidad_titulo']
+                ?? 'Servicio';
+
+            $subtitulo =
+                $servicio['publicacion_titulo_cotizacion']
+                ?? $servicio['publicacion_titulo_solicitud']
+                ?? $servicio['cotizacion_titulo']
+                ?? $servicio['solicitud_titulo']
+                ?? $servicio['necesidad_titulo']
+                ?? 'Solicitud';
+
+            $fechaInicio =
+                $servicio['fecha_solicitud']
+                ?? $servicio['necesidad_fecha_preferida']
+                ?? $servicio['solicitud_fecha_preferida']
+                ?? null;
+
+            $contratoId = (int)($servicio['contrato_id'] ?? 0);
+            $clienteNombre = $servicio['cliente_nombre'] ?? 'Cliente';
             ?>
 
-            <div class="tarjeta-proceso" data-contrato-id="<?= (int)($servicio['contrato_id'] ?? 0) ?>">
+            <div class="tarjeta-proceso" data-contrato-id="<?= $contratoId ?>">
 
                 <div class="proceso-header">
                     <div class="proceso-info-principal">
                         <h3 class="proceso-titulo">
-                            <?= htmlspecialchars($servicio['servicio_nombre'] ?? 'Servicio') ?>
+                            <?= htmlspecialchars($tituloServicio) ?>
                         </h3>
+
                         <div class="proceso-meta">
                             <span class="badge-categoria">
                                 <i class="bi bi-briefcase"></i>
-                                <?= htmlspecialchars($servicio['solicitud_titulo'] ?? 'Solicitud') ?>
+                                <?= htmlspecialchars($subtitulo) ?>
                             </span>
+
                             <span class="proceso-fecha">
                                 <i class="bi bi-calendar3"></i>
                                 Inicio:
-                                <?= !empty($servicio['fecha_solicitud']) ? date('d M Y', strtotime($servicio['fecha_solicitud'])) : 'N/A' ?>
+                                <?= $fechaInicio ? date('d M Y', strtotime($fechaInicio)) : 'N/A' ?>
                             </span>
                         </div>
                     </div>
@@ -78,11 +104,13 @@ $stats_en_proceso = count($servicios);
                 </div>
 
                 <div class="proceso-cliente">
-                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . $avatar ?>"
+                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . htmlspecialchars($avatar) ?>"
                         alt="Cliente"
-                        class="cliente-avatar">
+                        class="cliente-avatar"
+                        onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/uploads/usuarios/default_user.png';">
+
                     <div class="cliente-info">
-                        <div class="cliente-nombre"><?= htmlspecialchars($servicio['cliente_nombre'] ?? 'Cliente') ?></div>
+                        <div class="cliente-nombre"><?= htmlspecialchars($clienteNombre) ?></div>
                         <div class="cliente-contacto">
                             <i class="bi bi-telephone"></i>
                             <?= htmlspecialchars($servicio['cliente_telefono'] ?? 'N/A') ?>
@@ -101,22 +129,25 @@ $stats_en_proceso = count($servicios);
                 </div>
 
                 <div class="proceso-acciones">
-                    <button type="button" class="btn-accion btn-actualizar"
+                    <button type="button"
+                        class="btn-accion btn-actualizar"
                         onclick='abrirSeguimiento(
-                                <?= (int)($servicio['contrato_id'] ?? 0) ?>, 
-                                "<?= htmlspecialchars($servicio['servicio_nombre'] ?? $servicio['solicitud_titulo'] ?? 'Servicio en proceso', ENT_QUOTES) ?>", 
-                                "<?= htmlspecialchars($estadoKey) ?>",
-                                "<?= htmlspecialchars($servicio['cliente_nombre'] ?? 'Cliente', ENT_QUOTES) ?>"
-                            )'>
+                            <?= $contratoId ?>,
+                            "<?= htmlspecialchars($tituloServicio, ENT_QUOTES) ?>",
+                            "<?= htmlspecialchars($estadoKey, ENT_QUOTES) ?>",
+                            "<?= htmlspecialchars($clienteNombre, ENT_QUOTES) ?>"
+                        )'>
                         <i class="bi bi-clipboard-pulse"></i> Hacer Seguimiento
                     </button>
 
-                    <button class="btn-accion btn-contactar">
+                    <button type="button"
+                        class="btn-accion btn-contactar">
                         <i class="bi bi-chat-dots"></i> Contactar
                     </button>
                 </div>
 
             </div>
+
         <?php endforeach; ?>
     <?php else : ?>
         <div class="empty-state">

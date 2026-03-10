@@ -2,7 +2,7 @@
 // Importamos las dependencias necesarias
 require_once __DIR__ . '/../helpers/alert_helper.php';
 require_once __DIR__ . '/../models/Necesidad.php';
-require_once __DIR__ . '/../models/Cotizacion.php'; 
+require_once __DIR__ . '/../models/Cotizacion.php';
 
 // 1. VALIDACIÓN GLOBAL DE SESIÓN Y ROL
 // Como todo en este controlador es para el cliente, validamos desde el principio.
@@ -23,11 +23,9 @@ switch ($method) {
 
         if ($accion === 'crear_necesidad') {
             crearNecesidad();
-        } 
-        elseif ($accion === 'aceptar_cotizacion') {
+        } elseif ($accion === 'aceptar_cotizacion') {
             aceptarCotizacion();
-        } 
-        else {
+        } else {
             http_response_code(400);
             echo "Acción POST no válida";
         }
@@ -36,7 +34,7 @@ switch ($method) {
     case 'GET':
         // Si hay una acción específica por GET, la manejamos, sino mostramos la vista principal
         $accion = $_GET['accion'] ?? '';
-        
+
         // Por defecto, siempre cargaremos la vista de necesidades si es GET
         mostrarNecesidades();
         break;
@@ -53,48 +51,98 @@ switch ($method) {
 
 function crearNecesidad()
 {
+    if (!isset($_SESSION['user']) || $_SESSION['user']['rol'] !== 'cliente') {
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Solo clientes pueden publicar necesidades.',
+            '/ProviServers/login'
+        );
+        exit();
+    }
+
     $usuarioId = (int)$_SESSION['user']['id'];
 
-    // Captura de datos del formulario
-    $titulo       = trim($_POST['titulo'] ?? '');
-    $descripcion  = trim($_POST['descripcion'] ?? '');
-    $direccion    = trim($_POST['direccion'] ?? '');
-    $ciudad       = trim($_POST['ciudad'] ?? '');
-    $zona         = trim($_POST['zona'] ?? '');
-    $fecha        = trim($_POST['fecha_preferida'] ?? '');
-    $franja       = trim($_POST['franja_horaria'] ?? ''); // obligatorio (vista)
-    $hora         = trim($_POST['hora_preferida'] ?? ''); // opcional
-    $presupuesto  = $_POST['presupuesto_estimado'] ?? null;
+    // Datos del formulario
+    $categoria      = trim($_POST['categoria'] ?? '');
+    $categoriaOtro  = trim($_POST['categoria_otro'] ?? '');
+    $titulo         = trim($_POST['titulo'] ?? '');
+    $descripcion    = trim($_POST['descripcion'] ?? '');
+    $direccion      = trim($_POST['direccion'] ?? '');
+    $ciudad         = trim($_POST['ciudad'] ?? '');
+    $zona           = trim($_POST['zona'] ?? '');
+    $fecha          = trim($_POST['fecha_preferida'] ?? '');
+    $franja         = trim($_POST['franja_horaria'] ?? '');
+    $hora           = trim($_POST['hora_preferida'] ?? '');
+    $presupuesto    = $_POST['presupuesto_estimado'] ?? null;
 
-    // Validación obligatorios
-    if (!$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha || !$franja) {
-        mostrarSweetAlert('error', 'Campos incompletos', 'Completa los campos obligatorios.');
+    // Validación de obligatorios
+    if (
+        $categoria === '' ||
+        $titulo === '' ||
+        $descripcion === '' ||
+        $direccion === '' ||
+        $ciudad === '' ||
+        $fecha === '' ||
+        $franja === ''
+    ) {
+        mostrarSweetAlert(
+            'error',
+            'Campos incompletos',
+            'Completa todos los campos obligatorios.',
+            '/ProviServers/cliente/necesidades'
+        );
         exit();
     }
 
-    // Validación fuerte de franja
+    // Si selecciona "Otros", debe escribir la categoría
+    if ($categoria === 'Otros' && $categoriaOtro === '') {
+        mostrarSweetAlert(
+            'error',
+            'Categoría incompleta',
+            'Debes especificar la categoría.',
+            '/ProviServers/cliente/necesidades'
+        );
+        exit();
+    }
+
+    // Validar franja
     $franjasValidas = ['mañana', 'tarde', 'noche'];
     if (!in_array($franja, $franjasValidas, true)) {
-        mostrarSweetAlert('error', 'Franja inválida', 'Selecciona una franja horaria válida.');
+        mostrarSweetAlert(
+            'error',
+            'Franja inválida',
+            'Selecciona una franja horaria válida.',
+            '/ProviServers/cliente/necesidades'
+        );
         exit();
     }
 
-    // Normalizar hora: si no viene, asignamos una referencial por franja
+    // Normalizar hora
     if ($hora === '') {
         switch ($franja) {
-            case 'mañana': $hora = '09:00:00'; break;
-            case 'tarde':  $hora = '15:00:00'; break;
-            case 'noche':  $hora = '19:00:00'; break;
-            default:       $hora = null;       break;
+            case 'mañana':
+                $hora = '09:00:00';
+                break;
+            case 'tarde':
+                $hora = '15:00:00';
+                break;
+            case 'noche':
+                $hora = '19:00:00';
+                break;
         }
     } else {
-        // input time normalmente llega "HH:MM". Lo convertimos a "HH:MM:SS"
         if (preg_match('/^\d{2}:\d{2}$/', $hora)) {
             $hora .= ':00';
         }
-        // Validación simple formato TIME
+
         if (!preg_match('/^\d{2}:\d{2}:\d{2}$/', $hora)) {
-            mostrarSweetAlert('error', 'Hora inválida', 'Ingresa una hora válida.');
+            mostrarSweetAlert(
+                'error',
+                'Hora inválida',
+                'Ingresa una hora válida.',
+                '/ProviServers/cliente/necesidades'
+            );
             exit();
         }
     }
@@ -104,10 +152,12 @@ function crearNecesidad()
         $presupuesto = null;
     } else {
         $presupuesto = (float)$presupuesto;
-        if ($presupuesto < 0) $presupuesto = 0;
+        if ($presupuesto < 0) {
+            $presupuesto = 0;
+        }
     }
 
-    // Instanciar modelo y enviar datos
+    // Insertar necesidad
     $model = new Necesidad();
 
     $ok = $model->crearParaClienteUsuario($usuarioId, [
@@ -118,19 +168,29 @@ function crearNecesidad()
         'ciudad'               => $ciudad,
         'zona'                 => ($zona !== '' ? $zona : null),
         'fecha_preferida'      => $fecha,
+        'franja_horaria'       => $franja,
         'hora_preferida'       => $hora,
         'presupuesto_estimado' => $presupuesto,
     ]);
 
-    // Respuesta
     if ($ok) {
-        mostrarSweetAlert('success', 'Necesidad publicada', 'Los proveedores podrán enviarte ofertas.', '/ProviServers/cliente/necesidades');
+        mostrarSweetAlert(
+            'success',
+            'Necesidad publicada',
+            'Los proveedores podrán enviarte ofertas.',
+            '/ProviServers/cliente/necesidades'
+        );
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo publicar la necesidad. Intenta nuevamente.');
+        mostrarSweetAlert(
+            'error',
+            'Error',
+            'No se pudo publicar la necesidad. Intenta nuevamente.',
+            '/ProviServers/cliente/necesidades'
+        );
     }
+
     exit();
 }
-
 function aceptarCotizacion()
 {
     $usuarioId = (int)$_SESSION['user']['id'];
@@ -169,10 +229,10 @@ function mostrarNecesidades()
 
     // Si se solicita ver el detalle de una necesidad específica
     $nid = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-    
+
     if ($nid > 0) {
         $detalle = $model->obtenerDetallePorClienteUsuario($usuarioId, $nid);
-        
+
         if ($detalle) {
             $cotizaciones = $model->listarCotizacionesDeNecesidadParaCliente($usuarioId, $nid);
         }

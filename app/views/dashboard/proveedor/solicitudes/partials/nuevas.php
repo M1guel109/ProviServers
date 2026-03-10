@@ -1,4 +1,3 @@
-<!-- app/views/dashboard/proveedor/solicitudes/partials/nuevas.php -->
 <?php
 $solicitudes = $solicitudesNuevas ?? [];
 
@@ -6,7 +5,7 @@ $totalNuevas = count($solicitudes);
 
 $totalUrgentes = count(array_filter($solicitudes, function ($s) {
     $valor = $s['urgencia'] ?? $s['prioridad'] ?? 'baja';
-    return strtolower((string)$valor) === 'alta';
+    return mb_strtolower((string)$valor) === 'alta';
 }));
 
 $totalHoy = count(array_filter($solicitudes, function ($s) {
@@ -15,7 +14,6 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
 }));
 ?>
 
-<!-- Tarjetas de estadísticas -->
 <section id="estadisticas-solicitudes" class="d-flex gap-3 flex-wrap">
     <div class="tarjeta-estadistica shadow-sm p-3 bg-white rounded flex-fill">
         <i class="bi bi-inbox icono-estadistica text-primary"></i>
@@ -36,27 +34,50 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
     </div>
 </section>
 
-<!-- ✅ LISTADO EN TARJETAS (reemplaza la tabla) -->
 <section id="cards-solicitudes" class="mt-4 pb-3">
     <?php if (!empty($solicitudes)) : ?>
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
             <?php foreach ($solicitudes as $solicitud) : ?>
 
                 <?php
-                $estado = strtolower($solicitud['estado'] ?? 'pendiente');
+                $estado = mb_strtolower((string)($solicitud['estado'] ?? 'pendiente'));
 
-                // Ajusta colores según tus estados reales
                 $badgeEstado = match ($estado) {
                     'pendiente'   => 'bg-secondary',
                     'aceptada'    => 'bg-success',
                     'rechazada'   => 'bg-danger',
                     'en_proceso'  => 'bg-primary',
-                    'finalizada'  => 'bg-success',
+                    'finalizado', 'finalizada' => 'bg-success',
                     default       => 'bg-secondary',
                 };
 
-                $recibida = isset($solicitud['created_at']) ? date('d/m/y', strtotime($solicitud['created_at'])) : 'N/A';
-                $fechaPref = !empty($solicitud['fecha_preferida']) ? date('d/m/Y', strtotime($solicitud['fecha_preferida'])) : 'Sin fecha';
+                $solicitudId = (int)($solicitud['id'] ?? 0);
+
+                $clienteNombre = $solicitud['nombre_cliente']
+                    ?? $solicitud['cliente_nombre']
+                    ?? 'Cliente Desconocido';
+
+                $clienteTelefono = $solicitud['telefono_cliente']
+                    ?? $solicitud['cliente_telefono']
+                    ?? 'N/A';
+
+                $tituloServicio = $solicitud['servicio_nombre']
+                    ?? $solicitud['publicacion_titulo']
+                    ?? $solicitud['solicitud_titulo']
+                    ?? 'Servicio';
+
+                $recibida = !empty($solicitud['created_at'])
+                    ? date('d/m/y', strtotime($solicitud['created_at']))
+                    : 'N/A';
+
+                $fechaPref = !empty($solicitud['fecha_preferida'])
+                    ? date('d/m/Y', strtotime($solicitud['fecha_preferida']))
+                    : 'Sin fecha';
+
+                $franja = $solicitud['franja_horaria'] ?? 'N/A';
+
+                $ciudad = $solicitud['ciudad'] ?? '';
+                $zona = $solicitud['zona'] ?? '';
 
                 $payload = json_encode(
                     $solicitud,
@@ -68,68 +89,79 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-body">
 
-                            <!-- Encabezado: cliente + estado -->
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                 <div>
                                     <div class="fw-bold">
-                                        <?= htmlspecialchars($solicitud['nombre_cliente'] ?? 'Cliente Desconocido') ?>
+                                        <?= htmlspecialchars($clienteNombre) ?>
                                     </div>
                                     <div class="text-muted small">
                                         <i class="bi bi-telephone"></i>
-                                        <?= htmlspecialchars($solicitud['telefono_cliente'] ?? 'N/A') ?>
+                                        <?= htmlspecialchars($clienteTelefono) ?>
                                     </div>
                                 </div>
+
                                 <span class="badge <?= $badgeEstado ?> text-capitalize">
                                     <?= htmlspecialchars($estado) ?>
                                 </span>
                             </div>
 
-                            <!-- Servicio -->
                             <div class="mb-2">
                                 <div class="fw-medium">
                                     <i class="bi bi-briefcase"></i>
-                                    <?= htmlspecialchars($solicitud['servicio_nombre'] ?? $solicitud['publicacion_titulo'] ?? 'Servicio') ?>
+                                    <?= htmlspecialchars($tituloServicio) ?>
                                 </div>
                                 <div class="text-muted small">
-                                    Recibida: <?= $recibida ?>
+                                    Recibida: <?= htmlspecialchars($recibida) ?>
                                 </div>
                             </div>
 
-                            <!-- Fecha preferida + franja -->
-                            <div class="d-flex flex-wrap gap-3 text-muted small">
+                            <div class="d-flex flex-wrap gap-3 text-muted small mb-2">
                                 <div>
                                     <i class="bi bi-calendar3"></i>
-                                    <span class="fw-medium text-dark"><?= $fechaPref ?></span>
+                                    <span class="fw-medium text-dark"><?= htmlspecialchars($fechaPref) ?></span>
                                 </div>
                                 <div>
                                     <i class="bi bi-clock"></i>
-                                    <?= htmlspecialchars($solicitud['franja_horaria'] ?? 'N/A') ?>
+                                    <?= htmlspecialchars($franja) ?>
                                 </div>
                             </div>
 
+                            <?php if ($ciudad !== '') : ?>
+                                <div class="text-muted small">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <?= htmlspecialchars($ciudad . ($zona ? ' · ' . $zona : '')) ?>
+                                </div>
+                            <?php endif; ?>
+
                         </div>
 
-                        <!-- Acciones -->
                         <div class="card-footer bg-white border-0 pt-0">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-outline-primary flex-fill"
+                                    type="button"
                                     title="Ver Detalle"
                                     onclick='verDetalle(<?= $payload ?>)'>
                                     <i class="bi bi-eye"></i> Ver
                                 </button>
 
-                                <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar_solicitud&id=<?= (int)($solicitud['id'] ?? 0) ?>&tab=nuevas"
-                                    class="btn btn-sm btn-outline-success flex-fill"
-                                    title="Aceptar">
-                                    <i class="bi bi-check-lg"></i> Aceptar
-                                </a>
+                                <?php if ($solicitudId > 0) : ?>
+                                    <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar_solicitud&id=<?= $solicitudId ?>&tab=nuevas"
+                                        class="btn btn-sm btn-outline-success flex-fill"
+                                        title="Aceptar">
+                                        <i class="bi bi-check-lg"></i> Aceptar
+                                    </a>
 
-                                <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar&id=<?= (int)($solicitud['id'] ?? 0) ?>&tab=nuevas"
-                                    class="btn btn-sm btn-outline-danger flex-fill"
-                                    title="Rechazar"
-                                    onclick="return confirm('¿Rechazar esta solicitud?')">
-                                    <i class="bi bi-x-lg"></i> Rechazar
-                                </a>
+                                    <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar&id=<?= $solicitudId ?>&tab=nuevas"
+                                        class="btn btn-sm btn-outline-danger flex-fill"
+                                        title="Rechazar"
+                                        onclick="return confirm('¿Rechazar esta solicitud?')">
+                                        <i class="bi bi-x-lg"></i> Rechazar
+                                    </a>
+                                <?php else : ?>
+                                    <button class="btn btn-sm btn-outline-secondary flex-fill" type="button" disabled>
+                                        Sin ID
+                                    </button>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

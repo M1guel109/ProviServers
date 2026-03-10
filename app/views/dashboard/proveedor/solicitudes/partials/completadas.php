@@ -1,23 +1,39 @@
-<!-- app/views/dashboard/proveedor/solicitudes/partials/completadas.php -->
 <?php
 $servicios = $serviciosCompletados ?? [];
 
 // Stats básicas
 $totalCompletados = count($servicios);
-$esteMes = count(array_filter($servicios, function($s){
-    if (empty($s['fecha_fin']) && empty($s['updated_at'])) return false;
-    $f = $s['fecha_fin'] ?? $s['updated_at'];
+
+$esteMes = count(array_filter($servicios, function ($s) {
+    $f = $s['fecha_ejecucion']
+        ?? $s['necesidad_fecha_preferida']
+        ?? $s['solicitud_fecha_preferida']
+        ?? $s['fecha_solicitud']
+        ?? null;
+
+    if (!$f) return false;
+
     return date('Y-m', strtotime($f)) === date('Y-m');
 }));
 
-$ratings = array_values(array_filter(array_map(fn($s) => $s['calificacion'] ?? null, $servicios), fn($v) => $v !== null && $v !== ''));
-$promedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings), 2) : null;
+$ratings = array_values(array_filter(
+    array_map(fn($s) => $s['mi_calificacion'] ?? null, $servicios),
+    fn($v) => $v !== null && $v !== ''
+));
 
-$montos = array_values(array_filter(array_map(fn($s) => $s['monto'] ?? $s['monto_total'] ?? null, $servicios), fn($v) => is_numeric($v)));
+$promedio = !empty($ratings)
+    ? round(array_sum($ratings) / count($ratings), 2)
+    : null;
+
+$montos = array_values(array_filter(array_map(function ($s) {
+    return $s['cotizacion_precio']
+        ?? $s['solicitud_presupuesto_estimado']
+        ?? null;
+}, $servicios), fn($v) => is_numeric($v)));
+
 $ingresos = !empty($montos) ? array_sum($montos) : null;
 ?>
 
-<!-- Estadísticas (igual que en nuevas.php y en_proceso.php) -->
 <section id="estadisticas-completadas">
     <div class="tarjeta-estadistica">
         <i class="bi bi-check-circle icono-estadistica"></i>
@@ -49,12 +65,11 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
             <div class="stat-numero">
                 <?= $ingresos !== null ? ('$' . number_format($ingresos, 0, ',', '.')) : 'N/A' ?>
             </div>
-            <div class="stat-label">Ingresos Totales</div>
+            <div class="stat-label">Ingresos Referenciales</div>
         </div>
     </div>
 </section>
 
-<!-- Filtros (estilo oportunidades) -->
 <section id="filtros-completadas">
     <div class="contenedor-filtros">
         <div class="grupo-filtro">
@@ -87,36 +102,67 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
     </div>
 </section>
 
-<!-- Listado en tarjetas -->
 <section id="lista-completadas" class="grid-completadas">
     <?php if (!empty($servicios)) : ?>
         <?php foreach ($servicios as $s) : ?>
 
             <?php
-            $clienteFoto = $s['cliente_foto'] ?? '';
-            $avatar = $clienteFoto ? $clienteFoto : 'default_user.png';
+            $clienteFoto = trim((string)($s['cliente_foto'] ?? ''));
+            $avatar = $clienteFoto !== '' ? $clienteFoto : 'default_user.png';
 
-            $fechaFin = $s['fecha_fin'] ?? $s['updated_at'] ?? null;
-            $fechaInicio = $s['fecha_inicio'] ?? $s['fecha_solicitud'] ?? null;
+            $tituloServicio =
+                $s['servicio_nombre']
+                ?? $s['publicacion_titulo_cotizacion']
+                ?? $s['publicacion_titulo_solicitud']
+                ?? $s['cotizacion_titulo']
+                ?? $s['solicitud_titulo']
+                ?? $s['necesidad_titulo']
+                ?? 'Servicio completado';
 
-            $monto = $s['monto'] ?? $s['monto_total'] ?? null;
-            $calif = $s['calificacion'] ?? null;
-            $comentario = $s['comentario'] ?? '';
+            $subtitulo =
+                $s['publicacion_titulo_cotizacion']
+                ?? $s['publicacion_titulo_solicitud']
+                ?? $s['cotizacion_titulo']
+                ?? $s['solicitud_titulo']
+                ?? $s['necesidad_titulo']
+                ?? 'Solicitud';
+
+            $fechaFin =
+                $s['fecha_ejecucion']
+                ?? $s['necesidad_fecha_preferida']
+                ?? $s['solicitud_fecha_preferida']
+                ?? $s['fecha_solicitud']
+                ?? null;
+
+            $fechaInicio =
+                $s['fecha_solicitud']
+                ?? $s['necesidad_fecha_preferida']
+                ?? $s['solicitud_fecha_preferida']
+                ?? null;
+
+            $monto =
+                $s['cotizacion_precio']
+                ?? $s['solicitud_presupuesto_estimado']
+                ?? null;
+
+            $calif = $s['mi_calificacion'] ?? null;
+            $comentario = trim((string)($s['mi_comentario'] ?? ''));
+
+            $contratoId = (int)($s['contrato_id'] ?? 0);
             ?>
 
             <div class="tarjeta-completada">
 
-                <!-- Header con título y estado -->
                 <div class="completada-header">
                     <div class="completada-info-principal">
                         <h3 class="completada-titulo">
-                            <?= htmlspecialchars($s['servicio_nombre'] ?? 'Servicio completado') ?>
+                            <?= htmlspecialchars($tituloServicio) ?>
                         </h3>
 
                         <div class="completada-meta">
                             <span class="badge-categoria">
                                 <i class="bi bi-briefcase"></i>
-                                <?= htmlspecialchars($s['solicitud_titulo'] ?? 'Solicitud') ?>
+                                <?= htmlspecialchars($subtitulo) ?>
                             </span>
 
                             <span class="completada-fecha">
@@ -133,11 +179,11 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     </div>
                 </div>
 
-                <!-- Información del cliente (igual que en proceso) -->
                 <div class="completada-cliente">
-                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . $avatar ?>" 
-                         alt="Cliente" 
-                         class="cliente-avatar">
+                    <img src="<?= BASE_URL . '/public/uploads/usuarios/' . htmlspecialchars($avatar) ?>"
+                        alt="Cliente"
+                        class="cliente-avatar"
+                        onerror="this.onerror=null; this.src='<?= BASE_URL ?>/public/uploads/usuarios/default_user.png';">
                     <div class="cliente-info">
                         <div class="cliente-nombre"><?= htmlspecialchars($s['cliente_nombre'] ?? 'Cliente') ?></div>
                         <div class="cliente-contacto">
@@ -146,7 +192,6 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     </div>
                 </div>
 
-                <!-- Detalles del servicio (fecha inicio y monto) -->
                 <div class="completada-detalles">
                     <div class="detalle-item">
                         <i class="bi bi-calendar3"></i>
@@ -167,7 +212,6 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                     </div>
                 </div>
 
-                <!-- Calificación -->
                 <div class="completada-calificacion">
                     <div class="calificacion-header">
                         <span class="calificacion-titulo">Calificación del cliente</span>
@@ -182,14 +226,15 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                         </div>
                     </div>
 
-                    <?php if (!empty($comentario)) : ?>
+                    <?php if ($comentario !== '') : ?>
                         <p class="calificacion-comentario">"<?= htmlspecialchars($comentario) ?>"</p>
                     <?php endif; ?>
                 </div>
 
-                <!-- Acciones (botones) -->
                 <div class="completada-acciones">
-                    <button class="btn-accion btn-ver-detalles" type="button">
+                    <button class="btn-accion btn-ver-detalles"
+                        type="button"
+                        onclick='verDetalle(<?= json_encode($s, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) ?>)'>
                         <i class="bi bi-eye"></i> Ver Detalles
                     </button>
 
