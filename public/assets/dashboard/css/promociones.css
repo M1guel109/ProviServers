@@ -1,0 +1,712 @@
+/* ==========================================================================
+   PROMOCIONES - Estilos específicos
+   Basado en el diseño de membresía y facturación
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TÍTULO PRINCIPAL (IGUAL QUE DASHBOARD)
+   ========================================================================== */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+    padding-bottom: 15px;
+}
+
+#titulo-principal .row {
+    width: 100%;
+    margin: 0;
+}
+
+#titulo-principal .col-md-8,
+#titulo-principal .col-md-4 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+    margin-bottom: 0.5rem;
+}
+
+#titulo-principal .text-muted {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   2. BREADCRUMB
+   ========================================================================== */
+.breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0.5rem 0;
+    margin-bottom: 0;
+    list-style: none;
+    background: transparent;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item {
+    padding-left: 0.5rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    float: left;
+    padding-right: 0.5rem;
+    color: #6c757d;
+    content: ">";
+    font-weight: 300;
+}
+
+
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover, #0052cc);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+}
+
+.justify-content-md-end {
+    justify-content: flex-end !important;
+}
+
+/* ==========================================================================
+   3. FILTROS Y ACCIONES
+   ========================================================================== */
+.filtros-container {
+    background-color: var(--white-color);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+.filtros-container .form-select-sm,
+.filtros-container .form-control,
+.filtros-container .form-select {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    transition: all 0.25s ease;
+    min-height: 38px;
+}
+
+.filtros-container .form-control:focus,
+.filtros-container .form-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+    background-color: white;
+}
+
+.filtros-container .btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+    transition: all 0.25s ease;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.filtros-container .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 102, 255, 0.4);
+}
+
+/* ==========================================================================
+   4. TARJETAS DE ESTADÍSTICAS RÁPIDAS
+   ========================================================================== */
+.tarjeta-promocion {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.tarjeta-promocion:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+}
+
+.icono-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bg-primary-light {
+    background-color: rgba(0, 102, 255, 0.1);
+}
+
+.bg-success-light {
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+.bg-warning-light {
+    background-color: rgba(243, 156, 18, 0.1);
+}
+
+.bg-info-light {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.icono-wrapper .icono-promocion {
+    font-size: 28px;
+}
+
+.icono-wrapper .text-primary {
+    color: var(--primary-color);
+}
+
+.icono-wrapper .text-success {
+    color: #27ae60;
+}
+
+.icono-wrapper .text-warning {
+    color: #f39c12;
+}
+
+.icono-wrapper .text-info {
+    color: #3498db;
+}
+
+.promocion-contenido {
+    flex: 1;
+}
+
+.promocion-valor {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    display: block;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.promocion-etiqueta {
+    font-size: 0.85rem;
+    color: #64748b;
+    display: block;
+}
+
+/* ==========================================================================
+   5. CARDS DE PROMOCIONES (ACTIVAS)
+   ========================================================================== */
+.card-promocion {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-promocion:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.card-promocion.activa {
+    border-left: 4px solid #27ae60;
+}
+
+.card-promocion.disponible {
+    border-left: 4px solid var(--primary-color);
+}
+
+.promocion-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 15px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    z-index: 2;
+}
+
+.promocion-badge.activa {
+    /* background: linear-gradient(135deg, #27ae60, #1e8449); */
+    color: white;
+}
+
+.promocion-badge.disponible {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+}
+
+.promocion-imagen {
+    height: 100%;
+    min-height: 180px;
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px 0 0 16px;
+}
+
+.promocion-imagen i {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.promocion-detalle {
+    padding: 25px 25px 25px 20px; /* Aumentado el padding derecho y superior */
+}
+
+.promocion-detalle h5 {
+    margin-bottom: 12px; /* Más espacio después del título */
+    font-size: 1.2rem;
+}
+
+.promocion-detalle .text-muted {
+    margin-bottom: 15px; /* Más espacio después de la descripción */
+    line-height: 1.6;
+}
+
+.promocion-meta {
+    background-color: #f8fafc;
+    border-radius: 10px;
+    padding: 15px; /* Aumentado el padding interno */
+    margin-bottom: 15px; /* Espacio antes de la barra de progreso */
+}
+
+.promocion-meta .d-flex {
+    gap: 20px !important; /* Más espacio entre fecha y valor */
+}
+
+.promocion-meta .badge.bg-light {
+    margin-top: 8px; /* Espacio sobre las etiquetas de servicios */
+    display: inline-block;
+    padding: 6px 12px;
+}
+
+/* Ajuste para los servicios en badges */
+.promocion-meta .badge.bg-light {
+    background-color: #f1f5f9 !important;
+    color: #475569;
+    font-weight: 500;
+    margin-right: 8px;
+    margin-bottom: 5px;
+}
+
+/* Barra de progreso */
+.progress {
+    margin: 15px 0 8px; /* Espacio alrededor */
+}
+
+/* Contenedor de usos */
+.d-flex.justify-content-between.small {
+    margin-bottom: 15px !important;
+}
+
+/* Botones de acción */
+.promocion-detalle .d-flex.gap-2 {
+    margin-top: 15px; /* Espacio antes de los botones */
+    gap: 10px !important;
+}
+
+/* Badges de tipo */
+.badge.bg-primary {
+    background-color: rgba(0, 102, 255, 0.1) !important;
+    color: var(--primary-color);
+}
+
+.badge.bg-success {
+    background-color: rgba(39, 174, 96, 0.1) !important;
+    color: #27ae60;
+}
+
+.badge.bg-warning {
+    background-color: rgba(243, 156, 18, 0.1) !important;
+    color: #f39c12;
+}
+
+.badge.bg-secondary {
+    background-color: rgba(100, 116, 139, 0.1) !important;
+    color: #64748b;
+}
+
+/* ==========================================================================
+   6. CARDS DE PROMOCIONES DISPONIBLES (TARJETAS PEQUEÑAS)
+   ========================================================================== */
+.card-promocion.disponible {
+    padding: 0;
+}
+
+.promocion-header {
+    background: linear-gradient(135deg, #f8fafc, #ffffff);
+    padding: 25px 20px 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.promocion-icono-grande {
+    font-size: 3rem;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.promocion-body {
+    padding: 20px;
+}
+
+/* ==========================================================================
+   7. TABLA DE PROMOCIONES FINALIZADAS
+   ========================================================================== */
+.table {
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 15px;
+}
+
+.table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.table tbody tr:hover td {
+    background-color: #f8fafc;
+}
+
+.table .progress {
+    background-color: #e2e8f0;
+    border-radius: 10px;
+}
+
+.table .progress-bar {
+    border-radius: 10px;
+}
+
+.table .btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.25s ease;
+}
+
+.table .btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   8. BOTONES DE ACCIÓN
+   ========================================================================== */
+.btn-outline-primary,
+.btn-outline-danger,
+.btn-outline-secondary {
+    border: 1.5px solid transparent;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: transparent;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.3);
+}
+
+.btn-outline-danger {
+    border-color: #e74c3c;
+    color: #e74c3c;
+    background-color: transparent;
+}
+
+.btn-outline-danger:hover {
+    background-color: #e74c3c;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-outline-secondary {
+    border-color: #94a3b8;
+    color: #64748b;
+    background-color: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #64748b;
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   9. MODALES
+   ========================================================================== */
+.modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+}
+
+.modal-header.bg-success {
+    background: linear-gradient(135deg, #27ae60, #1e8449);
+}
+
+.modal-header.bg-warning {
+    background: linear-gradient(135deg, #f39c12, #d35400);
+}
+
+.modal-title {
+    font-family: var(--font-title);
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close-white {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+    transition: all 0.25s ease;
+}
+
+.btn-close-white:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Formularios en modal */
+.form-label {
+    font-weight: 600;
+    color: var(--dark-color);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.form-control,
+.form-select {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   10. ESTADÍSTICAS EN MODAL
+   ========================================================================== */
+.bg-light.rounded-3 {
+    background-color: #f8fafc !important;
+    border: 1px solid #e2e8f0;
+    transition: all 0.25s ease;
+}
+
+.bg-light.rounded-3:hover {
+    background-color: white !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   11. RESPONSIVE
+   ========================================================================== */
+
+/* Tablet Portrait */
+@media screen and (max-width: 992px) {
+    .row.g-4.mb-4 .col-md-3 {
+        width: 50%;
+    }
+    
+    .filtros-container .row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .filtros-container .col-md-4,
+    .filtros-container .col-md-3,
+    .filtros-container .col-md-2 {
+        width: 100%;
+    }
+    
+    .filtros-container .d-flex {
+        justify-content: flex-start !important;
+        flex-wrap: wrap;
+    }
+    
+    .card-promocion.activa .row {
+        flex-direction: column;
+    }
+    
+    .promocion-imagen {
+        border-radius: 16px 16px 0 0;
+        min-height: 120px;
+    }
+    
+    .promocion-detalle {
+        padding: 20px;
+    }
+}
+
+/* Móvil */
+@media screen and (max-width: 768px) {
+    #titulo-principal {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    #titulo-principal .col-md-8,
+    #titulo-principal .col-md-4 {
+        width: 100%;
+    }
+    
+    #titulo-principal .text-muted {
+        max-width: 100%;
+    }
+    
+    .breadcrumb {
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .row.g-4.mb-4 .col-md-3 {
+        width: 100%;
+    }
+    
+    .tarjeta-promocion {
+        padding: 15px;
+    }
+    
+    .icono-wrapper {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .icono-wrapper .icono-promocion {
+        font-size: 22px;
+    }
+    
+    .promocion-valor {
+        font-size: 1.3rem;
+    }
+    
+    .promocion-detalle .d-flex.gap-2 {
+        flex-direction: column;
+    }
+    
+    .promocion-detalle .btn {
+        width: 100%;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 10px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+}
+
+/* Móvil pequeño */
+@media screen and (max-width: 480px) {
+    .filtros-container .d-flex {
+        flex-direction: column;
+    }
+    
+    .filtros-container .btn {
+        width: 100%;
+    }
+    
+    .promocion-meta .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 5px;
+    }
+}
