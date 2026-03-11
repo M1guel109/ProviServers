@@ -127,18 +127,16 @@ class Solicitud
                 $this->conexion->rollBack();
             }
             return false;
-        } 
-        catch (PDOException $e) {
-    error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
-    if ($this->conexion->inTransaction()) $this->conexion->rollBack();
+        } catch (PDOException $e) {
+            error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
+            if ($this->conexion->inTransaction()) $this->conexion->rollBack();
 
-    // 👇 TEMPORAL (dev): ver en pantalla el error exacto
-    echo "<pre>PDOException: " . htmlspecialchars($e->getMessage()) . "</pre>";
-    exit;
+            // 👇 TEMPORAL (dev): ver en pantalla el error exacto
+            echo "<pre>PDOException: " . htmlspecialchars($e->getMessage()) . "</pre>";
+            exit;
 
-    return false;
-}
-
+            return false;
+        }
     }
 
     /* ======================================================
@@ -430,7 +428,7 @@ class Solicitud
 
 
 
-        /**
+    /**
      * Lista servicios contratados para el cliente logueado (usuario_id).
      * Usa servicios_contratados como tabla principal.
      */
@@ -494,54 +492,53 @@ class Solicitud
     /* ======================================================
    CONTAR SOLICITUDES POR ESTADO (CLIENTE por usuario_id)
    ====================================================== */
-public function contarPorEstadoClienteUsuario(int $usuarioId): array
-{
-    try {
-        $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
-        if (!$clienteIdReal) {
-            return ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
-        }
+    public function contarPorEstadoClienteUsuario(int $usuarioId): array
+    {
+        try {
+            $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
+            if (!$clienteIdReal) {
+                return ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
+            }
 
-        $sql = "
+            $sql = "
             SELECT estado, COUNT(*) AS total
             FROM solicitudes
             WHERE cliente_id = :cliente_id
             GROUP BY estado
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute([':cliente_id' => $clienteIdReal]);
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':cliente_id' => $clienteIdReal]);
 
-        $counts = ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $estado = $row['estado'];
-            $counts[$estado] = (int)$row['total'];
+            $counts = ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $estado = $row['estado'];
+                $counts[$estado] = (int)$row['total'];
+            }
+
+            return $counts;
+        } catch (PDOException $e) {
+            error_log("Solicitud::contarPorEstadoClienteUsuario -> " . $e->getMessage());
+            return ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
         }
-
-        return $counts;
-
-    } catch (PDOException $e) {
-        error_log("Solicitud::contarPorEstadoClienteUsuario -> " . $e->getMessage());
-        return ['pendiente' => 0, 'aceptada' => 0, 'rechazada' => 0, 'cancelada' => 0];
     }
-}
 
 
-/* ======================================================
+    /* ======================================================
    LISTAR SOLICITUDES POR ESTADO (CLIENTE por usuario_id)
    ====================================================== */
-public function listarPorClienteUsuarioYEstado(int $usuarioId, string $estado): array
-{
-    try {
-        $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
-        if (!$clienteIdReal) return [];
+    public function listarPorClienteUsuarioYEstado(int $usuarioId, string $estado): array
+    {
+        try {
+            $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
+            if (!$clienteIdReal) return [];
 
-        $estadosValidos = ['pendiente', 'aceptada', 'rechazada', 'cancelada'];
-        if (!in_array($estado, $estadosValidos, true)) {
-            $estado = 'pendiente';
-        }
+            $estadosValidos = ['pendiente', 'aceptada', 'rechazada', 'cancelada'];
+            if (!in_array($estado, $estadosValidos, true)) {
+                $estado = 'pendiente';
+            }
 
-        $sql = "
+            $sql = "
             SELECT
                 s.id,
                 s.titulo,
@@ -571,31 +568,30 @@ public function listarPorClienteUsuarioYEstado(int $usuarioId, string $estado): 
             ORDER BY s.created_at DESC
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute([
-            ':cliente_id' => $clienteIdReal,
-            ':estado'     => $estado
-        ]);
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([
+                ':cliente_id' => $clienteIdReal,
+                ':estado'     => $estado
+            ]);
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-    } catch (PDOException $e) {
-        error_log("Solicitud::listarPorClienteUsuarioYEstado -> " . $e->getMessage());
-        return [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log("Solicitud::listarPorClienteUsuarioYEstado -> " . $e->getMessage());
+            return [];
+        }
     }
-}
 
 
-/* ======================================================
+    /* ======================================================
    DETALLE SOLICITUD (CLIENTE por usuario_id + adjuntos)
    ====================================================== */
-public function obtenerDetallePorClienteUsuario(int $usuarioId, int $solicitudId): array
-{
-    try {
-        $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
-        if (!$clienteIdReal) return [];
+    public function obtenerDetallePorClienteUsuario(int $usuarioId, int $solicitudId): array
+    {
+        try {
+            $clienteIdReal = $this->obtenerClienteIdReal($usuarioId);
+            if (!$clienteIdReal) return [];
 
-        $sql = "
+            $sql = "
             SELECT
                 s.*,
 
@@ -620,20 +616,35 @@ public function obtenerDetallePorClienteUsuario(int $usuarioId, int $solicitudId
             LIMIT 1
         ";
 
-        $stmt = $this->conexion->prepare($sql);
-        $stmt->execute([
-            ':sid'        => $solicitudId,
-            ':cliente_id' => $clienteIdReal
-        ]);
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([
+                ':sid'        => $solicitudId,
+                ':cliente_id' => $clienteIdReal
+            ]);
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: [];
-
-    } catch (PDOException $e) {
-        error_log("Solicitud::obtenerDetallePorClienteUsuario -> " . $e->getMessage());
-        return [];
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ?: [];
+        } catch (PDOException $e) {
+            error_log("Solicitud::obtenerDetallePorClienteUsuario -> " . $e->getMessage());
+            return [];
+        }
     }
-}
 
+    public function contarPendientesProveedor(int $usuarioId): int
+    {
+        $sql = "
+        SELECT COUNT(*) AS total
+        FROM solicitudes s
+        INNER JOIN proveedores p
+            ON p.id = s.proveedor_id
+        WHERE p.usuario_id = :usuario_id
+          AND s.estado = 'pendiente'
+     ";
 
+        $stmt = $this->conexion->prepare($sql);
+        $stmt->execute([':usuario_id' => $usuarioId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return (int)($row['total'] ?? 0);
+    }
 }

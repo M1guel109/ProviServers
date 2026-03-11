@@ -219,3 +219,18 @@ document.addEventListener("DOMContentLoaded", () => {
     setActiveLink();
 });
 
+function sweetProyecto(icon, title, text, callback = null) {
+    Swal.fire({
+        icon: icon,
+        title: title,
+        text: text,
+        confirmButtonText: 'Aceptar',
+        confirmButtonColor: '#0066ff',
+        background: '#fff',
+        color: '#0e1116'
+    }).then(() => {
+        if (typeof callback === 'function') {
+            callback();
+        }
+    });
+}

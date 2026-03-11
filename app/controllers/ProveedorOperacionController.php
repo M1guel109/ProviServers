@@ -40,9 +40,11 @@ switch ($method) {
         break;
 
     case 'GET':
-        $accion = $_GET['accion'] ?? 'mostrar_oportunidades';
+        $accion = $_GET['accion'] ?? 'mostrar_dashboard_proveedor';
 
-        if ($accion === 'mostrar_oportunidades') {
+        if ($accion === 'mostrar_dashboard_proveedor') {
+            mostrarDashboardProveedor();
+        } elseif ($accion === 'mostrar_oportunidades') {
             mostrarOportunidades();
         } elseif ($accion === 'aceptar_solicitud') {
             aceptarSolicitud($_GET['id'] ?? null);
@@ -183,31 +185,64 @@ function mostrarServiciosContratadosProveedor()
 
 function actualizarEstadoServicio()
 {
-    // Esta función devuelve JSON para llamadas AJAX
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=utf-8');
 
-    if ($_SESSION['user']['rol'] !== 'proveedor') {
+    if (($_SESSION['user']['rol'] ?? '') !== 'proveedor') {
         http_response_code(403);
-        echo json_encode(['ok' => false, 'msg' => 'No autorizado. Solo proveedores.']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'No autorizado. Solo proveedores.'
+        ]);
         exit();
     }
 
-    if (!isset($_POST['contrato_id'], $_POST['estado'])) {
+    $contratoId = (int)($_POST['contrato_id'] ?? 0);
+
+    // Acepta ambos nombres: estado_actual y estado
+    $nuevoEstado = trim(
+        $_POST['estado_actual']
+            ?? $_POST['estado']
+            ?? ''
+    );
+
+    if ($contratoId <= 0 || $nuevoEstado === '') {
         http_response_code(400);
-        echo json_encode(['ok' => false, 'msg' => 'Datos incompletos']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Datos incompletos.'
+        ]);
         exit();
     }
 
-    $contratoId  = (int) $_POST['contrato_id'];
-    $nuevoEstado = trim($_POST['estado']);
-    $usuarioId   = (int) $_SESSION['user']['id'];
+    $estadosPermitidos = [
+        'pendiente',
+        'confirmado',
+        'en_proceso',
+        'finalizado',
+        'cancelado',
+        'cancelado_cliente',
+        'cancelado_proveedor'
+    ];
 
+    if (!in_array($nuevoEstado, $estadosPermitidos, true)) {
+        http_response_code(422);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Estado no válido.'
+        ]);
+        exit();
+    }
+
+    $usuarioId = (int)$_SESSION['user']['id'];
     $modelo = new ServicioContratado();
 
-    // Validar propiedad del contrato
+    // Verifica que el contrato realmente le pertenezca al proveedor logueado
     if (!$modelo->contratoPerteneceAProveedor($contratoId, $usuarioId)) {
         http_response_code(403);
-        echo json_encode(['ok' => false, 'msg' => 'No autorizado']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'No autorizado para modificar este servicio.'
+        ]);
         exit();
     }
 
@@ -215,11 +250,20 @@ function actualizarEstadoServicio()
 
     if (!$ok) {
         http_response_code(422);
-        echo json_encode(['ok' => false, 'msg' => 'Estado no válido o error al actualizar']);
+        echo json_encode([
+            'success' => false,
+            'message' => 'No se pudo actualizar el estado del servicio.'
+        ]);
         exit();
     }
 
-    echo json_encode(['ok' => true, 'estado' => $nuevoEstado]);
+    echo json_encode([
+        'success' => true,
+        'message' => $nuevoEstado === 'finalizado'
+            ? 'El servicio fue marcado como finalizado.'
+            : 'El estado del servicio fue actualizado correctamente.',
+        'estado' => $nuevoEstado
+    ]);
     exit();
 }
 
@@ -394,5 +438,36 @@ function rechazarSolicitud($id)
     } catch (Throwable $e) {
         mostrarSweetAlert('error', 'Error técnico', 'Mensaje: ' . $e->getMessage());
     }
+    exit();
+}
+function mostrarDashboardProveedor()
+{
+    if (($_SESSION['user']['rol'] ?? '') !== 'proveedor') {
+        mostrarSweetAlert(
+            'error',
+            'Acceso denegado',
+            'Solo proveedores pueden acceder al panel.',
+            '/ProviServers/login'
+        );
+        exit();
+    }
+
+    $usuarioId = (int)$_SESSION['user']['id'];
+
+    $servicioModel = new ServicioContratado();
+    $solicitudModel = new Solicitud();
+
+    // Resumen principal
+    $resumen = $servicioModel->obtenerResumenDashboardProveedor($usuarioId);
+
+    // Solicitudes pendientes
+    $solicitudesPendientes = $solicitudModel->contarPendientesProveedor($usuarioId);
+
+    // Listados
+    $serviciosRecientes = $servicioModel->obtenerServiciosRecientesProveedor($usuarioId, 4);
+    $resenasRecientes = $servicioModel->obtenerResenasRecientesProveedor($usuarioId, 5);
+    $proximasCitas = $servicioModel->obtenerProximasCitasProveedor($usuarioId, 5);
+
+    require_once BASE_PATH . '/app/views/dashboard/proveedor/dashboardProveedor.php';
     exit();
 }
