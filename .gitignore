@@ -1,0 +1,6 @@
+# Archivos de configuración de rutas
+config/config.php
+.htaccess
+
+# Archivo de conexión a la base de datos (MUY IMPORTANTE)
+config/database.php
