@@ -82,13 +82,15 @@ main {
     display: flex;
     width: 100%;
     max-width: 1200px;
-    height: 85vh; 
-    min-height: 0; /* Eliminamos altura mínima */
+    height: 85vh;
+    min-height: 0;
+    /* Eliminamos altura mínima */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
     border-radius: 24px;
     overflow: hidden;
     background-color: white;
-    margin: 20px auto; /* Centrado con margen */
+    margin: 20px auto;
+    /* Centrado con margen */
 }
 
 /* CONTENEDOR PRINCIPAL */
@@ -110,7 +112,7 @@ main {
     text-align: center;
 }
 
-#reset-password > p {
+#reset-password>p {
     color: var(--text-muted);
     margin-bottom: 2rem;
     text-align: center;
@@ -249,8 +251,13 @@ main {
 
 
 @keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .info-card {
@@ -268,8 +275,10 @@ main {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1.2;
-    margin-bottom: 0.5rem; /* REDUCE EL ESPACIO DEBAJO DEL TEXTO */
-    margin-top: 200px; /* AJUSTE FINO PARA SUBIR O BAJAR MÁS EL TEXTO */
+    margin-bottom: 0.5rem;
+    /* REDUCE EL ESPACIO DEBAJO DEL TEXTO */
+    margin-top: 200px;
+    /* AJUSTE FINO PARA SUBIR O BAJAR MÁS EL TEXTO */
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     margin-left: -230px;
     animation: float 3s ease-in-out infinite;
@@ -283,7 +292,8 @@ main {
     justify-content: flex-end;
     align-items: center;
     padding-right: 20px;
-    margin-top: -200px; /* ACERCA LA IMAGEN AL TEXTO */
+    margin-top: -200px;
+    /* ACERCA LA IMAGEN AL TEXTO */
 }
 
 .info-image {
@@ -295,8 +305,15 @@ main {
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
 }
 
 /* -------- ANIMACIONES ---------- */
@@ -305,47 +322,35 @@ main {
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+/* ==========================================================================
+   RESPONSIVE - RESTABLECER CONTRASEÑA
+   ========================================================================== */
 
-/* -------- RESPONSIVE (SIN SCROLL) ---------- */
-@media (max-width: 992px) {
+/* Tablet (768px - 1080px) */
+@media screen and (min-width: 768px) and (max-width: 1080px) {
     .custom-container {
         flex-direction: column;
         min-height: auto;
         height: auto;
     }
-    
+
     .info-section {
-        display: none; /* Se oculta en tablet/móvil como en login */
+        display: none; /* Se oculta en tablet */
     }
-    
+
     #reset-password {
-        padding: 50px 40px;
+        padding: 40px 30px; /* Unificado */
         min-height: auto;
     }
-}
 
-@media (max-width: 768px) {
-    #reset-password {
-        padding: 40px 30px;
-    }
-    
     #reset-password h1 {
         font-size: 2rem;
-    }
-}
-
-@media (max-width: 576px) {
-    #reset-password {
-        padding: 30px 20px;
-    }
-
-    #reset-password h1 {
-        font-size: 1.8rem;
     }
 
     .reset-steps {
@@ -353,10 +358,86 @@ main {
     }
 
     .reset-steps h3 {
+        font-size: 1.1rem;
+    }
+
+    .reset-steps li {
+        font-size: 0.95rem;
+    }
+}
+
+/* Móvil (320px - 767px) */
+@media screen and (min-width: 320px) and (max-width: 767px) {
+
+    main{
+        padding: 20px;
+    }
+    .custom-container {
+        flex-direction: column;
+        min-height: auto;
+        height: auto;
+    }
+
+    .info-section {
+        display: none; /* Se oculta en móvil */
+    }
+
+    #reset-password {
+        padding: 30px 20px;
+        min-height: auto;
+    }
+
+    #reset-password h1 {
+        font-size: 1.8rem;
+    }
+
+    .reset-steps {
+        padding: 1rem;
+    }
+
+    .reset-steps h3 {
         font-size: 1rem;
     }
 
     .reset-steps li {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    /* Ajustes adicionales para móvil */
+    .reset-steps ol {
+        padding-left: 1.2rem;
+    }
+
+    .form-group input {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+
+    .btn-reset {
+        padding: 12px 20px;
+        font-size: 0.95rem;
     }
 }
+
+/* Móvil pequeño (menos de 320px) */
+@media screen and (max-width: 319px) {
+    #reset-password {
+        padding: 20px 15px;
+    }
+
+    #reset-password h1 {
+        font-size: 1.5rem;
+    }
+
+    .reset-steps {
+        padding: 0.8rem;
+    }
+
+    .reset-steps li {
+        font-size: 0.8rem;
+    }
+}
+
+
+
+
