@@ -182,7 +182,7 @@ $totalCompletadas  = count($serviciosCompletados);
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
   <!-- CSS específico -->
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/Solicitudes.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/Solicitudes.css">
 </head>
 
 <body>
@@ -579,9 +579,9 @@ $totalCompletadas  = count($serviciosCompletados);
     const BASE_URL = "<?= BASE_URL ?>";
   </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/enProceso.js"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/completadas.js"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/enProceso.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/completadas.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

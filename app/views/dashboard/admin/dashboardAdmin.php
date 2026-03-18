@@ -82,7 +82,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
             <div class="tarjeta">
                 <h3>Servicio Destacado</h3>
                 <div class="servicio-imagen">
-                    <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Foto Servicio">
+                    <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Foto Servicio">
                 </div>
                 <div class="servicio-nombre">Plomería</div>
             </div>
@@ -112,12 +112,12 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
     <script>
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

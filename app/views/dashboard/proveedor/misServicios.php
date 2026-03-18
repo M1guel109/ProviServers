@@ -33,7 +33,7 @@ if ($usuarioId) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- css de tablas / dashboard -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/listar-servicio.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/listar-servicio.css">
 
 
 
@@ -411,9 +411,9 @@ if ($usuarioId) {
         crossorigin="anonymous"></script>
 
     <!-- JS del dashboard -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardProveedor.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardProveedor.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 
 
 

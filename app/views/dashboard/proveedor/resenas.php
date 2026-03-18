@@ -23,7 +23,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- CSS específico -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/resenas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/resenas.css">
 </head>
 
 <body>
@@ -227,8 +227,8 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <script>
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/resenas.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/resenas.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

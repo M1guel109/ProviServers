@@ -33,7 +33,7 @@ if ($usuarioId) {
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- css de tablas / dashboard -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/publicaciones.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/publicaciones.css">
 </head>
 
 <body>
@@ -317,10 +317,10 @@ if ($usuarioId) {
         crossorigin="anonymous"></script>
 
     <!-- JS dashboard (sidebar, etc.) -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/detallePublicacion.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/detallePublicacion.js"></script>
 
 
 </body>

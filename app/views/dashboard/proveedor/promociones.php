@@ -113,10 +113,10 @@ $tipos_promocion = [
 
     <!-- Estilos Globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
 
     <!-- CSS Específico -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/promociones.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/promociones.css">
 </head>
 
 <body>
@@ -672,8 +672,8 @@ $tipos_promocion = [
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/promociones.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/promociones.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 
     <script>
         const BASE_URL = "<?= BASE_URL ?>";

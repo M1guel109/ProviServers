@@ -17,7 +17,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css (asumo que puedes reutilizar el de registro de usuario o crear uno específico) -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
 </head>
 
 <body>
@@ -120,9 +120,9 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript para manejo de formularios y dashboard -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/categoria.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/categoria.js"></script>
 
 </body>
 

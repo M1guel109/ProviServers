@@ -19,10 +19,10 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- Estilos Globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
 
     <!-- CSS Específico -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/calendarioProveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/calendarioProveedor.css">
 </head>
 
 <body>
@@ -233,7 +233,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/calendario.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/calendario.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 </html>

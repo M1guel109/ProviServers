@@ -103,7 +103,7 @@ function obtenerEstiloNotificacion($tipo) {
 
         <div class="nav-item dropdown d-none d-sm-block">
             <a class="nav-link d-flex align-items-center gap-2 text-dark text-decoration-none" href="#" data-bs-toggle="dropdown">
-                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/<?= $imgBandera ?>" alt="<?= $txtIdioma ?>" height="20" class="rounded-1 border">
+                <img src="<?= BASE_URL ?>/public/assets/dashboard/img/<?= $imgBandera ?>" alt="<?= $txtIdioma ?>" height="20" class="rounded-1 border">
                 <span class="d-none d-lg-block small fw-bold"><?= $txtIdioma ?></span>
                 <i class="bi bi-chevron-down small text-muted"></i>
             </a>
@@ -112,13 +112,13 @@ function obtenerEstiloNotificacion($tipo) {
                 <li>
                     <a class="dropdown-item d-flex align-items-center rounded-2 py-2 <?= $idiomaActual == 'es' ? 'active' : '' ?>" 
                        href="<?= BASE_URL ?>/app/controllers/idiomaController.php?lang=es">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/es.png" height="16" class="me-2"> Español
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/es.png" height="16" class="me-2"> Español
                     </a>
                 </li>
                 <li>
                     <a class="dropdown-item d-flex align-items-center rounded-2 py-2 <?= $idiomaActual == 'en' ? 'active' : '' ?>" 
                        href="<?= BASE_URL ?>/app/controllers/idiomaController.php?lang=en">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/us.png" height="16" class="me-2"> English
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/us.png" height="16" class="me-2"> English
                     </a>
                 </li>
             </ul>

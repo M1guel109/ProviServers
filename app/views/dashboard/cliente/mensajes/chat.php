@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardCliente.css">
 </head>
 <body>
 <?php
@@ -78,7 +78,7 @@ if (!empty($mensajes)) {
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardCliente.js"></script>
 
 <script>
 const BASE = "<?= BASE_URL ?>";

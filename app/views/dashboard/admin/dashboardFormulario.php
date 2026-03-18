@@ -17,7 +17,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <link rel="stylesheet" href=" <?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css -->
-    <link rel="stylesheet" href=" <?= BASE_URL ?>/public/assets/dashBoard/css/dashboardFormulario.css">
+    <link rel="stylesheet" href=" <?= BASE_URL ?>/public/assets/dashboard/css/dashboardFormulario.css">
 </head>
 
 <body>
@@ -51,7 +51,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
                 <div class="seccion-foto">
                     <div class="tarjeta-foto">
                         <div class="foto-perfil">
-                            <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/foto-nuevo-admin.png" alt="Foto de perfil"
+                            <img src="<?= BASE_URL ?>/public/assets/dashboard/img/foto-nuevo-admin.png" alt="Foto de perfil"
                                 id="foto-preview">
                         </div>
                         <label for="foto-input" class="btn-agregar-foto">
@@ -127,7 +127,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
 </body>
 
 </html>

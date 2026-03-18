@@ -87,8 +87,8 @@ $correoActual = $_SESSION['user']['email'] ?? '';
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- Estilos específicos del dashboard proveedor -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/configuracion-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/configuracion-Proveedor.css">
 </head>
 
 <body>
@@ -1617,7 +1617,7 @@ $correoActual = $_SESSION['user']['email'] ?? '';
         crossorigin="anonymous"></script>
 
     <!-- JS del dashboard proveedor (si quieres reaprovechar comportamiento) -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardProveedor.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardProveedor.js"></script>
 </body>
 
 </html>
