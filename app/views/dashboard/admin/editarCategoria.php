@@ -38,7 +38,7 @@ if (!$categoria) {
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
 </head>
 
 <body>
@@ -123,9 +123,9 @@ if (!$categoria) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         crossorigin="anonymous"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/categoria.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/categoria.js"></script>
 
 </body>
 

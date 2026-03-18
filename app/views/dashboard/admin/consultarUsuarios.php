@@ -22,7 +22,7 @@ $datos = mostrarUsuarios();
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/estilosTablas.css">
 </head>
 
 <body>
@@ -286,9 +286,9 @@ $datos = mostrarUsuarios();
         }
     </script>
     
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/detalleUsuario.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/detalleUsuario.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 
 </body>
 </html>

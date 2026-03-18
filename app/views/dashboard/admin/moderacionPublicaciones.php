@@ -21,7 +21,7 @@ $datos = mostrarservicios();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/estilosTablas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/estilosTablas.css">
     <style>
         .btn-approve:hover { border-color: #0066ff; color: #0066ff; background-color: #d1e7dd; }
         .btn-reject:hover { border-color: #dc3545; color: #dc3545; background-color: #f8d7da; }
@@ -289,9 +289,9 @@ $datos = mostrarservicios();
 
     <script>const BASE_URL = "<?= BASE_URL ?>";</script>
     
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/moderacionServicio.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/moderacionServicio.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 
 </body>
 </html>

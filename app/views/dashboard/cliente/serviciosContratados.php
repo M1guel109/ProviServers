@@ -14,7 +14,7 @@
   <!-- Estilos globales -->
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
   <!-- Estilos específicos -->
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardCliente.css">
 </head>
 
 <body>
@@ -72,7 +72,7 @@
                 <?php
                 $imagen = !empty($srv['servicio_imagen'])
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  : BASE_URL . '/public/assets/dashboard/img/imagen-servicio.png';
 
                 $tituloServicio =
                   $srv['servicio_nombre']
@@ -151,7 +151,7 @@
                 <?php
                 $imagen = !empty($srv['servicio_imagen'])
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  : BASE_URL . '/public/assets/dashboard/img/imagen-servicio.png';
 
                 $tituloServicio =
                   $srv['servicio_nombre']
@@ -236,7 +236,7 @@
                 <?php
                 $imagen = !empty($srv['servicio_imagen'])
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  : BASE_URL . '/public/assets/dashboard/img/imagen-servicio.png';
 
                 $tituloServicio =
                   $srv['servicio_nombre']
@@ -336,7 +336,7 @@
                 <?php
                 $imagen = !empty($srv['servicio_imagen'])
                   ? BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($srv['servicio_imagen'])
-                  : BASE_URL . '/public/assets/dashBoard/img/imagen-servicio.png';
+                  : BASE_URL . '/public/assets/dashboard/img/imagen-servicio.png';
 
                 $tituloServicio =
                   $srv['servicio_nombre']
@@ -457,7 +457,7 @@
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JS propio -->
-  <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardCliente.js"></script>
 </body>
 
 </html>

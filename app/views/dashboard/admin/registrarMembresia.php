@@ -11,7 +11,7 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
     <title>Proviservers | Registrar Membresía</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
 </head>
 
 <body>
@@ -120,9 +120,9 @@ require_once BASE_PATH . '/app/helpers/session_admin.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </body>
 

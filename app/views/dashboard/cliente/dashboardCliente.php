@@ -25,8 +25,8 @@ $categorias = $objCategoria->mostrar() ?: [];
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- Estilos específicos de cliente -->
-    <!-- Ajusta el path si tu carpeta se llama distinto (dashBoard vs dashboard) -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardCliente.css">
+    <!-- Ajusta el path si tu carpeta se llama distinto (dashboard vs dashboard) -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardCliente.css">
 </head>
 
 <body>
@@ -321,7 +321,7 @@ $categorias = $objCategoria->mostrar() ?: [];
                     <div class="col-md-4">
                         <div class="service-item text-center">
                             <div class="service-content">
-                                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/Foto-usuario.png"
+                                <img src="<?= BASE_URL ?>/public/assets/dashboard/img/Foto-usuario.png"
                                     alt="Perfil"
                                     style="width: 120px; height: 120px; border-radius: 50%; border: 4px solid var(--primary-color); margin-bottom: 1rem;">
                                 <h3><?= htmlspecialchars($nombreSaludo) ?></h3>
@@ -560,7 +560,7 @@ $categorias = $objCategoria->mostrar() ?: [];
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <!-- JS propio -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardCliente.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardCliente.js"></script>
 
 
 

@@ -19,7 +19,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <!-- CSS específico para dashboard de proveedores -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
 </head>
 
 <body>
@@ -111,7 +111,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                 <h3>Servicios Recientes</h3>
                 <div class="servicios-recientes">
                     <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Servicio">
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
                         <div class="servicio-info">
                             <div class="servicio-nombre-item">Reparación de tuberías</div>
                             <div class="servicio-categoria">Plomería</div>
@@ -119,7 +119,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <span class="servicio-estado estado-activo">Activo</span>
                     </div>
                     <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Servicio">
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
                         <div class="servicio-info">
                             <div class="servicio-nombre-item">Instalación eléctrica</div>
                             <div class="servicio-categoria">Electricidad</div>
@@ -127,7 +127,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <span class="servicio-estado estado-pendiente">Pendiente</span>
                     </div>
                     <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Servicio">
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
                         <div class="servicio-info">
                             <div class="servicio-nombre-item">Limpieza residencial</div>
                             <div class="servicio-categoria">Limpieza</div>
@@ -135,7 +135,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                         <span class="servicio-estado estado-activo">Activo</span>
                     </div>
                     <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Servicio">
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
                         <div class="servicio-info">
                             <div class="servicio-nombre-item">Pintura de interiores</div>
                             <div class="servicio-categoria">Pintura</div>
@@ -239,8 +239,8 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboardProveedor.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardProveedor.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

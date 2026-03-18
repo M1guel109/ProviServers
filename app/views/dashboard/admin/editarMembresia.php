@@ -34,8 +34,8 @@ if (!$membresia) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboardFormulario.css"> -->
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardFormulario.css"> -->
 </head>
 
 <body>

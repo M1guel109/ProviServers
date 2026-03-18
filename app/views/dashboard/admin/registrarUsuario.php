@@ -24,7 +24,7 @@ $categorias_bd = [
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
 </head>
 
 <body>
@@ -199,9 +199,9 @@ $categorias_bd = [
         crossorigin="anonymous"></script>
 
     <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/registroUsuario.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/registroUsuario.js"></script>
     
 </body>
 

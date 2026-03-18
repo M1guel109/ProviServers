@@ -14,7 +14,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/oportunidades.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/oportunidades.css">
 </head>
 
 <body>
@@ -291,8 +291,8 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
         });
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/oportunidades.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/oportunidades.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

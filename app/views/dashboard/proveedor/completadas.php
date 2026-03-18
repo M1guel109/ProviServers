@@ -18,10 +18,10 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- Estilos Globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
 
     <!-- CSS Específico -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/completadas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/completadas.css">
    
 </head>
 
@@ -139,7 +139,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
                     </div>
 
                     <div class="completada-cliente">
-                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/avatar-cliente.png" class="cliente-avatar">
+                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/avatar-cliente.png" class="cliente-avatar">
                         <div class="cliente-info">
                             <div class="cliente-nombre">Carlos Rodríguez</div>
                             <div class="cliente-contacto">
@@ -221,7 +221,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- JS -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/completadas.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/completadas.js"></script>
 
 </body>
 </html>

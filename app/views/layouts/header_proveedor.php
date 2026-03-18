@@ -75,13 +75,13 @@ $cantidadNotif = 3;
         <div class="nav-item dropdown d-none d-md-block">
             <a class="nav-link d-flex align-items-center gap-2 text-dark text-decoration-none" href="#" 
                data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/es.png" alt="Español" height="22" class="rounded-1 border shadow-sm">
+                <img src="<?= BASE_URL ?>/public/assets/dashboard/img/es.png" alt="Español" height="22" class="rounded-1 border shadow-sm">
                 <span class="d-none d-lg-block small fw-bold">Español</span>
                 <i class="bi bi-chevron-down small text-muted"></i>
             </a>
             <ul class="dropdown-menu dropdown-menu-end shadow border-0 py-2">
-                <li><a class="dropdown-item py-2" href="#"><img src="<?= BASE_URL ?>/public/assets/dashBoard/img/es.png" alt="ES" height="18" class="me-2"> Español</a></li>
-                <li><a class="dropdown-item py-2" href="#"><img src="<?= BASE_URL ?>/public/assets/dashBoard/img/en.png" alt="EN" height="18" class="me-2"> English</a></li>
+                <li><a class="dropdown-item py-2" href="#"><img src="<?= BASE_URL ?>/public/assets/dashboard/img/es.png" alt="ES" height="18" class="me-2"> Español</a></li>
+                <li><a class="dropdown-item py-2" href="#"><img src="<?= BASE_URL ?>/public/assets/dashboard/img/en.png" alt="EN" height="18" class="me-2"> English</a></li>
             </ul>
         </div>
 
