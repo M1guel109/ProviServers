@@ -50,15 +50,15 @@ switch ($request) {
 
     // Vistas
     case '/login':
-        require BASE_PATH . '/app/views/auth/Login.php';
+        require BASE_PATH . '/app/views/auth/login.php';
         break;
 
     case '/registro':
-        require BASE_PATH . '/app/views/auth/Registro.php';
+        require BASE_PATH . '/app/views/auth/registro.php';
         break;
 
     case '/reestablecer-contrasena':
-        require BASE_PATH . '/app/views/auth/ReestablecerContrasena.php';
+        require BASE_PATH . '/app/views/auth/reestablecerContrasena.php';
         break;
 
     // Procesos
