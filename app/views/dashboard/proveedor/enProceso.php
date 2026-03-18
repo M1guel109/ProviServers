@@ -28,8 +28,8 @@ $stats = [
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/enProcesos.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/enProcesos.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
 </head>
 
 <body>
@@ -147,7 +147,7 @@ $stats = [
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/enProceso.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/enProceso.js"></script>
 
 </body>
 </html>

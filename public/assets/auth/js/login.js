@@ -6,5 +6,5 @@
 //     // Por ahora, solo redireccionamos
     
 //     // Redireccionar a dashboard
-//     window.location.href = '../../../../../dashBoard/admin/dashboardAdmin.html';
+//     window.location.href = '../../../../../dashboard/admin/dashboardAdmin.html';
 // });

@@ -19,7 +19,7 @@ $categorias = $categoriaModel->mostrar();
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css"> -->
+    <!-- <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrar-servicio.css"> -->
 </head>
 
 <body>
@@ -57,7 +57,7 @@ $categorias = $categoriaModel->mostrar();
                             <div class="seccion-foto">
                                 <div class="tarjeta-foto">
                                     <div class="foto-servicio">
-                                        <img src="<?= BASE_URL ?>/public/assets/dashBoard/img/imagen-servicio.png" alt="Imagen del servicio" id="foto-preview">
+                                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Imagen del servicio" id="foto-preview">
                                     </div>
                                     <label for="foto-input" class="btn-agregar-foto">
                                         <i class="bi bi-camera"></i> Agregar imagen
@@ -145,9 +145,9 @@ $categorias = $categoriaModel->mostrar();
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/registrar-servicio.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/registrar-servicio.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

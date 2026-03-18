@@ -40,7 +40,7 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrarUsuario.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrarUsuario.css">
 
     <style>
         .fade-in {
@@ -311,10 +311,10 @@ if ($usuario['rol'] === 'proveedor' && !empty($usuario['categorias'])) {
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <!-- <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/app.js"></script> -->
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/editarUsuario.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <!-- <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script> -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/editarUsuario.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

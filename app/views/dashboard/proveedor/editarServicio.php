@@ -38,7 +38,7 @@ $categorias = $categoriaModel->mostrar();
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
 
     <!-- tu css (puedes reutilizar el de registrar servicio) -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashBoard/css/registrar-servicio.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrar-servicio.css">
 </head>
 
 <body>
@@ -201,8 +201,8 @@ $categorias = $categoriaModel->mostrar();
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/dashboard.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashBoard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>
