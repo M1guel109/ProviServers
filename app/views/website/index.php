@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <!-- css de estilos globales o generales -->
-    <link rel="stylesheet" href="public/assets/webSite/css/landing.css">
+    <link rel="stylesheet" href="public/assets/website/css/landing.css">
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
     <!-- tu css -->
@@ -49,9 +49,9 @@
         <!-- HERO SECTION -->
         <section id="hero" class="hero d-flex align-items-start position-relative">
             <div class="hero-carousel">
-                <img src="public/assets/webSite/img/fondoLanding.png" class="hero-img active" alt="Imagen 1">
-                <img src="public/assets/webSite/img/fondoLanding2.jpg" class="hero-img" alt="Imagen 2">
-                <img src="public/assets/webSite/img/fondoLanding3.jpg" class="hero-img" alt="Imagen 3">
+                <img src="public/assets/website/img/fondoLanding.png" class="hero-img active" alt="Imagen 1">
+                <img src="public/assets/website/img/fondoLanding2.jpg" class="hero-img" alt="Imagen 2">
+                <img src="public/assets/website/img/fondoLanding3.jpg" class="hero-img" alt="Imagen 3">
             </div>
             <div class="container">
                 <div class="row justify-content-end">
@@ -83,8 +83,8 @@
                     </div>
 
                     <div class="contenedor-superpuesto">
-                        <img src="public/assets/webSite/img/Servicios2.png" data-aos="fade-right" data-aos-duration="1000" alt="Persona mayor sonriendo" class="img-servicio-base">
-                        <img src="public/assets/webSite/img/Servicios.png" data-aos="fade-left" data-aos-duration="1500" data-aos-delay="200" alt="Persona usando taladro" class="img-servicio-superpuesta">
+                        <img src="public/assets/website/img/Servicios2.png" data-aos="fade-right" data-aos-duration="1000" alt="Persona mayor sonriendo" class="img-servicio-base">
+                        <img src="public/assets/website/img/Servicios.png" data-aos="fade-left" data-aos-duration="1500" data-aos-delay="200" alt="Persona usando taladro" class="img-servicio-superpuesta">
                     </div>
                 </div>
             </div>
@@ -110,7 +110,7 @@
                 <!-- Tarjetas -->
                 <div class="roles-cards">
                     <article class="role-card">
-                        <img src="public/assets/webSite/img/roles1.png" alt="Proveedor" class="role-img">
+                        <img src="public/assets/website/img/roles1.png" alt="Proveedor" class="role-img">
                         <div class="role-content">
                             <h5>Proveedor</h5>
                             <p>
@@ -125,7 +125,7 @@
                     </article>
 
                     <article class="role-card">
-                        <img src="public/assets/webSite/img/roles2.png" alt="Cliente" class="role-img">
+                        <img src="public/assets/website/img/roles2.png" alt="Cliente" class="role-img">
                         <div class="role-content">
                             <h5>Cliente</h5>
                             <p>
@@ -160,7 +160,7 @@
                     <!-- Tarjeta 1 - Karen -->
                     <div class="card">
                         <div class="card-image">
-                            <img src="public/assets/webSite/img/team1.png" alt="Karen Heredia">
+                            <img src="public/assets/website/img/team1.png" alt="Karen Heredia">
                         </div>
                         <div class="card-content">
                             <div class="card-info">
@@ -194,7 +194,7 @@
                     <!-- Tarjeta 2 - Schneider (con borde) -->
                     <div class="card ">
                         <div class="card-image">
-                            <img src="public/assets/webSite/img/team2.png" alt="Schneider Manrrique">
+                            <img src="public/assets/website/img/team2.png" alt="Schneider Manrrique">
                         </div>
                         <div class="card-content">
                             <div class="card-info">
@@ -228,7 +228,7 @@
                     <!-- Tarjeta 3 - Miguel -->
                     <div class="card">
                         <div class="card-image">
-                            <img src="public/assets/webSite/img/team5.png" alt="Miguel Lozano">
+                            <img src="public/assets/website/img/team5.png" alt="Miguel Lozano">
                         </div>
                         <div class="card-content">
                             <div class="card-info">
@@ -262,7 +262,7 @@
                     <!-- Tarjeta 4 - Juanita -->
                     <div class="card">
                         <div class="card-image">
-                            <img src="public/assets/webSite/img/team4.png" alt="Juanita Jimenez">
+                            <img src="public/assets/website/img/team4.png" alt="Juanita Jimenez">
                         </div>
                         <div class="card-content">
                             <div class="card-info">
@@ -298,7 +298,7 @@
 
         <section id="pricing" class="pricing-section">
             <div class="pricing-background">
-                <img src="public/assets/webSite/img/Background.png" alt="Background" class="background-image">
+                <img src="public/assets/website/img/Background.png" alt="Background" class="background-image">
             </div>
 
             <div class="pricing-container">
@@ -459,7 +459,7 @@
                         <div class="testimonial-card active">
                             <div class="testimonial-content">
                                 <div class="testimonial-avatar">
-                                    <img src="public/assets/webSite/img/comentarios.png" alt="Cliente Carlos Marín" />
+                                    <img src="public/assets/website/img/comentarios.png" alt="Cliente Carlos Marín" />
                                 </div>
                                 <div class="testimonial-info">
                                     <h3>Carlos Marín</h3>
@@ -481,7 +481,7 @@
                         <div class="testimonial-card">
                             <div class="testimonial-content">
                                 <div class="testimonial-avatar">
-                                    <img src="public/assets/webSite/img/comentarios.png" alt="Cliente Laura Gómez" />
+                                    <img src="public/assets/website/img/comentarios.png" alt="Cliente Laura Gómez" />
                                 </div>
                                 <div class="testimonial-info">
                                     <h3>Laura Gómez</h3>
@@ -502,7 +502,7 @@
                         <div class="testimonial-card">
                             <div class="testimonial-content">
                                 <div class="testimonial-avatar">
-                                    <img src="public/assets/webSite/img/comentarios.png" alt="Proveedor Andrés Torres" />
+                                    <img src="public/assets/website/img/comentarios.png" alt="Proveedor Andrés Torres" />
                                 </div>
                                 <div class="testimonial-info">
                                     <h3>Andrés Torres</h3>
@@ -523,7 +523,7 @@
                         <div class="testimonial-card">
                             <div class="testimonial-content">
                                 <div class="testimonial-avatar">
-                                    <img src="public/assets/webSite/img/comentarios.png" alt="Cliente María Fernanda López" />
+                                    <img src="public/assets/website/img/comentarios.png" alt="Cliente María Fernanda López" />
                                 </div>
                                 <div class="testimonial-info">
                                     <h3>María Fernanda López</h3>
@@ -665,7 +665,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src="public/assets/webSite/js/landing.js"></script>
+    <script src="public/assets/website/js/landing.js"></script>
 </body>
 
 </html>
