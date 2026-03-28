@@ -1,26 +1,26 @@
 // JavaScript para el dashboard de proveedores
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Toggle del menú lateral
     const btnToggleMenu = document.getElementById('btn-toggle-menu');
     const sidebar = document.querySelector('.sidebar');
-    
+
     if (btnToggleMenu) {
-        btnToggleMenu.addEventListener('click', function() {
+        btnToggleMenu.addEventListener('click', function () {
             sidebar.classList.toggle('plegado');
         });
     }
-    
+
     // Toggle de submenús
     const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-    
+
     toggleSubmenuButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const submenu = this.parentElement.querySelector('.submenu');
             const hasSubmenu = this.parentElement;
-            
+
             hasSubmenu.classList.toggle('active');
-            
+
             if (hasSubmenu.classList.contains('active')) {
                 submenu.style.maxHeight = submenu.scrollHeight + 'px';
             } else {
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Inicializar gráficos (ejemplo con ApexCharts)
     if (typeof ApexCharts !== 'undefined') {
         // Gráfica principal
@@ -71,39 +71,39 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             colors: ['#3498db', '#2ecc71']
         };
-        
+
         const chart = new ApexCharts(document.querySelector("#chart"), chartOptions);
         chart.render();
-        
+
         // Cambiar período de la gráfica
         const periodoSelect = document.getElementById('periodo');
         if (periodoSelect) {
-            periodoSelect.addEventListener('change', function() {
+            periodoSelect.addEventListener('change', function () {
                 // Aquí podrías actualizar la gráfica según el período seleccionado
                 console.log('Período cambiado a:', this.value);
             });
         }
     }
-    
+
     // Ejemplo de funcionalidad para notificaciones
     const notificaciones = document.querySelector('.notificaciones');
     if (notificaciones) {
-        notificaciones.addEventListener('click', function() {
+        notificaciones.addEventListener('click', function () {
             alert('Tienes 3 notificaciones nuevas');
         });
     }
 });
 
 
-  // Helper: setText seguro
-  const setText = (id, value) => {
+// Helper: setText seguro
+const setText = (id, value) => {
     const el = document.getElementById(id);
     if (!el) return;
     el.textContent = value ?? '';
-  };
+};
 
-  // Resetea el modal (cuando se cierra)
-  const resetModalServicio = () => {
+// Resetea el modal (cuando se cierra)
+const resetModalServicio = () => {
     const loader = document.getElementById('loader-detalle-servicio');
     const cont = document.getElementById('contenido-detalle-servicio');
     if (loader) loader.classList.remove('d-none');
@@ -132,9 +132,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const linkEliminar = document.getElementById('modal-link-eliminar');
     if (linkEliminar) linkEliminar.href = '#';
-  };
+};
 
-  document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const modalEl = document.getElementById('modalDetalleServicio');
     if (!modalEl) return;
 
@@ -143,51 +143,51 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Delegación: captura clic en cualquier botón "Ver"
     document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn-ver-detalle-servicio');
-      if (!btn) return;
+        const btn = e.target.closest('.btn-ver-detalle-servicio');
+        if (!btn) return;
 
-      // Muestra contenido y oculta loader
-      const loader = document.getElementById('loader-detalle-servicio');
-      const cont = document.getElementById('contenido-detalle-servicio');
-      if (loader) loader.classList.add('d-none');
-      if (cont) cont.classList.remove('d-none');
+        // Muestra contenido y oculta loader
+        const loader = document.getElementById('loader-detalle-servicio');
+        const cont = document.getElementById('contenido-detalle-servicio');
+        if (loader) loader.classList.add('d-none');
+        if (cont) cont.classList.remove('d-none');
 
-      // Dataset (Bootstrap data-*)
-      const base = btn.dataset.baseUrl || '';
-      const id = btn.dataset.servicioId || '';
+        // Dataset (Bootstrap data-*)
+        const base = btn.dataset.baseUrl || '';
+        const id = btn.dataset.servicioId || '';
 
-      // Pintar campos
-      const imgUrl = btn.dataset.servicioImg || '';
-      const img = document.getElementById('modal-servicio-img');
-      if (img) img.src = imgUrl;
+        // Pintar campos
+        const imgUrl = btn.dataset.servicioImg || '';
+        const img = document.getElementById('modal-servicio-img');
+        if (img) img.src = imgUrl;
 
-      setText('modal-servicio-nombre', btn.dataset.servicioNombre || '');
-      setText('modal-servicio-id', `ID: ${id}`);
-      setText('modal-servicio-fecha', btn.dataset.servicioFecha || '');
-      setText('modal-servicio-categoria', btn.dataset.servicioCategoria || '');
-      setText('modal-servicio-descripcion', btn.dataset.servicioDescripcion || '');
-      setText('modal-servicio-estado-texto', btn.dataset.servicioEstadoTexto || '');
-      setText('modal-servicio-disponible-texto', btn.dataset.servicioDisponibleTexto || '');
+        setText('modal-servicio-nombre', btn.dataset.servicioNombre || '');
+        setText('modal-servicio-id', `ID: ${id}`);
+        setText('modal-servicio-fecha', btn.dataset.servicioFecha || '');
+        setText('modal-servicio-categoria', btn.dataset.servicioCategoria || '');
+        setText('modal-servicio-descripcion', btn.dataset.servicioDescripcion || '');
+        setText('modal-servicio-estado-texto', btn.dataset.servicioEstadoTexto || '');
+        setText('modal-servicio-disponible-texto', btn.dataset.servicioDisponibleTexto || '');
 
-      // Badges superiores (overlay)
-      const badgeEstado = document.getElementById('modal-servicio-estado');
-      if (badgeEstado) {
-        badgeEstado.className = 'badge ' + (btn.dataset.servicioEstadoBadgeclass || 'bg-secondary');
-        badgeEstado.textContent = btn.dataset.servicioEstadoTexto || '';
-      }
+        // Badges superiores (overlay)
+        const badgeEstado = document.getElementById('modal-servicio-estado');
+        if (badgeEstado) {
+            badgeEstado.className = 'badge ' + (btn.dataset.servicioEstadoBadgeclass || 'bg-secondary');
+            badgeEstado.textContent = btn.dataset.servicioEstadoTexto || '';
+        }
 
-      const disp = btn.dataset.servicioDisponible === '1';
-      const badgeDisp = document.getElementById('modal-servicio-disponible');
-      if (badgeDisp) {
-        badgeDisp.className = 'badge ' + (disp ? 'bg-success' : 'bg-dark');
-        badgeDisp.textContent = disp ? 'Disponible' : 'No disponible';
-      }
+        const disp = btn.dataset.servicioDisponible === '1';
+        const badgeDisp = document.getElementById('modal-servicio-disponible');
+        if (badgeDisp) {
+            badgeDisp.className = 'badge ' + (disp ? 'bg-success' : 'bg-dark');
+            badgeDisp.textContent = disp ? 'Disponible' : 'No disponible';
+        }
 
-      // Links acciones
-      const linkEditar = document.getElementById('modal-link-editar');
-      if (linkEditar) linkEditar.href = `${base}/proveedor/editar-servicio?id=${id}`;
+        // Links acciones
+        const linkEditar = document.getElementById('modal-link-editar');
+        if (linkEditar) linkEditar.href = `${base}/proveedor/editar-servicio?id=${id}`;
 
-      const linkEliminar = document.getElementById('modal-link-eliminar');
-      if (linkEliminar) linkEliminar.href = `${base}/proveedor/guardar-servicio?accion=eliminar&id=${id}`;
+        const linkEliminar = document.getElementById('modal-link-eliminar');
+        if (linkEliminar) linkEliminar.href = `${base}/proveedor/guardar-servicio?accion=eliminar&id=${id}`;
     });
-  });
+});
