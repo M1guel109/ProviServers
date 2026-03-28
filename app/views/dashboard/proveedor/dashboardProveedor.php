@@ -240,6 +240,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
     <!-- tu javaScript -->
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboardProveedor.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
