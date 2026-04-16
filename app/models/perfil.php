@@ -1,93 +1,122 @@
 <?php
 require_once __DIR__ . '/../../config/database.php';
 
-
 class Perfil
 {
     private $conexion;
 
     public function __construct()
     {
-        $db = new  Conexion();
+        $db = new Conexion();
         $this->conexion = $db->getConexion();
     }
 
-    // Esta funcion se duplica por cada rol
-    public function mostrarPerfilAdmin($id)
+    private function getTablaDetalle($rol)
+    {
+        if ($rol === 'cliente') return 'clientes';
+        if ($rol === 'proveedor') return 'proveedores';
+        if ($rol === 'admin') return 'admins';
+        throw new Exception("Rol no válido");
+    }
+
+    // Retorna toda la info del usuario logueado (unificado)
+    public function obtenerPerfilCompleto($id, $rol)
     {
         try {
+            $tabla = $this->getTablaDetalle($rol);
+            $sql = "SELECT u.email as correo, u.documento, u.rol, 
+                           d.nombres, d.apellidos, d.telefono, d.ubicacion as direccion, d.foto";
 
-           $consultar = "SELECT 
-                    -- 1. Trae TODAS las columnas (Base)
-                    u.*, c.*, p.*, a.*, 
+            // Si es proveedor, necesitamos su ID de la tabla proveedores para categorías
+            if ($rol === 'proveedor') {
+                $sql .= ", d.id as proveedor_id";
+            }
 
-                    -- 2. COLUMNAS CLAVE CONSOLIDADAS
-                    -- 🔥 IMPORTANTE: Forzamos que 'email' venga de usuarios (u)
-                    u.email, 
+            $sql .= " FROM usuarios u 
+                      INNER JOIN $tabla d ON u.id = d.usuario_id 
+                      WHERE u.id = :id";
 
-                    -- Consolida nombres, apellidos, etc.
-                    COALESCE(c.nombres, p.nombres, a.nombres) AS nombres,
-                    COALESCE(c.apellidos, p.apellidos, a.apellidos) AS apellidos,
-                    COALESCE(c.telefono, p.telefono, a.telefono) AS telefono,
-                    COALESCE(c.ubicacion, p.ubicacion, a.ubicacion) AS ubicacion,
-                    COALESCE(c.foto, p.foto, a.foto) AS foto
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            $perfil = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                FROM usuarios u
-                LEFT JOIN clientes c ON u.id = c.usuario_id AND u.rol = 'cliente'
-                LEFT JOIN proveedores p ON u.id = p.usuario_id AND u.rol = 'proveedor'
-                LEFT JOIN admins a ON u.id = a.usuario_id AND u.rol = 'admin'
-                WHERE u.id = :id
-                LIMIT 1
-            ";
-
-
-            $resultado = $this->conexion->prepare($consultar);
-            $resultado->bindParam(':id', $id);
-            $resultado->execute();
-
-            return $resultado->fetch();
-        } catch (PDOException $e) {
-            error_log("Error en Usuario::mostrar->" . $e->getMessage());
-            return [];
+            // Cargar categorías si es proveedor
+            if ($perfil && $rol === 'proveedor') {
+                $sqlCat = "SELECT c.nombre FROM categorias c 
+                           JOIN proveedor_categorias pc ON c.id = pc.categoria_id 
+                           WHERE pc.proveedor_id = :pid";
+                $stmtCat = $this->conexion->prepare($sqlCat);
+                $stmtCat->execute([':pid' => $perfil['proveedor_id']]);
+                $perfil['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+            }
+            return $perfil;
+        } catch (Exception $e) {
+            return null;
         }
     }
-    
-    public function actualizarClave($id, $claveActual, $claveNueva)
+
+    public function actualizarPerfil($id, $rol, $data)
     {
         try {
-            // 1. Obtener la contraseña actual de la BD para verificarla
-            $sql = "SELECT clave FROM usuarios WHERE id = :id";
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id', $id);
-            $stmt->execute();
+            $this->conexion->beginTransaction();
+            $tabla = $this->getTablaDetalle($rol);
+
+            // 1. Actualizar Usuario (Email y Clave si existe)
+            $sqlUser = "UPDATE usuarios SET email = :email";
+            $paramsUser = [':email' => $data['email'], ':id' => $id];
+            if (!empty($data['clave'])) {
+                $sqlUser .= ", clave = :clave";
+                $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
+            }
+            $sqlUser .= " WHERE id = :id";
+            $this->conexion->prepare($sqlUser)->execute($paramsUser);
+
+            // 2. Actualizar Tabla de Detalle
+            $sqlDetalle = "UPDATE $tabla SET 
+                            nombres = :nom, apellidos = :ape, 
+                            telefono = :tel, ubicacion = :ubi, foto = :foto 
+                           WHERE usuario_id = :id";
+            $this->conexion->prepare($sqlDetalle)->execute([
+                ':nom'  => $data['nombres'],
+                ':ape'  => $data['apellidos'],
+                ':tel'  => $data['telefono'],
+                ':ubi'  => $data['ubicacion'],
+                ':foto' => $data['foto'],
+                ':id'   => $id
+            ]);
+
+            $this->conexion->commit();
+            return true;
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            return false;
+        }
+    }
+
+    public function cambiarContrasena($id, $claveActual, $nuevaClave)
+    {
+        try {
+            // 1. Primero obtenemos la clave actual guardada en la BD
+            $stmt = $this->conexion->prepare("SELECT clave FROM usuarios WHERE id = :id");
+            $stmt->execute([':id' => $id]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$usuario) {
-                return "Usuario no encontrado.";
-            }
+            if (!$usuario) return false;
 
-            // 2. Verificar que la clave actual ingresada coincida con el hash en la BD
-            if (!password_verify($claveActual, $usuario['clave'])) {
-                return "La contraseña actual ingresada es incorrecta.";
-            }
-
-            // 3. Encriptar la nueva contraseña
-            $nuevaClaveHash = password_hash($claveNueva, PASSWORD_DEFAULT);
-
-            // 4. Actualizar en la base de datos
-            $update = "UPDATE usuarios SET clave = :clave WHERE id = :id";
-            $stmtUpdate = $this->conexion->prepare($update);
-            $stmtUpdate->bindParam(':clave', $nuevaClaveHash);
-            $stmtUpdate->bindParam(':id', $id);
-
-            if ($stmtUpdate->execute()) {
-                return true; // Éxito
+            // 2. Verificamos si la clave que el usuario escribió coincide con la de la BD
+            if (password_verify($claveActual, $usuario['clave'])) {
+                // 3. Si coincide, procedemos a actualizar con el nuevo HASH
+                $sql = "UPDATE usuarios SET clave = :clave WHERE id = :id";
+                $this->conexion->prepare($sql)->execute([
+                    ':clave' => password_hash($nuevaClave, PASSWORD_DEFAULT),
+                    ':id'    => $id
+                ]);
+                return true;
             } else {
-                return "Error al actualizar en la base de datos.";
+                return false; // Clave actual incorrecta
             }
-        } catch (PDOException $e) {
-            error_log("Error en Perfil::actualizarClave -> " . $e->getMessage());
-            return "Ocurrió un error interno.";
+        } catch (Exception $e) {
+            return false;
         }
     }
 }

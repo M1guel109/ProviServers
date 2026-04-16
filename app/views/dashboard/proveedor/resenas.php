@@ -1,6 +1,6 @@
 <?php
 // Asegúrate de que BASE_PATH esté definido en tu config
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 // Las variables $resenas, $promedio, $totalResenas, $porcentajes llegan del controlador
 ?>
 
@@ -28,11 +28,11 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 
 <body>
     <!-- SIDEBAR -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <main class="contenido">
         <!-- HEADER -->
-        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
         <!-- Título con breadcrumb (IGUAL QUE DASHBOARD) -->
         <section id="titulo-principal">

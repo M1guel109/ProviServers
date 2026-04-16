@@ -280,9 +280,9 @@ function cargarDetalleSuscripcion(id) {
 
     // 2. Petición AJAX (Ajusta la URL a tu estructura de rutas)
     // Opción A: Si usas rutas amigables
-    // const url = `${BASE_URL}/admin/api/suscripcion-detalle?id=${id}`;
+    // const url = `${BASE_URL}/admin/suscripcion-detalle?id=${id}`;
     // Opción B: Si usas parámetros GET en controlador principal
-    const url = `${BASE_URL}/app/controllers/SuscripcionController.php?action=detalle&id=${id}`;
+    const url = `${BASE_URL}/admin/suscripcion-detalle?id=${id}`;
 
     fetch(url)
         .then(response => response.json())

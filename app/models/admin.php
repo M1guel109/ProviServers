@@ -43,7 +43,7 @@ class Usuario
         } catch (PDOException $e) {
             return [];
         }
-    }   
+    }
 
     public function registrar($data)
     {
@@ -288,7 +288,7 @@ class Usuario
             $sqlUser .= " WHERE id = :id";
 
             $stmtUser = $this->conexion->prepare($sqlUser);
-            
+
             $paramsUser = [
                 ':email'  => $data['email'],
                 ':doc'    => $data['documento'],
@@ -296,27 +296,27 @@ class Usuario
                 ':estado' => $data['estado'], // ID numérico (1, 2...)
                 ':id'     => $data['id']
             ];
-            
+
             // Si hay nueva clave, la encriptamos
             if (!empty($data['clave'])) {
                 $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
             }
-            
+
             $stmtUser->execute($paramsUser);
 
             // ---------------------------------------------------------
             // 3. GESTIÓN DE PERFILES (Cliente / Proveedor / Admin)
             // ---------------------------------------------------------
-            
+
             // CASO A: El rol NO cambió (Actualización normal)
             if ($rolAnterior === $data['rol']) {
                 $tabla = $this->getTablaDetalle($data['rol']);
-                
+
                 $sqlPerfil = "UPDATE {$tabla} SET 
                             nombres = :nom, apellidos = :ape, telefono = :tel, 
                             ubicacion = :ubi, foto = :foto 
                             WHERE usuario_id = :uid";
-                
+
                 $stmtPerfil = $this->conexion->prepare($sqlPerfil);
                 $stmtPerfil->execute([
                     ':nom'  => $data['nombres'],
@@ -326,7 +326,7 @@ class Usuario
                     ':foto' => $data['foto_perfil'],
                     ':uid'  => $data['id']
                 ]);
-            } 
+            }
             // CASO B: El rol CAMBIÓ (Migración de datos)
             else {
                 // 1. Borramos el perfil en la tabla vieja
@@ -338,7 +338,7 @@ class Usuario
                 $tablaNueva = $this->getTablaDetalle($data['rol']);
                 $sqlIns = "INSERT INTO {$tablaNueva} (usuario_id, nombres, apellidos, telefono, ubicacion, foto) 
                         VALUES (:uid, :nom, :ape, :tel, :ubi, :foto)";
-                
+
                 $stmtIns = $this->conexion->prepare($sqlIns);
                 $stmtIns->execute([
                     ':uid'  => $data['id'],
@@ -354,7 +354,7 @@ class Usuario
             // 4. LÓGICA PROVEEDOR (Categorías y Documentos)
             // ---------------------------------------------------------
             if ($data['rol'] === 'proveedor') {
-                
+
                 // Necesitamos el ID de la tabla 'proveedores' (no el usuario_id)
                 $stmtPid = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid");
                 $stmtPid->execute([':uid' => $data['id']]);
@@ -371,14 +371,14 @@ class Usuario
                         $sqlCheck = "SELECT id FROM categorias WHERE nombre = :nom LIMIT 1";
                         $sqlInsCat = "INSERT INTO categorias (nombre) VALUES (:nom)";
                         $sqlRel = "INSERT INTO proveedor_categorias (proveedor_id, categoria_id) VALUES (:pid, :cid)";
-                        
+
                         $stmtCheck = $this->conexion->prepare($sqlCheck);
                         $stmtInsCat = $this->conexion->prepare($sqlInsCat);
                         $stmtRel = $this->conexion->prepare($sqlRel);
 
                         foreach ($data['categorias'] as $catNombre) {
                             $catNombre = trim($catNombre);
-                            if(empty($catNombre)) continue;
+                            if (empty($catNombre)) continue;
 
                             // 1. Verificar/Crear Categoría
                             $stmtCheck->execute([':nom' => $catNombre]);
@@ -392,7 +392,8 @@ class Usuario
                             // 2. Crear Relación
                             try {
                                 $stmtRel->execute([':pid' => $proveedor_id, ':cid' => $catId]);
-                            } catch (PDOException $e) { /* Ignorar si ya existe */ }
+                            } catch (PDOException $e) { /* Ignorar si ya existe */
+                            }
                         }
                     }
                 }
@@ -416,7 +417,6 @@ class Usuario
 
             $this->conexion->commit();
             return true;
-
         } catch (PDOException $e) {
             $this->conexion->rollBack();
             error_log("Error en Usuario::actualizar -> " . $e->getMessage());
@@ -438,7 +438,7 @@ class Usuario
 
             $rol = $usuario['rol'];
             $tieneHistorial = false;
-            $pid = null; 
+            $pid = null;
 
             // =========================================================
             // 2. VERIFICACIÓN DE HISTORIAL Y OBTENCIÓN DE IDs
@@ -456,7 +456,6 @@ class Usuario
                     if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
                     */
                 }
-
             } elseif ($rol === 'cliente') {
                 $stmtCid = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = :id");
                 $stmtCid->execute([':id' => $id]);
@@ -476,13 +475,12 @@ class Usuario
             // =========================================================
             if ($tieneHistorial) {
                 // A. Desactivar (Borrado Lógico)
-                $sqlSoft = "UPDATE usuarios SET estado_id = 4 WHERE id = :id"; 
+                $sqlSoft = "UPDATE usuarios SET estado_id = 4 WHERE id = :id";
                 $stmtSoft = $this->conexion->prepare($sqlSoft);
                 $stmtSoft->execute([':id' => $id]);
-                
+
                 $this->conexion->commit();
                 return 'desactivado';
-
             } else {
                 // B. Eliminar Definitivamente (Borrado Físico)
                 $tablaDetalle = $this->getTablaDetalle($rol);
@@ -511,7 +509,6 @@ class Usuario
                 $this->conexion->commit();
                 return 'eliminado';
             }
-
         } catch (PDOException $e) {
             $this->conexion->rollBack();
             // Logueamos el error internamente pero devolvemos false al controlador
@@ -523,20 +520,21 @@ class Usuario
     public function obtenerDetalleCompleto($id)
     {
         try {
-            // 1. Buscar datos básicos y rol
+            // 1. Datos básicos del usuario
             $sql = "SELECT u.id, u.email, u.documento, u.rol, ue.nombre as estado, u.created_at,
-                       COALESCE(p.nombres, c.nombres, a.nombres) as nombres,
-                       COALESCE(p.apellidos, c.apellidos, a.apellidos) as apellidos,
-                       COALESCE(p.telefono, c.telefono, a.telefono) as telefono,
-                       COALESCE(p.ubicacion, c.ubicacion, a.ubicacion) as ubicacion,
-                       COALESCE(p.foto, c.foto, a.foto) as foto,
-                       p.id as proveedor_id
-                FROM usuarios u
-                LEFT JOIN usuario_estados ue ON u.estado_id = ue.id
-                LEFT JOIN proveedores p ON u.id = p.usuario_id
-                LEFT JOIN clientes c ON u.id = c.usuario_id
-                LEFT JOIN admins a ON u.id = a.usuario_id
-                WHERE u.id = :id";
+                   COALESCE(p.nombres, c.nombres, a.nombres) as nombres,
+                   COALESCE(p.apellidos, c.apellidos, a.apellidos) as apellidos,
+                   COALESCE(p.telefono, c.telefono, a.telefono) as telefono,
+                   COALESCE(p.ubicacion, c.ubicacion, a.ubicacion) as ubicacion,
+                   COALESCE(p.foto, c.foto, a.foto) as foto,
+                   p.id as proveedor_id,
+                   c.id as cliente_id
+            FROM usuarios u
+            LEFT JOIN usuario_estados ue ON u.estado_id = ue.id
+            LEFT JOIN proveedores p ON u.id = p.usuario_id
+            LEFT JOIN clientes c ON u.id = c.usuario_id
+            LEFT JOIN admins a ON u.id = a.usuario_id
+            WHERE u.id = :id";
 
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute([':id' => $id]);
@@ -544,11 +542,10 @@ class Usuario
 
             if (!$usuario) return null;
 
-            // 2. Si es PROVEEDOR, buscar extras
+            // 2. Si es PROVEEDOR — categorías y documentos
             if ($usuario['rol'] === 'proveedor' && !empty($usuario['proveedor_id'])) {
                 $pid = $usuario['proveedor_id'];
 
-                // A. Categorías
                 $sqlCat = "SELECT c.nombre 
                        FROM categorias c
                        JOIN proveedor_categorias pc ON c.id = pc.categoria_id
@@ -557,7 +554,6 @@ class Usuario
                 $stmtCat->execute([':pid' => $pid]);
                 $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
 
-                // B. Documentos
                 $sqlDoc = "SELECT tipo_documento, archivo, estado 
                        FROM documentos_proveedor 
                        WHERE proveedor_id = :pid";
@@ -566,10 +562,180 @@ class Usuario
                 $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
             }
 
+            // 3. ✅ NUEVO — Si es CLIENTE — historial y solicitudes
+            if ($usuario['rol'] === 'cliente' && !empty($usuario['cliente_id'])) {
+                $cid = $usuario['cliente_id'];
+
+                // A. Historial de servicios contratados
+                $sqlHistorial = "SELECT 
+                                s.nombre AS servicio,
+                                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                                DATE_FORMAT(sc.created_at, '%d/%m/%Y') AS fecha_solicitud,
+                                sc.estado
+                             FROM servicios_contratados sc
+                             JOIN servicios s ON sc.servicio_id = s.id
+                             JOIN proveedores p ON sc.proveedor_id = p.id
+                             WHERE sc.cliente_id = :cid
+                             ORDER BY sc.created_at DESC
+                             LIMIT 10";
+                $stmtH = $this->conexion->prepare($sqlHistorial);
+                $stmtH->execute([':cid' => $cid]);
+                $usuario['historial_contrataciones'] = $stmtH->fetchAll(PDO::FETCH_ASSOC);
+
+                // B. Solicitudes / Necesidades activas
+                $sqlSol = "SELECT 
+                          titulo,
+                          descripcion,
+                          estado,
+                          DATE_FORMAT(created_at, '%d/%m/%Y') AS created_at
+                       FROM solicitudes
+                       WHERE cliente_id = :cid
+                       ORDER BY created_at DESC
+                       LIMIT 5";
+                $stmtS = $this->conexion->prepare($sqlSol);
+                $stmtS->execute([':cid' => $cid]);
+                $usuario['solicitudes_activas'] = $stmtS->fetchAll(PDO::FETCH_ASSOC);
+            }
+
             return $usuario;
         } catch (PDOException $e) {
             error_log("Error obtenerDetalleCompleto: " . $e->getMessage());
             return null;
+        }
+    }
+
+    // =========================================================
+// ESTADÍSTICAS DEL DASHBOARD ADMIN
+// =========================================================
+
+    /**
+     * Retorna publicaciones y servicios contratados agrupados por período.
+     * @param string $periodo 'mensual' | 'semanal' | 'anual'
+     * @return array ['labels'=>[], 'publicaciones'=>[], 'contratados'=>[]]
+     */
+    public function obtenerEstadisticasGrafica($periodo = 'mensual')
+    {
+        try {
+            // --- Definir formato y rango según período ---
+            switch ($periodo) {
+                case 'semanal':
+                    $formato_sql  = '%x-W%v';        // Año-Semana ISO
+                    $formato_label = '%d/%m';         // Etiqueta legible
+                    $intervalo    = '8 WEEK';
+                    break;
+                case 'anual':
+                    $formato_sql  = '%Y';
+                    $formato_label = '%Y';
+                    $intervalo    = '5 YEAR';
+                    break;
+                default: // mensual
+                    $formato_sql  = '%Y-%m';
+                    $formato_label = '%b %Y';         // Ene 2025
+                    $intervalo    = '12 MONTH';
+                    break;
+            }
+
+            // --- Query 1: Publicaciones por período ---
+            $sqlPub = "SELECT 
+                    DATE_FORMAT(fecha_publicacion, :fmt_sql) AS periodo,
+                    DATE_FORMAT(MIN(fecha_publicacion), :fmt_label) AS label,
+                    COUNT(*) AS total
+                   FROM publicaciones
+                   WHERE fecha_publicacion >= DATE_SUB(NOW(), INTERVAL {$intervalo})
+                   GROUP BY periodo
+                   ORDER BY periodo ASC";
+
+            $stmtPub = $this->conexion->prepare($sqlPub);
+            $stmtPub->execute([
+                ':fmt_sql'   => $formato_sql,
+                ':fmt_label' => $formato_label
+            ]);
+            $publicaciones = $stmtPub->fetchAll(PDO::FETCH_ASSOC);
+
+            // --- Query 2: Servicios contratados por período ---
+            $sqlSc = "SELECT 
+                    DATE_FORMAT(created_at, :fmt_sql) AS periodo,
+                    COUNT(*) AS total
+                  FROM servicios_contratados
+                  WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$intervalo})
+                  GROUP BY periodo
+                  ORDER BY periodo ASC";
+
+            $stmtSc = $this->conexion->prepare($sqlSc);
+            $stmtSc->execute([':fmt_sql' => $formato_sql]);
+            $contratados = $stmtSc->fetchAll(PDO::FETCH_ASSOC);
+
+            // --- Unificar períodos para que ambas series tengan los mismos labels ---
+            // Construimos un mapa periodo => total para cada serie
+            $mapPub = [];
+            $labels = [];
+            foreach ($publicaciones as $row) {
+                $mapPub[$row['periodo']] = (int)$row['total'];
+                $labels[$row['periodo']] = $row['label'];
+            }
+
+            $mapSc = [];
+            foreach ($contratados as $row) {
+                $mapSc[$row['periodo']] = (int)$row['total'];
+                // Si este período no estaba en publicaciones, lo agregamos igual
+                if (!isset($labels[$row['periodo']])) {
+                    $labels[$row['periodo']] = $row['periodo'];
+                }
+            }
+
+            // Ordenar por período (clave del mapa)
+            ksort($labels);
+
+            // --- Construir arrays finales alineados ---
+            $labelsFinales = [];
+            $seriePublicaciones = [];
+            $serieContratados   = [];
+
+            foreach ($labels as $periodo_key => $label_texto) {
+                $labelsFinales[]      = $label_texto;
+                $seriePublicaciones[] = $mapPub[$periodo_key] ?? 0;
+                $serieContratados[]   = $mapSc[$periodo_key]  ?? 0;
+            }
+
+            return [
+                'labels'        => $labelsFinales,
+                'publicaciones' => $seriePublicaciones,
+                'contratados'   => $serieContratados
+            ];
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::obtenerEstadisticasGrafica -> " . $e->getMessage());
+            return ['labels' => [], 'publicaciones' => [], 'contratados' => []];
+        }
+    }
+
+    /**
+     * Retorna conteos reales de usuarios activos para las métricas del dashboard.
+     * @return array
+     */
+    public function obtenerMetricasUsuarios()
+    {
+        try {
+            $sql = "SELECT
+                    -- Clientes activos (estado_id = 2)
+                    SUM(CASE WHEN u.rol = 'cliente'    AND u.estado_id = 2 THEN 1 ELSE 0 END) AS clientes_activos,
+                    -- Proveedores activos
+                    SUM(CASE WHEN u.rol = 'proveedor'  AND u.estado_id = 2 THEN 1 ELSE 0 END) AS proveedores_activos,
+                    -- Totales generales
+                    SUM(CASE WHEN u.rol = 'cliente'   THEN 1 ELSE 0 END) AS clientes_total,
+                    SUM(CASE WHEN u.rol = 'proveedor' THEN 1 ELSE 0 END) AS proveedores_total
+                FROM usuarios u";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Usuario::obtenerMetricasUsuarios -> " . $e->getMessage());
+            return [
+                'clientes_activos'    => 0,
+                'proveedores_activos' => 0,
+                'clientes_total'      => 0,
+                'proveedores_total'   => 0
+            ];
         }
     }
 }

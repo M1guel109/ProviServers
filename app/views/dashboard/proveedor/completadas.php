@@ -1,5 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 ?>
 
 <!DOCTYPE html>
@@ -28,13 +28,13 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 <body>
 
     <!-- SIDEBAR (FIJO) -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <!-- CONTENIDO GENERAL -->
     <main class="contenido">
 
         <!-- HEADER (FIJO) -->
-        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
         <!-- CONTENIDO INTERNO QUE SÍ DEBE MOVERSE -->
         <div class="contenido-completados">

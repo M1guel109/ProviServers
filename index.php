@@ -4,7 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // ======================================================
-// Router principal
+// ROUTER PRINCIPAL — ProviServers
 // ======================================================
 
 require_once __DIR__ . '/config/config.php';
@@ -27,7 +27,7 @@ if ($request === '') {
 }
 
 // ======================================================
-// Enrutamiento básico
+// ENRUTAMIENTO
 // ======================================================
 
 switch ($request) {
@@ -35,20 +35,20 @@ switch ($request) {
     // ==================================================
     // RUTAS PÚBLICAS
     // ==================================================
+
     case '/':
         require BASE_PATH . '/app/views/website/index.php';
         break;
 
     case '/contacto/enviar':
-        require_once BASE_PATH . '/app/controllers/ContactoController.php';
+        require_once BASE_PATH . '/app/controllers/contacto-controller.php';
         procesarContacto();
         break;
 
     // ==================================================
-    // RUTAS DE AUTENTICACIÓN
+    // AUTENTICACIÓN — Vistas
     // ==================================================
 
-    // Vistas
     case '/login':
         require BASE_PATH . '/app/views/auth/login.php';
         break;
@@ -57,238 +57,209 @@ switch ($request) {
         require BASE_PATH . '/app/views/auth/registro.php';
         break;
 
-    case '/reestablecer-contrasena':
-        require BASE_PATH . '/app/views/auth/reestablecerContrasena.php';
+    case '/restablecer-contrasena':
+        require BASE_PATH . '/app/views/auth/restablecer-contrasena.php';
         break;
 
-    // Procesos
+    // AUTENTICACIÓN — Procesos
+
     case '/iniciar-sesion':
-        require BASE_PATH . '/app/controllers/AuthController.php';
+        require BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/registro-usuario':
-        require BASE_PATH . '/app/controllers/AuthController.php';
+        require BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/generar-clave':
-        require BASE_PATH . '/app/controllers/AuthController.php';
+        require BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/cerrar-sesion':
-        require BASE_PATH . '/app/controllers/AuthController.php';
+        require BASE_PATH . '/app/controllers/auth-controller.php';
+        break;
+
+    case '/idioma':
+        require BASE_PATH . '/app/controllers/idioma-controller.php';
         break;
 
     // ==================================================
-    // RUTAS DEL ADMIN
+    // PANEL ADMINISTRADOR — Vistas generales
     // ==================================================
+
     case '/admin/dashboard':
-        require BASE_PATH . '/app/views/dashboard/admin/dashboardAdmin.php';
+        require BASE_PATH . '/app/views/dashboard/admin/dashboard-admin.php';
         break;
 
     case '/admin/perfil':
-        require BASE_PATH . '/app/views/dashboard/admin/dashboardPerfil.php';
+        require BASE_PATH . '/app/views/dashboard/admin/dashboard-perfil.php';
         break;
 
-    case '/admin/perfil/cambiar-clave':
-        require BASE_PATH . '/app/controllers/perfilController.php';
-        cambiarContrasenaUsuario();
-        break;
-
-    case '/admin/registrar-usuario':
-        require BASE_PATH . '/app/views/dashboard/admin/registrarUsuario.php';
-        break;
-
-    case '/admin/editar-usuario':
-        require BASE_PATH . '/app/views/dashboard/admin/editarUsuario.php';
-        break;
-
-    case '/admin/actualizar-usuario':
-        require BASE_PATH . '/app/controllers/adminController.php';
-        break;
-
-    case '/admin/guardar-usuario':
-        require BASE_PATH . '/app/controllers/adminController.php';
-        break;
-
-    case '/admin/consultar-usuarios':
-        require BASE_PATH . '/app/views/dashboard/admin/consultarUsuarios.php';
-        break;
-
-    case '/admin/api/usuario-detalle':
-        require BASE_PATH . '/app/controllers/adminController.php';
-        obtenerDetalleUsuarioAjax();
-        break;
-
-    case '/admin/eliminar-usuario':
-        require BASE_PATH . '/app/controllers/adminController.php';
-        break;
-
-    case '/admin/reporte':
-        require BASE_PATH . '/app/controllers/reportesPdfController.php';
-        reportesPdfController();
-        reporteMembresiasPDF();
-        break;
-
-    case '/admin/registrar-categoria':
-        require BASE_PATH . '/app/views/dashboard/admin/registrarCategoria.php';
-        break;
-
-    case '/admin/guardar-categoria':
-        require BASE_PATH . '/app/controllers/categoriaController.php';
-        break;
-
-    case '/admin/consultar-categorias':
-        require BASE_PATH . '/app/views/dashboard/admin/gestionarCategorias.php';
-        break;
-
-    case '/admin/eliminar-categoria':
-        require BASE_PATH . '/app/controllers/categoriaController.php';
-        break;
-
-    case '/admin/editar-categoria':
-        require BASE_PATH . '/app/views/dashboard/admin/editarCategoria.php';
-        break;
-
-    case '/admin/actualizar-categoria':
-        require BASE_PATH . '/app/controllers/categoriaController.php';
-        break;
-
-    case '/admin/registrar-membresia':
-        require BASE_PATH . '/app/views/dashboard/admin/registrarMembresia.php';
-        break;
-
-    case '/admin/guardar-membresia':
-        require BASE_PATH . '/app/controllers/membresiaController.php';
-        break;
-
-    case '/admin/consultar-membresias':
-        require BASE_PATH . '/app/views/dashboard/admin/gestionarMembresias.php';
-        break;
-
-    case '/admin/eliminar-membresia':
-        require BASE_PATH . '/app/controllers/membresiaController.php';
-        break;
-
-    case '/admin/editar-membresia':
-        require BASE_PATH . '/app/views/dashboard/admin/editarMembresia.php';
-        break;
-
-    case '/admin/actualizar-membresia':
-        require BASE_PATH . '/app/controllers/membresiaController.php';
-        break;
-
-    case '/admin/reportes-usuarios':
-        require BASE_PATH . '/app/views/dashboard/admin/reportesUsuarios.php';
+    case '/admin/calendario':
+        require BASE_PATH . '/app/views/dashboard/admin/dashboard-calendario.php';
         break;
 
     case '/admin/finanzas':
         require BASE_PATH . '/app/views/dashboard/admin/finanzas.php';
         break;
 
-    case '/admin/consultar-servicios':
-        require BASE_PATH . '/app/views/dashboard/admin/moderacionPublicaciones.php';
+    case '/admin/facturacion':
+        require BASE_PATH . '/app/views/dashboard/admin/facturacion.php';
         break;
 
-    case '/admin/calendario':
-        require BASE_PATH . '/app/views/dashboard/admin/dashboardCalendario.php';
+    case '/admin/ajustes':
+        require BASE_PATH . '/app/views/dashboard/admin/ajustes.php';
+        break;
+
+    case '/admin/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/admin/notificaciones.php';
+        break;
+
+    // ADMINISTRADOR — Perfil
+
+    case '/admin/perfil/cambiar-clave':
+        require BASE_PATH . '/app/controllers/perfil-controller.php';
+        cambiarContrasenaUsuario();
+        break;
+
+    case '/admin/perfil/actualizar':
+        require BASE_PATH . '/app/controllers/perfil-controller.php';
+        break;
+
+    // ADMINISTRADOR — Usuarios
+
+    case '/admin/registrar-usuario':
+        require BASE_PATH . '/app/views/dashboard/admin/registrar-usuario.php';
+        break;
+
+    case '/admin/consultar-usuarios':
+        require BASE_PATH . '/app/views/dashboard/admin/consultar-usuarios.php';
+        break;
+
+    case '/admin/editar-usuario':
+        require BASE_PATH . '/app/views/dashboard/admin/editar-usuario.php';
+        break;
+
+    case '/admin/guardar-usuario':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        break;
+
+    case '/admin/actualizar-usuario':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        break;
+
+    case '/admin/eliminar-usuario':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        break;
+
+    case '/admin/usuario-detalle':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        obtenerDetalleUsuarioAjax();
+        break;
+
+    // ADMINISTRADOR — Categorías
+
+    case '/admin/registrar-categoria':
+        require BASE_PATH . '/app/views/dashboard/admin/registrar-categoria.php';
+        break;
+
+    case '/admin/consultar-categorias':
+        require BASE_PATH . '/app/views/dashboard/admin/gestionar-categorias.php';
+        break;
+
+    case '/admin/editar-categoria':
+        require BASE_PATH . '/app/views/dashboard/admin/editar-categoria.php';
+        break;
+
+    case '/admin/guardar-categoria':
+        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        break;
+
+    case '/admin/actualizar-categoria':
+        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        break;
+
+    case '/admin/eliminar-categoria':
+        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        break;
+
+    // ADMINISTRADOR — Membresías
+
+    case '/admin/registrar-membresia':
+        require BASE_PATH . '/app/views/dashboard/admin/registrar-membresia.php';
+        break;
+
+    case '/admin/consultar-membresias':
+        require BASE_PATH . '/app/views/dashboard/admin/gestionar-membresias.php';
+        break;
+
+    case '/admin/editar-membresia':
+        require BASE_PATH . '/app/views/dashboard/admin/editar-membresia.php';
+        break;
+
+    case '/admin/guardar-membresia':
+        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        break;
+
+    case '/admin/actualizar-membresia':
+        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        break;
+
+    case '/admin/eliminar-membresia':
+        require BASE_PATH . '/app/controllers/membresia-controller.php';
         break;
 
     case '/admin/consultar-suscripciones':
-        require BASE_PATH . '/app/views/dashboard/admin/suscripcionesActivas.php';
+        require BASE_PATH . '/app/views/dashboard/admin/suscripciones-activas.php';
         break;
 
-    // Moderación de servicios
-    case '/admin/api/servicio-detalle':
-        require_once BASE_PATH . '/app/controllers/moderacionController.php';
+    case '/admin/suscripcion-detalle':
+        require_once BASE_PATH . '/app/controllers/membresia-controller.php';
+        obtenerDetalleJSON($_GET['id'] ?? null);
+        break;
+
+    // ADMINISTRADOR — Reportes
+
+    case '/admin/reportes-usuarios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-usuarios.php';
+        break;
+
+    case '/admin/reporte':
+        require BASE_PATH . '/app/controllers/reportes-pdf-controller.php';
+        reportesPdfController();
+        // reporteMembresiasPDF();
+        break;
+
+    // ADMINISTRADOR — Moderación
+
+    case '/admin/consultar-servicios':
+        require BASE_PATH . '/app/views/dashboard/admin/moderacion-publicaciones.php';
+        break;
+
+    case '/admin/servicio-detalle':
+        require_once BASE_PATH . '/app/controllers/moderacion-controller.php';
         apiDetalleServicio();
         break;
 
+    case '/admin/dashboard-stats':
+        require_once BASE_PATH . '/app/controllers/admin-controller.php';
+        obtenerDashboardStatsAjax();
+        break;
+
     case '/admin/moderacion-actualizar':
-        require BASE_PATH . '/app/controllers/moderacionController.php';
+        require BASE_PATH . '/app/controllers/moderacion-controller.php';
         break;
 
     // ==================================================
-    // RUTAS DEL PROVEEDOR
+    // PANEL PROVEEDOR — Vistas generales
     // ==================================================
+
     case '/proveedor/dashboard':
-        require BASE_PATH . '/app/views/dashboard/proveedor/dashboardProveedor.php';
-        break;
-
-    case '/proveedor/registrar-servicio':
-        require BASE_PATH . '/app/views/dashboard/proveedor/registrarServicio.php';
-        break;
-
-    case '/proveedor/guardar-servicio':
-        require BASE_PATH . '/app/controllers/proveedorController.php';
-        break;
-
-    case '/proveedor/listar-servicio':
-        require BASE_PATH . '/app/views/dashboard/proveedor/misServicios.php';
-        break;
-
-    case '/proveedor/publicaciones':
-        require BASE_PATH . '/app/views/dashboard/proveedor/misPublicaciones.php';
-        break;
-
-    case '/proveedor/editar-servicio':
-        require BASE_PATH . '/app/views/dashboard/proveedor/editarServicio.php';
-        break;
-
-    case '/proveedor/reporte':
-        require BASE_PATH . '/app/controllers/reportesPdfController.php';
-        reportesPdfController();
+        require BASE_PATH . '/app/views/dashboard/proveedor/dashboard-proveedor.php';
         break;
 
     case '/proveedor/calendario':
         require BASE_PATH . '/app/views/dashboard/proveedor/calendario.php';
-        break;
-
-    case '/proveedor/configuracion':
-        require BASE_PATH . '/app/views/dashboard/proveedor/configuracionProveedor.php';
-        break;
-
-    case '/proveedor/guardar-perfil-profesional':
-        require BASE_PATH . '/app/controllers/proveedorPerfilController.php';
-        break;
-
-    // Cuenta y seguridad
-    case '/proveedor/actualizar-credenciales':
-    case '/proveedor/actualizar-seguridad':
-    case '/proveedor/cerrar-sesiones':
-        require BASE_PATH . '/app/controllers/proveedorCuentaController.php';
-        break;
-
-    case '/proveedor/guardar-disponibilidad':
-        require BASE_PATH . '/app/controllers/proveedorDisponibilidadController.php';
-        break;
-
-    case '/proveedor/guardar-notificaciones':
-        require BASE_PATH . '/app/controllers/proveedorNotificacionesController.php';
-        break;
-
-    case '/proveedor/guardar-pagos':
-        require BASE_PATH . '/app/controllers/proveedorPagosController.php';
-        break;
-
-    case '/proveedor/guardar-politicas':
-        require BASE_PATH . '/app/controllers/proveedorPoliticasController.php';
-        break;
-
-    case '/proveedor/nuevas_solicitudes':
-        require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
-        break;
-
-    case '/proveedor/en-proceso':
-        require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
-        require BASE_PATH . '/app/views/dashboard/proveedor/enProceso.php';
-        break;
-
-    case '/proveedor/actualizar-estado':
-        require_once __DIR__ . '/app/controllers/proveedorServiciosContratadosController.php';
-        break;
-
-    case '/proveedor/completadas':
-        require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
 
     case '/proveedor/estadisticas':
@@ -310,55 +281,171 @@ switch ($request) {
     case '/proveedor/membresia':
         require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
         break;
+
+    case '/proveedor/completadas':
+        require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
+        break;
+
+    // PROVEEDOR — Servicios
+
+    case '/proveedor/registrar-servicio':
+        require BASE_PATH . '/app/views/dashboard/proveedor/registrar-servicio.php';
+        break;
+
+    case '/proveedor/listar-servicio':
+        require BASE_PATH . '/app/views/dashboard/proveedor/mis-servicios.php';
+        break;
+
+    case '/proveedor/publicaciones':
+        require BASE_PATH . '/app/views/dashboard/proveedor/mis-publicaciones.php';
+        break;
+
+    case '/proveedor/editar-servicio':
+        require BASE_PATH . '/app/views/dashboard/proveedor/editar-servicio.php';
+        break;
+
+    case '/proveedor/guardar-servicio':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
+    case '/proveedor/reporte':
+        require BASE_PATH . '/app/controllers/reportes-pdf-controller.php';
+        reportesPdfController();
+        break;
+
+    // PROVEEDOR — Solicitudes
+
+    case '/proveedor/nuevas-solicitudes':
+        require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
+        break;
+
+    case '/proveedor/solicitudes':
+        require BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
+        break;
+
+    case '/proveedor/en-proceso':
+        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
+        require BASE_PATH . '/app/views/dashboard/proveedor/en-proceso.php';
+        break;
+
+    case '/proveedor/actualizar-estado':
+        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
+        break;
+
+    // PROVEEDOR — Oportunidades y cotizaciones
+
     case '/proveedor/oportunidades':
-        require_once BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
+        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
         mostrarOportunidades();
         break;
 
     case '/proveedor/oportunidades/enviar-cotizacion':
-        require_once BASE_PATH . '/app/controllers/proveedorOperacionController.php';
+        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
         break;
 
+    // PROVEEDOR — Reseñas
+
     case '/proveedor/resenas':
-        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+        require_once BASE_PATH . '/app/controllers/proveedor-resenas-controller.php';
         mostrarResenasProveedor();
         break;
 
     case '/proveedor/resenas/responder':
-        require_once BASE_PATH . '/app/controllers/proveedorResenasController.php';
+        require_once BASE_PATH . '/app/controllers/proveedor-resenas-controller.php';
         guardarRespuestaProveedor();
         break;
 
+    // PROVEEDOR — Configuración y perfil
+
+    case '/proveedor/configuracion':
+        require BASE_PATH . '/app/views/dashboard/proveedor/configuracion-proveedor.php';
+        break;
+
+    case '/proveedor/guardar-perfil-profesional':
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
+        break;
+
+    case '/proveedor/actualizar-credenciales':
+        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        break;
+
+    case '/proveedor/actualizar-seguridad':
+        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        break;
+
+    case '/proveedor/cerrar-sesiones':
+        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        break;
+
+    case '/proveedor/guardar-disponibilidad':
+        require BASE_PATH . '/app/controllers/proveedor-disponibilidad-controller.php';
+        break;
+
+    case '/proveedor/guardar-notificaciones':
+        require BASE_PATH . '/app/controllers/proveedor-notificaciones-controller.php';
+        break;
+
+    case '/proveedor/guardar-pagos':
+        require BASE_PATH . '/app/controllers/proveedor-pagos-controller.php';
+        break;
+
+    case '/proveedor/guardar-politicas':
+        require BASE_PATH . '/app/controllers/proveedor-politicas-controller.php';
+        break;
+
     case '/proveedor/logout':
-        require BASE_PATH . '/app/controllers/logoutController.php';
-        break;
-
-    case '/proveedor/solicitudes':
-        require BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
+        require BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     // ==================================================
-    // RUTAS DEL CLIENTE
+    // PANEL CLIENTE — Vistas generales
     // ==================================================
+
     case '/cliente/dashboard':
-        require BASE_PATH . '/app/views/dashboard/cliente/dashboardCliente.php';
+        require BASE_PATH . '/app/views/dashboard/cliente/dashboard-cliente.php';
         break;
 
-    // Catálogo público de servicios
+    case '/cliente/favoritos':
+        require BASE_PATH . '/app/views/dashboard/cliente/favoritos.php';
+        break;
+
+    case '/cliente/ayuda':
+        require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
+        break;
+
+    case '/cliente/historial':
+        require BASE_PATH . '/app/views/dashboard/cliente/historial-servicios.php';
+        break;
+
+    // CLIENTE — Servicios
+
     case '/cliente/explorar-servicios':
-        require BASE_PATH . '/app/controllers/PublicacionController.php';
-        require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
+        require BASE_PATH . '/app/controllers/publicacion-controller.php';
+        require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
         mostrarCatalogoPublico();
         break;
 
     case '/cliente/explorar':
-        require BASE_PATH . '/app/controllers/clientePublicacionesController.php';
+        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
         mostrarCatalogoPublico();
         break;
 
-    // Servicios contratados (controlador unificado)
+    case '/cliente/publicacion':
+        require BASE_PATH . '/app/controllers/cliente-publicacion-detalle-controller.php';
+        break;
+
+    case '/cliente/solicitar-servicio':
+        require BASE_PATH . '/app/views/dashboard/cliente/solicitar-servicio.php';
+        break;
+
+    case '/cliente/guardar-solicitud':
+        require BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
+        break;
+
+    // CLIENTE — Servicios contratados
+
     case '/cliente/servicios-contratados':
-        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
+        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
         break;
 
     case '/cliente/servicios-contratados/calificar':
@@ -366,7 +453,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
+        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
         break;
 
     case '/cliente/servicios-contratados/cancelar':
@@ -374,73 +461,18 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
+        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
         break;
 
-    // OJO: esta también venía del módulo viejo que unificaste
     case '/cliente/mis-solicitudes':
         $_GET['accion'] = 'ver_solicitudes';
-        require BASE_PATH . '/app/controllers/ClienteServicioController.php';
+        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
         break;
 
-    // Vistas varias del cliente
-    case '/cliente/mensajes':
-        require BASE_PATH . '/app/views/dashboard/cliente/mensajes.php';
-        break;
+    // CLIENTE — Necesidades
 
-    case '/cliente/favoritos':
-        require BASE_PATH . '/app/views/dashboard/cliente/favoritos.php';
-        break;
-
-    case '/cliente/historial':
-        require BASE_PATH . '/app/views/dashboard/cliente/historialServicios.php';
-        break;
-
-    case '/cliente/perfil':
-        require BASE_PATH . '/app/controllers/perfilController.php';
-
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        $id = (int) ($_SESSION['user']['id'] ?? 0);
-
-        if ($id <= 0) {
-            header('Location: ' . BASE_URL . '/login');
-            exit;
-        }
-
-        $usuario = mostrarPerfilCliente($id);
-
-        require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
-        break;
-
-    case '/cliente/perfil/cambiar-clave':
-        require BASE_PATH . '/app/controllers/perfilController.php';
-        cambiarContrasenaUsuario('/cliente/perfil');
-        break;
-
-    case '/cliente/ayuda':
-        require BASE_PATH . '/app/views/dashboard/cliente/ayuda.php';
-        break;
-
-    case '/cliente/publicacion':
-        require BASE_PATH . '/app/controllers/clientePublicacionDetalleController.php';
-        break;
-
-    // Solicitar servicio (vista)
-    case '/cliente/solicitar-servicio':
-        require BASE_PATH . '/app/views/dashboard/cliente/solicitarServicio.php';
-        break;
-
-    // Esta queda pendiente de confirmar si también fue absorbida por un controlador nuevo
-    case '/cliente/guardar-solicitud':
-        require BASE_PATH . '/app/controllers/ProveedorOperacionController.php';
-        break;
-
-    // Necesidades (controlador unificado)
     case '/cliente/necesidades':
-        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
+        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
         break;
 
     case '/cliente/necesidades/crear':
@@ -448,7 +480,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/dashboard');
             exit;
         }
-        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
+        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
         break;
 
     case '/cliente/necesidades/aceptar-cotizacion':
@@ -456,39 +488,63 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/necesidades');
             exit;
         }
-        require BASE_PATH . '/app/controllers/ClienteNecesidadController.php';
+        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
         break;
-    // Mensajes
-    case 'cliente/mensajes':
-        require BASE_PATH . '/app/controllers/MensajesController.php';
+
+    // CLIENTE — Perfil
+
+    case '/cliente/perfil':
+        require BASE_PATH . '/app/controllers/perfil-controller.php';
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $id = (int) ($_SESSION['user']['id'] ?? 0);
+        if ($id <= 0) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
+        }
+        $usuario = mostrarPerfilCliente($id);
+        require BASE_PATH . '/app/views/dashboard/cliente/perfil.php';
+        break;
+
+    case '/cliente/perfil/cambiar-clave':
+        require BASE_PATH . '/app/controllers/perfil-controller.php';
+        cambiarContrasenaUsuario('/cliente/perfil');
+        break;
+
+    // CLIENTE — Mensajes
+
+    case '/cliente/mensajes':
+        require BASE_PATH . '/app/controllers/mensajes-controller.php';
         (new MensajesController())->inbox();
         break;
 
     case '/mensajes/abrir':
-        require BASE_PATH . '/app/controllers/MensajesController.php';
+        require BASE_PATH . '/app/controllers/mensajes-controller.php';
         (new MensajesController())->abrir();
         break;
 
     case '/mensajes/ver':
-        require BASE_PATH . '/app/controllers/MensajesController.php';
+        require BASE_PATH . '/app/controllers/mensajes-controller.php';
         (new MensajesController())->ver();
         break;
 
     case '/mensajes/enviar':
-        require BASE_PATH . '/app/controllers/MensajesController.php';
+        require BASE_PATH . '/app/controllers/mensajes-controller.php';
         (new MensajesController())->enviar();
         break;
 
     case '/mensajes/poll':
-        require BASE_PATH . '/app/controllers/MensajesController.php';
+        require BASE_PATH . '/app/controllers/mensajes-controller.php';
         (new MensajesController())->poll();
         break;
 
     // ==================================================
     // 404
     // ==================================================
+
     default:
         http_response_code(404);
-        require BASE_PATH . '/app/views/auth/Error404.php';
+        require BASE_PATH . '/app/views/auth/error-404.php';
         break;
 }

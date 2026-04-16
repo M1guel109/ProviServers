@@ -1,5 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 // Aquí iría la lógica para obtener datos reales desde el controlador
 // Por ahora usamos datos de ejemplo
@@ -53,11 +53,11 @@ $servicios_categorias = [
 
 <body>
     <!-- Sidebar Proveedor -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <main class="contenido">
         <!-- Header Proveedor -->
-        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
         <!-- TÍTULO CON BREADCRUMB -->
         <section id="titulo-principal">

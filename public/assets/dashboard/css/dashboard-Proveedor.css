@@ -131,7 +131,7 @@
 }
 
 /* ==========================================================================
-   4. TARJETAS INFERIORES
+   4. TARJETAS INFERIORES - SIN SCROLL VISIBLE
    ========================================================================== */
 #tarjetas-inferiores {
     display: grid;
@@ -164,12 +164,23 @@
     font-weight: 600;
 }
 
-/* Servicios Recientes */
+/* Servicios Recientes, Reseñas Recientes, Citas Próximas */
 .servicios-recientes,
 .reseñas-recientes,
 .citas-proximas {
     max-height: 300px;
     overflow-y: auto;
+    /* Mantiene el scroll funcional pero lo oculta */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Ocultar scrollbar en Chrome/Safari/Opera */
+.servicios-recientes::-webkit-scrollbar,
+.reseñas-recientes::-webkit-scrollbar,
+.citas-proximas::-webkit-scrollbar {
+    display: none;
+    width: 0;
 }
 
 /* Estilos específicos para items */
