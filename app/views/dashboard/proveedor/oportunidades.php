@@ -1,5 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 ?>
 
 <!DOCTYPE html>
@@ -18,10 +18,10 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
 </head>
 
 <body>
-    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <main class="contenido oportunidades-page">
-        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
         <section class="mb-4">
             <h1 class="fw-bold mb-2">Explorar oportunidades</h1>
@@ -69,7 +69,7 @@ require_once BASE_PATH . '/app/helpers/session_proveedor.php';
         <section>
             <?php if (empty($necesidades)): ?>
                 <div class="empty-state">
-                    <img src="<?= BASE_URL ?>/public/assets/img/illustrations/empty-search.svg" alt="Sin resultados">
+                    <!-- <img src="<?= BASE_URL ?>/public/assets/img/illustrations/empty-search.svg" alt="Sin resultados"> -->
                     <h4 class="text-muted">No hay oportunidades disponibles por ahora.</h4>
                     <p class="text-muted">Intenta ajustar los filtros o vuelve más tarde.</p>
                 </div>

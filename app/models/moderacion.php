@@ -74,7 +74,6 @@ class Moderacion
 
             $this->conexion->commit();
             return true;
-
         } catch (PDOException $e) {
             $this->conexion->rollBack();
             error_log("Error en Moderacion::aprobar -> " . $e->getMessage());
@@ -134,10 +133,88 @@ class Moderacion
 
             $this->conexion->commit();
             return true;
-
         } catch (PDOException $e) {
             $this->conexion->rollBack();
             error_log("Error en Moderacion::rechazar -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Lista todos los servicios con su estado de publicación
+     * para la tabla de moderación del admin.
+     */
+    public function listar()
+    {
+        try {
+            $sql = "SELECT 
+                    s.id,
+                    s.nombre,
+                    s.descripcion,
+                    s.precio,
+                    s.imagen,
+                    s.created_at,
+                    c.nombre  AS categoria_nombre,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                    u.email   AS proveedor_email,
+                    p.telefono AS proveedor_telefono,
+                    p.ubicacion AS proveedor_ubicacion,
+                    pub.estado AS publicacion_estado,
+                    pub.id    AS publicacion_id
+                FROM servicios s
+                JOIN categorias c    ON s.id_categoria = c.id
+                JOIN publicaciones pub ON s.id = pub.servicio_id
+                JOIN proveedores p   ON pub.proveedor_id = p.id
+                JOIN usuarios u      ON p.usuario_id = u.id
+                ORDER BY 
+                    CASE pub.estado 
+                        WHEN 'pendiente'  THEN 1 
+                        WHEN 'rechazado'  THEN 2 
+                        WHEN 'aprobado'   THEN 3 
+                    END ASC,
+                    s.created_at DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Moderacion::listar -> " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtiene el detalle completo de un servicio para el modal AJAX.
+     */
+    public function obtenerDetalle($id)
+    {
+        try {
+            $sql = "SELECT 
+                    s.id,
+                    s.nombre,
+                    s.descripcion,
+                    s.precio,
+                    s.imagen,
+                    s.created_at,
+                    c.nombre  AS categoria_nombre,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
+                    u.email   AS proveedor_email,
+                    p.telefono AS proveedor_telefono,
+                    p.ubicacion AS proveedor_ubicacion,
+                    pub.estado AS publicacion_estado
+                FROM servicios s
+                JOIN categorias c     ON s.id_categoria = c.id
+                JOIN publicaciones pub ON s.id = pub.servicio_id
+                JOIN proveedores p    ON pub.proveedor_id = p.id
+                JOIN usuarios u       ON p.usuario_id = u.id
+                WHERE s.id = :id
+                LIMIT 1";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->execute([':id' => $id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en Moderacion::obtenerDetalle -> " . $e->getMessage());
             return false;
         }
     }

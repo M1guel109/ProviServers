@@ -122,4 +122,13 @@ class Suscripcion
     }
 
     // ... resto de la clase ...
+
+
+    /**
+     * Alias de listarTodas() — usado por el controlador.
+     */
+    public function listar()
+    {
+        return $this->listarTodas();
+    }
 }

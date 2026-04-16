@@ -1,16 +1,65 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // =======================================================
-    // 1. GRÁFICA PRINCIPAL (#chart)
-    // =======================================================
-    const chartElement1 = document.querySelector("#chart");
-    
-    if (chartElement1) {
-        var options = {
+    // ================================================================
+    // VARIABLES GLOBALES DE GRÁFICAS
+    // ================================================================
+    let chartPrincipal = null;   // Referencia a la gráfica principal (para destruir/recrear)
+    let chartUsuarios  = null;
+    let chartMetricas  = null;
+
+    // ================================================================
+    // 1. INICIALIZACIÓN — Cargar todo al arrancar
+    // ================================================================
+    cargarDashboard('mensual');
+
+    // ================================================================
+    // 2. SELECTOR DE PERÍODO — Escucha cambios y recarga la gráfica
+    // ================================================================
+    const selectPeriodo = document.getElementById('periodo');
+    if (selectPeriodo) {
+        selectPeriodo.addEventListener('change', () => {
+            cargarDashboard(selectPeriodo.value);
+        });
+    }
+
+    // ================================================================
+    // 3. FUNCIÓN PRINCIPAL — Fetch a nuestro endpoint PHP
+    // ================================================================
+    function cargarDashboard(periodo) {
+        fetch(`${BASE_URL}/admin/dashboard-stats?periodo=${periodo}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Error en la respuesta del servidor');
+                return res.json();
+            })
+            .then(data => {
+                renderGraficaPrincipal(data.grafica);
+                renderGraficaUsuarios(data.metricas);
+                renderGraficaMetricas(data.grafica);
+                actualizarMetricasNumericas(data.metricas);
+            })
+            .catch(err => {
+                console.error('Error cargando el dashboard:', err);
+            });
+    }
+
+    // ================================================================
+    // 4. GRÁFICA PRINCIPAL — Publicaciones vs Contratados
+    // ================================================================
+    function renderGraficaPrincipal(grafica) {
+        const el = document.querySelector("#chart");
+        if (!el) return;
+
+        // Destruir instancia anterior si existe (evita gráficas apiladas)
+        if (chartPrincipal) {
+            chartPrincipal.destroy();
+        }
+
+        chartPrincipal = new ApexCharts(el, {
             chart: {
                 type: 'area',
-                height: 350,
-                toolbar: { show: false }
+                height: 320,
+                toolbar: { show: false },
+                animations: { enabled: true, speed: 600 }
             },
             colors: ['#0066ff', '#0e1116'],
             dataLabels: { enabled: false },
@@ -18,15 +67,16 @@ document.addEventListener("DOMContentLoaded", () => {
             series: [
                 {
                     name: 'Servicios publicados',
-                    data: [20, 35, 28, 27, 55, 30, 90, 50, 65, 28, 60, 20]
+                    data: grafica.publicaciones
                 },
                 {
                     name: 'Servicios contratados',
-                    data: [20, 70, 40, 30, 50, 50, 30, 55, 40, 35, 90, 25]
+                    data: grafica.contratados
                 }
             ],
             xaxis: {
-                categories: ['5k', '10k', '15k', '20k', '25k', '30k', '35k', '40k', '45k', '50k', '55k', '60k']
+                categories: grafica.labels,
+                labels: { style: { fontSize: '12px' } }
             },
             legend: {
                 position: 'bottom',
@@ -35,86 +85,115 @@ document.addEventListener("DOMContentLoaded", () => {
             fill: {
                 type: 'solid',
                 opacity: 0.6
+            },
+            // Mensaje cuando no hay datos
+            noData: {
+                text: 'Sin datos para este período',
+                align: 'center',
+                verticalAlign: 'middle',
+                style: { color: '#94a3b8', fontSize: '14px' }
             }
-        };
+        });
 
-        var chart = new ApexCharts(chartElement1, options);
-        chart.render();
+        chartPrincipal.render();
     }
 
+    // ================================================================
+    // 5. GRÁFICA DONUT — Clientes vs Proveedores activos
+    // ================================================================
+    function renderGraficaUsuarios(metricas) {
+        const el = document.querySelector("#chart-usuarios");
+        if (!el) return;
 
-    // =======================================================
-    // 2. GRÁFICA DE USUARIOS (#chart-usuarios)
-    // =======================================================
-    const chartElement2 = document.querySelector("#chart-usuarios");
+        if (chartUsuarios) chartUsuarios.destroy();
 
-    if (chartElement2) {
-        var optionsUsuarios = {
+        chartUsuarios = new ApexCharts(el, {
             chart: {
                 type: 'donut',
-                height: 250
+                height: 220
             },
-            series: [34249, 1420], 
+            series: [
+                parseInt(metricas.clientes_activos)    || 0,
+                parseInt(metricas.proveedores_activos) || 0
+            ],
             labels: ['Clientes activos', 'Proveedores activos'],
             colors: ['#007bff', '#000000'],
             dataLabels: { enabled: false },
             legend: { position: 'bottom' },
             plotOptions: {
-                pie: {
-                    donut: { size: '70%' }
-                }
+                pie: { donut: { size: '70%' } }
+            },
+            noData: {
+                text: 'Sin datos',
+                style: { color: '#94a3b8' }
             }
-        };
+        });
 
-        var chartUsuarios = new ApexCharts(chartElement2, optionsUsuarios);
         chartUsuarios.render();
     }
 
+    // ================================================================
+    // 6. GRÁFICA DE LÍNEA — Métricas (mismos datos, diferente visual)
+    // ================================================================
+    function renderGraficaMetricas(grafica) {
+        const el = document.querySelector("#chart-nuevos-servicios");
+        if (!el) return;
 
-    // =======================================================
-    // 3. GRÁFICA DE MÉTRICAS (#chart-nuevos-servicios)
-    // =======================================================
-    const chartElement3 = document.querySelector("#chart-nuevos-servicios");
+        if (chartMetricas) chartMetricas.destroy();
 
-    if (chartElement3) {
-        var optionsMetricas = {
+        chartMetricas = new ApexCharts(el, {
             chart: {
                 type: 'line',
-                height: 280,
+                height: 220,
                 toolbar: { show: false }
             },
             series: [
                 {
-                    name: 'Servicios publicados',
-                    data: [25, 65, 55, 45, 50, 75, 100]
+                    name: 'Publicados',
+                    data: grafica.publicaciones
                 },
                 {
-                    name: 'Servicios contratados',
-                    data: [0, 50, 60, 25, 30, 60, 95]
+                    name: 'Contratados',
+                    data: grafica.contratados
                 }
             ],
             stroke: { width: 3, curve: 'smooth' },
-            markers: { size: 5 },
+            markers: { size: 4 },
             xaxis: {
-                categories: ['2015', '2016', '2017', '2018', '2019'],
-                labels: { style: { fontSize: '12px' } }
-            },
-            yaxis: {
-                labels: { style: { fontSize: '12px' } }
+                categories: grafica.labels,
+                labels: { style: { fontSize: '11px' } }
             },
             grid: { strokeDashArray: 4 },
             dataLabels: { enabled: false },
-            legend: { show: true, position: 'bottom' }
-        };
+            legend: { show: true, position: 'bottom' },
+            colors: ['#0066ff', '#0e1116'],
+            noData: {
+                text: 'Sin datos',
+                style: { color: '#94a3b8' }
+            }
+        });
 
-        var chartMetricas = new ApexCharts(chartElement3, optionsMetricas);
         chartMetricas.render();
     }
 
+    // ================================================================
+    // 7. MÉTRICAS NUMÉRICAS — Actualizar los spans con datos reales
+    // ================================================================
+    function actualizarMetricasNumericas(metricas) {
+        // Seleccionamos los dos spans .valor dentro de .metricas
+        const spans = document.querySelectorAll('.metricas .valor');
 
-    // =======================================================
-    // 4. LÓGICA DEL SIDEBAR (Menú Desplegable)
-    // =======================================================
+        if (spans[0]) {
+            spans[0].textContent = Number(metricas.clientes_total || 0).toLocaleString('es-CO');
+        }
+        if (spans[1]) {
+            spans[1].textContent = Number(metricas.proveedores_total || 0).toLocaleString('es-CO');
+        }
+    }
+
+    // ================================================================
+    // 8. SIDEBAR — Lógica de submenús desplegables (sin cambios)
+    // ================================================================
     const triggers = document.querySelectorAll(".has-submenu > a, .has-submenu .toggle-submenu");
 
     triggers.forEach(trigger => {
@@ -123,20 +202,18 @@ document.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
 
             const parentLi = trigger.closest(".has-submenu");
-            const submenu = parentLi.querySelector(".submenu");
+            const submenu  = parentLi.querySelector(".submenu");
 
             if (!submenu) return;
 
             const isOpen = parentLi.classList.contains("active");
 
             if (isOpen) {
-                // CERRAR
                 submenu.style.maxHeight = submenu.scrollHeight + "px";
                 submenu.offsetHeight; // Force reflow
                 parentLi.classList.remove("active");
                 submenu.style.maxHeight = "0";
             } else {
-                // ABRIR
                 parentLi.classList.add("active");
                 submenu.style.maxHeight = submenu.scrollHeight + "px";
             }

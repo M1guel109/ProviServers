@@ -10,8 +10,8 @@
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <!-- css de estilos globales o generales -->
-    <link rel="stylesheet" href="public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="public/assets/auth/css/login.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/login.css">
 
     <!-- tu css -->
 </head>
@@ -20,7 +20,7 @@
     <header>
         <div class="header-container">
             <a href="<?= BASE_URL ?>/">
-                <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Proviservers - Plataforma de servicios locales"
+                <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png" alt="Proviservers - Plataforma de servicios locales"
                     class="header-logo">
             </a>
         </div>
@@ -30,7 +30,7 @@
         <div class="custom-container">
             <section id="login">
                 <h1>Inicia Sesión</h1>
-                <p>Accede a tu cuenta para encontrar o fofrecer servicios locales</p>
+                <p>Accede a tu cuenta para encontrar o ofrecer servicios locales</p>
                 <form id="loginForm" action="<?= BASE_URL ?>/iniciar-sesion" method="POST">
 
                     <input type="hidden" name="accion" value="iniciar_sesion">
@@ -46,7 +46,7 @@
                         <!-- <label>
                             <input type="checkbox"> Recordarme
                         </label> -->
-                        <a href="<?= BASE_URL ?>/reestablecer-contrasena">¿Olvidaste tu contraseña?</a>
+                        <a href="<?= BASE_URL ?>/restablecer-contrasena">¿Olvidaste tu contraseña?</a>       
                     </div>
                     <button type="submit" class="btn-login">Iniciar Sesión</button>
                 </form>
@@ -63,21 +63,21 @@
                     </div> -->
                     <div class="carousel-inner">
                         <!-- Slide 1 -->
-                        <div class="carousel-item active" style="background-image: url('public/assets/auth/img/carrousel-login/1.jpg');">
+                        <div class="carousel-item active" style="background-image: url('<?= BASE_URL ?>/public/assets/auth/img/carrousel-login/1.jpg');">
                             <div class="carousel-caption-content">
                                 <h2>Te esperan trabajos muy buenos</h2>
                                 <p>Encuentra las mejores oportunidades laborales en tu zona</p>
                             </div>
                         </div>
                         <!-- Slide 2 -->
-                        <div class="carousel-item" style="background-image: url('public/assets/auth/img/carrousel-login/2.jpg');">
+                        <div class="carousel-item" style="background-image: url('<?= BASE_URL ?>/public/assets/auth/img/carrousel-login/2.jpg');">
                             <div class="carousel-caption-content">
                                 <h2>Conectamos talento con oportunidades</h2>
                                 <p>Únete a nuestra comunidad de profesionales</p>
                             </div>
                         </div>
                         <!-- Slide 3 (podrías usar una imagen nueva o repetir una) -->
-                        <div class="carousel-item" style="background-image: url('public/assets/auth/img/carrousel-login/1.jpg');">
+                        <div class="carousel-item" style="background-image: url('<?= BASE_URL ?>/public/assets/auth/img/carrousel-login/1.jpg');">
                             <div class="carousel-caption-content">
                                 <h2>¡Inicia sesión ahora!</h2>
                                 <p>Accede a tu cuenta y comienza a conectar</p>
@@ -99,7 +99,7 @@
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <script src="public/assets/auth/js/login.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/auth/js/login.js"></script>
 </body>
 
 </html>

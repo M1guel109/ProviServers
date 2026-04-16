@@ -1,6 +1,6 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_admin.php';
-require_once BASE_PATH . '/app/controllers/finanzaController.php';
+require_once BASE_PATH . '/app/helpers/session-admin.php';
+require_once BASE_PATH . '/app/controllers/finanza-controller.php';
 
 // Cargamos los datos del controlador
 $data = cargarDashboardFinanzas();
@@ -18,14 +18,14 @@ $data = cargarDashboardFinanzas();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
 
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboardFinanzas.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-finanzas.css">
 </head>
 
 <body>
-    <?php include_once __DIR__ . '/../../layouts/sidebar_administrador.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-administrador.php'; ?>
 
     <main class="contenido">
-        <?php include_once __DIR__ . '/../../layouts/header_administrador.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-administrador.php'; ?>
 
         <section id="titulo-principal" class="mb-4">
             <h1 class="fw-bold text-dark">Gestión Financiera</h1>
