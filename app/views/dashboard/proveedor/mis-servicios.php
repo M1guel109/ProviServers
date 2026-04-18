@@ -83,6 +83,8 @@ if ($usuarioId) {
 
                 <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
 
+
+
                     <?php foreach ($datos as $fila) : ?>
                         <?php
                         $estado = $fila['estado_publicacion'] ?? 'pendiente';
@@ -92,19 +94,23 @@ if ($usuarioId) {
                             case 'aprobado':
                                 $textoEstado = 'Publicado';
                                 $claseEstado = 'estado-publicacion estado-activa';
+                                $badgeModalClass = 'bg-success';
                                 break;
                             case 'rechazada':
                                 $textoEstado = 'Rechazado';
                                 $claseEstado = 'estado-publicacion estado-rechazada';
+                                $badgeModalClass = 'bg-danger';
                                 break;
                             case 'pausada':
                                 $textoEstado = 'Pausado';
                                 $claseEstado = 'estado-publicacion estado-pausada';
+                                $badgeModalClass = 'bg-secondary';
                                 break;
                             case 'pendiente':
                             default:
                                 $textoEstado = 'Pendiente de aprobación';
                                 $claseEstado = 'estado-publicacion estado-pendiente';
+                                $badgeModalClass = 'bg-warning text-dark';
                                 break;
                         }
 
@@ -113,178 +119,132 @@ if ($usuarioId) {
                         $img = $fila['servicio_imagen'] ?? '';
                         $imgUrl = !empty($img)
                             ? (BASE_URL . '/public/uploads/servicios/' . $img)
-                            : (BASE_URL . '/public/assets/img/default_service.png'); // crea este placeholder si quieres
+                            : (BASE_URL . '/public/assets/img/default_service.png');
 
                         $servicioId = (int)($fila['servicio_id'] ?? 0);
 
-                        // Descripción corta
-                        $desc = trim((string)($fila['servicio_descripcion'] ?? 'Sin descripción'));
-                        if (mb_strlen($desc) > 120) $desc = mb_substr($desc, 0, 120) . '...';
+                        // Descripción completa para modal
+                        $descFull = trim((string)($fila['servicio_descripcion'] ?? 'Sin descripción'));
+
+                        // Descripción corta para tarjeta
+                        $descCard = $descFull;
+                        if (mb_strlen($descCard) > 120) $descCard = mb_substr($descCard, 0, 120) . '...';
 
                         $fechaPub = $fila['publicacion_created_at'] ?? '';
+
+                        // Helper para atributos HTML
+                        $nombreAttr = htmlspecialchars((string)($fila['servicio_nombre'] ?? ''), ENT_QUOTES, 'UTF-8');
+                        $catAttr    = htmlspecialchars((string)($fila['categoria_nombre'] ?? 'Sin categoría'), ENT_QUOTES, 'UTF-8');
+                        $descAttr   = htmlspecialchars($descFull, ENT_QUOTES, 'UTF-8');
+                        $imgAttr    = htmlspecialchars($imgUrl, ENT_QUOTES, 'UTF-8');
+                        $fechaAttr  = htmlspecialchars((string)$fechaPub, ENT_QUOTES, 'UTF-8');
+                        $estadoTxtAttr = htmlspecialchars($textoEstado, ENT_QUOTES, 'UTF-8');
+                        $badgeClassAttr = htmlspecialchars($badgeModalClass, ENT_QUOTES, 'UTF-8');
+                        $dispTxtAttr = $disponible ? 'Disponible' : 'No disponible';
                         ?>
 
-                        <?php foreach ($datos as $fila) : ?>
-                            <?php
-                            $estado = $fila['estado_publicacion'] ?? 'pendiente';
+                        <div class="col">
+                            <div class="card card-servicio h-100 border-0 shadow-sm">
 
-                            // Texto y estilos por estado (igual que tu lógica)
-                            switch ($estado) {
-                                case 'aprobado':
-                                    $textoEstado = 'Publicado';
-                                    $claseEstado = 'estado-publicacion estado-activa';
-                                    $badgeModalClass = 'bg-success';
-                                    break;
-                                case 'rechazada':
-                                    $textoEstado = 'Rechazado';
-                                    $claseEstado = 'estado-publicacion estado-rechazada';
-                                    $badgeModalClass = 'bg-danger';
-                                    break;
-                                case 'pausada':
-                                    $textoEstado = 'Pausado';
-                                    $claseEstado = 'estado-publicacion estado-pausada';
-                                    $badgeModalClass = 'bg-secondary';
-                                    break;
-                                case 'pendiente':
-                                default:
-                                    $textoEstado = 'Pendiente de aprobación';
-                                    $claseEstado = 'estado-publicacion estado-pendiente';
-                                    $badgeModalClass = 'bg-warning text-dark';
-                                    break;
-                            }
+                                <!-- (IMAGEN REMOVIDA DE LA TARJETA) -->
+                                <!-- Puedes dejar un header visual mínimo si quieres -->
+                                <div class="card-servicio-topbar"></div>
 
-                            $disponible = (int)($fila['servicio_disponible'] ?? 0) === 1;
+                                <div class="card-body">
+                                    <!-- Estado + disponibilidad -->
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                        <span class="<?= $claseEstado ?>"><?= $textoEstado ?></span>
 
-                            $img = $fila['servicio_imagen'] ?? '';
-                            $imgUrl = !empty($img)
-                                ? (BASE_URL . '/public/uploads/servicios/' . $img)
-                                : (BASE_URL . '/public/assets/img/default_service.png');
-
-                            $servicioId = (int)($fila['servicio_id'] ?? 0);
-
-                            // Descripción completa para modal
-                            $descFull = trim((string)($fila['servicio_descripcion'] ?? 'Sin descripción'));
-
-                            // Descripción corta para tarjeta
-                            $descCard = $descFull;
-                            if (mb_strlen($descCard) > 120) $descCard = mb_substr($descCard, 0, 120) . '...';
-
-                            $fechaPub = $fila['publicacion_created_at'] ?? '';
-
-                            // Helper para atributos HTML
-                            $nombreAttr = htmlspecialchars((string)($fila['servicio_nombre'] ?? ''), ENT_QUOTES, 'UTF-8');
-                            $catAttr    = htmlspecialchars((string)($fila['categoria_nombre'] ?? 'Sin categoría'), ENT_QUOTES, 'UTF-8');
-                            $descAttr   = htmlspecialchars($descFull, ENT_QUOTES, 'UTF-8');
-                            $imgAttr    = htmlspecialchars($imgUrl, ENT_QUOTES, 'UTF-8');
-                            $fechaAttr  = htmlspecialchars((string)$fechaPub, ENT_QUOTES, 'UTF-8');
-                            $estadoTxtAttr = htmlspecialchars($textoEstado, ENT_QUOTES, 'UTF-8');
-                            $badgeClassAttr = htmlspecialchars($badgeModalClass, ENT_QUOTES, 'UTF-8');
-                            $dispTxtAttr = $disponible ? 'Disponible' : 'No disponible';
-                            ?>
-
-                            <div class="col">
-                                <div class="card card-servicio h-100 border-0 shadow-sm">
-
-                                    <!-- (IMAGEN REMOVIDA DE LA TARJETA) -->
-                                    <!-- Puedes dejar un header visual mínimo si quieres -->
-                                    <div class="card-servicio-topbar"></div>
-
-                                    <div class="card-body">
-                                        <!-- Estado + disponibilidad -->
-                                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                                            <span class="<?= $claseEstado ?>"><?= $textoEstado ?></span>
-
-                                            <?php if ($disponible): ?>
-                                                <span class="badge-disponibilidad badge-disponible">Disponible</span>
-                                            <?php else: ?>
-                                                <span class="badge-disponibilidad badge-no-disponible">No disponible</span>
-                                            <?php endif; ?>
-                                        </div>
-
-                                        <!-- Nombre -->
-                                        <h5 class="card-title fw-bold mb-1">
-                                            <?= htmlspecialchars($fila['servicio_nombre'] ?? '') ?>
-                                        </h5>
-
-                                        <!-- Categoría -->
-                                        <div class="text-muted small mb-2">
-                                            <i class="bi bi-tag"></i>
-                                            <?= htmlspecialchars($fila['categoria_nombre'] ?? 'Sin categoría') ?>
-                                        </div>
-
-                                        <!-- Descripción -->
-                                        <p class="card-text text-secondary small mb-3">
-                                            <?= htmlspecialchars($descCard) ?>
-                                        </p>
-
-                                        <!-- Fecha publicación -->
-                                        <div class="meta-row text-muted small">
-                                            <i class="bi bi-calendar3"></i>
-                                            <span>Publicado: <?= htmlspecialchars($fechaPub) ?></span>
-                                        </div>
+                                        <?php if ($disponible): ?>
+                                            <span class="badge-disponibilidad badge-disponible">Disponible</span>
+                                        <?php else: ?>
+                                            <span class="badge-disponibilidad badge-no-disponible">No disponible</span>
+                                        <?php endif; ?>
                                     </div>
 
-                                    <!-- Acciones -->
-                                    <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
-                                        <div class="d-flex gap-2 flex-wrap">
+                                    <!-- Nombre -->
+                                    <h5 class="card-title fw-bold mb-1">
+                                        <?= htmlspecialchars($fila['servicio_nombre'] ?? '') ?>
+                                    </h5>
 
-                                            <!-- VER DETALLE (ABRE MODAL Y PASA DATA) -->
-                                            <button
-                                                type="button"
-                                                class="btn btn-sm btn-outline-primary flex-fill btn-ver-detalle-servicio"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#modalDetalleServicio"
-                                                data-base-url="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>"
-                                                data-servicio-id="<?= (int)$servicioId ?>"
-                                                data-servicio-nombre="<?= $nombreAttr ?>"
-                                                data-servicio-categoria="<?= $catAttr ?>"
-                                                data-servicio-descripcion="<?= $descAttr ?>"
-                                                data-servicio-img="<?= $imgAttr ?>"
-                                                data-servicio-fecha="<?= $fechaAttr ?>"
-                                                data-servicio-estado-texto="<?= $estadoTxtAttr ?>"
-                                                data-servicio-estado-badgeclass="<?= $badgeClassAttr ?>"
-                                                data-servicio-disponible="<?= $disponible ? 1 : 0 ?>"
-                                                data-servicio-disponible-texto="<?= htmlspecialchars($dispTxtAttr, ENT_QUOTES, 'UTF-8') ?>"
-                                                title="Ver detalle">
-                                                <i class="bi bi-eye"></i> Ver
-                                            </button>
-
-                                            <!-- Editar (solo pendiente o rechazada) -->
-                                            <?php if (in_array($estado, ['pendiente', 'rechazada'], true)) : ?>
-                                                <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
-                                                    class="btn btn-sm btn-outline-success flex-fill"
-                                                    title="<?= $estado === 'rechazada' ? 'Editar y reenviar a revisión' : 'Editar servicio' ?>">
-                                                    <i class="bi bi-pencil-square"></i> Editar
-                                                </a>
-                                            <?php endif; ?>
-
-                                            <!-- Eliminar -->
-                                            <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicioId ?>"
-                                                class="btn btn-sm btn-outline-danger flex-fill"
-                                                title="Eliminar servicio"
-                                                >
-                                                <i class="bi bi-trash3"></i> Eliminar
-                                            </a>
-
-                                            <!-- Pausar (placeholder) -->
-                                            <?php if ($estado === 'aprobado') : ?>
-                                                <button type="button"
-                                                    class="btn btn-sm btn-outline-secondary flex-fill"
-                                                    title="Pausar publicación (placeholder)">
-                                                    <i class="bi bi-pause-circle"></i> Pausar
-                                                </button>
-                                            <?php endif; ?>
-
-                                        </div>
+                                    <!-- Categoría -->
+                                    <div class="text-muted small mb-2">
+                                        <i class="bi bi-tag"></i>
+                                        <?= htmlspecialchars($fila['categoria_nombre'] ?? 'Sin categoría') ?>
                                     </div>
 
+                                    <!-- Descripción -->
+                                    <p class="card-text text-secondary small mb-3">
+                                        <?= htmlspecialchars($descCard) ?>
+                                    </p>
+
+                                    <!-- Fecha publicación -->
+                                    <div class="meta-row text-muted small">
+                                        <i class="bi bi-calendar3"></i>
+                                        <span>Publicado: <?= htmlspecialchars($fechaPub) ?></span>
+                                    </div>
                                 </div>
+
+                                <!-- Acciones -->
+                                <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+                                    <div class="d-flex gap-2 flex-wrap">
+
+                                        <!-- VER DETALLE (ABRE MODAL Y PASA DATA) -->
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-primary flex-fill btn-ver-detalle-servicio"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDetalleServicio"
+                                            data-base-url="<?= htmlspecialchars(BASE_URL, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-servicio-id="<?= (int)$servicioId ?>"
+                                            data-servicio-nombre="<?= $nombreAttr ?>"
+                                            data-servicio-categoria="<?= $catAttr ?>"
+                                            data-servicio-descripcion="<?= $descAttr ?>"
+                                            data-servicio-img="<?= $imgAttr ?>"
+                                            data-servicio-fecha="<?= $fechaAttr ?>"
+                                            data-servicio-estado-texto="<?= $estadoTxtAttr ?>"
+                                            data-servicio-estado-badgeclass="<?= $badgeClassAttr ?>"
+                                            data-servicio-disponible="<?= $disponible ? 1 : 0 ?>"
+                                            data-servicio-disponible-texto="<?= htmlspecialchars($dispTxtAttr, ENT_QUOTES, 'UTF-8') ?>"
+                                            title="Ver detalle">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </button>
+
+                                        <!-- Editar (solo pendiente o rechazada) -->
+                                        <?php if (in_array($estado, ['pendiente', 'rechazada'], true)) : ?>
+                                            <a href="<?= BASE_URL ?>/proveedor/editar-servicio?id=<?= $servicioId ?>"
+                                                class="btn btn-sm btn-outline-success flex-fill"
+                                                title="<?= $estado === 'rechazada' ? 'Editar y reenviar a revisión' : 'Editar servicio' ?>">
+                                                <i class="bi bi-pencil-square"></i> Editar
+                                            </a>
+                                        <?php endif; ?>
+
+                                        <!-- Eliminar -->
+                                        <a href="<?= BASE_URL ?>/proveedor/guardar-servicio?accion=eliminar&id=<?= $servicioId ?>"
+                                            class="btn btn-sm btn-outline-danger flex-fill"
+                                            title="Eliminar servicio">
+                                            <i class="bi bi-trash3"></i> Eliminar
+                                        </a>
+
+                                        <!-- Pausar (placeholder) -->
+                                        <?php if ($estado === 'aprobado') : ?>
+                                            <button type="button"
+                                                class="btn btn-sm btn-outline-secondary flex-fill"
+                                                title="Pausar publicación (placeholder)">
+                                                <i class="bi bi-pause-circle"></i> Pausar
+                                            </button>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </div>
+
                             </div>
-
-                        <?php endforeach; ?>
-
+                        </div>
 
                     <?php endforeach; ?>
+
+
+
 
                 </div>
 

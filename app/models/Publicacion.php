@@ -33,58 +33,96 @@ class Publicacion
     }
 
     /**
-     * Crea una publicación para un servicio creado por un proveedor.
-     * - Se deja en estado 'pendiente' para flujo de moderación.
+     * Crea una publicación para un servicio recién registrado por un proveedor.
+     * Si el proveedor tiene auto_aprobacion_activa = 1, la publica directo como 'aprobado'.
+     * Si no, la deja en 'pendiente' para revisión del admin.
+     *
+     * @param int   $usuarioId  ID del usuario (tabla usuarios)
+     * @param int   $servicioId ID del servicio recién creado
+     * @param array $data       ['nombre', 'descripcion', 'precio']
+     * @return bool
      */
-    public function crearParaServicioDeProveedor(
-        int $usuarioId,
-        int $servicioId,
-        array $data = []
-    ): bool {
-        $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
+    public function crearParaServicioDeProveedor(int $usuarioId, int $servicioId, array $data): bool
+    {
+        try {
+            $this->conexion->beginTransaction();
 
-        if (!$proveedorId) {
-            throw new Exception("No se encontró proveedor asociado al usuario {$usuarioId}");
+            // 1. Obtener el proveedor_id y verificar si tiene auto-aprobación activa
+            $sqlProv = "SELECT id, auto_aprobacion_activa 
+                    FROM proveedores 
+                    WHERE usuario_id = :usuario_id 
+                    LIMIT 1";
+
+            $stmtProv = $this->conexion->prepare($sqlProv);
+            $stmtProv->bindParam(':usuario_id', $usuarioId, PDO::PARAM_INT);
+            $stmtProv->execute();
+            $proveedor = $stmtProv->fetch(PDO::FETCH_ASSOC);
+
+            // Si no se encuentra el proveedor, cancelamos
+            if (!$proveedor) {
+                $this->conexion->rollBack();
+                error_log("Publicacion::crearParaServicioDeProveedor — proveedor no encontrado para usuario_id {$usuarioId}");
+                return false;
+            }
+
+            $proveedorId     = (int) $proveedor['id'];
+            $esVip           = (int) $proveedor['auto_aprobacion_activa'] === 1;
+
+            // 2. Determinar estado según reputación del proveedor
+            // VIP (>= 3 publicaciones aprobadas) → aprobado directo
+            // Nuevo proveedor → pendiente de revisión del admin
+            $estadoPublicacion = $esVip ? 'aprobado' : 'pendiente';
+
+            // 3. Insertar la publicación
+            $sql = "INSERT INTO publicaciones (
+                    tipo_publicacion,
+                    proveedor_id,
+                    servicio_id,
+                    titulo,
+                    descripcion,
+                    precio,
+                    estado,
+                    fecha_publicacion,
+                    created_at
+                ) VALUES (
+                    'proveedor',
+                    :proveedor_id,
+                    :servicio_id,
+                    :titulo,
+                    :descripcion,
+                    :precio,
+                    :estado,
+                    NOW(),
+                    NOW()
+                )";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':proveedor_id', $proveedorId,           PDO::PARAM_INT);
+            $stmt->bindParam(':servicio_id',  $servicioId,            PDO::PARAM_INT);
+            $stmt->bindValue(':titulo',       $data['nombre']         ?? '');
+            $stmt->bindValue(':descripcion',  $data['descripcion']    ?? '');
+            $stmt->bindValue(':precio',       $data['precio']         ?? 0);
+            $stmt->bindParam(':estado',       $estadoPublicacion,     PDO::PARAM_STR);
+            $stmt->execute();
+
+            // 4. Si es VIP y se aprobó automáticamente, sumar al contador de reputación
+            if ($esVip) {
+                $sqlCount = "UPDATE proveedores 
+                         SET publicaciones_aprobadas_count = publicaciones_aprobadas_count + 1 
+                         WHERE id = :proveedor_id";
+                $stmtCount = $this->conexion->prepare($sqlCount);
+                $stmtCount->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
+                $stmtCount->execute();
+            }
+
+            $this->conexion->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            error_log("Error en Publicacion::crearParaServicioDeProveedor -> " . $e->getMessage());
+            return false;
         }
-
-        $titulo      = $data['nombre'] ?? $data['titulo'] ?? 'Servicio ofertado';
-        $descripcion = $data['descripcion'] ?? null;
-        $precio      = isset($data['precio']) ? (float)$data['precio'] : 0.00;
-
-        $tipoPublicacion = 'proveedor';
-        $estado          = 'pendiente';
-
-        $sql = "INSERT INTO publicaciones (
-                tipo_publicacion,
-                proveedor_id,
-                servicio_id,
-                titulo,
-                descripcion,
-                precio,
-                estado
-            ) VALUES (
-                :tipo_publicacion,
-                :proveedor_id,
-                :servicio_id,
-                :titulo,
-                :descripcion,
-                :precio,
-                :estado
-            )";
-
-        $stmt = $this->conexion->prepare($sql);
-
-        $stmt->bindParam(':tipo_publicacion', $tipoPublicacion);
-        $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
-        $stmt->bindParam(':servicio_id', $servicioId, PDO::PARAM_INT);
-        $stmt->bindParam(':titulo', $titulo);
-        $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':precio', $precio);
-        $stmt->bindParam(':estado', $estado);
-
-        return $stmt->execute();
     }
-
     /**
      * Lista todas las publicaciones asociadas a un proveedor (para el panel del proveedor).
      * Retorna alias pensados para la vista:
