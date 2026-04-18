@@ -51,8 +51,8 @@ function apiDetalleServicio()
         exit;
     }
 
-    $modelo  = new Moderacion();
-    $datos   = $modelo->obtenerDetalle($id);
+    $modelo = new Moderacion();
+    $datos  = $modelo->obtenerDetalle($id);
 
     if (!$datos) {
         echo json_encode(['error' => 'Servicio no encontrado']);
@@ -81,7 +81,7 @@ function apiActualizarEstado()
     if (ob_get_length()) ob_clean();
     header('Content-Type: application/json');
 
-    $id     = isset($_POST['id'])     ? (int)$_POST['id'] : null;
+    $id     = isset($_POST['id']) ? (int)$_POST['id'] : null;
     $estado = $_POST['estado'] ?? null;
     $motivo = trim($_POST['motivo'] ?? '');
 

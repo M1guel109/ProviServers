@@ -249,6 +249,7 @@ switch ($request) {
 
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacion-controller.php';
+        apiActualizarEstado();
         break;
 
     // ==================================================

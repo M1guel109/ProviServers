@@ -27,7 +27,7 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
 
                 <!-- Explorar servicios -->
                 <li>
-                    <a href="<?= BASE_URL ?>/cliente/explorar" data-title="<?= __('cliente_explorar_servicios') ?>">
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios" data-title="<?= __('cliente_explorar_servicios') ?>">
                         <i class="bi bi-search"></i>
                         <span class="nav-text"><?= __('cliente_explorar_servicios') ?></span>
                     </a>
