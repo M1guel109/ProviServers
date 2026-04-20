@@ -1,159 +1,161 @@
 <?php
-// Si tienes un helper de sesión para proveedor, podrías usarlo aquí
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+// ✅ CORREGIDO: kebab-case correcto
+require_once BASE_PATH . '/app/controllers/proveedor-controller.php';
 
-// Enlazamos el controlador del proveedor
-require_once BASE_PATH . '/app/controllers/proveedorController.php';
+// Validar ID
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header('Location: ' . BASE_URL . '/proveedor/listar-servicio');
+    exit;
+}
 
-// Modelo de categorías para llenar el select
-require_once BASE_PATH . '/app/models/categoria.php';
-
-// Capturamos el id enviado por GET
-$id = $_GET['id'] ?? null;
-
-// Obtenemos la info del servicio desde el controlador
+$id       = (int)$_GET['id'];
 $servicio = mostrarServicioId($id);
 
-// Obtenemos las categorías para el select
-$categoriaModel = new Categoria();
-$categorias = $categoriaModel->mostrar();
-?>
+if (!$servicio) {
+    header('Location: ' . BASE_URL . '/proveedor/listar-servicio');
+    exit;
+}
 
+// ✅ CORREGIDO: categorías vienen del controlador, no del modelo directo
+$categorias = obtenerCategorias();
+?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Editar Servicio</title>
+    <title>ProviServers | Editar Servicio</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-    <!-- css de estilos globales o generales -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-
-    <!-- tu css (puedes reutilizar el de registrar servicio) -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/registrar-servicio.css">
 </head>
-
 <body>
-    <!-- SIDEBAR (lateral izquierdo) -->
-    <?php
-    include_once __DIR__ . '/../../layouts/sidebar-proveedor.php';
-    ?>
+
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <main class="contenido">
-        <?php
-        include_once __DIR__ . '/../../layouts/header-proveedor.php';
-        ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- Título -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
+        <section id="titulo-principal"
+                 class="d-flex justify-content-between align-items-start flex-wrap">
             <div>
                 <h1 class="mb-1">Actualizar Servicio</h1>
                 <p class="text-muted mb-0">
                     Modifica la información de tu servicio publicado en la plataforma.
                 </p>
             </div>
-
             <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0"></ol>
+                <ol class="breadcrumb mb-0 mt-2">
+                    <li class="breadcrumb-item">
+                        <a href="<?= BASE_URL ?>/proveedor/dashboard">Panel</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="<?= BASE_URL ?>/proveedor/listar-servicio">Mis Servicios</a>
+                    </li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
             </nav>
         </section>
 
-        <!-- Formulario de edición -->
         <section id="formulario-servicio">
             <div class="contenedor-formulario">
-                <form action="<?= BASE_URL ?>/proveedor/guardar-servicio" method="post" id="form-servicio">
+                <!-- ✅ CORREGIDO: enctype para subir imagen -->
+                <form action="<?= BASE_URL ?>/proveedor/guardar-servicio"
+                      method="POST"
+                      id="form-servicio"
+                      enctype="multipart/form-data">
+
+                    <!-- Campos ocultos -->
+                    <input type="hidden" name="id"     value="<?= (int)$servicio['id'] ?>">
+                    <input type="hidden" name="accion" value="actualizar">
+                    <!-- ✅ CORREGIDO: imagen_actual para no perder la imagen si no se cambia -->
+                    <input type="hidden" name="imagen_actual"
+                           value="<?= htmlspecialchars($servicio['imagen'] ?? 'default_service.png') ?>">
+
                     <div class="row g-3">
 
-                        <!-- Foto del servicio -->
+                        <!-- IMAGEN ACTUAL -->
                         <div class="col-12 d-flex justify-content-center">
                             <div class="seccion-foto">
                                 <div class="tarjeta-foto">
                                     <div class="foto-servicio">
-                                        <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($servicio['imagen']) ?>"
-                                            alt="Imagen del servicio" id="foto-preview">
+                                        <img src="<?= BASE_URL ?>/public/uploads/servicios/<?= htmlspecialchars($servicio['imagen'] ?? 'default_service.png') ?>"
+                                             alt="Imagen del servicio"
+                                             id="foto-preview">
                                     </div>
-                                    <!-- Si luego quieres permitir cambiar imagen, aquí agregas input file con name="imagen" -->
                                     <label for="foto-input" class="btn-agregar-foto">
                                         <i class="bi bi-camera"></i> Cambiar imagen
                                     </label>
-                                    <input type="file" id="foto-input" accept="image/*" style="display: none;">
+                                    <input type="file" id="foto-input" name="imagen"
+                                           accept="image/*" style="display:none;">
                                 </div>
                                 <div class="form-text text-center mt-2">
-                                    Imagen actual del servicio.
+                                    Imagen actual. Deja vacío para mantenerla.
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Hidden: id y acción -->
-                        <input type="hidden" name="id" value="<?= $servicio['id'] ?>">
-                        <input type="hidden" name="accion" value="actualizar">
-
-                        <!-- Nombre del servicio -->
+                        <!-- NOMBRE -->
                         <div class="col-md-12">
-                            <label for="nombre" class="form-label">Nombre del servicio *</label>
-                            <input
-                                type="text"
-                                class="form-control"
-                                id="nombre"
-                                name="nombre"
-                                placeholder="Ej: Reparación de tuberías residenciales"
-                                required
-                                maxlength="100"
-                                value="<?= htmlspecialchars($servicio['nombre']) ?>"
-                            >
-                            <div class="form-text">Máximo 100 caracteres</div>
+                            <label for="nombre" class="form-label">
+                                Nombre del servicio <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nombre" name="nombre"
+                                   required maxlength="100"
+                                   value="<?= htmlspecialchars($servicio['nombre'] ?? '') ?>">
+                            <div class="form-text">Máximo 100 caracteres.</div>
                         </div>
 
-                        <!-- Categoría -->
+                        <!-- CATEGORÍA -->
                         <div class="col-md-6">
-                            <label for="id_categoria" class="form-label">Categoría *</label>
+                            <label for="id_categoria" class="form-label">
+                                Categoría <span class="text-danger">*</span>
+                            </label>
                             <select class="form-select" id="id_categoria" name="id_categoria" required>
                                 <option value="">Seleccionar categoría...</option>
                                 <?php foreach ($categorias as $categoria): ?>
-                                    <option
-                                        value="<?= htmlspecialchars($categoria['id']) ?>"
-                                        <?= $categoria['id'] == $servicio['id_categoria'] ? 'selected' : '' ?>
-                                    >
+                                    <option value="<?= (int)$categoria['id'] ?>"
+                                        <?= $categoria['id'] == $servicio['id_categoria'] ? 'selected' : '' ?>>
                                         <?= htmlspecialchars($categoria['nombre']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
-                        <!-- Disponibilidad -->
+                        <!-- ✅ CORREGIDO: campo precio que faltaba -->
                         <div class="col-md-6">
-                            <label class="form-label">Disponibilidad *</label>
-                            <div class="disponibilidad-opciones pt-2">
+                            <label for="precio" class="form-label">
+                                Precio (COP) <span class="text-danger">*</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="precio" name="precio"
+                                       min="0" step="0.01" required
+                                       value="<?= htmlspecialchars($servicio['precio'] ?? '0') ?>">
+                            </div>
+                        </div>
+
+                        <!-- DISPONIBILIDAD -->
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Disponibilidad <span class="text-danger">*</span>
+                            </label>
+                            <div class="pt-2">
                                 <div class="form-check form-check-inline">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="disponibilidad"
-                                        id="disponible"
-                                        value="1"
-                                        <?= (int)$servicio['disponibilidad'] === 1 ? 'checked' : '' ?>
-                                    >
+                                    <input class="form-check-input" type="radio"
+                                           name="disponibilidad" id="disponible" value="1"
+                                           <?= (int)($servicio['disponibilidad'] ?? 1) === 1 ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="disponible">
                                         <i class="bi bi-check-circle-fill text-success"></i> Disponible
                                     </label>
                                 </div>
                                 <div class="form-check form-check-inline">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="disponibilidad"
-                                        id="no-disponible"
-                                        value="0"
-                                        <?= (int)$servicio['disponibilidad'] === 0 ? 'checked' : '' ?>
-                                    >
+                                    <input class="form-check-input" type="radio"
+                                           name="disponibilidad" id="no-disponible" value="0"
+                                           <?= (int)($servicio['disponibilidad'] ?? 1) === 0 ? 'checked' : '' ?>>
                                     <label class="form-check-label" for="no-disponible">
                                         <i class="bi bi-x-circle-fill text-danger"></i> No disponible
                                     </label>
@@ -161,26 +163,23 @@ $categorias = $categoriaModel->mostrar();
                             </div>
                         </div>
 
-                        <!-- Descripción -->
+                        <!-- DESCRIPCIÓN -->
                         <div class="col-md-12">
                             <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea
-                                class="form-control"
-                                id="descripcion"
-                                name="descripcion"
-                                rows="4"
-                                maxlength="500"
-                                placeholder="Describe detalladamente en qué consiste tu servicio, materiales que utilizas, tiempo estimado, etc."
-                            ><?= htmlspecialchars($servicio['descripcion'] ?? '') ?></textarea>
+                            <textarea class="form-control" id="descripcion" name="descripcion"
+                                      rows="4" maxlength="500"
+                                      placeholder="Describe detalladamente tu servicio..."><?= htmlspecialchars($servicio['descripcion'] ?? '') ?></textarea>
                             <div class="form-text">
-                                Máximo 500 caracteres. <span id="contador-descripcion">0/500</span>
+                                Máximo 500 caracteres.
+                                <span id="contador-descripcion">0/500</span>
                             </div>
                         </div>
 
-                        <!-- Botones -->
+                        <!-- BOTONES -->
                         <div class="col-12 mt-4">
                             <div class="d-flex gap-2 justify-content-center justify-content-md-end">
-                                <a href="<?= BASE_URL ?>/proveedor/dashboard" class="btn btn-secondary">
+                                <a href="<?= BASE_URL ?>/proveedor/listar-servicio"
+                                   class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-left"></i> Volver
                                 </a>
                                 <button type="submit" class="btn btn-primary px-4" id="btn-guardar">
@@ -193,16 +192,16 @@ $categorias = $categoriaModel->mostrar();
                 </form>
             </div>
         </section>
-
     </main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
+    <footer></footer>
 
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>const BASE_URL = "<?= BASE_URL ?>";</script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
-</body>
+    <!-- Reutilizamos el JS de registrar — tiene preview de imagen y contador -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/registrar-servicio.js"></script>
 
+</body>
 </html>

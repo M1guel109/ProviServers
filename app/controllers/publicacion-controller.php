@@ -47,7 +47,7 @@ function mostrarCatalogoPublico()
     $publicaciones    = $publicacionModel->listarPublicasActivas($busqueda, $categoriaId);
 
     // Cargamos la vista del dashboard cliente
-    require BASE_PATH . '/app/views/dashboard/cliente/explorarServicios.php';
+    require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
     exit();
 }
 

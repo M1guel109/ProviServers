@@ -76,8 +76,9 @@ switch ($request) {
         break;
 
     case '/cerrar-sesion':
+        $_GET['accion'] = 'cerrar_sesion';
         require BASE_PATH . '/app/controllers/auth-controller.php';
-        break;
+        break;  
 
     case '/idioma':
         require BASE_PATH . '/app/controllers/idioma-controller.php';
@@ -248,6 +249,7 @@ switch ($request) {
 
     case '/admin/moderacion-actualizar':
         require BASE_PATH . '/app/controllers/moderacion-controller.php';
+        apiActualizarEstado();
         break;
 
     // ==================================================

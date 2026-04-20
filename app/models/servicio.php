@@ -159,6 +159,49 @@ class Servicio
         }
     }
 
+    /**
+     * Cambiar el estado de disponibilidad del servicio
+     * @param int $id ID del servicio
+     * @param int $estado 1 para disponible, 0 para pausado
+     */
+    public function cambiarDisponibilidad($id, $estado)
+    {
+        try {
+            $sql = "UPDATE servicios SET 
+                    disponibilidad = :estado,
+                    modified_at = NOW() 
+                WHERE id = :id";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':estado', $estado, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Servicio::cambiarDisponibilidad -> " . $e->getMessage());
+            return false;
+        }
+    }
+
+    // En tu clase Servicio.php
+    public function reanudarDisponibilidad($id)
+    {
+        try {
+            $sql = "UPDATE servicios SET 
+                    disponibilidad = 1,
+                    modified_at = NOW() 
+                WHERE id = :id";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error en Servicio::reanudarDisponibilidad -> " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function getUltimoIdInsertado(): int
     {
         return (int) $this->conexion->lastInsertId();
