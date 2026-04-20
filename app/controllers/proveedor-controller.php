@@ -25,14 +25,21 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
+        $id = $_GET['id'] ?? null;
 
-        // ✅ CORREGIDO: elseif para evitar múltiples ejecuciones
-        if ($accion === 'eliminar') {
-            eliminarServicio($_GET['id'] ?? null);
+        // 1. Primero las acciones específicas
+        if ($accion === 'pausar') {
+            pausarServicio($id);
+        } elseif ($accion === 'eliminar') {
+            eliminarServicio($id);
         } elseif ($accion === 'ver_solicitudes') {
             $listaSolicitudes = obtenerSolicitudesProveedor();
-        } elseif (isset($_GET['id'])) {
-            mostrarServicioId($_GET['id']);
+        } elseif ($accion === 'reanudar') {
+            reanudarServicio($_GET['id'] ?? null);
+        }
+        // 2. Solo después las acciones genéricas si no hubo una acción específica
+        elseif ($id) {
+            mostrarServicioId($id);
         } else {
             mostrarServicios();
         }
@@ -198,6 +205,7 @@ function obtenerCategorias()
 
 function actualizarServicio()
 {
+    // 1. Obtener y validar datos básicos
     $id             = (int)($_POST['id'] ?? 0);
     $nombre         = trim($_POST['nombre'] ?? '');
     $id_categoria   = (int)($_POST['id_categoria'] ?? 0);
@@ -206,34 +214,50 @@ function actualizarServicio()
     $precio         = $_POST['precio'] ?? '';
 
     if ($id <= 0 || $nombre === '' || $id_categoria <= 0 || $disponibilidad === '') {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
+        mostrarSweetAlert('error', 'Campos inválidos', 'Por favor, rellena todos los campos correctamente.');
         exit();
     }
 
-    // Manejo de imagen en edición
-    $ruta_img = $_POST['imagen_actual'] ?? null;
+    $objServicio = new Servicio();
+    $ruta_img = $_POST['imagen_actual'] ?? 'default_service.png'; // Valor por defecto
 
-    if (!empty($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-        $file      = $_FILES['imagen'];
-        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $permitidas = ['png', 'jpg', 'jpeg'];
+    // 2. Manejo de archivo (Solo si el usuario seleccionó uno nuevo)
+    if (!empty($_FILES['imagen']['name']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+        $file = $_FILES['imagen'];
 
-        if (in_array($extension, $permitidas) && $file['size'] <= 2 * 1024 * 1024) {
-            $nuevo_nombre = uniqid('servicio_') . '.' . $extension;
-            $destino      = BASE_PATH . '/public/uploads/servicios/' . $nuevo_nombre;
+        // Validación técnica de tipo MIME (más segura que solo extensión)
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+        $permitidos = ['image/jpeg', 'image/png', 'image/jpg'];
 
-            if (move_uploaded_file($file['tmp_name'], $destino)) {
-                // Borrar imagen anterior si no es la default
-                if ($ruta_img && $ruta_img !== 'default_service.png') {
-                    $ruta_anterior = BASE_PATH . '/public/uploads/servicios/' . $ruta_img;
-                    if (file_exists($ruta_anterior)) unlink($ruta_anterior);
-                }
-                $ruta_img = $nuevo_nombre;
+        if (!in_array($mime, $permitidos)) {
+            mostrarSweetAlert('error', 'Tipo no permitido', 'Solo se aceptan imágenes JPG o PNG.');
+            exit();
+        }
+
+        if ($file['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Archivo grande', 'El límite es 2MB.');
+            exit();
+        }
+
+        // Generar nombre y mover
+        $nuevo_nombre = uniqid('servicio_') . '.' . pathinfo($file['name'], PATHINFO_EXTENSION);
+        $destino = BASE_PATH . '/public/uploads/servicios/' . $nuevo_nombre;
+
+        if (move_uploaded_file($file['tmp_name'], $destino)) {
+            // Borrar imagen vieja solo si logramos subir la nueva
+            if ($ruta_img && $ruta_img !== 'default_service.png' && file_exists(BASE_PATH . '/public/uploads/servicios/' . $ruta_img)) {
+                unlink(BASE_PATH . '/public/uploads/servicios/' . $ruta_img);
             }
+            $ruta_img = $nuevo_nombre;
+        } else {
+            mostrarSweetAlert('error', 'Error servidor', 'No se pudo guardar la imagen.');
+            exit();
         }
     }
 
-    $objServicio = new Servicio();
+    // 3. Ejecutar actualización
     $data = [
         'id'             => $id,
         'nombre'         => $nombre,
@@ -245,30 +269,35 @@ function actualizarServicio()
     ];
 
     if ($objServicio->actualizar($data)) {
-        // ✅ CORREGIDO: BASE_URL
-        mostrarSweetAlert('success', 'Servicio actualizado', 'Los datos se actualizaron correctamente.', BASE_URL . '/proveedor/listar-servicio');
+        mostrarSweetAlert('success', 'Actualizado', 'Servicio actualizado correctamente.', BASE_URL . '/proveedor/listar-servicio');
     } else {
-        mostrarSweetAlert('error', 'Error al actualizar', 'No se pudo actualizar el servicio. Intenta nuevamente.');
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar en la base de datos.');
     }
-
     exit();
 }
 
 function eliminarServicio($id)
 {
-    if (!$id) {
-        mostrarSweetAlert('error', 'Error', 'ID inválido.');
-        exit();
+    $objServicio = new Servicio();
+
+    // 1. OBTENER INFORMACIÓN DEL SERVICIO ANTES DE BORRAR
+    $servicioActual = $objServicio->mostrarId($id);
+
+
+    // 3. BORRAR EL ARCHIVO FÍSICO (Si no es el default)
+    $img_a_borrar = $servicioActual['imagen'] ?? '';
+    if ($img_a_borrar && $img_a_borrar !== 'default_service.png') {
+        $ruta_archivo = BASE_PATH . '/public/uploads/servicios/' . $img_a_borrar;
+        if (file_exists($ruta_archivo)) {
+            unlink($ruta_archivo);
+        }
     }
 
-    $objServicio = new Servicio();
-    $respuesta   = $objServicio->eliminar((int)$id);
-
-    if ($respuesta === true) {
-        // ✅ CORREGIDO: BASE_URL
-        mostrarSweetAlert('success', 'Eliminación exitosa', 'El servicio ha sido eliminado.', BASE_URL . '/proveedor/listar-servicio');
+    // 4. ELIMINAR REGISTRO EN BASE DE DATOS
+    if ($objServicio->eliminar($id)) {
+        mostrarSweetAlert('success', 'Eliminado', 'Servicio eliminado con éxito.', BASE_URL . '/proveedor/listar-servicio');
     } else {
-        mostrarSweetAlert('error', 'Error al eliminar', 'No se pudo eliminar el servicio.');
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el registro.');
     }
     exit();
 }
@@ -279,4 +308,63 @@ function obtenerSolicitudesProveedor()
     $usuarioId     = (int)$_SESSION['user']['id'];
     $solicitudModel = new Solicitud();
     return $solicitudModel->listarPorProveedor($usuarioId);
+}
+
+/**
+ * Retorna los servicios/publicaciones del proveedor logueado.
+ * Usada por mis-servicios.php
+ */
+function obtenerServiciosDelProveedor(int $usuarioId): array
+{
+    require_once BASE_PATH . '/app/models/publicacion.php';
+    $obj = new Publicacion();
+    return $obj->listarPorProveedorUsuario($usuarioId);
+}
+
+function pausarServicio($id)
+{
+    $id = (int)$id;
+    $objServicio = new Servicio();
+
+    // 1. Obtener datos para verificar el estado de la publicación
+    $datosServicio = $objServicio->obtenerDetalleCompleto($id);
+
+    // 2. Validación de seguridad y lógica de negocio
+    // Solo permitimos pausar si la publicación está "aprobado"
+    if (!$datosServicio || $datosServicio['publicacion_estado'] !== 'aprobado') {
+        mostrarSweetAlert('error', 'Acción no permitida', 'Solo puedes pausar servicios que ya han sido aprobados.');
+        exit();
+    }
+
+    // 3. Ejecutar la pausa (ponemos disponibilidad en 0)
+    if ($objServicio->cambiarDisponibilidad($id, 0)) {
+        mostrarSweetAlert('success', 'Servicio pausado', 'Tu servicio ya no es visible para los clientes.', BASE_URL . '/proveedor/listar-servicio');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo pausar el servicio.');
+    }
+    exit();
+}
+
+
+function reanudarServicio($id) {
+    $id = (int)$id;
+    $objServicio = new Servicio();
+
+    // 1. Obtener datos para verificar el estado de la publicación
+    $datosServicio = $objServicio->obtenerDetalleCompleto($id);
+
+    // 2. Validación de seguridad y lógica de negocio
+    // Solo permitimos reanudar si la publicación está "aprobado"
+    if (!$datosServicio || $datosServicio['publicacion_estado'] !== 'aprobado') {
+        mostrarSweetAlert('error', 'Acción no permitida', 'Solo puedes reanudar servicios que ya han sido aprobados.');
+        exit();
+    }
+
+    // 3. Ejecutar la reanudación (ponemos disponibilidad en 1)
+    if ($objServicio->reanudarDisponibilidad($id)) {
+        mostrarSweetAlert('success', 'Servicio reanudado', 'Tu servicio es visible nuevamente para los clientes.', BASE_URL . '/proveedor/listar-servicio');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo reanudar el servicio.');
+    }
+    exit();
 }

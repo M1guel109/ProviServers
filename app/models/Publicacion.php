@@ -139,9 +139,7 @@ class Publicacion
         try {
             $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
 
-            if (!$proveedorId) {
-                return [];
-            }
+            if (!$proveedorId) return [];
 
             $sql = "
             SELECT 
@@ -150,7 +148,7 @@ class Publicacion
                 pub.titulo              AS titulo,
                 pub.descripcion         AS descripcion,
                 pub.precio              AS precio,
-                pub.estado              AS estado,
+                pub.estado              AS estado_publicacion,
                 pub.motivo_rechazo      AS motivo_rechazo,
                 pub.fecha_publicacion   AS fecha_publicacion,
                 pub.created_at          AS publicacion_created_at,
@@ -159,11 +157,12 @@ class Publicacion
                 s.descripcion           AS servicio_descripcion,
                 s.imagen                AS servicio_imagen,
                 s.disponibilidad        AS servicio_disponible,
+                s.precio                AS servicio_precio,
 
                 c.nombre                AS categoria_nombre
             FROM publicaciones AS pub
             INNER JOIN servicios  AS s ON pub.servicio_id = s.id
-            LEFT JOIN categorias  AS c ON s.id_categoria = c.id
+            LEFT  JOIN categorias AS c ON s.id_categoria  = c.id
             WHERE pub.proveedor_id = :proveedor_id
             ORDER BY pub.fecha_publicacion DESC, pub.id DESC
         ";
@@ -172,9 +171,7 @@ class Publicacion
             $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
             $stmt->execute();
 
-            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $filas ?: [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("Error en Publicacion::listarPorProveedorUsuario -> " . $e->getMessage());
             return [];
@@ -191,25 +188,26 @@ class Publicacion
     {
         try {
             $sql = "
-            SELECT 
-                pub.id,
-                pub.servicio_id,
-                pub.titulo,
-                pub.descripcion,
-                pub.precio,
-                pub.estado,
-                pub.created_at,
+                        SELECT 
+                            pub.id,
+                            pub.servicio_id,
+                            pub.titulo,
+                            pub.descripcion,
+                            pub.precio,
+                            pub.estado,
+                            pub.created_at,
 
-                s.nombre       AS servicio_nombre,
-                s.descripcion  AS servicio_descripcion,
-                s.imagen       AS servicio_imagen,
+                            s.nombre       AS servicio_nombre,
+                            s.descripcion  AS servicio_descripcion,
+                            s.imagen       AS servicio_imagen,
 
-                c.nombre       AS categoria_nombre
-            FROM publicaciones AS pub
-            INNER JOIN servicios   AS s ON pub.servicio_id = s.id
-            LEFT  JOIN categorias  AS c ON s.id_categoria = c.id
-            WHERE pub.estado = 'aprobado'
-        ";
+                            c.nombre       AS categoria_nombre
+                        FROM publicaciones AS pub
+                        INNER JOIN servicios   AS s ON pub.servicio_id = s.id
+                        LEFT  JOIN categorias  AS c ON s.id_categoria = c.id
+                        WHERE pub.estado = 'aprobado' 
+                        AND s.disponibilidad = 1  -- <--- ESTA ES LA CLAVE
+                    ";
 
             $params = [];
 
