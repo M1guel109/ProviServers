@@ -25,20 +25,21 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
-        $id = $_GET['id'] ?? null;
+        $id     = $_GET['id']     ?? null;
 
-        // 1. Primero las acciones específicas
-        if ($accion === 'pausar') {
-            pausarServicio($id);
-        } elseif ($accion === 'eliminar') {
+        // ✅ Acciones específicas (eliminada 'detalle' — eso va al cliente-controller)
+        if ($accion === 'eliminar') {
             eliminarServicio($id);
+        } elseif ($accion === 'pausar') {
+            cambiarEstadoServicio($id, 0);  // ✅ unificado
+        } elseif ($accion === 'reanudar') {
+            cambiarEstadoServicio($id, 1);  // ✅ unificado
         } elseif ($accion === 'ver_solicitudes') {
             $listaSolicitudes = obtenerSolicitudesProveedor();
-        } elseif ($accion === 'reanudar') {
-            reanudarServicio($_GET['id'] ?? null);
-        }
-        // 2. Solo después las acciones genéricas si no hubo una acción específica
-        elseif ($id) {
+        } // Agregar al final del switch case 'GET'
+        elseif ($accion === 'detalle') {
+            obtenerDetallePublicacionJSON($_GET['id'] ?? null);
+        } elseif ($id) {
             mostrarServicioId($id);
         } else {
             mostrarServicios();
@@ -278,24 +279,35 @@ function actualizarServicio()
 
 function eliminarServicio($id)
 {
-    $objServicio = new Servicio();
-
-    // 1. OBTENER INFORMACIÓN DEL SERVICIO ANTES DE BORRAR
-    $servicioActual = $objServicio->mostrarId($id);
-
-
-    // 3. BORRAR EL ARCHIVO FÍSICO (Si no es el default)
-    $img_a_borrar = $servicioActual['imagen'] ?? '';
-    if ($img_a_borrar && $img_a_borrar !== 'default_service.png') {
-        $ruta_archivo = BASE_PATH . '/public/uploads/servicios/' . $img_a_borrar;
-        if (file_exists($ruta_archivo)) {
-            unlink($ruta_archivo);
-        }
+    // ✅ Validación de ID
+    $id = (int)$id;
+    if ($id <= 0) {
+        mostrarSweetAlert('error', 'Error', 'ID de servicio inválido.');
+        exit();
     }
 
-    // 4. ELIMINAR REGISTRO EN BASE DE DATOS
+    $objServicio    = new Servicio();
+    $servicioActual = $objServicio->mostrarId($id);
+
+    if (!$servicioActual) {
+        mostrarSweetAlert('error', 'No encontrado', 'El servicio no existe.');
+        exit();
+    }
+
+    // Borrar imagen física si no es la default
+    $img = $servicioActual['imagen'] ?? '';
+    if ($img && $img !== 'default_service.png') {
+        $ruta = BASE_PATH . '/public/uploads/servicios/' . $img;
+        if (file_exists($ruta)) unlink($ruta);
+    }
+
     if ($objServicio->eliminar($id)) {
-        mostrarSweetAlert('success', 'Eliminado', 'Servicio eliminado con éxito.', BASE_URL . '/proveedor/listar-servicio');
+        mostrarSweetAlert(
+            'success',
+            'Eliminado',
+            'Servicio eliminado con éxito.',
+            BASE_URL . '/proveedor/listar-servicio'
+        );
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el registro.');
     }
@@ -321,50 +333,70 @@ function obtenerServiciosDelProveedor(int $usuarioId): array
     return $obj->listarPorProveedorUsuario($usuarioId);
 }
 
-function pausarServicio($id)
+/**
+ * ✅ Función unificada para pausar y reanudar un servicio.
+ * @param int $id ID del servicio
+ * @param int $estado 1 = reanudar, 0 = pausar
+ */
+function cambiarEstadoServicio($id, int $estado)
 {
     $id = (int)$id;
-    $objServicio = new Servicio();
-
-    // 1. Obtener datos para verificar el estado de la publicación
-    $datosServicio = $objServicio->obtenerDetalleCompleto($id);
-
-    // 2. Validación de seguridad y lógica de negocio
-    // Solo permitimos pausar si la publicación está "aprobado"
-    if (!$datosServicio || $datosServicio['publicacion_estado'] !== 'aprobado') {
-        mostrarSweetAlert('error', 'Acción no permitida', 'Solo puedes pausar servicios que ya han sido aprobados.');
+    if ($id <= 0) {
+        mostrarSweetAlert('error', 'Error', 'ID de servicio inválido.');
         exit();
     }
 
-    // 3. Ejecutar la pausa (ponemos disponibilidad en 0)
-    if ($objServicio->cambiarDisponibilidad($id, 0)) {
-        mostrarSweetAlert('success', 'Servicio pausado', 'Tu servicio ya no es visible para los clientes.', BASE_URL . '/proveedor/listar-servicio');
+    $objServicio = new Servicio();
+    $datos       = $objServicio->obtenerDetalleCompleto($id);
+
+    // Solo se puede actuar sobre servicios aprobados
+    if (!$datos || ($datos['publicacion_estado'] ?? '') !== 'aprobado') {
+        mostrarSweetAlert(
+            'warning',
+            'Acción no permitida',
+            'Solo puedes pausar o reanudar servicios aprobados.'
+        );
+        exit();
+    }
+
+    $accionTxt = $estado === 1 ? 'reanudado' : 'pausado';
+    $mensaje   = $estado === 1
+        ? 'Tu servicio es visible nuevamente para los clientes.'
+        : 'Tu servicio ya no es visible para los clientes.';
+
+    if ($objServicio->cambiarDisponibilidad($id, $estado)) {
+        mostrarSweetAlert(
+            'success',
+            "Servicio {$accionTxt}",
+            $mensaje,
+            BASE_URL . '/proveedor/listar-servicio'
+        );
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo pausar el servicio.');
+        mostrarSweetAlert('error', 'Error', "No se pudo actualizar el servicio.");
     }
     exit();
 }
 
+/**
+ * Retorna los datos de una publicación en formato JSON para el modal de detalle del cliente.
+ */
+function obtenerDetallePublicacionJSON($id)
+{
+    header('Content-Type: application/json');
 
-function reanudarServicio($id) {
     $id = (int)$id;
-    $objServicio = new Servicio();
-
-    // 1. Obtener datos para verificar el estado de la publicación
-    $datosServicio = $objServicio->obtenerDetalleCompleto($id);
-
-    // 2. Validación de seguridad y lógica de negocio
-    // Solo permitimos reanudar si la publicación está "aprobado"
-    if (!$datosServicio || $datosServicio['publicacion_estado'] !== 'aprobado') {
-        mostrarSweetAlert('error', 'Acción no permitida', 'Solo puedes reanudar servicios que ya han sido aprobados.');
+    if ($id <= 0) {
+        echo json_encode(['error' => 'ID no proporcionado']);
         exit();
     }
 
-    // 3. Ejecutar la reanudación (ponemos disponibilidad en 1)
-    if ($objServicio->reanudarDisponibilidad($id)) {
-        mostrarSweetAlert('success', 'Servicio reanudado', 'Tu servicio es visible nuevamente para los clientes.', BASE_URL . '/proveedor/listar-servicio');
+    $objPublicacion = new Publicacion();
+    $detalle        = $objPublicacion->obtenerDetallePublicacion($id);
+
+    if ($detalle) {
+        echo json_encode($detalle);
     } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo reanudar el servicio.');
+        echo json_encode(['error' => 'Publicación no encontrada']);
     }
     exit();
 }

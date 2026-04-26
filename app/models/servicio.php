@@ -101,24 +101,30 @@ class Servicio
      *  - disponibilidad
      * (la imagen la puedes manejar en otra función si luego permites cambiarla)
      */
+    /**
+     * ✅ CORREGIDO: ahora actualiza precio e imagen también
+     */
     public function actualizar($data)
     {
         try {
             $sql = "UPDATE servicios SET
-                        nombre        = :nombre,
-                        descripcion   = :descripcion,
-                        id_categoria  = :id_categoria,
-                        disponibilidad= :disponibilidad,
-                        modified_at   = NOW()
-                    WHERE id = :id";
+                    nombre         = :nombre,
+                    descripcion    = :descripcion,
+                    id_categoria   = :id_categoria,
+                    disponibilidad = :disponibilidad,
+                    precio         = :precio,
+                    imagen         = :imagen,
+                    modified_at    = NOW()
+                WHERE id = :id";
 
             $stmt = $this->conexion->prepare($sql);
-
-            $stmt->bindParam(':id',            $data['id'], PDO::PARAM_INT);
-            $stmt->bindParam(':nombre',        $data['nombre']);
-            $stmt->bindParam(':descripcion',   $data['descripcion']);
-            $stmt->bindParam(':id_categoria',  $data['id_categoria'], PDO::PARAM_INT);
+            $stmt->bindParam(':id',             $data['id'],             PDO::PARAM_INT);
+            $stmt->bindParam(':nombre',         $data['nombre']);
+            $stmt->bindParam(':descripcion',    $data['descripcion']);
+            $stmt->bindParam(':id_categoria',   $data['id_categoria'],   PDO::PARAM_INT);
             $stmt->bindParam(':disponibilidad', $data['disponibilidad'], PDO::PARAM_INT);
+            $stmt->bindParam(':precio',         $data['precio']);
+            $stmt->bindParam(':imagen',         $data['imagen']);
 
             return $stmt->execute();
         } catch (PDOException $e) {
