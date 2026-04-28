@@ -38,76 +38,48 @@ class Solicitud
     public function crear(array $data): bool
     {
         try {
-            // Convertimos ID de sesión (usuarios.id) a clientes.id
             $clienteIdReal = $this->obtenerClienteIdReal((int)$data['cliente_id']);
 
             if (!$clienteIdReal) {
-                throw new Exception("El usuario actual no tiene un perfil de cliente registrado en la base de datos.");
+                throw new Exception("El usuario actual no tiene un perfil de cliente registrado.");
             }
 
             $this->conexion->beginTransaction();
 
             $sql = "INSERT INTO solicitudes (
-                        cliente_id,
-                        proveedor_id,
-                        publicacion_id,
-                        titulo,
-                        descripcion,
-                        direccion,
-                        ciudad,
-                        zona,
-                        fecha_preferida,
-                        franja_horaria,
-                        estado
-                    ) VALUES (
-                        :cliente_id,
-                        :proveedor_id,
-                        :publicacion_id,
-                        :titulo,
-                        :descripcion,
-                        :direccion,
-                        :ciudad,
-                        :zona,
-                        :fecha_preferida,
-                        :franja_horaria,
-                        'pendiente'
-                    )";
+                    cliente_id, proveedor_id, publicacion_id,
+                    titulo, descripcion, direccion, ciudad, zona,
+                    fecha_preferida, franja_horaria, estado
+                ) VALUES (
+                    :cliente_id, :proveedor_id, :publicacion_id,
+                    :titulo, :descripcion, :direccion, :ciudad, :zona,
+                    :fecha_preferida, :franja_horaria, 'pendiente'
+                )";
 
             $stmt = $this->conexion->prepare($sql);
-
             $stmt->execute([
-                ':cliente_id'           => $clienteIdReal, // ID de clientes.id
-                ':proveedor_id'         => $data['proveedor_id'],
-                ':publicacion_id'       => $data['publicacion_id'],
-                ':titulo'               => $data['titulo'],
-                ':descripcion'          => $data['descripcion'],
-                ':direccion'            => $data['direccion'],
-                ':ciudad'               => $data['ciudad'],
-                ':zona'                 => $data['zona'],
-                ':fecha_preferida'      => $data['fecha_servicio'] ?? $data['fecha_preferida'] ?? null,
-                ':franja_horaria'       => $data['franja_horaria']
+                ':cliente_id'      => $clienteIdReal,
+                ':proveedor_id'    => $data['proveedor_id'],
+                ':publicacion_id'  => $data['publicacion_id'],
+                ':titulo'          => $data['titulo'],
+                ':descripcion'     => $data['descripcion'],
+                ':direccion'       => $data['direccion'],
+                ':ciudad'          => $data['ciudad'],
+                ':zona'            => $data['zona'] ?? null,
+                ':fecha_preferida' => $data['fecha_servicio'] ?? $data['fecha_preferida'] ?? null,
+                ':franja_horaria'  => $data['franja_horaria']
             ]);
 
             $solicitudId = $this->conexion->lastInsertId();
             if (!$solicitudId) {
-                throw new Exception("No se pudo obtener el ID de la solicitud recién creada.");
+                throw new Exception("No se pudo obtener el ID de la solicitud.");
             }
 
-            // Insertar adjuntos si existen
+            // Adjuntos opcionales
             if (!empty($data['adjuntos']) && is_array($data['adjuntos'])) {
-                $sqlAdjunto = "INSERT INTO solicitud_adjuntos (
-                                   solicitud_id,
-                                   archivo,
-                                   tipo_archivo,
-                                   tamano
-                               ) VALUES (
-                                   :sid,
-                                   :arc,
-                                   :tip,
-                                   :tam
-                               )";
-
-                $stmtAdj = $this->conexion->prepare($sqlAdjunto);
+                $sqlAdj = "INSERT INTO solicitud_adjuntos (solicitud_id, archivo, tipo_archivo, tamano)
+                       VALUES (:sid, :arc, :tip, :tam)";
+                $stmtAdj = $this->conexion->prepare($sqlAdj);
 
                 foreach ($data['adjuntos'] as $adjunto) {
                     $stmtAdj->execute([
@@ -121,20 +93,11 @@ class Solicitud
 
             $this->conexion->commit();
             return true;
-        } catch (PDOException $e) {
-            error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
+        } catch (Exception $e) {
             if ($this->conexion->inTransaction()) {
                 $this->conexion->rollBack();
             }
-            return false;
-        } catch (PDOException $e) {
-            error_log("Error SQL en Solicitud::crear -> " . $e->getMessage());
-            if ($this->conexion->inTransaction()) $this->conexion->rollBack();
-
-            // 👇 TEMPORAL (dev): ver en pantalla el error exacto
-            echo "<pre>PDOException: " . htmlspecialchars($e->getMessage()) . "</pre>";
-            exit;
-
+            error_log("Error en Solicitud::crear -> " . $e->getMessage());
             return false;
         }
     }

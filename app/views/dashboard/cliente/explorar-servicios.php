@@ -193,19 +193,31 @@ $categorias = obtenerCategorias();
                     <h5 class="modal-title"><i class="bi bi-calendar-plus me-2"></i>Solicitar Servicio</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="<?= BASE_URL ?>/cliente/solicitar-servicio" method="POST">
+                <form action="<?= BASE_URL ?>/cliente/guardar-solicitud" method="POST" enctype="multipart/form-data">
                     <div class="modal-body p-4">
-                        <input type="hidden" name="accion" value="crear_solicitud">
-                        <input type="hidden" name="id_publicacion" id="modal_servicio_id">
+
+                        <!-- ✅ AGREGAR: acción y campo correcto -->
+                        <input type="hidden" name="accion" value="guardar_solicitud_cliente">
+                        <input type="hidden" name="publicacion_id" id="modal_servicio_id">
+
+                        <!-- ✅ AGREGAR: titulo (auto-generado del servicio) -->
+                        <input type="hidden" name="titulo" id="modal_servicio_titulo_input">
+
                         <div class="bg-light p-3 rounded-3 mb-4">
                             <small class="text-muted d-block mb-1">Estás solicitando:</small>
                             <strong id="modal_servicio_titulo" class="text-primary fs-5"></strong>
-                            <p class="mb-0 mt-2"><span class="text-muted">Precio desde:</span> <strong id="modal_servicio_precio" class="text-success"></strong></p>
+                            <p class="mb-0 mt-2">
+                                <span class="text-muted">Precio desde:</span>
+                                <strong id="modal_servicio_precio" class="text-success"></strong>
+                            </p>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Fecha preferida <span class="text-danger">*</span></label>
-                            <input type="date" name="fecha_preferida" class="form-control" min="<?= date('Y-m-d') ?>" required>
+                            <input type="date" name="fecha_preferida" class="form-control"
+                                min="<?= date('Y-m-d') ?>" required>
                         </div>
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Horario <span class="text-danger">*</span></label>
                             <select name="franja_horaria" class="form-select" required>
@@ -215,18 +227,36 @@ $categorias = obtenerCategorias();
                                 <option value="noche">Noche (18:00 - 22:00)</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Dirección <span class="text-danger">*</span></label>
-                            <input type="text" name="direccion" class="form-control" placeholder="Ingresa tu dirección" required>
+
+                        <!-- ✅ AGREGAR: ciudad obligatoria -->
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" name="direccion" class="form-control"
+                                    placeholder="Calle 123 # 45-67" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" name="ciudad" class="form-control"
+                                    placeholder="Bogotá" required>
+                            </div>
                         </div>
+
+                        <!-- ✅ Cambiar 'mensaje' por 'descripcion' -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Descripción adicional</label>
-                            <textarea name="mensaje" class="form-control" rows="3" placeholder="Detalles adicionales sobre el servicio..."></textarea>
+                            <label class="form-label fw-bold">
+                                Descripción del trabajo <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="descripcion" class="form-control" rows="3"
+                                placeholder="Cuéntale al proveedor qué necesitas..." required></textarea>
                         </div>
+
                     </div>
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-send me-2"></i>Enviar solicitud</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-2"></i>Enviar solicitud
+                        </button>
                     </div>
                 </form>
             </div>

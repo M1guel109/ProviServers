@@ -13,7 +13,7 @@ session_start();
 // Este controlador maneja acciones tanto de Cliente (Crear Solicitud) como de Proveedor.
 // Por lo tanto, validamos la sesión general primero.
 if (!isset($_SESSION['user']['id'])) {
-    mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para realizar esta acción.', '/ProviServers/login');
+    mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para realizar esta acción.', BASE_URL . '/login');
     exit();
 }
 
@@ -79,7 +79,7 @@ function mostrarOportunidades()
             'error',
             'Acceso denegado',
             'Solo proveedores pueden ver oportunidades.',
-            '/ProviServers/login'
+            BASE_URL . '/login'
         );
         exit();
     }
@@ -109,7 +109,7 @@ function enviarCotizacion()
             'error',
             'Acceso denegado',
             'Solo proveedores pueden enviar cotizaciones.',
-            '/ProviServers/login'
+            BASE_URL . '/login'
         );
         exit();
     }
@@ -128,7 +128,7 @@ function enviarCotizacion()
             'error',
             'Datos incompletos',
             'Debes seleccionar una publicación, escribir un título y definir un precio.',
-            '/ProviServers/proveedor/oportunidades'
+            BASE_URL . '/proveedor/oportunidades'
         );
         exit();
     }
@@ -149,14 +149,14 @@ function enviarCotizacion()
             'success',
             'Oferta enviada',
             'El cliente verá tu cotización.',
-            '/ProviServers/proveedor/oportunidades'
+            BASE_URL . '/proveedor/oportunidades'
         );
     } else {
         mostrarSweetAlert(
             'error',
             'Error',
             'No se pudo enviar. Verifica que la necesidad siga abierta y que la publicación seleccionada sea tuya y esté aprobada.',
-            '/ProviServers/proveedor/oportunidades'
+            BASE_URL . '/proveedor/oportunidades'
         );
     }
 
@@ -170,7 +170,7 @@ function enviarCotizacion()
 function mostrarServiciosContratadosProveedor()
 {
     if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', '/ProviServers/login');
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', BASE_URL . '/login');
         exit();
     }
 
@@ -275,13 +275,12 @@ function guardarSolicitud()
 {
     // Esto lo ejecuta el CLIENTE
     if ($_SESSION['user']['rol'] !== 'cliente') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo clientes pueden solicitar servicios.', '/ProviServers/login');
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo clientes pueden solicitar servicios.', BASE_URL . '/login');
         exit();
     }
 
     $clienteId     = (int) $_SESSION['user']['id'];
     $publicacionId = (int) ($_POST['publicacion_id'] ?? 0);
-    $titulo        = trim($_POST['titulo'] ?? '');
     $descripcion   = trim($_POST['descripcion'] ?? '');
     $direccion     = trim($_POST['direccion'] ?? '');
     $ciudad        = trim($_POST['ciudad'] ?? '');
@@ -289,21 +288,22 @@ function guardarSolicitud()
     $fecha         = trim($_POST['fecha_preferida'] ?? '');
     $franja        = trim($_POST['franja_horaria'] ?? '');
 
-
-
-    if (!$publicacionId || !$titulo || !$descripcion || !$direccion || !$ciudad || !$fecha) {
+    // ✅ Validar primero que tengamos los datos clave
+    if (!$publicacionId || !$descripcion || !$direccion || !$ciudad || !$fecha) {
         mostrarSweetAlert('error', 'Campos incompletos', 'Completa los campos obligatorios.');
         exit();
     }
 
-    $pubModel = new Publicacion();
-    $publicacion = $pubModel->obtenerPublicaActivaPorId($publicacionId);
+    $pubModel    = new Publicacion();
+    $publicacion = $pubModel->obtenerDetallePublicacion($publicacionId);
 
     if (!$publicacion) {
         mostrarSweetAlert('error', 'Error', 'La publicación no existe o no está activa.');
         exit();
     }
 
+    // ✅ El título lo tomamos directo de la publicación — no del form
+    $titulo      = $publicacion['titulo'] ?? $publicacion['servicio_nombre'] ?? 'Solicitud de servicio';
     $proveedorId = (int) $publicacion['proveedor_id'];
 
     $solicitudModel = new Solicitud();
@@ -373,7 +373,7 @@ function guardarSolicitud()
         $resultado = $solicitudModel->crear($data);
 
         if ($resultado === true) {
-            mostrarSweetAlert('success', 'Solicitud enviada', 'El proveedor recibirá tu solicitud.', '/ProviServers/cliente/explorar-servicios');
+            mostrarSweetAlert('success', 'Solicitud enviada', 'El proveedor recibirá tu solicitud.', BASE_URL . '/cliente/explorar-servicios');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo enviar la solicitud.');
         }
@@ -386,7 +386,7 @@ function guardarSolicitud()
 function aceptarSolicitud($id)
 {
     if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', '/ProviServers/login');
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', BASE_URL . '/login');
         exit();
     }
 
@@ -402,7 +402,7 @@ function aceptarSolicitud($id)
         $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', '/ProviServers/proveedor/nuevas_solicitudes');
+            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas_solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.');
         }
@@ -415,7 +415,7 @@ function aceptarSolicitud($id)
 function rechazarSolicitud($id)
 {
     if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', '/ProviServers/login');
+        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', BASE_URL . '/login');
         exit();
     }
 
@@ -431,7 +431,7 @@ function rechazarSolicitud($id)
         $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada.', '/ProviServers/proveedor/solicitudes');
+            mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada.', BASE_URL . '/proveedor/solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo rechazar la solicitud.');
         }
@@ -447,7 +447,7 @@ function mostrarDashboardProveedor()
             'error',
             'Acceso denegado',
             'Solo proveedores pueden acceder al panel.',
-            '/ProviServers/login'
+            BASE_URL . '/login'
         );
         exit();
     }
