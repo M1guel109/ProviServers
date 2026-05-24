@@ -279,20 +279,142 @@ function cerrarSesiones()
 }
 
 // -------------------------------------------------------------------
-// DISPONIBILIDAD (stub — PASO 3)
+// DISPONIBILIDAD — horarios y zona de cobertura
 // -------------------------------------------------------------------
 function guardarDisponibilidad()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $diasTrabajo        = $_POST['dias_trabajo']        ?? [];
+    $horaInicio         = trim($_POST['hora_inicio']    ?? '');
+    $horaFin            = trim($_POST['hora_fin']       ?? '');
+    $atiendeFinesSemana = isset($_POST['atiende_fines_semana']) ? 1 : 0;
+    $atiendeFestivos    = isset($_POST['atiende_festivos'])     ? 1 : 0;
+    $atencionUrgencias  = isset($_POST['atencion_urgencias'])   ? 1 : 0;
+    $detalleUrgencias   = trim($_POST['detalle_urgencias']      ?? '');
+    $tipoZona           = $_POST['tipo_zona']           ?? 'ciudad';
+    $radioKm            = $_POST['radio_km']            ?? '';
+    $zonasTexto         = trim($_POST['zonas_texto']    ?? '');
+
+    if (empty($diasTrabajo)) {
+        mostrarSweetAlert('error', 'Días requeridos', 'Selecciona al menos un día de trabajo.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+        exit();
+    }
+
+    if (empty($horaInicio) || empty($horaFin)) {
+        mostrarSweetAlert('error', 'Horario requerido', 'Debes indicar una hora de inicio y una hora de fin.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+        exit();
+    }
+
+    if ($horaInicio >= $horaFin) {
+        mostrarSweetAlert('error', 'Horario inválido', 'La hora de inicio debe ser menor que la hora de fin.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+        exit();
+    }
+
+    $tiposZonaPermitidos = ['ciudad', 'radio', 'varias_ciudades', 'remoto'];
+    if (!in_array($tipoZona, $tiposZonaPermitidos, true)) {
+        mostrarSweetAlert('error', 'Zona inválida', 'El tipo de zona de servicio seleccionado no es válido.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+        exit();
+    }
+
+    if ($tipoZona === 'radio' && ($radioKm === '' || !is_numeric($radioKm) || (int)$radioKm <= 0)) {
+        mostrarSweetAlert('error', 'Radio inválido', 'Indica un radio en kilómetros mayor a cero.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+        exit();
+    }
+
+    $data = [
+        'dias_trabajo'         => $diasTrabajo,
+        'hora_inicio'          => $horaInicio,
+        'hora_fin'             => $horaFin,
+        'atiende_fines_semana' => $atiendeFinesSemana,
+        'atiende_festivos'     => $atiendeFestivos,
+        'atencion_urgencias'   => $atencionUrgencias,
+        'detalle_urgencias'    => $detalleUrgencias,
+        'tipo_zona'            => $tipoZona,
+        'radio_km'             => $radioKm,
+        'zonas_texto'          => $zonasTexto,
+    ];
+
+    $modelo = new ProveedorPerfil();
+    $ok     = $modelo->guardarDisponibilidad($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Disponibilidad actualizada', 'Tu horario y zona de cobertura se guardaron correctamente.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudo guardar tu disponibilidad. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#disponibilidad');
+    }
     exit();
 }
 
 // -------------------------------------------------------------------
-// POLÍTICAS DE SERVICIO (stub — PASO 3)
+// POLÍTICAS DE SERVICIO — cancelación, garantía y condiciones
 // -------------------------------------------------------------------
 function guardarPoliticas()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#politicas');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $tipoCancelacion        = $_POST['tipo_cancelacion']           ?? 'moderada';
+    $descripcionCancelacion = trim($_POST['descripcion_cancelacion'] ?? '');
+    $permiteReprogramar     = isset($_POST['permite_reprogramar'])   ? 1 : 0;
+    $horasMinReprogramacion = trim($_POST['horas_min_reprogramacion'] ?? '');
+    $cobraVisita            = isset($_POST['cobra_visita'])          ? 1 : 0;
+    $valorVisita            = trim($_POST['valor_visita']           ?? '');
+    $ofreceGarantia         = isset($_POST['ofrece_garantia'])       ? 1 : 0;
+    $diasGarantia           = trim($_POST['dias_garantia']          ?? '');
+    $detallesGarantia       = trim($_POST['detalles_garantia']      ?? '');
+    $soloContactoPlataforma = isset($_POST['solo_contacto_por_plataforma']) ? 1 : 0;
+    $tiempoRespuesta        = trim($_POST['tiempo_respuesta_promedio'] ?? '');
+    $otrasCondiciones       = trim($_POST['otras_condiciones']      ?? '');
+
+    $tiposCancelacion = ['flexible', 'moderada', 'estricta'];
+    if (!in_array($tipoCancelacion, $tiposCancelacion, true)) {
+        mostrarSweetAlert('error', 'Política inválida', 'El tipo de política de cancelación seleccionado no es válido.', BASE_URL . '/proveedor/configuracion#politicas');
+        exit();
+    }
+
+    if ($permiteReprogramar && $horasMinReprogramacion !== '' && (!is_numeric($horasMinReprogramacion) || (int)$horasMinReprogramacion < 0)) {
+        mostrarSweetAlert('error', 'Horas inválidas', 'Las horas mínimas para reprogramar deben ser un número igual o mayor a cero.', BASE_URL . '/proveedor/configuracion#politicas');
+        exit();
+    }
+
+    if ($cobraVisita && ($valorVisita === '' || !is_numeric($valorVisita) || (float)$valorVisita <= 0)) {
+        mostrarSweetAlert('error', 'Valor de visita requerido', 'Si cobras por visita, indica un valor válido mayor a cero.', BASE_URL . '/proveedor/configuracion#politicas');
+        exit();
+    }
+
+    if ($ofreceGarantia && ($diasGarantia === '' || !is_numeric($diasGarantia) || (int)$diasGarantia <= 0)) {
+        mostrarSweetAlert('error', 'Días de garantía requeridos', 'Si ofreces garantía, indica un número de días mayor a cero.', BASE_URL . '/proveedor/configuracion#politicas');
+        exit();
+    }
+
+    if (strlen($tiempoRespuesta) > 50) {
+        mostrarSweetAlert('error', 'Texto demasiado largo', 'El tiempo de respuesta promedio no puede superar 50 caracteres.', BASE_URL . '/proveedor/configuracion#politicas');
+        exit();
+    }
+
+    $data = [
+        'tipo_cancelacion'             => $tipoCancelacion,
+        'descripcion_cancelacion'      => $descripcionCancelacion,
+        'permite_reprogramar'          => $permiteReprogramar,
+        'horas_min_reprogramacion'     => $horasMinReprogramacion,
+        'cobra_visita'                 => $cobraVisita,
+        'valor_visita'                 => $valorVisita,
+        'ofrece_garantia'              => $ofreceGarantia,
+        'dias_garantia'                => $diasGarantia,
+        'detalles_garantia'            => $detallesGarantia,
+        'solo_contacto_por_plataforma' => $soloContactoPlataforma,
+        'tiempo_respuesta_promedio'    => $tiempoRespuesta,
+        'otras_condiciones'            => $otrasCondiciones,
+    ];
+
+    $modelo = new ProveedorPerfil();
+    $ok     = $modelo->guardarPoliticas($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Políticas actualizadas', 'Tus políticas de servicio se guardaron correctamente.', BASE_URL . '/proveedor/configuracion#politicas');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus políticas. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#politicas');
+    }
     exit();
 }
 
