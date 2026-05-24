@@ -157,29 +157,124 @@ function guardarPerfilProfesional()
 }
 
 // -------------------------------------------------------------------
-// CREDENCIALES (stub — PASO 2)
+// CREDENCIALES — email y/o contraseña
 // -------------------------------------------------------------------
 function actualizarCredenciales()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#cuenta');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $emailNuevo        = trim($_POST['email_nuevo']        ?? '');
+    $emailConfirmacion = trim($_POST['email_confirmacion'] ?? '');
+    $claveActual       = $_POST['clave_actual']            ?? '';
+    $nuevaClave        = $_POST['nueva_clave']             ?? '';
+    $confirmarClave    = $_POST['confirmar_clave']         ?? '';
+
+    $cambios = [];
+
+    if (!empty($emailNuevo)) {
+        if (!filter_var($emailNuevo, FILTER_VALIDATE_EMAIL)) {
+            mostrarSweetAlert('error', 'Correo inválido', 'Ingresa un correo electrónico válido.', BASE_URL . '/proveedor/configuracion#cuenta');
+            exit();
+        }
+        if ($emailNuevo !== $emailConfirmacion) {
+            mostrarSweetAlert('error', 'Correos no coinciden', 'El nuevo correo y su confirmación deben ser iguales.', BASE_URL . '/proveedor/configuracion#cuenta');
+            exit();
+        }
+        $cambios['email'] = $emailNuevo;
+    }
+
+    if (!empty($nuevaClave)) {
+        if (strlen($nuevaClave) < 8) {
+            mostrarSweetAlert('error', 'Contraseña muy corta', 'La nueva contraseña debe tener al menos 8 caracteres.', BASE_URL . '/proveedor/configuracion#cuenta');
+            exit();
+        }
+        if ($nuevaClave !== $confirmarClave) {
+            mostrarSweetAlert('error', 'Contraseñas no coinciden', 'La nueva contraseña y su confirmación deben ser iguales.', BASE_URL . '/proveedor/configuracion#cuenta');
+            exit();
+        }
+        $cambios['clave'] = $nuevaClave;
+    }
+
+    if (empty($cambios)) {
+        mostrarSweetAlert('info', 'Sin cambios', 'No enviaste ningún dato para actualizar.', BASE_URL . '/proveedor/configuracion#cuenta');
+        exit();
+    }
+
+    if (empty($claveActual)) {
+        mostrarSweetAlert('error', 'Contraseña requerida', 'Debes ingresar tu contraseña actual para confirmar los cambios.', BASE_URL . '/proveedor/configuracion#cuenta');
+        exit();
+    }
+
+    $modelo    = new ProveedorPerfil();
+    $resultado = $modelo->actualizarCredenciales($idUsuario, $claveActual, $cambios);
+
+    switch ($resultado) {
+        case 'ok':
+            if (!empty($cambios['email'])) {
+                $_SESSION['user']['email'] = $cambios['email'];
+            }
+            mostrarSweetAlert('success', 'Credenciales actualizadas', 'Tus datos de acceso se guardaron correctamente.', BASE_URL . '/proveedor/configuracion#cuenta');
+            break;
+        case 'clave_incorrecta':
+            mostrarSweetAlert('error', 'Contraseña incorrecta', 'La contraseña actual ingresada no es correcta.', BASE_URL . '/proveedor/configuracion#cuenta');
+            break;
+        case 'email_duplicado':
+            mostrarSweetAlert('error', 'Correo en uso', 'El correo ingresado ya está registrado en otra cuenta.', BASE_URL . '/proveedor/configuracion#cuenta');
+            break;
+        case 'sin_cambios':
+            mostrarSweetAlert('info', 'Sin cambios', 'No se detectaron cambios para guardar.', BASE_URL . '/proveedor/configuracion#cuenta');
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'Ocurrió un problema al guardar. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#cuenta');
+    }
     exit();
 }
 
 // -------------------------------------------------------------------
-// SEGURIDAD (stub — PASO 2)
+// SEGURIDAD — alertas y tiempo de sesión
 // -------------------------------------------------------------------
 function actualizarSeguridad()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#cuenta');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $data = [
+        'alerta_solicitudes'   => isset($_POST['alerta_solicitudes']) ? 1 : 0,
+        'alerta_resenas'       => isset($_POST['alerta_resenas'])     ? 1 : 0,
+        'alerta_pagos'         => isset($_POST['alerta_pagos'])       ? 1 : 0,
+        'canal_notificaciones' => $_POST['canal_notificaciones']      ?? 'ambos',
+        'tiempo_sesion'        => (int)($_POST['tiempo_sesion']       ?? 60),
+    ];
+
+    $modelo = new ProveedorPerfil();
+    $ok     = $modelo->guardarSeguridad($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Preferencias guardadas', 'Tus preferencias de seguridad se actualizaron correctamente.', BASE_URL . '/proveedor/configuracion#cuenta');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#cuenta');
+    }
     exit();
 }
 
 // -------------------------------------------------------------------
-// CERRAR SESIONES (stub — PASO 2)
+// CERRAR SESIONES — destruye la sesión activa
 // -------------------------------------------------------------------
 function cerrarSesiones()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#cuenta');
+    $_SESSION = [];
+    session_unset();
+    session_destroy();
+
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(
+            session_name(), '', time() - 42000,
+            $params['path'], $params['domain'],
+            $params['secure'], $params['httponly']
+        );
+    }
+
+    mostrarSweetAlert('success', 'Sesión cerrada', 'Tu sesión se cerró correctamente.', BASE_URL . '/login');
     exit();
 }
 

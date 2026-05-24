@@ -397,4 +397,66 @@ class ProveedorPerfil
             return false;
         }
     }
+
+    // ======================================================================
+    // 5. ACTUALIZAR CREDENCIALES (email y/o contraseña en tabla usuarios)
+    // ======================================================================
+
+    public function actualizarCredenciales(int $usuarioId, string $claveActual, array $cambios): string
+    {
+        try {
+            if (empty($cambios['email']) && empty($cambios['clave'])) {
+                return 'sin_cambios';
+            }
+
+            $stmt = $this->conexion->prepare(
+                "SELECT email, clave FROM usuarios WHERE id = :id LIMIT 1"
+            );
+            $stmt->bindParam(':id', $usuarioId, PDO::PARAM_INT);
+            $stmt->execute();
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) {
+                return 'error';
+            }
+
+            if (!password_verify($claveActual, $usuario['clave'])) {
+                return 'clave_incorrecta';
+            }
+
+            $campos = [];
+            $params = [':id' => $usuarioId];
+
+            if (!empty($cambios['email'])) {
+                $stmtCheck = $this->conexion->prepare(
+                    "SELECT id FROM usuarios WHERE email = :email AND id <> :id LIMIT 1"
+                );
+                $stmtCheck->bindParam(':email', $cambios['email'], PDO::PARAM_STR);
+                $stmtCheck->bindParam(':id',    $usuarioId,        PDO::PARAM_INT);
+                $stmtCheck->execute();
+
+                if ($stmtCheck->fetch()) {
+                    return 'email_duplicado';
+                }
+
+                $campos[]         = 'email = :email';
+                $params[':email'] = $cambios['email'];
+            }
+
+            if (!empty($cambios['clave'])) {
+                $campos[]         = 'clave = :clave';
+                $params[':clave'] = password_hash($cambios['clave'], PASSWORD_DEFAULT);
+            }
+
+            $stmtUpd = $this->conexion->prepare(
+                "UPDATE usuarios SET " . implode(', ', $campos) . " WHERE id = :id"
+            );
+            $stmtUpd->execute($params);
+
+            return 'ok';
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorPerfil::actualizarCredenciales -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
 }
