@@ -1,14 +1,17 @@
 <?php
-// Importamos las dependencias
+
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/auth.php';
+require_once __DIR__ . '/../models/Auth.php';
 require_once __DIR__ . '/../models/membresia.php';
 
+// ===================================================================
+// ROUTER INTERNO — Dispatch por método HTTP y acción
+// ===================================================================
 
-// Capturamos en una variale el metodo o solicitud hecha al servidor
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
+
     case 'POST':
         $accion = $_POST['accion'] ?? '';
 
@@ -20,7 +23,8 @@ switch ($method) {
             recuperarPassword();
         } else {
             http_response_code(400);
-            echo "Acción no válida";
+            mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
+            exit();
         }
         break;
 
@@ -29,342 +33,298 @@ switch ($method) {
 
         if ($accion === 'cerrar_sesion') {
             cerrarSesion();
-        } else if ($accion === 'ver_registro') {
-            // Llamamos a la función que busca las categorías en la BD
-            $categorias_bd = cargarPaginaRegistro();
-            // Después de esto, tu sistema cargará la vista y el foreach funcionará.
-        } else {
-            http_response_code(400);
-            echo "Acción no válida";
         }
+        // Acciones GET restantes (ej. cargarRegistro) son llamadas
+        // explícitamente desde index.php tras el require_once.
         break;
 
     default:
         http_response_code(405);
-        echo "Metodo no permitido";
-        break;
+        mostrarSweetAlert('error', 'Método no permitido', 'Esta ruta no acepta ese tipo de petición.');
+        exit();
 }
 
-// ======================================================================
+// ===================================================================
 // FUNCIONES DEL CONTROLADOR
-// ======================================================================
+// ===================================================================
 
+// -------------------------------------------------------------------
+// INICIAR SESIÓN
+// -------------------------------------------------------------------
 function iniciarSesion()
 {
-    // CÓDIGO TEMPORAL PARA OBTENER EL HASH DE "123"
-    // Al cargar el login y dar clic en iniciar sesión, verás el código en pantalla.
-    
-    // $clave_test = "123";
-    // $hash = password_hash($clave_test, PASSWORD_DEFAULT);
-    // die("El hash para '123' es: " . $hash);
-    
+    $correo = trim($_POST['email'] ?? '');
+    $clave  = $_POST['clave']     ?? '';
 
-    // Capturamos en variables los valores enviados a traves de los name del formulario
-    $correo = $_POST['email'] ?? '';
-    $clave = $_POST['clave'] ?? '';
-
-    // Validamos que los campos/variables no esten vacios
     if (empty($correo) || empty($clave)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos');
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa correo y contraseña.');
         exit();
     }
 
-    // POO - Instaciamos las clases del modelo, para acceder a un method (funcion) en especifico
-    $login = new Auth();
-    $resultado = $login->autenticar($correo, $clave);
+    $modelo    = new Auth();
+    $resultado = $modelo->autenticar($correo, $clave);
 
-    // verificar si el modelo devolvio el error 
     if (isset($resultado['error'])) {
-        mostrarSweetAlert('error', 'Error de autenticacion', $resultado['error']);
+        mostrarSweetAlert('error', 'Error de autenticación', $resultado['error']);
         exit();
     }
 
-    /**
-     * VERIFICACIÓN DE ESTADOS
-     * Validamos el estado que viene del modelo antes de iniciar sesión
-     */
     switch ($resultado['estado']) {
         case 'bloqueado':
-            mostrarSweetAlert('error', 'Acceso Denegado', 'Tu cuenta ha sido bloqueada. Contacta al soporte.');
+            mostrarSweetAlert('error', 'Acceso denegado', 'Tu cuenta está bloqueada. Contacta al soporte.');
             exit();
-
         case 'pendiente':
-            mostrarSweetAlert('info', 'En Revisión', 'Tu perfil de proveedor está siendo evaluado por un administrador. Te enviaremos un correo pronto.');
+            mostrarSweetAlert('info', 'En revisión', 'Tu perfil de proveedor está siendo evaluado. Te notificaremos por correo.');
             exit();
-
         case 'inactivo':
-            mostrarSweetAlert('warning', 'Cuenta Inactiva', 'Tu cuenta está desactivada.');
+            mostrarSweetAlert('warning', 'Cuenta inactiva', 'Tu cuenta está desactivada. Contacta al soporte.');
             exit();
-
         case 'activo':
-            // Si está activo, permitimos que continúe el flujo de sesión
             break;
-
         default:
-            mostrarSweetAlert('error', 'Estado desconocido', 'Hubo un problema con tu cuenta.');
+            mostrarSweetAlert('error', 'Estado desconocido', 'Problema con el estado de tu cuenta. Contacta al soporte.');
             exit();
     }
 
     if ($resultado['rol'] === 'proveedor') {
-        $activador = new Membresia();
-        // Este método solo actuará si la membresía está inactiva y sin fechas.
-        $activador->activarSiEsNecesario($resultado['id']);
+        $membresia = new Membresia();
+        $membresia->activarSiEsNecesario($resultado['id']);
     }
 
-    // SI PASA ESTA LINEA, EL USUARIO ES VALIDO
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    session_regenerate_id(true);
+
     $_SESSION['user'] = [
-        'id' => $resultado['id'],
-        'rol' => $resultado['rol'],
-        'email' => $resultado['email']
+        'id'    => $resultado['id'],
+        'rol'   => $resultado['rol'],
+        'email' => $resultado['email'],
     ];
 
-    // Redireccion segun rol 
-    $redirectUrl = '/ProviServers/login';
-    $mensaje = 'Rol inexistente. Redirigiendo al inicio de sesión...';
+    $destinos = [
+        'admin'     => BASE_URL . '/admin/dashboard',
+        'proveedor' => BASE_URL . '/proveedor/dashboard',
+        'cliente'   => BASE_URL . '/cliente/dashboard',
+    ];
 
-    switch ($resultado['rol']) {
-        case 'admin':
-            $redirectUrl = '/ProviServers/admin/dashboard';
-            $mensaje = 'Bienvenido Administrador';
-            break;
-        case 'proveedor':
-            $redirectUrl = '/ProviServers/proveedor/dashboard';
-            $mensaje = 'Bienvenido Proveedor';
-            break;
-        case 'cliente':
-            $redirectUrl = '/ProviServers/cliente/dashboard';
-            $mensaje = 'Bienvenido Cliente';
-            break;
-    }
+    $redirect = $destinos[$resultado['rol']] ?? BASE_URL . '/login';
 
-    mostrarSweetAlert('success', 'Ingreso Exitoso', $mensaje, $redirectUrl);
+    mostrarSweetAlert('success', 'Ingreso exitoso', 'Bienvenido/a de vuelta.', $redirect);
     exit();
 }
 
-// Esta función sirve para CARGAR la página (Ver las categorías en el select)
-function cargarPaginaRegistro()
-{
-    $objAuth = new Auth();
-    // Traemos las categorías de la BD antes de que se muestre el HTML
-    $categorias_bd = $objAuth->obtenerTodasCategorias();
-
-    // Aquí es donde tu sistema de rutas cargaría la vista.
-    // Al haber definido $categorias_bd arriba, el foreach del HTML funcionará.
-    return $categorias_bd;
-}
-
+// -------------------------------------------------------------------
+// REGISTRAR USUARIO (Cliente o Proveedor)
+// -------------------------------------------------------------------
 function registrarUsuario()
 {
-    // 1. CAPTURA Y VALIDACIÓN BÁSICA DE DATOS
-    // --------------------------------------------
-    $nombres = $_POST['nombres'] ?? '';
-    $apellidos = $_POST['apellidos'] ?? '';
-    $documento = $_POST['documento'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $clave = $_POST['clave'] ?? '';
-    $confirmar = $_POST['confirmar'] ?? '';
-    $telefono = $_POST['telefono'] ?? '';
-    $ubicacion = $_POST['ubicacion'] ?? '';
-    $rol = $_POST['rol'] ?? '';
+    $nombres   = trim($_POST['nombres']   ?? '');
+    $apellidos = trim($_POST['apellidos'] ?? '');
+    $documento = trim($_POST['documento'] ?? '');
+    $email     = trim($_POST['email']     ?? '');
+    $clave     = $_POST['clave']          ?? '';
+    $confirmar = $_POST['confirmar']      ?? '';
+    $telefono  = trim($_POST['telefono']  ?? '');
+    $ubicacion = trim($_POST['ubicacion'] ?? '');
+    $rol       = trim($_POST['rol']       ?? '');
 
-    // CAPTURAR HABILIDADES
-    $habilidades = !empty($_POST['lista_categorias']) ? json_decode($_POST['lista_categorias'], true) : [];
+    $habilidades = [];
+    if (!empty($_POST['lista_categorias'])) {
+        $decoded     = json_decode($_POST['lista_categorias'], true);
+        $habilidades = is_array($decoded) ? $decoded : [];
+    }
 
-    // Validación de cantidad de habilidades (opcional pero recomendado)
-    if ($rol === 'proveedor' && count($habilidades) < 1) {
-        mostrarSweetAlert('error', 'Habilidades requeridas', 'Debes seleccionar al menos una habilidad en el Paso 4.');
+    if (
+        empty($nombres) || empty($apellidos) || empty($documento) ||
+        empty($email)   || empty($clave)     || empty($confirmar) ||
+        empty($telefono)|| empty($ubicacion) || empty($rol)
+    ) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Completa todos los campos del formulario.');
         exit();
     }
 
-    // Validamos campos obligatorios
-    if (empty($documento) || empty($email) || empty($clave) || empty($confirmar) || empty($nombres) || empty($apellidos) || empty($telefono) || empty($ubicacion) || empty($rol)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos del formulario');
-        exit();
-    }
-
-    // Validar que las claves coincidan
     if ($clave !== $confirmar) {
-        mostrarSweetAlert('error', 'Error de contraseña', 'Las contraseñas no coinciden. Intenta de nuevo.');
+        mostrarSweetAlert('error', 'Contraseñas no coinciden', 'Las contraseñas ingresadas no son iguales.');
         exit();
     }
 
-    // 2. LÓGICA DE CARGA DE ARCHIVOS DE PERFIL
-    // -----------------------------------------
-    $ruta_foto_perfil = 'default_user.png'; // Valor por defecto
+    if ($rol === 'proveedor' && count($habilidades) < 1) {
+        mostrarSweetAlert('error', 'Habilidades requeridas', 'Debes seleccionar al menos una habilidad en el paso 4.');
+        exit();
+    }
 
+    // — Foto de perfil —
+    $foto = 'default_user.png';
     if (!empty($_FILES['foto']['tmp_name'])) {
-        $file = $_FILES['foto'];
-
-        // Usamos la función auxiliar, cambiando el prefijo de 'foto_perfil' a 'usuario'
-        $ruta_foto_perfil = subirArchivo($file, '/public/uploads/usuarios/', ['png', 'jpg', 'jpeg'], 2 * 1024 * 1024, 'usuario');
-
-        if ($ruta_foto_perfil === false) {
-            mostrarSweetAlert('error', 'Error de Foto', 'Hubo un problema al cargar la foto de perfil o el formato es incorrecto (Max 2MB).');
+        $foto = subirArchivo(
+            $_FILES['foto'],
+            '/public/uploads/usuarios/',
+            ['png', 'jpg', 'jpeg'],
+            2 * 1024 * 1024,
+            'usuario'
+        );
+        if ($foto === false) {
+            mostrarSweetAlert('error', 'Error de foto', 'Formato o tamaño inválido. Máx. 2MB, JPG o PNG.');
             exit();
         }
     }
 
-    // 3. LÓGICA DE CARGA DE DOCUMENTOS (Solo para Proveedores)
-    // --------------------------------------------------------
-    $archivos_proveedor = [];
+    // — Documentos del proveedor —
+    $archivosProveedor = [];
     if ($rol === 'proveedor') {
-        $documentos_permitidos = ['doc-cedula', 'doc-foto', 'doc-antecedentes', 'doc-certificado'];
-        $directorio_docs = '/public/uploads/proveedores/documentos_proveedores/';
-        $max_size_docs = 5 * 1024 * 1024; // 5MB
+        $camposDoc = ['doc-cedula', 'doc-foto', 'doc-antecedentes', 'doc-certificado'];
+        $maxDoc    = 5 * 1024 * 1024;
 
-        foreach ($documentos_permitidos as $campo_name) {
-            // Si el campo no se envió, lo omitimos
-            if (empty($_FILES[$campo_name]['tmp_name'])) continue;
-
-            // Subir el archivo
-            $ruta_doc = subirArchivo($_FILES[$campo_name], $directorio_docs, ['png', 'jpg', 'jpeg', 'pdf'], $max_size_docs, $campo_name);
-
-            if ($ruta_doc === false) {
-                mostrarSweetAlert('error', 'Error de Documento', 'Hubo un problema al cargar el documento: ' . $campo_name);
+        foreach ($camposDoc as $campo) {
+            if (empty($_FILES[$campo]['tmp_name'])) {
+                continue;
+            }
+            $ruta = subirArchivo(
+                $_FILES[$campo],
+                '/public/uploads/documentos/',
+                ['png', 'jpg', 'jpeg', 'pdf'],
+                $maxDoc,
+                $campo
+            );
+            if ($ruta === false) {
+                mostrarSweetAlert('error', 'Error de documento', "Problema al cargar: {$campo}. Máx. 5MB, PDF o imagen.");
                 exit();
             }
-            $archivos_proveedor[$campo_name] = $ruta_doc;
+            $archivosProveedor[$campo] = $ruta;
         }
 
-        // Validamos que al menos los documentos básicos obligatorios se hayan subido
-        if (empty($archivos_proveedor['doc-cedula']) || empty($archivos_proveedor['doc-foto']) || empty($archivos_proveedor['doc-antecedentes'])) {
-            mostrarSweetAlert('error', 'Documentos obligatorios', 'Para registrarte como Proveedor, la Cédula, Selfie y Antecedentes son obligatorios.');
+        if (
+            empty($archivosProveedor['doc-cedula']) ||
+            empty($archivosProveedor['doc-foto'])   ||
+            empty($archivosProveedor['doc-antecedentes'])
+        ) {
+            mostrarSweetAlert('error', 'Documentos obligatorios', 'La cédula, selfie y antecedentes son obligatorios para proveedores.');
             exit();
         }
     }
 
-    // 4. PREPARAR Y ENVIAR DATOS AL MODELO
-    // --------------------------------------------------------
-    $objRegistro = new Auth();
+    $modelo    = new Auth();
+    $resultado = $modelo->registrarUsuario([
+        'nombres'              => $nombres,
+        'apellidos'            => $apellidos,
+        'documento'            => $documento,
+        'email'                => $email,
+        'clave'                => $clave,
+        'telefono'             => $telefono,
+        'ubicacion'            => $ubicacion,
+        'rol'                  => $rol,
+        'foto'                 => $foto,
+        'documentos'           => $archivosProveedor,
+        'habilidades'          => $habilidades,
+        'id_membresia_defecto' => 4,
+    ]);
 
-    $data = [
-        'nombres' => $nombres,
-        'apellidos' => $apellidos,
-        'documento' => $documento,
-        'email' => $email,
-        'clave' => $clave,
-        'telefono' => $telefono,
-        'ubicacion' => $ubicacion,
-        'rol' => $rol,
-        'foto' => $ruta_foto_perfil,
-        'documentos' => $archivos_proveedor,
-        'habilidades' => $habilidades,
-        'id_membresia_defecto' => 4
-    ];
-
-    $resultado = $objRegistro->registrarUsuario($data);
-
-    // 5. RESPUESTA Y REDIRECCIÓN
-    // --------------------------
     if ($resultado === true) {
-        if ($rol === 'proveedor') {
-            mostrarSweetAlert(
-                'success',
-                'Registro Recibido',
-                'Tus documentos han sido cargados exitosamente. Nuestro equipo los validará en un plazo de 24-48h. Te notificaremos por correo.',
-                BASE_URL . '/login'
-            );
-        } else {
-            mostrarSweetAlert(
-                'success',
-                '¡Bienvenido!',
-                'Tu cuenta ha sido creada con éxito. Ya puedes iniciar sesión y explorar.',
-                BASE_URL . '/login'
-            );
-        }
+        $msg = ($rol === 'proveedor')
+            ? 'Tus documentos fueron recibidos. El equipo los validará en 24-48h y te avisará por correo.'
+            : 'Tu cuenta fue creada con éxito. Ya puedes iniciar sesión.';
+        mostrarSweetAlert('success', '¡Registro exitoso!', $msg, BASE_URL . '/login');
     } elseif ($resultado === 'duplicado') {
-        mostrarSweetAlert('error', 'Error de Registro', 'El correo o documento ya están registrados.', BASE_URL . '/registro');
+        mostrarSweetAlert('error', 'Ya registrado', 'El correo o documento ya están registrados.', BASE_URL . '/registro');
     } else {
-        mostrarSweetAlert('error', 'Error al Registrar', 'Ocurrió un error inesperado. Intenta nuevamente.', BASE_URL . '/registro');
+        mostrarSweetAlert('error', 'Error al registrar', 'Ocurrió un error inesperado. Intenta nuevamente.', BASE_URL . '/registro');
     }
-
     exit();
 }
 
+// -------------------------------------------------------------------
+// RECUPERAR CONTRASEÑA
+// -------------------------------------------------------------------
 function recuperarPassword()
 {
-    $email = $_POST['correo'] ?? '';
+    $email = trim($_POST['correo'] ?? '');
 
-    // Validamos lo campos que son obligatorios
     if (empty($email)) {
-        mostrarSweetAlert('error', 'Campos vacío', 'Por favor completa el campo.');
+        mostrarSweetAlert('error', 'Campo vacío', 'Ingresa tu correo electrónico.');
         exit();
     }
 
-    $objModelo = new Auth();
-    $resultado = $objModelo->recuperarClave($email);
+    $modelo    = new Auth();
+    $resultado = $modelo->recuperarClave($email);
 
-    // Si la respuesta del modelo es verdadera confirmamos, si es falsa notificamos
     if ($resultado === true) {
-        mostrarSweetAlert('success', 'Nueva clave generada', 'Se ha enviado una nueva contraseña a tu correo electronico.', '/ProviServers/login');
+        mostrarSweetAlert('success', 'Nueva clave generada', 'Se envió una contraseña temporal a tu correo.', BASE_URL . '/login');
     } else {
-        mostrarSweetAlert('error', 'Usuario no encontrado', 'Verifique su correo electronico e Intente nuevamente.');
+        mostrarSweetAlert('error', 'Usuario no encontrado', 'Verifica el correo e intenta nuevamente.');
     }
     exit();
 }
 
+// -------------------------------------------------------------------
+// CERRAR SESIÓN
+// -------------------------------------------------------------------
 function cerrarSesion()
 {
-    // Iniciar sesión si no está iniciada
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
 
-    // Vaciar variables de sesión
     $_SESSION = [];
-
-    // Destruir sesión
     session_unset();
     session_destroy();
 
-    // Eliminar cookie de sesión (opcional pero recomendado)
-    if (ini_get("session.use_cookies")) {
+    if (ini_get('session.use_cookies')) {
         $params = session_get_cookie_params();
         setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params["path"],
-            $params["domain"],
-            $params["secure"],
-            $params["httponly"]
+            session_name(), '', time() - 42000,
+            $params['path'], $params['domain'],
+            $params['secure'], $params['httponly']
         );
     }
 
-    // Redirigir al login
-    header("Location: " . BASE_URL . "/login");
+    header('Location: ' . BASE_URL . '/login');
     exit();
 }
 
-// ======================================================================
-// FUNCIONES AUXILIARES
-// ======================================================================
+// -------------------------------------------------------------------
+// CARGAR VISTA DE REGISTRO (precarga categorías antes del HTML)
+// -------------------------------------------------------------------
+function cargarRegistro()
+{
+    $modelo        = new Auth();
+    $categorias_bd = $modelo->obtenerTodasCategorias();
+    require BASE_PATH . '/app/views/auth/registro.php';
+    exit();
+}
+
+// ===================================================================
+// FUNCIÓN AUXILIAR — SUBIDA DE ARCHIVOS
+// ===================================================================
 
 /**
- * Función genérica para subir un archivo de forma segura.
- * @param array $file Array $_FILES del archivo.
- * @param string $destino_dir Directorio donde se guardará (ej: '/public/uploads/').
- * @param array $permitidas Extensiones permitidas.
- * @param int $max_size Tamaño máximo en bytes.
- * @param string $prefijo Prefijo para el nombre único del archivo.
- * @return string|false Nombre del archivo guardado o false si hay error.
+ * Sube un archivo al servidor y devuelve su nombre final o false si falla.
+ *
+ * @param  array  $file         Entrada de $_FILES.
+ * @param  string $dirRelativo  Ruta relativa al BASE_PATH (ej. '/public/uploads/usuarios/').
+ * @param  array  $extensiones  Extensiones permitidas (ej. ['jpg', 'png']).
+ * @param  int    $maxBytes     Tamaño máximo en bytes.
+ * @param  string $prefijo      Prefijo del nombre de archivo generado.
+ * @return string|false
  */
-function subirArchivo($file, $destino_dir, $permitidas, $max_size, $prefijo = 'file')
+function subirArchivo($file, $dirRelativo, $extensiones, $maxBytes, $prefijo = 'file')
 {
-    if ($file['error'] !== UPLOAD_ERR_OK) return false;
-
-    $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($extension, $permitidas)) return false;
-
-    if ($file['size'] > $max_size) return false;
-
-    $nombre_archivo = $prefijo . '_' . uniqid() . '.' . $extension;
-    $destino_completo = BASE_PATH . $destino_dir . $nombre_archivo;
-
-    if (move_uploaded_file($file['tmp_name'], $destino_completo)) {
-        return $nombre_archivo;
-    } else {
+    if ($file['error'] !== UPLOAD_ERR_OK) {
         return false;
     }
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+    if (!in_array($ext, $extensiones, true)) {
+        return false;
+    }
+
+    if ($file['size'] > $maxBytes) {
+        return false;
+    }
+
+    $nombre  = $prefijo . '_' . uniqid() . '.' . $ext;
+    $destino = BASE_PATH . $dirRelativo . $nombre;
+
+    return move_uploaded_file($file['tmp_name'], $destino) ? $nombre : false;
 }

@@ -54,34 +54,36 @@ switch ($request) {
         break;
 
     case '/registro':
-        require BASE_PATH . '/app/views/auth/registro.php';
+        // Carga categorías en $categorias_bd antes de renderizar el HTML
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
+        cargarRegistro();
         break;
 
     case '/restablecer-contrasena':
         require BASE_PATH . '/app/views/auth/restablecer-contrasena.php';
         break;
 
-    // AUTENTICACIÓN — Procesos
+    // AUTENTICACIÓN — Procesos (el switch interno del controller despacha por $_POST['accion'])
 
     case '/iniciar-sesion':
-        require BASE_PATH . '/app/controllers/auth-controller.php';
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/registro-usuario':
-        require BASE_PATH . '/app/controllers/auth-controller.php';
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/generar-clave':
-        require BASE_PATH . '/app/controllers/auth-controller.php';
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     case '/cerrar-sesion':
         $_GET['accion'] = 'cerrar_sesion';
-        require BASE_PATH . '/app/controllers/auth-controller.php';
-        break;  
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
+        break;
 
     case '/idioma':
-        require BASE_PATH . '/app/controllers/idioma-controller.php';
+        require_once BASE_PATH . '/app/controllers/idioma-controller.php';
         break;
 
     // ==================================================
@@ -368,35 +370,36 @@ switch ($request) {
         break;
 
     case '/proveedor/actualizar-credenciales':
-        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/actualizar-seguridad':
-        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/cerrar-sesiones':
-        require BASE_PATH . '/app/controllers/proveedor-cuenta-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/guardar-disponibilidad':
-        require BASE_PATH . '/app/controllers/proveedor-disponibilidad-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/guardar-notificaciones':
-        require BASE_PATH . '/app/controllers/proveedor-notificaciones-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/guardar-pagos':
-        require BASE_PATH . '/app/controllers/proveedor-pagos-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/guardar-politicas':
-        require BASE_PATH . '/app/controllers/proveedor-politicas-controller.php';
+        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/logout':
-        require BASE_PATH . '/app/controllers/auth-controller.php';
+        $_GET['accion'] = 'cerrar_sesion';
+        require_once BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
     // ==================================================

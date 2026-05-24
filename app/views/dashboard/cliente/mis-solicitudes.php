@@ -31,9 +31,8 @@
         <?php
         $tabs = [
           'pendiente' => 'Pendientes',
-          'aceptada'  => 'Aceptadas',
           'rechazada' => 'Rechazadas',
-          'cancelada' => 'Canceladas'
+
         ];
         ?>
         <?php foreach ($tabs as $key => $label): ?>
@@ -105,7 +104,11 @@
                 <?php endforeach; ?>
               </div>
             <?php else: ?>
-              <div class="alert alert-info mb-0">No tienes solicitudes en este estado.</div>
+              <div class="alert alert-info mb-0"> No tienes solicitudes pendientes.
+                <a href="<?= BASE_URL ?>/cliente/servicios-contratados">
+                  Ver tus servicios contratados →
+                </a>
+              </div>
             <?php endif; ?>
           </div>
         </div>
@@ -170,6 +173,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <!-- JS propio -->
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 
 </html>

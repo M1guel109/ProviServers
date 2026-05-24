@@ -402,7 +402,7 @@ function aceptarSolicitud($id)
         $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas_solicitudes');
+            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.');
         }

@@ -143,6 +143,7 @@ class Solicitud
                     LEFT JOIN solicitud_adjuntos sa ON sa.solicitud_id = s.id
 
                     WHERE pr.usuario_id = :usuario_id
+                    AND s.estado = 'pendiente'
                     GROUP BY s.id
                     ORDER BY s.created_at DESC";
 

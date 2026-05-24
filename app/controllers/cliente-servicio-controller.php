@@ -23,11 +23,9 @@ switch ($method) {
 
         if ($accion === 'calificar_servicio') {
             calificarServicio();
-        } 
-        elseif ($accion === 'cancelar_servicio') {
+        } elseif ($accion === 'cancelar_servicio') {
             cancelarServicio();
-        } 
-        else {
+        } else {
             http_response_code(400);
             echo "Acción POST no válida";
         }
@@ -35,11 +33,10 @@ switch ($method) {
 
     case 'GET':
         $accion = $_GET['accion'] ?? '';
-        
+
         if ($accion === 'ver_solicitudes') {
             mostrarSolicitudes();
-        } 
-        else {
+        } else {
             // Por defecto, si no hay acción o es 'ver_servicios', mostramos los contratados
             mostrarServiciosContratados();
         }
@@ -78,7 +75,7 @@ function mostrarServiciosContratados()
 
                 case 'cancelado_cliente':
                 case 'cancelado_proveedor':
-                case 'cancelado': 
+                case 'cancelado':
                     $serviciosCancelados[] = $c;
                     break;
 
@@ -96,7 +93,7 @@ function mostrarServiciosContratados()
     }
 
     // Finalmente cargamos la vista
-    require BASE_PATH . '/app/views/dashboard/cliente/serviciosContratados.php';
+    require BASE_PATH . '/app/views/dashboard/cliente/servicios-contratados.php';
     exit();
 }
 
@@ -169,6 +166,6 @@ function mostrarSolicitudes()
     }
 
     // Cargar vista
-    require_once BASE_PATH . '/app/views/dashboard/cliente/misSolicitudes.php';
+    require_once BASE_PATH . '/app/views/dashboard/cliente/mis-solicitudes.php';
     exit();
 }
