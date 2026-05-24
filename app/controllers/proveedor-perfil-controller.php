@@ -419,19 +419,113 @@ function guardarPoliticas()
 }
 
 // -------------------------------------------------------------------
-// NOTIFICACIONES (stub — PASO 4)
+// NOTIFICACIONES — preferencias de alertas y canales
 // -------------------------------------------------------------------
 function guardarNotificaciones()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#notificaciones');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $data = [
+        'noti_solicitudes_nuevas' => isset($_POST['noti_solicitudes_nuevas']) ? 1 : 0,
+        'noti_cambios_estado'     => isset($_POST['noti_cambios_estado'])     ? 1 : 0,
+        'noti_resenas'            => isset($_POST['noti_resenas'])            ? 1 : 0,
+        'noti_pagos'              => isset($_POST['noti_pagos'])              ? 1 : 0,
+        'canal_email'             => isset($_POST['canal_email'])             ? 1 : 0,
+        'canal_interna'           => isset($_POST['canal_interna'])           ? 1 : 0,
+        'canal_whatsapp'          => isset($_POST['canal_whatsapp'])          ? 1 : 0,
+        'resumen_diario'          => isset($_POST['resumen_diario'])          ? 1 : 0,
+        'resumen_semanal'         => isset($_POST['resumen_semanal'])         ? 1 : 0,
+    ];
+
+    $modelo = new ProveedorNotificaciones();
+    $ok     = $modelo->guardarDesdeFormulario($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Notificaciones actualizadas', 'Tus preferencias de notificación se guardaron correctamente.', BASE_URL . '/proveedor/configuracion#notificaciones');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#notificaciones');
+    }
     exit();
 }
 
 // -------------------------------------------------------------------
-// PAGOS Y FACTURACIÓN (stub — PASO 4)
+// PAGOS Y FACTURACIÓN — datos fiscales y bancarios
 // -------------------------------------------------------------------
 function guardarPagos()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/proveedor/configuracion#pagos');
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $tipoDocumento        = trim($_POST['tipo_documento']        ?? '');
+    $numeroDocumento      = trim($_POST['numero_documento']      ?? '');
+    $razonSocial          = trim($_POST['razon_social']          ?? '');
+    $regimenFiscal        = trim($_POST['regimen_fiscal']        ?? '');
+    $direccionFacturacion = trim($_POST['direccion_facturacion'] ?? '');
+    $ciudadFacturacion    = trim($_POST['ciudad_facturacion']    ?? '');
+    $paisFacturacion      = trim($_POST['pais_facturacion']      ?? 'Colombia');
+    $correoFacturacion    = trim($_POST['correo_facturacion']    ?? '');
+    $telefonoFacturacion  = trim($_POST['telefono_facturacion']  ?? '');
+
+    $banco                 = trim($_POST['banco']                  ?? '');
+    $tipoCuenta            = trim($_POST['tipo_cuenta']            ?? '');
+    $numeroCuenta          = trim($_POST['numero_cuenta']          ?? '');
+    $titularCuenta         = trim($_POST['titular_cuenta']         ?? '');
+    $identificacionTitular = trim($_POST['identificacion_titular'] ?? '');
+    $metodoPagoPreferido   = trim($_POST['metodo_pago_preferido']  ?? '');
+    $notaMetodoPago        = trim($_POST['nota_metodo_pago']       ?? '');
+
+    $frecuenciaLiquidacion    = trim($_POST['frecuencia_liquidacion']     ?? '');
+    $montoMinimoRetiro        = trim($_POST['monto_minimo_retiro']        ?? '');
+    $aceptaFacturaElectronica = isset($_POST['acepta_factura_electronica']) ? 1 : 0;
+
+    if (
+        empty($tipoDocumento)     || empty($numeroDocumento)      ||
+        empty($razonSocial)       || empty($direccionFacturacion) ||
+        empty($ciudadFacturacion) || empty($paisFacturacion)      ||
+        empty($correoFacturacion)
+    ) {
+        mostrarSweetAlert('error', 'Campos obligatorios', 'Completa todos los campos requeridos de facturación.', BASE_URL . '/proveedor/configuracion#pagos');
+        exit();
+    }
+
+    if (!filter_var($correoFacturacion, FILTER_VALIDATE_EMAIL)) {
+        mostrarSweetAlert('error', 'Correo inválido', 'El correo de facturación no tiene un formato válido.', BASE_URL . '/proveedor/configuracion#pagos');
+        exit();
+    }
+
+    if ($montoMinimoRetiro !== '' && (!is_numeric($montoMinimoRetiro) || (float)$montoMinimoRetiro < 0)) {
+        mostrarSweetAlert('error', 'Monto inválido', 'El monto mínimo de retiro debe ser un número igual o mayor a cero.', BASE_URL . '/proveedor/configuracion#pagos');
+        exit();
+    }
+
+    $data = [
+        'tipo_documento'              => $tipoDocumento,
+        'numero_documento'            => $numeroDocumento,
+        'razon_social'                => $razonSocial,
+        'regimen_fiscal'              => $regimenFiscal        ?: null,
+        'direccion_facturacion'       => $direccionFacturacion,
+        'ciudad_facturacion'          => $ciudadFacturacion,
+        'pais_facturacion'            => $paisFacturacion,
+        'correo_facturacion'          => $correoFacturacion,
+        'telefono_facturacion'        => $telefonoFacturacion  ?: null,
+        'banco'                       => $banco                ?: null,
+        'tipo_cuenta'                 => $tipoCuenta           ?: null,
+        'numero_cuenta'               => $numeroCuenta         ?: null,
+        'titular_cuenta'              => $titularCuenta        ?: null,
+        'identificacion_titular'      => $identificacionTitular ?: null,
+        'metodo_pago_preferido'       => $metodoPagoPreferido  ?: null,
+        'nota_metodo_pago'            => $notaMetodoPago       ?: null,
+        'frecuencia_liquidacion'      => $frecuenciaLiquidacion ?: null,
+        'monto_minimo_retiro'         => $montoMinimoRetiro !== '' ? $montoMinimoRetiro : null,
+        'acepta_factura_electronica'  => $aceptaFacturaElectronica,
+    ];
+
+    $modelo = new ProveedorPagosFacturacion();
+    $ok     = $modelo->guardarDesdeFormulario($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Facturación guardada', 'Tu información de pagos y facturación se guardó correctamente.', BASE_URL . '/proveedor/configuracion#pagos');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudo guardar tu información de pagos. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion#pagos');
+    }
     exit();
 }
