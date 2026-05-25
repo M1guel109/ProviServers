@@ -121,10 +121,6 @@ switch ($request) {
     // ADMINISTRADOR — Perfil
 
     case '/admin/perfil/cambiar-clave':
-        require BASE_PATH . '/app/controllers/perfil-controller.php';
-        cambiarContrasenaUsuario();
-        break;
-
     case '/admin/perfil/actualizar':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
         break;
@@ -486,7 +482,6 @@ switch ($request) {
 
     case '/cliente/perfil/cambiar-clave':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
-        cambiarContrasenaUsuario('/cliente/perfil');
         break;
 
     // CLIENTE — Mensajes
