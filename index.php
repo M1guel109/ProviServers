@@ -201,15 +201,15 @@ switch ($request) {
         break;
 
     case '/admin/guardar-membresia':
-        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     case '/admin/actualizar-membresia':
-        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     case '/admin/eliminar-membresia':
-        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     case '/admin/consultar-suscripciones':
@@ -217,7 +217,7 @@ switch ($request) {
         break;
 
     case '/admin/suscripcion-detalle':
-        require_once BASE_PATH . '/app/controllers/membresia-controller.php';
+        require_once BASE_PATH . '/app/controllers/admin-controller.php';
         obtenerDetalleJSON($_GET['id'] ?? null);
         break;
 

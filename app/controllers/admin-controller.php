@@ -533,47 +533,199 @@ function procesarImagenCategoria(array $file): array
 }
 
 // ===================================================================
-// FUNCIONES — MEMBRESÍAS, SUSCRIPCIONES, MODERACIÓN, REPORTES
-// Implementadas en PASO 2 y PASO 3
+// FUNCIONES — MEMBRESÍAS
 // ===================================================================
 
+// -------------------------------------------------------------------
+// REGISTRAR MEMBRESÍA
+// -------------------------------------------------------------------
 function registrarMembresia()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/admin/consultar-membresias');
+    $tipo        = trim($_POST['tipo']             ?? '');
+    $descripcion = trim($_POST['descripcion']      ?? '');
+    $costo       = trim($_POST['costo']            ?? '');
+    $dias        = trim($_POST['duracion_dias']    ?? '');
+    $estado      = trim($_POST['estado']           ?? 'activa');
+    $destacado   = isset($_POST['es_destacado'])            ? 1 : 0;
+    $stats       = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
+    $videos      = isset($_POST['permite_videos'])          ? 1 : 0;
+    $max_serv    = (int)($_POST['max_servicios_activos']    ?? 0);
+    $orden_raw   = $_POST['orden_visual'] ?? '';
+    $orden       = ($orden_raw !== '') ? (int)$orden_raw : null;
+
+    if (empty($tipo) || empty($descripcion) || $costo === '' || empty($dias)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
+        exit();
+    }
+
+    $modelo    = new Membresia();
+    $resultado = $modelo->registrar([
+        'tipo'                    => $tipo,
+        'descripcion'             => $descripcion,
+        'costo'                   => $costo,
+        'duracion_dias'           => $dias,
+        'estado'                  => $estado,
+        'es_destacado'            => $destacado,
+        'orden_visual'            => $orden,
+        'max_servicios_activos'   => $max_serv,
+        'acceso_estadisticas_pro' => $stats,
+        'permite_videos'          => $videos,
+    ]);
+
+    if ($resultado) {
+        mostrarSweetAlert('success', 'Membresía creada', 'La membresía fue registrada correctamente.', BASE_URL . '/admin/consultar-membresias');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo guardar la membresía. Intenta nuevamente.');
+    }
     exit();
 }
 
+// -------------------------------------------------------------------
+// ACTUALIZAR MEMBRESÍA
+// -------------------------------------------------------------------
 function actualizarMembresia()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/admin/consultar-membresias');
+    $id          = (int)($_POST['id']             ?? 0);
+    $tipo        = trim($_POST['tipo']             ?? '');
+    $descripcion = trim($_POST['descripcion']      ?? '');
+    $costo       = trim($_POST['costo']            ?? '');
+    $dias        = trim($_POST['duracion_dias']    ?? '');
+    $estado      = trim($_POST['estado']           ?? 'activa');
+    $destacado   = isset($_POST['es_destacado'])            ? 1 : 0;
+    $stats       = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
+    $videos      = isset($_POST['permite_videos'])          ? 1 : 0;
+    $max_serv    = (int)($_POST['max_servicios_activos']    ?? 0);
+    $orden_raw   = $_POST['orden_visual'] ?? '';
+    $orden       = ($orden_raw !== '') ? (int)$orden_raw : null;
+
+    if (!$id || empty($tipo) || empty($descripcion) || $costo === '' || empty($dias)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa todos los campos obligatorios.');
+        exit();
+    }
+
+    $modelo    = new Membresia();
+    $resultado = $modelo->actualizar([
+        'id'                      => $id,
+        'tipo'                    => $tipo,
+        'descripcion'             => $descripcion,
+        'costo'                   => $costo,
+        'duracion_dias'           => $dias,
+        'estado'                  => $estado,
+        'es_destacado'            => $destacado,
+        'orden_visual'            => $orden,
+        'max_servicios_activos'   => $max_serv,
+        'acceso_estadisticas_pro' => $stats,
+        'permite_videos'          => $videos,
+    ]);
+
+    if ($resultado) {
+        mostrarSweetAlert('success', 'Membresía actualizada', 'Los cambios fueron guardados correctamente.', BASE_URL . '/admin/consultar-membresias');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar la membresía. Intenta nuevamente.');
+    }
     exit();
 }
 
+// -------------------------------------------------------------------
+// ELIMINAR MEMBRESÍA
+// -------------------------------------------------------------------
 function eliminarMembresia($id)
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/admin/consultar-membresias');
+    $id = (int)$id;
+    if (!$id) {
+        mostrarSweetAlert('error', 'ID inválido', 'No se proporcionó un ID válido.', BASE_URL . '/admin/consultar-membresias');
+        exit();
+    }
+
+    $modelo = new Membresia();
+
+    if ($modelo->tieneProveedores($id)) {
+        mostrarSweetAlert('warning', 'No se puede eliminar', 'Esta membresía está asignada a proveedores activos.', BASE_URL . '/admin/consultar-membresias');
+        exit();
+    }
+
+    if ($modelo->eliminar($id)) {
+        mostrarSweetAlert('success', 'Membresía eliminada', 'La membresía fue eliminada correctamente.', BASE_URL . '/admin/consultar-membresias');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar la membresía.', BASE_URL . '/admin/consultar-membresias');
+    }
     exit();
 }
 
-function mostrarMembresias() { return []; }
-function mostrarMembresiaId($id) { return null; }
+// -------------------------------------------------------------------
+// FUNCIONES DE LECTURA (usadas por vistas y AJAX)
+// -------------------------------------------------------------------
+function mostrarMembresias()
+{
+    $modelo = new Membresia();
+    return $modelo->mostrar();
+}
 
+function mostrarMembresiaId($id)
+{
+    $modelo = new Membresia();
+    return $modelo->mostrarId($id);
+}
+
+// ===================================================================
+// FUNCIONES — SUSCRIPCIONES
+// ===================================================================
+
+// -------------------------------------------------------------------
+// CANCELAR SUSCRIPCIÓN
+// -------------------------------------------------------------------
 function cancelarSuscripcion($id)
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/admin/consultar-suscripciones');
+    $id = (int)$id;
+    if (!$id) {
+        mostrarSweetAlert('error', 'ID inválido', 'No se proporcionó un ID válido.', BASE_URL . '/admin/consultar-suscripciones');
+        exit();
+    }
+
+    $modelo = new Suscripcion();
+    if ($modelo->cancelar($id)) {
+        mostrarSweetAlert('success', 'Suscripción cancelada', 'La suscripción fue cancelada correctamente.', BASE_URL . '/admin/consultar-suscripciones');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo cancelar la suscripción.', BASE_URL . '/admin/consultar-suscripciones');
+    }
     exit();
 }
 
+// -------------------------------------------------------------------
+// ELIMINAR SUSCRIPCIÓN
+// -------------------------------------------------------------------
 function eliminarSuscripcion($id)
 {
-    mostrarSweetAlert('info', 'En construcción', 'Esta función estará disponible en el siguiente paso.', BASE_URL . '/admin/consultar-suscripciones');
+    $id = (int)$id;
+    if (!$id) {
+        mostrarSweetAlert('error', 'ID inválido', 'No se proporcionó un ID válido.', BASE_URL . '/admin/consultar-suscripciones');
+        exit();
+    }
+
+    $modelo = new Suscripcion();
+    if ($modelo->eliminar($id)) {
+        mostrarSweetAlert('success', 'Suscripción eliminada', 'El registro fue eliminado permanentemente.', BASE_URL . '/admin/consultar-suscripciones');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el registro.', BASE_URL . '/admin/consultar-suscripciones');
+    }
     exit();
 }
 
+// -------------------------------------------------------------------
+// AJAX — Detalle de suscripción
+// -------------------------------------------------------------------
 function obtenerDetalleJSON($id)
 {
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Función en construcción.']);
+    $id = (int)$id;
+    if (!$id) {
+        echo json_encode(['error' => 'ID no proporcionado']);
+        exit;
+    }
+
+    $modelo = new Suscripcion();
+    $dato   = $modelo->obtenerPorId($id);
+    echo json_encode($dato ?: ['error' => 'Suscripción no encontrada']);
     exit;
 }
 
