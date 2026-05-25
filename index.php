@@ -318,77 +318,27 @@ switch ($request) {
         break;
 
     case '/proveedor/solicitudes':
-        require BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        break;
-
     case '/proveedor/en-proceso':
-        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        require BASE_PATH . '/app/views/dashboard/proveedor/en-proceso.php';
-        break;
-
     case '/proveedor/actualizar-estado':
-        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        break;
-
-    // PROVEEDOR — Oportunidades y cotizaciones
-
     case '/proveedor/oportunidades':
-        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        mostrarOportunidades();
-        break;
-
     case '/proveedor/oportunidades/enviar-cotizacion':
-        require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        break;
-
-    // PROVEEDOR — Reseñas
-
     case '/proveedor/resenas':
-        require_once BASE_PATH . '/app/controllers/proveedor-resenas-controller.php';
-        mostrarResenasProveedor();
-        break;
-
     case '/proveedor/resenas/responder':
-        require_once BASE_PATH . '/app/controllers/proveedor-resenas-controller.php';
-        guardarRespuestaProveedor();
+    case '/proveedor/guardar-perfil-profesional':
+    case '/proveedor/actualizar-credenciales':
+    case '/proveedor/actualizar-seguridad':
+    case '/proveedor/cerrar-sesiones':
+    case '/proveedor/guardar-disponibilidad':
+    case '/proveedor/guardar-notificaciones':
+    case '/proveedor/guardar-pagos':
+    case '/proveedor/guardar-politicas':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
-    // PROVEEDOR — Configuración y perfil
+    // PROVEEDOR — Configuración y perfil (vista estática)
 
     case '/proveedor/configuracion':
         require BASE_PATH . '/app/views/dashboard/proveedor/configuracion-proveedor.php';
-        break;
-
-    case '/proveedor/guardar-perfil-profesional':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/actualizar-credenciales':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/actualizar-seguridad':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/cerrar-sesiones':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/guardar-disponibilidad':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/guardar-notificaciones':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/guardar-pagos':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
-        break;
-
-    case '/proveedor/guardar-politicas':
-        require BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
         break;
 
     case '/proveedor/logout':

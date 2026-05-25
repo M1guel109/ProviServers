@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/perfil.php';
+require_once __DIR__ . '/../models/Perfil.php';
 
 // ===================================================================
 // GUARD DE SESIÓN

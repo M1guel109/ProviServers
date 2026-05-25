@@ -1,17 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session-proveedor.php';
-require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-
-// Llamamos al controlador para obtener los datos
-$servicios = mostrarServiciosContratadosProveedor();
-
-// Estadísticas simples (puedes refinarlas luego)
-$stats = [
-    'en_proceso' => count($servicios),
-    'para_hoy'   => 0, 
-    'vencen'     => 0,
-    'promedio'   => 0,
-];
+// $servicios y $stats son inyectados por mostrarEnProceso() en proveedor-controller.php
 ?>
 
 <!DOCTYPE html>

@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/mensajeria.php';
+require_once __DIR__ . '/../models/Mensajeria.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL

@@ -1,11 +1,11 @@
-<?php
+﻿<?php
 // Importamos las dependencias necesarias
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/necesidad.php';
-require_once __DIR__ . '/../models/cotizacion.php';
-require_once __DIR__ . '/../models/solicitud.php';
-require_once __DIR__ . '/../models/servicio-contratado.php';
-require_once __DIR__ . '/../models/publicacion.php';
+require_once __DIR__ . '/../models/Necesidad.php';
+require_once __DIR__ . '/../models/Cotizacion.php';
+require_once __DIR__ . '/../models/Solicitud.php';
+require_once __DIR__ . '/../models/ServicioContratado.php';
+require_once __DIR__ . '/../models/Publicacion.php';
 
 // 1. VALIDACIÓN GLOBAL DE SESIÓN Y ROL
 if (session_status() === PHP_SESSION_NONE) {

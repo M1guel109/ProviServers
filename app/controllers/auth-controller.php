@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/Auth.php';
-require_once __DIR__ . '/../models/membresia.php';
+require_once __DIR__ . '/../models/Membresia.php';
 
 // ===================================================================
 // ROUTER INTERNO — Dispatch por método HTTP y acción
