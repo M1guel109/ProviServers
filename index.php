@@ -492,28 +492,11 @@ switch ($request) {
     // CLIENTE — Mensajes
 
     case '/cliente/mensajes':
-        require BASE_PATH . '/app/controllers/mensajes-controller.php';
-        (new MensajesController())->inbox();
-        break;
-
     case '/mensajes/abrir':
-        require BASE_PATH . '/app/controllers/mensajes-controller.php';
-        (new MensajesController())->abrir();
-        break;
-
     case '/mensajes/ver':
-        require BASE_PATH . '/app/controllers/mensajes-controller.php';
-        (new MensajesController())->ver();
-        break;
-
     case '/mensajes/enviar':
-        require BASE_PATH . '/app/controllers/mensajes-controller.php';
-        (new MensajesController())->enviar();
-        break;
-
     case '/mensajes/poll':
         require BASE_PATH . '/app/controllers/mensajes-controller.php';
-        (new MensajesController())->poll();
         break;
 
     // ==================================================

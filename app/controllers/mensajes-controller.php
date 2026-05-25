@@ -1,79 +1,79 @@
 <?php
-// Importamos las dependencias
+
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/conversacion.php';
-require_once __DIR__ . '/../models/mensaje.php';
+require_once __DIR__ . '/../models/mensajeria.php';
 
-session_start();
+// ===================================================================
+// GUARD DE SESIÓN Y ROL
+// ===================================================================
 
-// 1. VALIDACIÓN GLOBAL DE SESIÓN
-if (!isset($_SESSION['user']['id'])) {
-    http_response_code(403);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$_rolMensajes = $_SESSION['user']['rol'] ?? '';
+
+if (!isset($_SESSION['user']['id']) || !in_array($_rolMensajes, ['cliente', 'proveedor'], true)) {
     mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para acceder a mensajes.', BASE_URL . '/login');
     exit();
 }
 
-// Capturamos el método de la solicitud
+// ===================================================================
+// ROUTER INTERNO — Dispatch por método HTTP y URI
+// ===================================================================
+
 $method = $_SERVER['REQUEST_METHOD'];
+$uri    = $_SERVER['REQUEST_URI'];
 
-// 2. ENRUTADOR PRINCIPAL (Switch)
 switch ($method) {
-    case 'GET':
-        $accion = $_GET['accion'] ?? 'inbox';
 
-        if ($accion === 'inbox') {
-            mostrarInbox();
-        } elseif ($accion === 'abrir') {
+    case 'GET':
+        if (str_contains($uri, '/mensajes/abrir')) {
             abrirConversacion();
-        } elseif ($accion === 'ver') {
+        } elseif (str_contains($uri, '/mensajes/ver')) {
             verConversacion();
-        } elseif ($accion === 'poll') {
+        } elseif (str_contains($uri, '/mensajes/poll')) {
             obtenerMensajesNuevos();
         } else {
-            http_response_code(400);
-            echo "Acción GET no válida";
+            mostrarInbox();
         }
         break;
 
     case 'POST':
         $accion = $_POST['accion'] ?? '';
-
-        if ($accion === 'enviar') {
+        if ($accion === 'enviar' || str_contains($uri, '/mensajes/enviar')) {
             enviarMensaje();
         } else {
             http_response_code(400);
-            echo "Acción POST no válida";
+            mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
+            exit();
         }
         break;
 
     default:
         http_response_code(405);
-        echo "Método no permitido";
-        break;
+        mostrarSweetAlert('error', 'Método no permitido', 'Esta ruta no acepta ese tipo de petición.');
+        exit();
 }
 
-// ======================================================================
-// 3. FUNCIONES DEL CONTROLADOR
-// ======================================================================
+// ===================================================================
+// FUNCIONES DEL CONTROLADOR
+// ===================================================================
 
 function mostrarInbox()
 {
-    // 1. Obtener ID del usuario autenticado
-    $uid = (int)$_SESSION['user']['id'];
+    $uid    = (int)$_SESSION['user']['id'];
+    $modelo = new Mensajeria();
 
-    // 2. Instanciar modelo y obtener conversaciones
-    $convModel = new Conversacion();
-    $conversaciones = $convModel->listarInbox($uid);
+    $conversaciones = $modelo->listarInbox($uid);
+    $vista          = resolverVistaRol('inbox');
 
-    // 3. Cargar vista correspondiente al rol
-    $vistaPerfil = obtenerVistaDeRol('inbox');
-
-    require $vistaPerfil;
+    require $vista;
+    exit();
 }
 
 function abrirConversacion()
 {
-    // 1. Validación de parámetros
     $uid  = (int)$_SESSION['user']['id'];
     $tipo = $_GET['tipo'] ?? '';
     $id   = (int)($_GET['id'] ?? 0);
@@ -84,24 +84,22 @@ function abrirConversacion()
     }
 
     try {
-        // 2. Obtener o crear conversación según el tipo
-        $convModel = new Conversacion();
+        $modelo = new Mensajeria();
         $convId = ($tipo === 'solicitud')
-            ? $convModel->getOrCreateFromSolicitud($id, $uid)
-            : $convModel->getOrCreateFromCotizacion($id, $uid);
+            ? $modelo->getOrCreateFromSolicitud($id, $uid)
+            : $modelo->getOrCreateFromCotizacion($id, $uid);
 
-        // 3. Redirigir a la vista de conversación
-        header("Location: " . BASE_URL . "/mensajes/ver?id=" . $convId);
+        header('Location: ' . BASE_URL . '/mensajes/ver?id=' . $convId);
         exit();
     } catch (Exception $e) {
-        mostrarSweetAlert('error', 'Error', 'No se pudo abrir la conversación: ' . $e->getMessage(), BASE_URL . '/cliente/mensajes');
+        error_log('Error en abrirConversacion -> ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo abrir la conversación. Verifica que tengas acceso.', BASE_URL . '/cliente/mensajes');
         exit();
     }
 }
 
 function verConversacion()
 {
-    // 1. Validación de parámetros
     $uid    = (int)$_SESSION['user']['id'];
     $convId = (int)($_GET['id'] ?? 0);
 
@@ -110,42 +108,34 @@ function verConversacion()
         exit();
     }
 
-    // 2. Instanciar modelos
-    $convModel = new Conversacion();
-    $msgModel  = new Mensaje();
+    $modelo = new Mensajeria();
 
-    // 3. Validar acceso del usuario a la conversación
-    if (!$convModel->usuarioTieneAcceso($convId, $uid)) {
+    if (!$modelo->usuarioTieneAcceso($convId, $uid)) {
         mostrarSweetAlert('error', 'Acceso denegado', 'No tienes acceso a esta conversación.', BASE_URL . '/cliente/mensajes');
         exit();
     }
 
-    // 4. Obtener datos de la conversación
-    $conversacion = $convModel->obtenerPorId($convId);
+    $conversacion = $modelo->obtenerConversacionPorId($convId);
     if (!$conversacion) {
         mostrarSweetAlert('error', 'Error', 'No existe la conversación.', BASE_URL . '/cliente/mensajes');
         exit();
     }
 
-    // 5. Obtener tema de la conversación
-    $tema = $convModel->obtenerTema($convId);
-    $otroUsuarioId = $convModel->obtenerOtroUsuarioId($conversacion, $uid);
+    $tema          = $modelo->obtenerTema($convId);
+    $otroUsuarioId = $modelo->obtenerOtroUsuarioId($conversacion, $uid);
+    $mensajes      = $modelo->listarMensajesPorConversacion($convId, 80);
+    $modelo->marcarMensajesLeidos($convId, $uid);
 
-    // 6. Obtener mensajes y marcar como leídos
-    $mensajes = $msgModel->listarPorConversacion($convId, 80);
-    $msgModel->marcarLeidos($convId, $uid);
+    $vista = resolverVistaRol('chat');
 
-    // 7. Cargar vista correspondiente al rol
-    $vistaPerfil = obtenerVistaDeRol('chat');
-
-    require $vistaPerfil;
+    require $vista;
+    exit();
 }
 
 function enviarMensaje()
 {
     header('Content-Type: application/json; charset=utf-8');
 
-    // 1. Validación de entrada
     $uid    = (int)$_SESSION['user']['id'];
     $convId = (int)($_POST['conversacion_id'] ?? 0);
     $texto  = trim($_POST['mensaje'] ?? '');
@@ -153,35 +143,29 @@ function enviarMensaje()
     if ($convId <= 0 || empty($texto)) {
         http_response_code(400);
         echo json_encode(['ok' => false, 'error' => 'Datos inválidos']);
-        return;
+        exit;
     }
 
-    // 2. Instanciar modelo y validar acceso
-    $convModel = new Conversacion();
-    $msgModel  = new Mensaje();
+    $modelo       = new Mensajeria();
+    $conversacion = $modelo->obtenerConversacionPorId($convId);
 
-    $conversacion = $convModel->obtenerPorId($convId);
-    if (!$conversacion || !$convModel->usuarioTieneAcceso($convId, $uid)) {
+    if (!$conversacion || !$modelo->usuarioTieneAcceso($convId, $uid)) {
         http_response_code(403);
         echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
-        return;
+        exit;
     }
 
-    // 3. Obtener ID del receptor
-    $receptorId = $convModel->obtenerOtroUsuarioId($conversacion, $uid);
+    $receptorId = $modelo->obtenerOtroUsuarioId($conversacion, $uid);
+    $msgId      = $modelo->crearMensaje($convId, $uid, $receptorId, $texto);
 
-    // 4. Crear mensaje en BD
-    $msgId = $msgModel->crear($convId, $uid, $receptorId, $texto);
-
-    // 5. Retornar respuesta
     echo json_encode(['ok' => true, 'id' => $msgId]);
+    exit;
 }
 
 function obtenerMensajesNuevos()
 {
     header('Content-Type: application/json; charset=utf-8');
 
-    // 1. Validación de parámetros
     $uid    = (int)$_SESSION['user']['id'];
     $convId = (int)($_GET['id'] ?? 0);
     $after  = $_GET['after'] ?? null;
@@ -189,53 +173,48 @@ function obtenerMensajesNuevos()
     if ($convId <= 0) {
         http_response_code(400);
         echo json_encode(['ok' => false, 'error' => 'Parámetros inválidos']);
-        return;
+        exit;
     }
 
-    // 2. Validar acceso del usuario
-    $convModel = new Conversacion();
-    if (!$convModel->usuarioTieneAcceso($convId, $uid)) {
+    $modelo = new Mensajeria();
+
+    if (!$modelo->usuarioTieneAcceso($convId, $uid)) {
         http_response_code(403);
         echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
-        return;
+        exit;
     }
 
-    // 3. Obtener nuevos mensajes y marcar como leídos
-    $msgModel = new Mensaje();
-    $nuevos = $msgModel->listarNuevos($convId, $after);
-
+    $nuevos = $modelo->listarMensajesNuevos($convId, $after);
     if (!empty($nuevos)) {
-        $msgModel->marcarLeidos($convId, $uid);
+        $modelo->marcarMensajesLeidos($convId, $uid);
     }
 
-    // 4. Retornar respuesta
     echo json_encode(['ok' => true, 'mensajes' => $nuevos]);
+    exit;
 }
 
-// ======================================================================
-// 4. FUNCIONES UTILITARIAS
-// ======================================================================
+// ===================================================================
+// UTILIDAD — Resolver vista según rol del usuario
+// ===================================================================
 
-function obtenerVistaDeRol($nombre)
+function resolverVistaRol(string $nombre): string
 {
-    // Obtener rol del usuario autenticado
     $rol = $_SESSION['user']['rol'] ?? '';
 
-    // Determinar ruta según rol
-    if ($rol === 'cliente') {
-        $ruta = BASE_PATH . "/app/views/dashboard/cliente/mensajes/{$nombre}.php";
-    } elseif ($rol === 'proveedor') {
-        $ruta = BASE_PATH . "/app/views/dashboard/proveedor/mensajes/{$nombre}.php";
-    } else {
+    $rutas = [
+        'cliente'   => BASE_PATH . "/app/views/dashboard/cliente/mensajes/{$nombre}.php",
+        'proveedor' => BASE_PATH . "/app/views/dashboard/proveedor/mensajes/{$nombre}.php",
+    ];
+
+    if (!isset($rutas[$rol])) {
         mostrarSweetAlert('error', 'Rol no permitido', 'Tu rol no tiene acceso a esta sección.', BASE_URL . '/login');
         exit();
     }
 
-    // Validar que la vista existe
-    if (!file_exists($ruta)) {
+    if (!file_exists($rutas[$rol])) {
         mostrarSweetAlert('error', 'Vista no encontrada', "La vista {$nombre}.php no existe para tu rol.", BASE_URL . '/login');
         exit();
     }
 
-    return $ruta;
+    return $rutas[$rol];
 }
