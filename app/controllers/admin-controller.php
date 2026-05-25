@@ -513,6 +513,21 @@ function eliminarCategoria(int $id)
 }
 
 // -------------------------------------------------------------------
+// FUNCIONES DE LECTURA — usadas por vistas (consultar-categorias)
+// -------------------------------------------------------------------
+function mostrarCategorias(): array
+{
+    $modelo = new Categoria();
+    return $modelo->mostrar() ?: [];
+}
+
+function mostrarCategoriaId($id): mixed
+{
+    $modelo = new Categoria();
+    return $modelo->mostrarId($id);
+}
+
+// -------------------------------------------------------------------
 // HELPER — Procesamiento de imagen de categoría
 // -------------------------------------------------------------------
 function procesarImagenCategoria(array $file): array
@@ -711,6 +726,15 @@ function eliminarSuscripcion($id)
         mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el registro.', BASE_URL . '/admin/consultar-suscripciones');
     }
     exit();
+}
+
+// -------------------------------------------------------------------
+// FUNCIÓN DE LECTURA — usada por vista (consultar-suscripciones)
+// -------------------------------------------------------------------
+function listarSuscripciones(): array
+{
+    $modelo = new Suscripcion();
+    return $modelo->listarTodas() ?: [];
 }
 
 // -------------------------------------------------------------------

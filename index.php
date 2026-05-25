@@ -307,7 +307,7 @@ switch ($request) {
         break;
 
     case '/proveedor/reporte':
-        require BASE_PATH . '/app/controllers/reportes-pdf-controller.php';
+        require_once BASE_PATH . '/app/controllers/admin-controller.php';
         reportesPdfController();
         break;
 

@@ -1,7 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
-// ✅ CORREGIDO: usa moderacion-controller, no proveedor-controller
-require_once BASE_PATH . '/app/controllers/moderacion-controller.php';
+require_once BASE_PATH . '/app/controllers/admin-controller.php';
 
 $datos = mostrarServicios();
 ?>

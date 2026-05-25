@@ -1,7 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
-// ✅ CORREGIDO: descomentar para que $suscripciones tenga datos
-require_once BASE_PATH . '/app/controllers/membresia-controller.php';
+require_once BASE_PATH . '/app/controllers/admin-controller.php';
 $suscripciones = listarSuscripciones();
 
 function calcularDiasRestantes($fecha_fin)
