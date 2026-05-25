@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
-require_once BASE_PATH . '/app/controllers/proveedorServiciosContratadosController.php';
+require_once BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
 
 // Llamamos al controlador para obtener los datos
 $servicios = mostrarServiciosContratadosProveedor();
