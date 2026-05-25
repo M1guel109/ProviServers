@@ -8,7 +8,9 @@ require_once __DIR__ . '/../models/servicio-contratado.php';
 require_once __DIR__ . '/../models/publicacion.php';
 
 // 1. VALIDACIÓN GLOBAL DE SESIÓN Y ROL
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Este controlador maneja acciones tanto de Cliente (Crear Solicitud) como de Proveedor.
 // Por lo tanto, validamos la sesión general primero.

@@ -11,6 +11,14 @@ function mostrarSweetAlert($tipo, $titulo, $mensaje, $redirect = null)
     $COLOR_SECUNDARIO = '#0e1116'; // Casi Negro (Botón Cancelar / Título)
     $COLOR_FONDO = '#fff'; // Blanco (Fondo del SweetAlert)
 
+    // json_encode escapa caracteres especiales para contexto JS (previene XSS y open redirect)
+    $jsTipo     = json_encode((string) $tipo);
+    $jsTitulo   = json_encode((string) $titulo);
+    $jsMensaje  = json_encode((string) $mensaje);
+    $jsRedirect = $redirect
+        ? 'window.location.href = ' . json_encode((string) $redirect) . ';'
+        : 'window.history.back();';
+
     echo "
     <html>
         <head>
@@ -24,34 +32,33 @@ function mostrarSweetAlert($tipo, $titulo, $mensaje, $redirect = null)
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    /* Fondo degradado usando los colores del proyecto */
-                    background: linear-gradient(135deg, $COLOR_SECUNDARIO, $COLOR_PRINCIPAL); 
+                    background: linear-gradient(135deg, $COLOR_SECUNDARIO, $COLOR_PRINCIPAL);
                     font-family: 'Montserrat', sans-serif;
                     color: $COLOR_FONDO;
                 }
 
                 .swal2-popup {
                     font-family: 'Montserrat', sans-serif !important;
-                    background-color: $COLOR_FONDO !important; /* Fondo del cuadro de alerta */
-                    color: $COLOR_SECUNDARIO !important; /* Texto general del mensaje */
+                    background-color: $COLOR_FONDO !important;
+                    color: $COLOR_SECUNDARIO !important;
                 }
 
                 .swal2-title {
-                    color: $COLOR_SECUNDARIO !important; /* Color del Título */
+                    color: $COLOR_SECUNDARIO !important;
                     font-weight: 600 !important;
                 }
 
                 .swal2-styled.swal2-confirm {
-                    background-color: $COLOR_PRINCIPAL !important; /* Botón Aceptar: Principal */
+                    background-color: $COLOR_PRINCIPAL !important;
                     border: none !important;
                 }
 
                 .swal2-styled.swal2-confirm:hover {
-                    background-color: #004cbf !important; /* Un tono más oscuro de azul para el hover */
+                    background-color: #004cbf !important;
                 }
 
                 .swal2-styled.swal2-cancel {
-                    background-color: $COLOR_SECUNDARIO !important; /* Botón Cancelar: Secundario */
+                    background-color: $COLOR_SECUNDARIO !important;
                     color: $COLOR_FONDO !important;
                 }
             </style>
@@ -60,16 +67,15 @@ function mostrarSweetAlert($tipo, $titulo, $mensaje, $redirect = null)
         <body>
             <script>
                 Swal.fire({
-                    icon: '$tipo',
-                    title: '$titulo',
-                    text: '$mensaje',
+                    icon: $jsTipo,
+                    title: $jsTitulo,
+                    text: $jsMensaje,
                     confirmButtonText: 'Aceptar',
-                    // Sobreescribe el color de confirmación en la configuración de SweetAlert
-                    confirmButtonColor: '$COLOR_PRINCIPAL', 
+                    confirmButtonColor: '$COLOR_PRINCIPAL',
                     background: '$COLOR_FONDO',
-                    color: '$COLOR_SECUNDARIO' // Color del texto del mensaje
+                    color: '$COLOR_SECUNDARIO'
                 }).then((result) => {
-                    " . ($redirect ? "window.location.href = '$redirect';" : "window.history.back();") . "
+                    $jsRedirect
                 });
             </script>
         </body>
