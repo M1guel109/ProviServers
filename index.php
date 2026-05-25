@@ -423,32 +423,17 @@ switch ($request) {
     // CLIENTE — Servicios
 
     case '/cliente/explorar-servicios':
-        require BASE_PATH . '/app/controllers/publicacion-controller.php';
-        require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
-        mostrarCatalogoPublico();
-        break;
-
     case '/cliente/explorar':
-        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
-        mostrarCatalogoPublico();
-        break;
-
     case '/cliente/publicacion':
-        require BASE_PATH . '/app/controllers/cliente-publicacion-detalle-controller.php';
+    case '/cliente/guardar-solicitud':
+    case '/cliente/servicios-contratados':
+    case '/cliente/mis-solicitudes':
+    case '/cliente/necesidades':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     case '/cliente/solicitar-servicio':
         require BASE_PATH . '/app/views/dashboard/cliente/solicitar-servicio.php';
-        break;
-
-    case '/cliente/guardar-solicitud':
-        require BASE_PATH . '/app/controllers/proveedor-operacion-controller.php';
-        break;
-
-    // CLIENTE — Servicios contratados
-
-    case '/cliente/servicios-contratados':
-        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
         break;
 
     case '/cliente/servicios-contratados/calificar':
@@ -456,7 +441,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     case '/cliente/servicios-contratados/cancelar':
@@ -464,18 +449,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/servicios-contratados');
             exit;
         }
-        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
-        break;
-
-    case '/cliente/mis-solicitudes':
-        $_GET['accion'] = 'ver_solicitudes';
-        require BASE_PATH . '/app/controllers/cliente-servicio-controller.php';
-        break;
-
-    // CLIENTE — Necesidades
-
-    case '/cliente/necesidades':
-        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     case '/cliente/necesidades/crear':
@@ -483,7 +457,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/dashboard');
             exit;
         }
-        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     case '/cliente/necesidades/aceptar-cotizacion':
@@ -491,7 +465,7 @@ switch ($request) {
             header('Location: ' . BASE_URL . '/cliente/necesidades');
             exit;
         }
-        require BASE_PATH . '/app/controllers/cliente-necesidad-controller.php';
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     // CLIENTE — Perfil
