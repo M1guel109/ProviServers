@@ -175,15 +175,15 @@ switch ($request) {
         break;
 
     case '/admin/guardar-categoria':
-        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     case '/admin/actualizar-categoria':
-        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     case '/admin/eliminar-categoria':
-        require BASE_PATH . '/app/controllers/categoria-controller.php';
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     // ADMINISTRADOR — Membresías
