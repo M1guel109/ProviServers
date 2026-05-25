@@ -36,6 +36,8 @@ switch ($method) {
         if (str_contains($uri, '/admin/guardar-categoria') || str_contains($uri, '/admin/actualizar-categoria')) {
             if ($accion === 'actualizar') { actualizarCategoria(); }
             else { registrarCategoria(); }
+        } elseif (str_contains($uri, '/admin/moderacion-actualizar')) {
+            apiActualizarEstado();
         } elseif ($accion === 'registrar_membresia') {
             registrarMembresia();
         } elseif ($accion === 'actualizar_membresia') {
@@ -729,24 +731,156 @@ function obtenerDetalleJSON($id)
     exit;
 }
 
-function mostrarServicios() { return []; }
+// ===================================================================
+// FUNCIONES — MODERACIÓN DE SERVICIOS
+// ===================================================================
+
+function mostrarServicios()
+{
+    $modelo = new Moderacion();
+    return $modelo->listar();
+}
 
 function apiDetalleServicio()
 {
+    if (ob_get_length()) ob_clean();
     header('Content-Type: application/json');
-    echo json_encode(['error' => 'Función en construcción.']);
+
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    if (!$id) {
+        echo json_encode(['error' => 'Falta el ID']);
+        exit;
+    }
+
+    $modelo = new Moderacion();
+    $datos  = $modelo->obtenerDetalle($id);
+
+    if (!$datos) {
+        echo json_encode(['error' => 'Servicio no encontrado']);
+        exit;
+    }
+
+    echo json_encode([
+        'id'                  => $datos['id'],
+        'nombre'              => $datos['nombre'],
+        'descripcion'         => $datos['descripcion'],
+        'precio'              => $datos['precio'],
+        'categoria'           => $datos['categoria_nombre'],
+        'proveedor_nombre'    => $datos['proveedor_nombre'],
+        'proveedor_tel'       => $datos['proveedor_telefono'] ?? 'N/A',
+        'proveedor_email'     => $datos['proveedor_email'],
+        'proveedor_ubicacion' => $datos['proveedor_ubicacion'] ?? 'No registrada',
+        'foto'                => $datos['imagen'] ?? 'default_service.png',
+        'estado'              => $datos['publicacion_estado'],
+        'created_at'          => $datos['created_at'],
+    ]);
     exit;
 }
 
 function apiActualizarEstado()
 {
+    if (ob_get_length()) ob_clean();
     header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'error' => 'Función en construcción.']);
+
+    $id     = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+    $estado = $_POST['estado'] ?? null;
+    $motivo = trim($_POST['motivo'] ?? '');
+
+    if (!$id || !$estado) {
+        echo json_encode(['success' => false, 'error' => 'Datos incompletos']);
+        exit;
+    }
+
+    $modelo    = new Moderacion();
+    $resultado = false;
+
+    if ($estado === 'aprobado') {
+        $resultado = $modelo->aprobar($id);
+    } elseif ($estado === 'rechazado') {
+        if (empty($motivo)) {
+            echo json_encode(['success' => false, 'error' => 'El motivo es obligatorio.']);
+            exit;
+        }
+        $resultado = $modelo->rechazar($id, $motivo);
+    }
+
+    echo json_encode(
+        $resultado
+            ? ['success' => true]
+            : ['success' => false, 'error' => 'No se pudo actualizar la base de datos.']
+    );
     exit;
 }
 
+// ===================================================================
+// FUNCIONES — REPORTES PDF
+// ===================================================================
+
 function reportesPdfController()
 {
-    mostrarSweetAlert('info', 'En construcción', 'Los reportes PDF estarán disponibles en el siguiente paso.');
-    exit();
+    require_once BASE_PATH . '/app/helpers/pdf-helper.php';
+
+    $tipo = $_GET['tipo'] ?? '';
+
+    switch ($tipo) {
+        case 'usuarios':
+            reporteUsuariosPDF();
+            break;
+        case 'serviciosProveedor':
+            reporteServiciosProveedorPDF();
+            break;
+        case 'membresias':
+            reporteMembresiasPDF();
+            break;
+        default:
+            mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
+            exit();
+    }
+}
+
+function reporteUsuariosPDF()
+{
+    $usuarios = mostrarUsuarios();
+
+    $foto_default_base64 = '';
+    $ruta_default = BASE_PATH . '/public/uploads/usuarios/default_user.png';
+    if (file_exists($ruta_default)) {
+        $foto_default_base64 = 'data:image/png;base64,' . base64_encode(file_get_contents($ruta_default));
+    }
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/usuarios-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_usuarios.pdf', false);
+}
+
+function reporteServiciosProveedorPDF()
+{
+    $servicios = mostrarServicios();
+
+    $categoriaModel = new Categoria();
+    $categorias     = $categoriaModel->mostrar();
+
+    $mapCategorias = [];
+    foreach ($categorias as $cat) {
+        $mapCategorias[$cat['id']] = $cat['nombre'];
+    }
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/servicios-proveedor-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_servicios_proveedor.pdf', false);
+}
+
+function reporteMembresiasPDF()
+{
+    $membresias = mostrarMembresias();
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/membresias-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_membresias.pdf', false);
 }

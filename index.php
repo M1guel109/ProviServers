@@ -228,9 +228,8 @@ switch ($request) {
         break;
 
     case '/admin/reporte':
-        require BASE_PATH . '/app/controllers/reportes-pdf-controller.php';
+        require_once BASE_PATH . '/app/controllers/admin-controller.php';
         reportesPdfController();
-        // reporteMembresiasPDF();
         break;
 
     // ADMINISTRADOR — Moderación
@@ -240,7 +239,7 @@ switch ($request) {
         break;
 
     case '/admin/servicio-detalle':
-        require_once BASE_PATH . '/app/controllers/moderacion-controller.php';
+        require_once BASE_PATH . '/app/controllers/admin-controller.php';
         apiDetalleServicio();
         break;
 
@@ -250,8 +249,7 @@ switch ($request) {
         break;
 
     case '/admin/moderacion-actualizar':
-        require BASE_PATH . '/app/controllers/moderacion-controller.php';
-        apiActualizarEstado();
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     // ==================================================
