@@ -258,7 +258,7 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                                 <label class="form-label fw-bold">Franja horaria <span class="text-danger">*</span></label>
                                 <select class="form-select" name="franja_horaria" id="franja_nec" required>
                                     <option value="">Seleccionar</option>
-                                    <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                    <option value="manana">Mañana (8:00 - 12:00)</option>
                                     <option value="tarde">Tarde (12:00 - 18:00)</option>
                                     <option value="noche">Noche (18:00 - 22:00)</option>
                                 </select>

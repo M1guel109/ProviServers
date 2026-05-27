@@ -1135,12 +1135,19 @@ body.toggle-sidebar .contenido {
     font-size: 0.9rem;
 }
 
+/* Botón cerrar sidebar — oculto en desktop, visible en móvil via @media */
+.close-menu-mobile {
+    display: none;
+}
+
 /* ==========================================================================
    16. RESPONSIVE (MÓVIL Y TABLET)
    ========================================================================== */
 @media screen and (max-width: 1024px) {
     .contenido {
         margin-left: 0;
+        width: 100%;
+        padding: 15px;
     }
 
     /* Sidebar oculto por defecto */
@@ -1161,7 +1168,6 @@ body.toggle-sidebar .contenido {
     /* Sidebar visible */
     body.toggle-sidebar .sidebar {
         left: 0;
-        width: 100%;
     }
 
     /* Overlay oscuro */
@@ -1172,8 +1178,10 @@ body.toggle-sidebar .contenido {
         left: 0;
         width: 100%;
         height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
         z-index: 1040;
         animation: fadeIn 0.3s ease;
+        cursor: pointer;
     }
 
     body.toggle-sidebar .contenido {
@@ -1240,8 +1248,12 @@ body.toggle-sidebar .contenido {
         color: white;
     }
 
-    .logo img {
+    .logo .logo-completo {
         display: none;
+    }
+
+    .logo .logo-favicon {
+        display: block;
     }
 
     /* Animación escalonada para móvil */
@@ -1382,4 +1394,39 @@ body.toggle-sidebar .toggle-submenu {
 /* Quitar el active::before que se desplaza en modo colapsado */
 body.toggle-sidebar .menu-principal a.active::before {
     display: none !important;
+}
+
+/* ==========================================================================
+   17. RESPONSIVE EXTRA — TABLETS Y MÓVILES PEQUEÑOS
+   ========================================================================== */
+@media screen and (max-width: 768px) {
+    .barra-superior {
+        padding: 8px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .acciones-barra {
+        gap: 8px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .barra-superior {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .contenido {
+        padding: 10px;
+    }
+
+    .acciones-barra {
+        gap: 6px;
+    }
+
+    /* Reducir tamaño de notificaciones dropdown en móvil */
+    .notifications {
+        width: 280px !important;
+    }
 }

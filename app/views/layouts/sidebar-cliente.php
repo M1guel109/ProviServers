@@ -5,11 +5,14 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
 <aside class="sidebar" id="mainSidebar">
     <div class="logo">
         <a href="<?= BASE_URL ?>/cliente/dashboard">
-            <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png" 
+            <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png"
                  alt="<?= __('cliente_alt_logo') ?>" class="logo-completo">
-            <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png" 
+            <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png"
                  alt="<?= __('cliente_alt_logo') ?>" class="logo-favicon">
         </a>
+        <button class="close-menu-mobile" id="closeMenuMobile" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <div class="menu-bar">

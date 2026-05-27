@@ -144,6 +144,12 @@ $stats_en_proceso = count($servicios);
                         class="btn-accion btn-contactar">
                         <i class="bi bi-chat-dots"></i> Contactar
                     </button>
+
+                    <a href="<?= BASE_URL ?>/proveedor/contrato-pdf?contrato_id=<?= $contratoId ?>"
+                       class="btn-accion" target="_blank"
+                       style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+                        <i class="bi bi-file-earmark-pdf-fill"></i> Comprobante PDF
+                    </a>
                 </div>
 
             </div>

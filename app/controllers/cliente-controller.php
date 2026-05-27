@@ -31,7 +31,9 @@ $uri    = $_SERVER['REQUEST_URI'];
 switch ($method) {
 
     case 'GET':
-        if (str_contains($uri, 'explorar')) {
+        if (str_contains($uri, 'contrato-pdf')) {
+            generarComprobantePDFCliente();
+        } elseif (str_contains($uri, 'explorar')) {
             mostrarCatalogoPublico();
         } elseif (str_contains($uri, '/cliente/publicacion')) {
             mostrarDetallePublicacion();
@@ -97,14 +99,14 @@ function mostrarDetallePublicacion()
     }
 
     $modelo      = new Publicacion();
-    $publicacion = $modelo->obtenerPublicaActivaPorId($id);
+    $publicacion = $modelo->obtenerDetallePublicacion($id);
 
     if (!$publicacion) {
         mostrarSweetAlert('error', 'No encontrada', 'La publicación no existe o ya no está disponible.', BASE_URL . '/cliente/explorar-servicios');
         exit();
     }
 
-    require BASE_PATH . '/app/views/dashboard/cliente/detallePublicacion.php';
+    require BASE_PATH . '/app/views/dashboard/cliente/detalle-publicacion.php';
     exit();
 }
 
@@ -403,6 +405,41 @@ function crearNecesidad()
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo publicar la necesidad. Intenta nuevamente.', BASE_URL . '/cliente/necesidades');
     }
+    exit();
+}
+
+function generarComprobantePDFCliente()
+{
+    $usuarioId   = (int)$_SESSION['user']['id'];
+    $solicitudId = isset($_GET['solicitud_id']) ? (int)$_GET['solicitud_id'] : 0;
+    $contratoId  = isset($_GET['contrato_id'])  ? (int)$_GET['contrato_id']  : 0;
+
+    $scModel = new ServicioContratado();
+
+    // Resolver contrato_id desde solicitud_id si viene por esa vía
+    if ($contratoId <= 0 && $solicitudId > 0) {
+        $contratoId = $scModel->obtenerContratoIdPorSolicitud($solicitudId, $usuarioId) ?? 0;
+    }
+
+    if ($contratoId <= 0) {
+        mostrarSweetAlert('error', 'No encontrado', 'El comprobante no existe o no tienes acceso.', BASE_URL . '/cliente/mis-solicitudes');
+        exit();
+    }
+
+    $contrato = $scModel->obtenerDetalleParaPDF($contratoId, $usuarioId, 'cliente');
+
+    if (empty($contrato)) {
+        mostrarSweetAlert('error', 'Acceso denegado', 'No tienes permiso para ver este comprobante.', BASE_URL . '/cliente/mis-solicitudes');
+        exit();
+    }
+
+    require_once BASE_PATH . '/app/helpers/pdf-helper.php';
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/comprobante-contrato-pdf.php';
+    $html = ob_get_clean();
+
+    $filename = 'comprobante-contrato-' . str_pad($contratoId, 6, '0', STR_PAD_LEFT) . '.pdf';
+    generarPDF($html, $filename, false);
     exit();
 }
 

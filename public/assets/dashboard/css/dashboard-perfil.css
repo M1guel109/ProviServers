@@ -164,60 +164,27 @@
 
 
 /* 9. Responsive Tablet */
-@media screen and (min-width:768px) and (max-width:1080px) {
-    .sidebar {
-        width: 240px;
-    }
-
+@media screen and (min-width: 768px) and (max-width: 1080px) {
     #tarjetas-inferiores {
         grid-template-columns: repeat(2, 1fr);
     }
 
     .barra-superior {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px 20px;
-    }
-
-    .buscador {
-        width: 100%;
-    }
-
-    .acciones-barra {
-        width: 100%;
-        justify-content: space-between;
+        padding: 10px 20px;
     }
 }
 
-/* 10. Responsive Smartphone */
-@media screen and (min-width:320px) and (max-width:767px) {
-    body {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 15px 0;
-    }
-
+/* 10. Responsive Móvil */
+@media screen and (max-width: 767px) {
     .contenido {
         padding: 15px;
     }
 
     .barra-superior {
-        flex-direction: column;
-        gap: 15px;
-        padding: 15px;
-    }
-
-    .buscador {
-        width: 100%;
+        padding: 8px 12px;
     }
 
     .acciones-barra {
-        width: 100%;
-        justify-content: space-between;
         flex-wrap: wrap;
         gap: 10px;
     }

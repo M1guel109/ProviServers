@@ -43,7 +43,9 @@ switch ($method) {
         $accion = $_GET['accion'] ?? '';
         $id     = $_GET['id']     ?? null;
 
-        if (str_contains($uri, '/proveedor/oportunidades')) {
+        if (str_contains($uri, '/proveedor/contrato-pdf')) {
+            generarComprobantePDFProveedor();
+        } elseif (str_contains($uri, '/proveedor/oportunidades')) {
             mostrarOportunidades();
         } elseif (str_contains($uri, '/proveedor/resenas')) {
             mostrarResenasProveedor();
@@ -115,6 +117,12 @@ function registrarServicio()
     $usuarioId = (int)($_SESSION['user']['id'] ?? 0);
     if ($usuarioId <= 0) {
         mostrarSweetAlert('error', 'Sesión inválida', 'No se encontró el usuario en sesión.');
+        exit();
+    }
+
+    $bloqueo = verificarPerfilHabilitado($usuarioId);
+    if ($bloqueo !== null) {
+        mostrarSweetAlert('warning', 'Perfil incompleto', $bloqueo, BASE_URL . '/proveedor/configuracion');
         exit();
     }
 
@@ -397,7 +405,14 @@ function mostrarOportunidades()
 
 function enviarCotizacion()
 {
-    $usuarioId     = (int)$_SESSION['user']['id'];
+    $usuarioId = (int)$_SESSION['user']['id'];
+
+    $bloqueo = verificarPerfilHabilitado($usuarioId);
+    if ($bloqueo !== null) {
+        mostrarSweetAlert('warning', 'Perfil incompleto', $bloqueo, BASE_URL . '/proveedor/oportunidades');
+        exit();
+    }
+
     $necesidadId   = (int)($_POST['necesidad_id']   ?? 0);
     $publicacionId = (int)($_POST['publicacion_id'] ?? 0);
     $titulo        = trim($_POST['titulo']           ?? '');
@@ -1010,7 +1025,65 @@ function guardarPagos()
 }
 
 // =======================================================================
-// SECCIÓN 6: DASHBOARD
+// SECCIÓN 6: VALIDACIÓN DE PERFIL HABILITADO
+// =======================================================================
+
+/**
+ * Verifica que el proveedor cumpla los requisitos mínimos para operar.
+ * Devuelve null si todo está OK, o el mensaje de bloqueo si no.
+ */
+function verificarPerfilHabilitado(int $usuarioId): ?string
+{
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        // 1. Cuenta activa
+        $stmt = $pdo->prepare(
+            "SELECT u.estado_id, ue.nombre AS estado_nombre
+             FROM usuarios u
+             LEFT JOIN usuario_estados ue ON u.estado_id = ue.id
+             WHERE u.id = :id LIMIT 1"
+        );
+        $stmt->execute([':id' => $usuarioId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || (int)$user['estado_id'] !== 2) {
+            $estado = $user['estado_nombre'] ?? 'pendiente';
+            return "Tu cuenta está en estado «{$estado}». El administrador debe activarla antes de que puedas operar.";
+        }
+
+        // 2. Al menos una categoría
+        $stmt2 = $pdo->prepare(
+            "SELECT COUNT(*) FROM proveedor_categorias pc
+             JOIN proveedores p ON pc.proveedor_id = p.id
+             WHERE p.usuario_id = :uid"
+        );
+        $stmt2->execute([':uid' => $usuarioId]);
+        if ((int)$stmt2->fetchColumn() === 0) {
+            return "Debes tener al menos una categoría/habilidad registrada en tu perfil profesional.";
+        }
+
+        // 3. Al menos un documento aprobado
+        $stmt3 = $pdo->prepare(
+            "SELECT COUNT(*) FROM documentos_proveedor dp
+             JOIN proveedores p ON dp.proveedor_id = p.id
+             WHERE p.usuario_id = :uid AND dp.estado = 'aprobado'"
+        );
+        $stmt3->execute([':uid' => $usuarioId]);
+        if ((int)$stmt3->fetchColumn() === 0) {
+            return "Necesitas al menos un documento aprobado por el administrador para publicar o cotizar servicios.";
+        }
+
+        return null;
+    } catch (PDOException $e) {
+        error_log("Error en verificarPerfilHabilitado: " . $e->getMessage());
+        return "No se pudo verificar el estado de tu perfil. Intenta nuevamente.";
+    }
+}
+
+// =======================================================================
+// SECCIÓN 7: DASHBOARD
 // =======================================================================
 
 function mostrarDashboardProveedor()
@@ -1027,5 +1100,37 @@ function mostrarDashboardProveedor()
     $proximasCitas         = $servicioModel->obtenerProximasCitasProveedor($usuarioId, 5);
 
     require_once BASE_PATH . '/app/views/dashboard/proveedor/dashboard-proveedor.php';
+    exit();
+}
+
+// ===================================================================
+// FUNCIÓN — COMPROBANTE PDF DE CONTRATO
+// ===================================================================
+
+function generarComprobantePDFProveedor()
+{
+    $usuarioId  = (int)$_SESSION['user']['id'];
+    $contratoId = isset($_GET['contrato_id']) ? (int)$_GET['contrato_id'] : 0;
+
+    if ($contratoId <= 0) {
+        mostrarSweetAlert('error', 'No encontrado', 'El comprobante no existe.', BASE_URL . '/proveedor/nuevas-solicitudes');
+        exit();
+    }
+
+    $scModel  = new ServicioContratado();
+    $contrato = $scModel->obtenerDetalleParaPDF($contratoId, $usuarioId, 'proveedor');
+
+    if (empty($contrato)) {
+        mostrarSweetAlert('error', 'Acceso denegado', 'No tienes permiso para ver este comprobante.', BASE_URL . '/proveedor/nuevas-solicitudes');
+        exit();
+    }
+
+    require_once BASE_PATH . '/app/helpers/pdf-helper.php';
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/comprobante-contrato-pdf.php';
+    $html = ob_get_clean();
+
+    $filename = 'comprobante-contrato-' . str_pad($contratoId, 6, '0', STR_PAD_LEFT) . '.pdf';
+    generarPDF($html, $filename, false);
     exit();
 }

@@ -116,16 +116,8 @@
 
                 <?php foreach ($usuarios as $usuario) : 
                     
-                    $foto_nombre = htmlspecialchars($usuario['foto']);
-                    
-                    // LÓGICA CLAVE: Si la foto es distinta a la por defecto, usa la URL HTTP.
-                    if ($foto_nombre !== 'default_user.png') {
-                        $src_imagen = BASE_URL . '/public/uploads/usuarios/' . $foto_nombre;
-                    } else {
-                        // Si es la por defecto, usa la Base64 (incrustada). 
-                        // El ?? es un fallback por si Base64 falló en el controlador, aunque esto no debería pasar.
-                        $src_imagen = $foto_default_base64 ?? (BASE_URL . '/public/uploads/usuarios/' . $foto_nombre);
-                    }
+                    $foto_nombre = !empty($usuario['foto']) ? $usuario['foto'] : 'default_user.png';
+                    $src_imagen  = BASE_URL . '/public/uploads/usuarios/' . htmlspecialchars($foto_nombre);
                     
                     // Manejar nombres compuestos
                     $nombre_completo = $usuario['nombres'] . ' ' . $usuario['apellidos'];

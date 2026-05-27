@@ -284,6 +284,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
 
+    case '/proveedor/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/proveedor/notificaciones.php';
+        break;
+
     // PROVEEDOR — Servicios
 
     case '/proveedor/registrar-servicio':
@@ -303,6 +307,10 @@ switch ($request) {
         break;
 
     case '/proveedor/guardar-servicio':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
+    case '/proveedor/contrato-pdf':
         require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
@@ -366,6 +374,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/historial-servicios.php';
         break;
 
+    case '/cliente/notificaciones':
+        require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
+        break;
+
     // CLIENTE — Servicios
 
     case '/cliente/explorar-servicios':
@@ -375,6 +387,10 @@ switch ($request) {
     case '/cliente/servicios-contratados':
     case '/cliente/mis-solicitudes':
     case '/cliente/necesidades':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
+    case '/cliente/contrato-pdf':
         require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 

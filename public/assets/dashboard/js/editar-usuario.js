@@ -177,8 +177,7 @@ window.cambiarEstadoDoc = async function (idDoc, nuevoEstado, btnElement) {
         formData.append('id_doc',      idDoc);
         formData.append('nuevo_estado', nuevoEstado);
 
-        // ✅ CORREGIDO: pasa por el Front Controller
-        const response = await fetch(`${BASE_URL}/admin/moderacion-actualizar`, {
+        const response = await fetch(`${BASE_URL}/admin/actualizar-usuario`, {
             method: 'POST',
             body: formData
         });

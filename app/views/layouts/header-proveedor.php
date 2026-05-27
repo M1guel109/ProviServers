@@ -1,6 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/controllers/perfil-controller.php'; // ✅ kebab-case
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/helpers/notificaciones-proveedor.php';
 
 $id = $_SESSION['user']['id'] ?? null;
 
@@ -23,8 +24,8 @@ $idiomaActual = obtenerIdiomaActual();
 $imgBandera   = ($idiomaActual === 'es') ? 'es.png' : 'us.png';
 $txtIdioma    = ($idiomaActual === 'es') ? 'Español' : 'English';
 
-// ✅ CORREGIDO: 0 hasta implementar notificaciones reales
-$cantidadNotif = 0;
+$misNotificaciones = obtenerNotificacionesProveedor((int)($_SESSION['user']['id'] ?? 0));
+$cantidadNotif     = count($misNotificaciones);
 ?>
 
 <header class="barra-superior d-flex align-items-center justify-content-between">
@@ -57,23 +58,46 @@ $cantidadNotif = 0;
                 <?php endif; ?>
             </a>
 
-            <div class="dropdown-menu dropdown-menu-end shadow-lg border-0 p-0"
-                 style="width:320px;">
-                <div class="dropdown-header bg-primary bg-opacity-10 py-3 px-3">
-                    <h6 class="mb-0 fw-bold">Notificaciones</h6>
-                    <small class="text-muted">
-                        <?= $cantidadNotif > 0 ? "Tienes $cantidadNotif sin leer" : 'Sin notificaciones nuevas' ?>
-                    </small>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+                style="width:320px;">
+
+                <li class="dropdown-header p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-dark">Notificaciones</span>
+                    <a href="<?= BASE_URL ?>/proveedor/notificaciones" class="badge bg-primary text-decoration-none">Ver todas</a>
+                </li>
+
+                <div class="notificaciones-scroll" style="max-height:300px; overflow-y:auto;">
+                    <?php if (!empty($misNotificaciones)): ?>
+                        <?php foreach ($misNotificaciones as $notif): ?>
+                            <?php $estilo = estiloNotificacion($notif['tipo'] ?? 'info'); ?>
+                            <li class="notification-item d-flex align-items-start p-3 border-bottom">
+                                <div class="me-3 fs-5 <?= $estilo['color'] ?> <?= $estilo['bg'] ?> rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                     style="width:38px; height:38px;">
+                                    <i class="bi <?= $estilo['icon'] ?>"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold fs-6 text-dark"><?= htmlspecialchars($notif['titulo']) ?></h6>
+                                    <p class="mb-1 small text-secondary lh-sm"><?= htmlspecialchars($notif['mensaje']) ?></p>
+                                    <small class="text-muted" style="font-size:0.75rem;">
+                                        <i class="bi bi-clock me-1"></i><?= $notif['hora'] ?>
+                                    </small>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li class="p-4 text-center text-muted">
+                            <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
+                            Sin notificaciones nuevas
+                        </li>
+                    <?php endif; ?>
                 </div>
-                <div class="notificaciones-scroll p-3 text-center text-muted small"
-                     style="max-height:350px; overflow-y:auto;">
-                    <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
-                    Sin notificaciones por ahora
-                </div>
-                <div class="text-center py-2 border-top">
-                    <a href="#" class="text-primary text-decoration-none small">Ver todas</a>
-                </div>
-            </div>
+
+                <li class="text-center p-2 bg-light border-top">
+                    <a href="<?= BASE_URL ?>/proveedor/notificaciones" class="small text-primary text-decoration-none fw-bold">
+                        Ver historial completo <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </li>
+            </ul>
         </div>
 
         <!-- SELECTOR DE IDIOMA -->

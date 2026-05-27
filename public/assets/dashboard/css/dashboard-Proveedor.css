@@ -371,27 +371,7 @@
         display: flex;
     }
 
-    .sidebar {
-        /* position: fixed; */
-        /* left: -280px; */
-        top: 0;
-        bottom: 0;
-        width: 280px;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar.mobile-open {
-        left: 0;
-    }
-
-    .contenido {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-
-    /* Ajustes del header */
+    /* Header sticky en tablet para mejor UX */
     .barra-superior {
         position: sticky;
         top: 0;
@@ -402,10 +382,6 @@
         padding: 12px 20px;
     }
 
-    /* Buscador se oculta en tablet/móvil */
-    .buscador.d-none.d-md-flex {
-        display: none !important;
-    }
 }
 
 /* Tablet Portrait (hasta 992px) */
@@ -439,29 +415,6 @@
 /* Móvil (hasta 768px) */
 @media screen and (max-width: 768px) {
 
-    .sidebar {
-        position: fixed;
-        /* Asegura que flote sobre el contenido */
-        top: 0;
-        left: -100%;
-        /* Oculta por defecto */
-        height: 100vh;
-        /* OBLIGATORIO para el scroll */
-        width: 280px;
-        overflow-y: auto;
-        /* Habilita el scroll interno del menú */
-        -webkit-overflow-scrolling: touch;
-        /* Suaviza el scroll en iOS */
-        z-index: 9999;
-        background: var(--white-color);
-        transition: left 0.3s ease;
-    }
-
-    .sidebar.mobile-open {
-        left: 0;
-        /* Clase para mostrarlo */
-    }
-
     .contenido {
         padding: 15px 12px;
     }
@@ -483,16 +436,6 @@
         gap: 8px;
     }
 
-    /* Ocultar selector de idioma en móvil */
-    .nav-item.dropdown.d-none.d-sm-block {
-        display: none !important;
-    }
-
-    /* Ocultar plan gold en móvil */
-    .d-none.d-lg-flex {
-        display: none !important;
-    }
-
     .usuario img {
         width: 38px;
         height: 38px;
@@ -511,10 +454,6 @@
         box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
     }
 
-    .sidebar {
-        width: 85%;
-        max-width: 300px;
-    }
 }
 
 /* Móvil pequeño (hasta 480px) */

@@ -135,6 +135,13 @@
               <p class="mb-1"><strong>Horario:</strong> <?= htmlspecialchars($detalle['franja_horaria'] ?? 'Cualquiera') ?></p>
               <p class="mb-3"><strong>Presupuesto:</strong> $ <?= htmlspecialchars($detalle['presupuesto_estimado'] ?? '0') ?></p>
 
+              <?php if (($detalle['estado'] ?? '') === 'aceptada'): ?>
+              <a href="<?= BASE_URL ?>/cliente/contrato-pdf?solicitud_id=<?= (int)$detalle['id'] ?>"
+                 class="btn btn-danger w-100 mb-3" target="_blank">
+                <i class="bi bi-file-earmark-pdf-fill me-2"></i>Descargar Comprobante PDF
+              </a>
+              <?php endif; ?>
+
               <?php
               $adj = [];
               if (!empty($detalle['adjuntos'])) {

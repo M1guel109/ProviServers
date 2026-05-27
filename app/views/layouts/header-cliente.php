@@ -1,6 +1,7 @@
 <?php
 // Aquí asumimos que session-cliente.php se ejecutó antes en la vista
 require_once BASE_PATH . '/app/controllers/perfil-controller.php';
+require_once BASE_PATH . '/app/helpers/notificaciones-cliente.php';
 
 $id = $_SESSION['user']['id'] ?? null;
 
@@ -19,8 +20,8 @@ $fotoPerfil = !empty($usuarioC['foto']) ? $usuarioC['foto'] : 'default_user.png'
 $nombrePerfil = $usuarioC['nombres'] ?? 'Usuario';
 $rolPerfil = ucfirst($usuarioC['rol'] ?? 'Cliente');
 
-// Notificaciones (simuladas por ahora)
-$cantidadNotif = 2;
+$misNotificaciones = obtenerNotificacionesCliente((int)($_SESSION['user']['id'] ?? 0));
+$cantidadNotif     = count($misNotificaciones);
 ?>
 
 <header class="barra-superior d-flex align-items-center justify-content-between">
@@ -60,32 +61,29 @@ $cantidadNotif = 2;
                 </li>
 
                 <div class="notificaciones-scroll" style="max-height: 300px; overflow-y: auto;">
-                    <li class="notification-item d-flex align-items-start p-3 border-bottom hover-bg">
-                        <div class="me-3 fs-4 text-primary bg-primary-light rounded-circle d-flex align-items-center justify-content-center" 
-                            style="width:40px; height:40px;">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-bold fs-6 text-dark">Servicio completado</h6>
-                            <p class="mb-1 small text-secondary lh-sm">Tu servicio de jardinería ha sido completado</p>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                <i class="bi bi-clock me-1"></i>Hace 2 horas
-                            </small>
-                        </div>
-                    </li>
-                    <li class="notification-item d-flex align-items-start p-3 border-bottom hover-bg">
-                        <div class="me-3 fs-4 text-warning bg-warning-light rounded-circle d-flex align-items-center justify-content-center" 
-                            style="width:40px; height:40px;">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-bold fs-6 text-dark">Cita confirmada</h6>
-                            <p class="mb-1 small text-secondary lh-sm">Tu cita de plomería ha sido confirmada</p>
-                            <small class="text-muted" style="font-size: 0.75rem;">
-                                <i class="bi bi-clock me-1"></i>Hace 1 día
-                            </small>
-                        </div>
-                    </li>
+                    <?php if (!empty($misNotificaciones)): ?>
+                        <?php foreach ($misNotificaciones as $notif): ?>
+                            <?php $estilo = estiloNotificacion($notif['tipo'] ?? 'info'); ?>
+                            <li class="notification-item d-flex align-items-start p-3 border-bottom">
+                                <div class="me-3 fs-5 <?= $estilo['color'] ?> <?= $estilo['bg'] ?> rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                     style="width:38px; height:38px;">
+                                    <i class="bi <?= $estilo['icon'] ?>"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold fs-6 text-dark"><?= htmlspecialchars($notif['titulo']) ?></h6>
+                                    <p class="mb-1 small text-secondary lh-sm"><?= htmlspecialchars($notif['mensaje']) ?></p>
+                                    <small class="text-muted" style="font-size: 0.75rem;">
+                                        <i class="bi bi-clock me-1"></i><?= $notif['hora'] ?>
+                                    </small>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <li class="p-4 text-center text-muted">
+                            <i class="bi bi-bell-slash fs-3 d-block mb-2"></i>
+                            Sin notificaciones nuevas
+                        </li>
+                    <?php endif; ?>
                 </div>
 
                 <li class="dropdown-footer text-center p-2 bg-light border-top">

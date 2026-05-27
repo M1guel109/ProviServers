@@ -10,6 +10,9 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
             <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png"
                  alt="ProviServers" class="logo-favicon">
         </a>
+        <button class="close-menu-mobile" id="closeMenuMobile" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <div class="menu-bar">

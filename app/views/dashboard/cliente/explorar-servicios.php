@@ -1,12 +1,13 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
-require_once BASE_PATH . '/app/controllers/proveedor-controller.php';
+require_once BASE_PATH . '/app/models/Categoria.php';
 
 // Aseguramos que las variables existan para evitar errores de notice
 $busqueda = $busqueda ?? '';
 $catActual = $catActual ?? '';
-// $publicaciones = obtenerDetallePublicacion($id) ?? [];
-$categorias = obtenerCategorias();
+$publicaciones = $publicaciones ?? [];
+$objCategoria = new Categoria();
+$categorias = $objCategoria->mostrar() ?: [];
 
 
 ?>
@@ -222,7 +223,7 @@ $categorias = obtenerCategorias();
                             <label class="form-label fw-bold">Horario <span class="text-danger">*</span></label>
                             <select name="franja_horaria" class="form-select" required>
                                 <option value="">Seleccionar horario</option>
-                                <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                <option value="manana">Mañana (8:00 - 12:00)</option>
                                 <option value="tarde">Tarde (12:00 - 18:00)</option>
                                 <option value="noche">Noche (18:00 - 22:00)</option>
                             </select>

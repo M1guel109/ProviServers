@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command ' *)",
+      "PowerShell(& \"C:\\\\xampp\\\\php\\\\php.exe\" -r \"echo password_hash\\('Provi2024!', PASSWORD_DEFAULT\\);\")",
+      "Bash(curl -s -b /tmp/cookie_prov.txt -c /tmp/cookie_prov.txt http://localhost/ProviServers/proveedor/contrato-pdf?contrato_id=27 -D - -o /tmp/test_pdf_prov.bin)",
+      "Bash(cat /tmp/test_pdf_prov.bin | head -c 2000)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -b /tmp/cookie_prov.txt -c /tmp/cookie_prov.txt http://localhost/ProviServers/proveedor/contrato-pdf?contrato_id=27 -D - -o /tmp/test_pdf_prov2.bin)",
+      "Bash(php -r \"echo extension_loaded\\('gd'\\) ? 'GD OK' : 'GD MISSING';\")",
+      "Bash(php --ini)",
+      "Bash(curl -s \"http://localhost/ProviServers/\" -o /dev/null -w \"%{http_code}\")",
+      "Bash(curl -s -b /tmp/cookie_prov.txt -c /tmp/cookie_prov.txt http://localhost/ProviServers/proveedor/contrato-pdf?contrato_id=27 -D - -o /tmp/test_pdf_prov3.bin)",
+      "Bash(curl -s -c /tmp/cookie_cli2.txt -b /tmp/cookie_cli2.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=valtorres%40gmail.com&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
+      "Bash(mysql -u root -e \"SELECT u.email, u.id FROM usuarios u JOIN clientes c ON c.usuario_id = u.id LIMIT 5;\" ProviServers)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -u root -e \"SELECT u.email FROM usuarios u JOIN clientes c ON c.usuario_id = u.id LIMIT 5;\" ProviServers)",
+      "Bash(curl -s -c /tmp/cookie_cli2.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=valentina.torres%40proviservers.co&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
+      "Bash(curl -s -c /tmp/cookie_cli2.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=cliente%40gmail.com&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
+      "Bash(C:/xampp/mysql/bin/mysql.exe -u root -e ' *)"
+    ],
+    "additionalDirectories": [
+      "C:\\xampp\\php"
+    ]
+  }
+}
