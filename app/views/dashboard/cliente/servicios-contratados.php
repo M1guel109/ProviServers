@@ -167,9 +167,27 @@
 
                       <!-- ✅ "Ver detalles" pendiente de ruta real -->
                       <a href="<?= BASE_URL ?>/cliente/mis-solicitudes"
-                        class="btn btn-primary w-100">
+                        class="btn btn-primary w-100 mb-2">
                         Ver detalles
                       </a>
+
+                      <?php
+                      $montoSrv   = (float)($srv['monto']     ?? 0);
+                      $yaPagado   = (int)($srv['ya_pagado']   ?? 0);
+                      ?>
+                      <?php if ($montoSrv > 0 && !$yaPagado && $estadoContrato === 'en_proceso'): ?>
+                        <button type="button"
+                          class="btn btn-success w-100 btn-pagar-servicio"
+                          data-contrato-id="<?= $contratoId ?>"
+                          data-monto="<?= number_format($montoSrv, 0, ',', '.') ?>"
+                          data-titulo="<?= htmlspecialchars($tituloServicio) ?>">
+                          <i class="bi bi-credit-card me-1"></i> Pagar servicio
+                        </button>
+                      <?php elseif ($yaPagado): ?>
+                        <span class="badge bg-success w-100 py-2">
+                          <i class="bi bi-check-circle me-1"></i> Pagado
+                        </span>
+                      <?php endif; ?>
                     </div>
                   </div>
                 </div>
@@ -252,6 +270,24 @@
                         class="btn btn-primary w-100 mb-2">
                         Ver detalles
                       </a>
+
+                      <?php
+                      $montoSrv2 = (float)($srv['monto']     ?? 0);
+                      $yaPagado2 = (int)($srv['ya_pagado']   ?? 0);
+                      ?>
+                      <?php if ($montoSrv2 > 0 && !$yaPagado2 && $estadoContrato === 'confirmado'): ?>
+                        <button type="button"
+                          class="btn btn-success w-100 mb-2 btn-pagar-servicio"
+                          data-contrato-id="<?= $contratoId ?>"
+                          data-monto="<?= number_format($montoSrv2, 0, ',', '.') ?>"
+                          data-titulo="<?= htmlspecialchars($tituloServicio) ?>">
+                          <i class="bi bi-credit-card me-1"></i> Pagar servicio
+                        </button>
+                      <?php elseif ($yaPagado2): ?>
+                        <span class="badge bg-success w-100 py-2 mb-2">
+                          <i class="bi bi-check-circle me-1"></i> Pagado
+                        </span>
+                      <?php endif; ?>
 
                       <!-- ✅ Cancelar con data-attribute — SweetAlert abajo -->
                       <?php if ($contratoId > 0 && in_array($estadoContrato, ['pendiente', 'confirmado'], true)): ?>
@@ -564,6 +600,58 @@
         if (result.isConfirmed) {
           document.getElementById('form-cancelar-' + contratoId)?.submit();
         }
+      });
+    });
+  </script>
+
+  <!-- ── Pagar servicio ─────────────────────────────── -->
+  <script>
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn-pagar-servicio');
+      if (!btn) return;
+
+      const contratoId = btn.dataset.contratoId;
+      const monto      = btn.dataset.monto;
+      const titulo     = btn.dataset.titulo || 'este servicio';
+
+      Swal.fire({
+        title: 'Confirmar pago',
+        html: `<p class="mb-1">Servicio: <strong>${titulo}</strong></p>
+               <p>Monto: <strong class="text-success">$${monto} COP</strong></p>`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-credit-card me-1"></i> Ir a pagar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#198754'
+      }).then(result => {
+        if (!result.isConfirmed) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+
+        const body = new FormData();
+        body.append('contrato_id', contratoId);
+
+        fetch('<?= BASE_URL ?>/cliente/pagar-servicio', {
+          method: 'POST',
+          body,
+          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+          .then(r => r.json())
+          .then(data => {
+            if (data.ok) {
+              window.location.href = data.url;
+            } else {
+              Swal.fire('Error', data.error || 'No se pudo iniciar el pago.', 'error');
+              btn.disabled = false;
+              btn.innerHTML = '<i class="bi bi-credit-card me-1"></i> Pagar servicio';
+            }
+          })
+          .catch(() => {
+            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-credit-card me-1"></i> Pagar servicio';
+          });
       });
     });
   </script>

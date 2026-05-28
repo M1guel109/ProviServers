@@ -438,6 +438,16 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
+    // CLIENTE — Pago de servicios (MercadoPago)
+
+    case '/cliente/pagar-servicio':
+    case '/cliente/pago-servicio-exitoso':
+    case '/cliente/pago-servicio-pendiente':
+    case '/cliente/pago-servicio-fallido':
+    case '/cliente/pago-servicio/webhook':
+        require BASE_PATH . '/app/controllers/pago-servicio-controller.php';
+        break;
+
     // CLIENTE — Perfil
 
     case '/cliente/perfil':

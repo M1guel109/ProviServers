@@ -126,6 +126,20 @@ function mostrarServiciosContratados()
     $modelo    = new ServicioContratado();
     $contratos = $modelo->listarPorClienteUsuario($usuarioId) ?: [];
 
+    // Marcar cuáles ya tienen pago registrado (tabla puede no existir aún)
+    $pagadosIds = [];
+    try {
+        $dbPag = new Conexion();
+        $pdoPag = $dbPag->getConexion();
+        $stPag = $pdoPag->query("SELECT servicio_contratado_id FROM pagos_servicios");
+        $pagadosIds = array_column($stPag->fetchAll(PDO::FETCH_ASSOC), 'servicio_contratado_id');
+    } catch (PDOException $e) { /* tabla aún no existe */ }
+
+    foreach ($contratos as &$c) {
+        $c['ya_pagado'] = in_array((int)$c['contrato_id'], $pagadosIds, true) ? 1 : 0;
+    }
+    unset($c);
+
     foreach ($contratos as $c) {
         $estado = $c['estado'] ?? 'pendiente';
         switch ($estado) {

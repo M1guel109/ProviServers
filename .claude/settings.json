@@ -46,7 +46,8 @@
       "Bash(curl -s -c /tmp/cookie_cli3.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=cliente%40gmail.com&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
       "Bash(curl -s -b /tmp/cookie_cli3.txt -X POST http://localhost/ProviServers/cliente/servicios-contratados/calificar -d 'accion=calificar_servicio&contrato_id=29&calificacion=5&comentario=Excelente+servicio' -H 'Content-Type: application/x-www-form-urlencoded' -L -o /tmp/calificar2.html)",
       "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\views\\\\dashboard\" -Recurse -Filter \"*.php\")",
-      "Bash(Get-Content \"C:\\\\xampp\\\\apache\\\\logs\\\\error.log\" -Tail 30)"
+      "Bash(Get-Content \"C:\\\\xampp\\\\apache\\\\logs\\\\error.log\" -Tail 30)",
+      "Read(//c/Users/luism/Downloads/**)"
     ]
   }
 }
