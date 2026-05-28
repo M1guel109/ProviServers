@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selectEstado.addEventListener('change', toggleCamposSeguimiento);
         toggleCamposSeguimiento();
     }
+
 });
 
 /**
@@ -227,7 +228,7 @@ async function guardarNuevoAvance(formulario) {
     // Acción que espera tu controlador general
     formData.set('accion', 'actualizar_estado_servicio');
 
-    const CONTROLLER_URL = `${BASE_URL}/app/controllers/ProveedorOperacionController.php`;
+    const CONTROLLER_URL = `${BASE_URL}/proveedor/actualizar-estado`;
 
     const btnSubmit = getBotonGuardarSeguimiento();
     const originalHtml = btnSubmit ? btnSubmit.innerHTML : 'Guardar';

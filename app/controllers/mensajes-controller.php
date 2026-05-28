@@ -65,8 +65,8 @@ function mostrarInbox()
     $uid    = (int)$_SESSION['user']['id'];
     $modelo = new Mensajeria();
 
-    $conversaciones = $modelo->listarInbox($uid);
-    $vista          = resolverVistaRol('inbox');
+    $convs = $modelo->listarInbox($uid);
+    $vista = resolverVistaRol('inbox');
 
     require $vista;
     exit();
@@ -156,7 +156,23 @@ function enviarMensaje()
     }
 
     $receptorId = $modelo->obtenerOtroUsuarioId($conversacion, $uid);
-    $msgId      = $modelo->crearMensaje($convId, $uid, $receptorId, $texto);
+
+    try {
+        $msgId = $modelo->crearMensaje($convId, $uid, $receptorId, $texto);
+    } catch (Exception $e) {
+        if ($e->getMessage() === 'CONTACTO_BLOQUEADO') {
+            http_response_code(422);
+            echo json_encode([
+                'ok'      => false,
+                'bloqueado' => true,
+                'error'   => 'Por políticas de ProviServers no está permitido compartir datos de contacto (teléfonos, emails o links externos). Todos los tratos deben cerrarse dentro de la plataforma.',
+            ]);
+            exit;
+        }
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'error' => 'Error al enviar el mensaje.']);
+        exit;
+    }
 
     echo json_encode(['ok' => true, 'id' => $msgId]);
     exit;

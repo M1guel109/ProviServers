@@ -558,10 +558,12 @@ function escapeRegex(str) {
 }
 
 function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function (m) {
+  return String(str ?? '').replace(/[&<>"']/g, function (m) {
     if (m === "&") return "&amp;";
     if (m === "<") return "&lt;";
     if (m === ">") return "&gt;";
+    if (m === '"') return "&quot;";
+    if (m === "'") return "&#039;";
     return m;
   });
 }

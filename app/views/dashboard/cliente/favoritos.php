@@ -1,96 +1,47 @@
+<?php
+require_once BASE_PATH . '/app/helpers/session-cliente.php';
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proviservers | Favoritos</title>
-
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-  <!-- Estilos globales -->
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-  <!-- Estilos específicos de cliente -->
-  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proviservers | Favoritos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
 </head>
 <body>
-  <!-- SIDEBAR -->
-  <?php 
+    <?php
     $currentPage = 'favoritos';
-    include_once __DIR__ . '/../../layouts/sidebar-cliente.php'; 
-  ?>
+    include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
+    ?>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="contenido">
+    <main class="contenido">
+        <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
-    <!-- HEADER -->
-    <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
+        <section id="favoritos">
+            <div class="container">
+                <div class="section-hero mb-4">
+                    <p class="breadcrumb">Inicio &gt; Favoritos</p>
+                    <h1><i class="bi bi-heart-fill text-danger me-2"></i>Mis Favoritos</h1>
+                    <p>Tus proveedores preferidos, guardados para contratarlos fácilmente.</p>
+                </div>
 
-    <section id="favoritos">
-      <div class="container">
-      <div class="section-hero mb-4">
-        <p class="breadcrumb">Inicio > Favoritos</p>
-        <h1><i class=" bi text-primary"></i>Mis Favoritos</h1>
-        <p>Tus proveedores locales preferidos, listos para atenderte donde estés.</p>
-      </div>
-
-        <div class="row gy-4">
-          <!-- Tarjeta de servicio favorito -->
-          <div class="col-lg-4 col-md-6" data-id="1">
-            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
-              <img src="<?= BASE_URL ?>/public/uploads/proveedores/reparaciones.jpg" class="card-img-top img-servicio" alt="Reparaciones a domicilio">
-              <button class="btn btn-fav position-absolute top-0 end-0 m-2 p-2 rounded-circle">
-                <i class="bi bi-heart-fill"></i>
-              </button>
-              <div class="card-body text-center d-flex flex-column justify-content-between">
-                <h5 class="card-title fw-bold mb-1">Reparaciones a domicilio</h5>
-                <p class="text-muted small mb-2">Proveedor: Juan Pérez</p>
-                <a href="#" class="btn btn-primary btn-sm mt-auto">Solicitar servicio</a>
-              </div>
+                <div class="text-center py-5">
+                    <i class="bi bi-heart text-muted" style="font-size:3rem;"></i>
+                    <h5 class="mt-3 text-muted fw-semibold">Aún no tienes favoritos guardados</h5>
+                    <p class="text-muted small">Explora proveedores y guarda los que más te gusten para encontrarlos rápidamente.</p>
+                    <a href="<?= BASE_URL ?>/cliente/explorar" class="btn btn-primary mt-2">
+                        <i class="bi bi-search me-2"></i>Explorar proveedores
+                    </a>
+                </div>
             </div>
-          </div>
+        </section>
+    </main>
 
-          <!-- Repite para cada proveedor -->
-          <div class="col-lg-4 col-md-6" data-id="2">
-            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
-              <img src="<?= BASE_URL ?>/public/uploads/proveedores/cosmetologaBelleza.jpg" class="card-img-top img-servicio" alt="Belleza a domicilio">
-              <button class="btn btn-fav position-absolute top-0 end-0 m-2 p-2 rounded-circle">
-                <i class="bi bi-heart-fill"></i>
-              </button>
-              <div class="card-body text-center d-flex flex-column justify-content-between">
-                <h5 class="card-title fw-bold mb-1">Belleza y cuidado personal</h5>
-                <p class="text-muted small mb-2">Proveedor: María Gómez</p>
-                <a href="#" class="btn btn-primary btn-sm mt-auto">Solicitar servicio</a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6" data-id="3">
-            <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden position-relative">
-              <img src="<?= BASE_URL ?>/public/uploads/proveedores/veterinaria-domicilio.jpg" class="card-img-top img-servicio" alt="Veterinaria móvil">
-              <button class="btn btn-fav position-absolute top-0 end-0 m-2 p-2 rounded-circle">
-                <i class="bi bi-heart-fill"></i>
-              </button>
-              <div class="card-body text-center d-flex flex-column justify-content-between">
-                <h5 class="card-title fw-bold mb-1">Veterinaria móvil</h5>
-                <p class="text-muted small mb-2">Proveedor: Clínica Mi Mascota</p>
-                <a href="#" class="btn btn-primary btn-sm mt-auto">Solicitar servicio</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-
-
-  </main>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- JS propio -->
-  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
 </body>
 </html>

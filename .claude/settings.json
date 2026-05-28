@@ -40,7 +40,13 @@
       "Bash(curl -s -c /tmp/cookie_admin.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=admin%40proviservers.com&clave=Admin123!' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
       "Bash(C:/xampp/mysql/bin/mysql.exe -u root ProviServers -e \"SELECT email FROM usuarios WHERE rol='admin' LIMIT 3;\")",
       "Bash(curl -s -c /tmp/cookie_admin.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=ana1%40gmail.com&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
-      "Bash(curl -s -b /tmp/cookie_admin.txt http://localhost/ProviServers/admin/reporte?tipo=usuarios -D - -o /tmp/pdf_admin_usuarios.bin)"
+      "Bash(curl -s -b /tmp/cookie_admin.txt http://localhost/ProviServers/admin/reporte?tipo=usuarios -D - -o /tmp/pdf_admin_usuarios.bin)",
+      "Bash(curl -s -b /tmp/cookie_prov4.txt -X POST http://localhost/ProviServers/proveedor/actualizar-estado -d 'accion=actualizar_estado_servicio&contrato_id=29&estado_actual=finalizado' -H 'Content-Type: application/x-www-form-urlencoded')",
+      "Bash(curl -s -b /tmp/cookie_val3.txt -c /tmp/cookie_val3.txt -X POST http://localhost/ProviServers/cliente/servicios-contratados/calificar -d 'accion=calificar_servicio&contrato_id=29&calificacion=5&comentario=Excelente+servicio+probando+el+flujo' -H 'Content-Type: application/x-www-form-urlencoded' -L -o /tmp/calificar_resp.html)",
+      "Bash(curl -s -c /tmp/cookie_cli3.txt -X POST http://localhost/ProviServers/iniciar-sesion -d 'accion=iniciar_sesion&email=cliente%40gmail.com&clave=Test1234%21' -H 'Content-Type: application/x-www-form-urlencoded' -L)",
+      "Bash(curl -s -b /tmp/cookie_cli3.txt -X POST http://localhost/ProviServers/cliente/servicios-contratados/calificar -d 'accion=calificar_servicio&contrato_id=29&calificacion=5&comentario=Excelente+servicio' -H 'Content-Type: application/x-www-form-urlencoded' -L -o /tmp/calificar2.html)",
+      "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\views\\\\dashboard\" -Recurse -Filter \"*.php\")",
+      "Bash(Get-Content \"C:\\\\xampp\\\\apache\\\\logs\\\\error.log\" -Tail 30)"
     ]
   }
 }

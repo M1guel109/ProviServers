@@ -1,5 +1,7 @@
 <?php
-function tiempoRelativoInboxCli(?string $fh): string {
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+
+function tiempoRelativoInboxProv(?string $fh): string {
     if (!$fh) return '';
     $ts = strtotime($fh);
     if ($ts === false) return $fh;
@@ -24,22 +26,21 @@ function tiempoRelativoInboxCli(?string $fh): string {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/mensajes.css">
 </head>
 <body>
 <?php
 $currentPage = 'mensajes';
-include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
+include_once __DIR__ . '/../../../layouts/sidebar-proveedor.php';
 ?>
 <main class="contenido">
-    <?php include_once __DIR__ . '/../../../layouts/header-cliente.php'; ?>
+    <?php include_once __DIR__ . '/../../../layouts/header-proveedor.php'; ?>
 
     <div class="container-fluid px-4 py-3">
 
         <div class="inbox-header">
             <h1><i class="bi bi-chat-dots me-2 text-primary"></i>Mensajes</h1>
-            <p>Comunícate con tus proveedores. Todos los tratos deben cerrarse dentro de la plataforma.</p>
+            <p>Comunícate con tus clientes. Todos los tratos deben cerrarse dentro de la plataforma.</p>
         </div>
 
         <div class="conv-list">
@@ -47,25 +48,24 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
                 <div class="inbox-empty">
                     <i class="bi bi-chat-square-text"></i>
                     <p class="mb-1 fw-semibold">No tienes conversaciones aún</p>
-                    <small>Aparecerán aquí una vez que solicites o contratas un servicio.</small>
+                    <small>Cuando aceptes una solicitud o envíes una cotización aparecerá aquí.</small>
                 </div>
             <?php else: ?>
                 <?php foreach ($convs as $c): ?>
                     <?php
                         $nombre   = trim(($c['otro_nombres'] ?? '') . ' ' . ($c['otro_apellidos'] ?? ''));
-                        $rolOtro  = $c['otro_rol'] ?? '';
-                        $nombre   = ($rolOtro === 'proveedor' ? 'Prov. ' : '') . ($nombre !== '' ? $nombre : 'Proveedor');
+                        $nombre   = $nombre !== '' ? $nombre : 'Cliente';
                         $tema     = $c['tema'] ?? 'Conversación';
                         $preview  = $c['ultimo_contenido'] ?? '';
                         $preview  = $preview !== '' ? mb_strimwidth($preview, 0, 110, '…') : 'Sin mensajes aún.';
-                        $cuando   = tiempoRelativoInboxCli($c['ultimo_fecha'] ?? null);
+                        $cuando   = tiempoRelativoInboxProv($c['ultimo_fecha'] ?? null);
                         $noLeidos = (int)($c['no_leidos'] ?? 0);
                     ?>
                     <a href="<?= BASE_URL ?>/mensajes/ver?id=<?= (int)$c['id'] ?>"
                        class="conv-item <?= $noLeidos > 0 ? 'no-leidos' : '' ?>">
 
                         <div class="conv-avatar">
-                            <i class="bi bi-person-workspace"></i>
+                            <i class="bi bi-person"></i>
                         </div>
 
                         <div class="conv-body">
@@ -91,6 +91,6 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
 </html>

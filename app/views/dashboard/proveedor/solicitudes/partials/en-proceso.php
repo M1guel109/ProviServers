@@ -70,8 +70,18 @@ $stats_en_proceso = count($servicios);
                 ?? $servicio['solicitud_fecha_preferida']
                 ?? null;
 
-            $contratoId = (int)($servicio['contrato_id'] ?? 0);
+            $contratoId    = (int)($servicio['contrato_id'] ?? 0);
             $clienteNombre = $servicio['cliente_nombre'] ?? 'Cliente';
+
+            $solicitudIdMsg  = (int)($servicio['solicitud_id'] ?? 0);
+            $cotizacionIdMsg = (int)($servicio['cotizacion_id'] ?? 0);
+            if ($solicitudIdMsg > 0) {
+                $urlContactar = BASE_URL . '/mensajes/abrir?tipo=solicitud&id=' . $solicitudIdMsg;
+            } elseif ($cotizacionIdMsg > 0) {
+                $urlContactar = BASE_URL . '/mensajes/abrir?tipo=cotizacion&id=' . $cotizacionIdMsg;
+            } else {
+                $urlContactar = BASE_URL . '/proveedor/mensajes';
+            }
             ?>
 
             <div class="tarjeta-proceso" data-contrato-id="<?= $contratoId ?>">
@@ -133,17 +143,17 @@ $stats_en_proceso = count($servicios);
                         class="btn-accion btn-actualizar"
                         onclick='abrirSeguimiento(
                             <?= $contratoId ?>,
-                            "<?= htmlspecialchars($tituloServicio, ENT_QUOTES) ?>",
-                            "<?= htmlspecialchars($estadoKey, ENT_QUOTES) ?>",
-                            "<?= htmlspecialchars($clienteNombre, ENT_QUOTES) ?>"
+                            <?= json_encode((string)$tituloServicio, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>,
+                            <?= json_encode((string)$estadoKey) ?>,
+                            <?= json_encode((string)$clienteNombre, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>
                         )'>
                         <i class="bi bi-clipboard-pulse"></i> Hacer Seguimiento
                     </button>
 
-                    <button type="button"
-                        class="btn-accion btn-contactar">
+                    <a href="<?= $urlContactar ?>"
+                       class="btn-accion btn-contactar">
                         <i class="bi bi-chat-dots"></i> Contactar
-                    </button>
+                    </a>
 
                     <a href="<?= BASE_URL ?>/proveedor/contrato-pdf?contrato_id=<?= $contratoId ?>"
                        class="btn-accion" target="_blank"

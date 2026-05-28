@@ -1,27 +1,111 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/app/models/ServicioContratado.php';
+require_once BASE_PATH . '/config/database.php';
 
-// Aquí iría la lógica para obtener datos reales desde el controlador
-// Por ahora usamos datos de ejemplo
+$uid     = (int)($_SESSION['user']['id'] ?? 0);
+$scModel = new ServicioContratado();
+$resumen = $scModel->obtenerResumenDashboardProveedor($uid);
+
+$serviciosCompletados = 0;
+$clientesNuevosMes    = 0;
+$ingresosAnuales      = 0.0;
+$ingresos_meses       = ['meses' => [], 'valores' => []];
+$servicios_categorias = ['categorias' => [], 'valores' => []];
+
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
+
+    // Servicios completados totales
+    $st = $pdo->prepare("
+        SELECT COUNT(*) FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        WHERE p.usuario_id = ? AND sc.estado = 'finalizado'
+    ");
+    $st->execute([$uid]);
+    $serviciosCompletados = (int)$st->fetchColumn();
+
+    // Clientes distintos este mes
+    $st = $pdo->prepare("
+        SELECT COUNT(DISTINCT sc.cliente_id)
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        WHERE p.usuario_id = ?
+          AND DATE_FORMAT(sc.created_at, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+    ");
+    $st->execute([$uid]);
+    $clientesNuevosMes = (int)$st->fetchColumn();
+
+    // Ingresos anuales
+    $st = $pdo->prepare("
+        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = ? AND sc.estado = 'finalizado'
+          AND YEAR(COALESCE(sc.fecha_ejecucion, sc.created_at)) = YEAR(CURDATE())
+    ");
+    $st->execute([$uid]);
+    $ingresosAnuales = (float)$st->fetchColumn();
+
+    // Ingresos por mes (últimos 12 meses) para gráfica
+    $st = $pdo->prepare("
+        SELECT DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%b') AS mes,
+               DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%Y-%m') AS mes_key,
+               COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0) AS total
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = :uid AND sc.estado = 'finalizado'
+          AND COALESCE(sc.fecha_ejecucion, sc.created_at) >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY mes_key, mes
+        ORDER BY mes_key ASC
+    ");
+    $st->execute([':uid' => $uid]);
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+    if ($rows) {
+        $ingresos_meses = [
+            'meses'  => array_column($rows, 'mes'),
+            'valores' => array_map('floatval', array_column($rows, 'total')),
+        ];
+    }
+
+    // Contratos por categoría de servicio para gráfica
+    $st = $pdo->prepare("
+        SELECT COALESCE(cat.nombre, 'Sin categoría') AS categoria, COUNT(sc.id) AS total
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        INNER JOIN servicios sv  ON sv.id  = sc.servicio_id
+        LEFT  JOIN categorias cat ON cat.id = sv.id_categoria
+        WHERE p.usuario_id = :uid
+        GROUP BY cat.id, cat.nombre
+        ORDER BY total DESC
+        LIMIT 6
+    ");
+    $st->execute([':uid' => $uid]);
+    $catRows = $st->fetchAll(PDO::FETCH_ASSOC);
+    if ($catRows) {
+        $servicios_categorias = [
+            'categorias' => array_column($catRows, 'categoria'),
+            'valores'    => array_map('intval', array_column($catRows, 'total')),
+        ];
+    }
+} catch (PDOException $e) {
+    error_log('estadisticas.php: ' . $e->getMessage());
+}
+
 $estadisticas = [
-    'ingresos_mes' => 2450000,
-    'servicios_mes' => 48,
-    'clientes_nuevos' => 12,
-    'calificacion_promedio' => 4.8,
-    'servicios_completados' => 156,
-    'tasa_aceptacion' => 92,
-    'tiempo_respuesta_promedio' => 2.5,
-    'ingresos_anuales' => 18350000
-];
-
-$ingresos_meses = [
-    'meses' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-    'valores' => [1850000, 2100000, 1950000, 2300000, 2450000, 2680000, 2520000, 2780000, 2650000, 2900000, 2850000, 3100000]
-];
-
-$servicios_categorias = [
-    'categorias' => ['Plomería', 'Electricidad', 'Limpieza', 'Pintura', 'Jardinería', 'Carpintería'],
-    'valores' => [42, 38, 25, 18, 15, 12]
+    'ingresos_mes'             => $resumen['ingresos_mes'],
+    'servicios_mes'            => $serviciosCompletados,
+    'clientes_nuevos'          => $clientesNuevosMes,
+    'calificacion_promedio'    => $resumen['calificacion_promedio'] ?? 0,
+    'servicios_completados'    => $serviciosCompletados,
+    'tasa_aceptacion'          => 0,
+    'tiempo_respuesta_promedio'=> 0,
+    'ingresos_anuales'         => $ingresosAnuales,
 ];
 ?>
 
@@ -199,10 +283,7 @@ $servicios_categorias = [
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-success" style="width: 85%"></div>
-                                </div>
-                                <small class="text-muted mt-2 d-block">85% de meta mensual</small>
+                                <small class="text-muted mt-2 d-block">Total acumulado</small>
                             </div>
                         </div>
                     </div>
@@ -211,18 +292,15 @@ $servicios_categorias = [
                         <div class="card shadow-sm p-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="text-muted small">Tasa de aceptación</span>
-                                    <h3 class="fw-bold mt-1"><?= $estadisticas['tasa_aceptacion'] ?>%</h3>
+                                    <span class="text-muted small">Clientes este mes</span>
+                                    <h3 class="fw-bold mt-1"><?= $estadisticas['clientes_nuevos'] ?></h3>
                                 </div>
                                 <div class="bg-primary-light p-3 rounded-circle">
-                                    <i class="bi bi-hand-thumbs-up-fill text-primary fs-3"></i>
+                                    <i class="bi bi-people-fill text-primary fs-3"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-primary" style="width: <?= $estadisticas['tasa_aceptacion'] ?>%"></div>
-                                </div>
-                                <small class="text-muted mt-2 d-block">+5% vs mes anterior</small>
+                                <small class="text-muted mt-2 d-block">Clientes distintos atendidos</small>
                             </div>
                         </div>
                     </div>
@@ -231,18 +309,19 @@ $servicios_categorias = [
                         <div class="card shadow-sm p-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="text-muted small">Tiempo respuesta</span>
-                                    <h3 class="fw-bold mt-1"><?= $estadisticas['tiempo_respuesta_promedio'] ?> hrs</h3>
+                                    <span class="text-muted small">Calificación promedio</span>
+                                    <h3 class="fw-bold mt-1">
+                                        <?= $estadisticas['calificacion_promedio']
+                                            ? number_format($estadisticas['calificacion_promedio'], 1)
+                                            : 'N/A' ?>
+                                    </h3>
                                 </div>
                                 <div class="bg-warning-light p-3 rounded-circle">
-                                    <i class="bi bi-clock-fill text-warning fs-3"></i>
+                                    <i class="bi bi-star-fill text-warning fs-3"></i>
                                 </div>
                             </div>
                             <div class="mt-3">
-                                <div class="progress" style="height: 8px;">
-                                    <div class="progress-bar bg-warning" style="width: 70%"></div>
-                                </div>
-                                <small class="text-muted mt-2 d-block">Meta: 2 horas</small>
+                                <small class="text-muted mt-2 d-block">Promedio de tus valoraciones</small>
                             </div>
                         </div>
                     </div>
@@ -276,46 +355,16 @@ $servicios_categorias = [
                     </div>
                     <div class="card-body">
                         <div class="list-group list-group-flush">
-                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <div>
-                                    <span class="fw-bold">Plomería</span>
-                                    <br>
-                                    <small class="text-muted">Reparaciones y mantenimiento</small>
+                            <?php if (!empty($servicios_categorias['categorias'])): ?>
+                                <?php foreach ($servicios_categorias['categorias'] as $i => $cat): ?>
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="fw-bold"><?= htmlspecialchars($cat) ?></span>
+                                    <span class="badge bg-primary rounded-pill"><?= $servicios_categorias['valores'][$i] ?? 0 ?></span>
                                 </div>
-                                <span class="badge bg-primary rounded-pill">42</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <div>
-                                    <span class="fw-bold">Electricidad</span>
-                                    <br>
-                                    <small class="text-muted">Instalaciones y reparaciones</small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">38</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <div>
-                                    <span class="fw-bold">Limpieza</span>
-                                    <br>
-                                    <small class="text-muted">Hogar y oficinas</small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">25</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <div>
-                                    <span class="fw-bold">Pintura</span>
-                                    <br>
-                                    <small class="text-muted">Interiores y exteriores</small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">18</span>
-                            </div>
-                            <div class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                <div>
-                                    <span class="fw-bold">Jardinería</span>
-                                    <br>
-                                    <small class="text-muted">Mantenimiento de áreas verdes</small>
-                                </div>
-                                <span class="badge bg-primary rounded-pill">15</span>
-                            </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted small py-2">Sin datos de categorías aún.</p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -338,15 +387,19 @@ $servicios_categorias = [
                                 <small class="text-muted">Ingresos totales</small>
                             </div>
                             <div class="col-md-3">
-                                <h5 class="fw-bold">156</h5>
+                                <h5 class="fw-bold"><?= $estadisticas['servicios_completados'] ?></h5>
                                 <small class="text-muted">Servicios completados</small>
                             </div>
                             <div class="col-md-3">
-                                <h5 class="fw-bold">48</h5>
-                                <small class="text-muted">Clientes nuevos</small>
+                                <h5 class="fw-bold"><?= $estadisticas['clientes_nuevos'] ?></h5>
+                                <small class="text-muted">Clientes atendidos</small>
                             </div>
                             <div class="col-md-3">
-                                <h5 class="fw-bold">4.9</h5>
+                                <h5 class="fw-bold">
+                                    <?= $estadisticas['calificacion_promedio']
+                                        ? number_format($estadisticas['calificacion_promedio'], 1)
+                                        : 'N/A' ?>
+                                </h5>
                                 <small class="text-muted">Calificación promedio</small>
                             </div>
                         </div>

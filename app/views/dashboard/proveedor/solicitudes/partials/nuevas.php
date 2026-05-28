@@ -151,7 +151,7 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
                                         <i class="bi bi-check-lg"></i> Aceptar
                                     </a>
 
-                                    <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar&id=<?= $solicitudId ?>&tab=nuevas"
+                                    <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar_solicitud&id=<?= $solicitudId ?>&tab=nuevas"
                                         class="btn btn-sm btn-outline-danger flex-fill"
                                         title="Rechazar"
                                         onclick="return confirm('¿Rechazar esta solicitud?')">

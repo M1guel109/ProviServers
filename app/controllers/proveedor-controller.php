@@ -126,6 +126,20 @@ function registrarServicio()
         exit();
     }
 
+    // Verificar límite de publicaciones del plan activo
+    require_once BASE_PATH . '/app/helpers/plan-helper.php';
+    if (!proveedorPuedePublicar($usuarioId)) {
+        $plan = obtenerPlanActivoProveedor($usuarioId);
+        $max  = $plan['max_servicios_activos'] ?? 3;
+        mostrarSweetAlert(
+            'warning',
+            'Límite de publicaciones alcanzado',
+            "Tu plan \"{$plan['nombre']}\" permite hasta {$max} publicaciones activas. Mejora tu membresía para publicar más.",
+            BASE_URL . '/proveedor/membresia'
+        );
+        exit();
+    }
+
     $nombre         = trim($_POST['nombre'] ?? '');
     $id_categoria   = (int)($_POST['id_categoria'] ?? 0);
     $precio         = $_POST['precio'] ?? '';

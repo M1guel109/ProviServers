@@ -280,6 +280,14 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/membresia.php';
         break;
 
+    case '/proveedor/membresia/pagar':
+    case '/proveedor/membresia/pago-exitoso':
+    case '/proveedor/membresia/pago-pendiente':
+    case '/proveedor/membresia/pago-fallido':
+    case '/proveedor/membresia/webhook':
+        require BASE_PATH . '/app/controllers/membresia-controller.php';
+        break;
+
     case '/proveedor/completadas':
         require BASE_PATH . '/app/views/dashboard/proveedor/completadas.php';
         break;
@@ -453,6 +461,7 @@ switch ($request) {
     // CLIENTE — Mensajes
 
     case '/cliente/mensajes':
+    case '/proveedor/mensajes':
     case '/mensajes/abrir':
     case '/mensajes/ver':
     case '/mensajes/enviar':

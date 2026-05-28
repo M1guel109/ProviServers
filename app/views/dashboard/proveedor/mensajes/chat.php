@@ -1,4 +1,6 @@
 <?php
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+
 $convId = (int)($convId ?? 0);
 $uid    = (int)($_SESSION['user']['id'] ?? 0);
 $last   = '1970-01-01 00:00:00';
@@ -7,7 +9,7 @@ if (!empty($mensajes)) {
     if (!empty($ult['fecha_hora'])) $last = $ult['fecha_hora'];
 }
 
-function fmtHoraCli(?string $fh): string {
+function fmtHora(?string $fh): string {
     if (!$fh) return '';
     $ts = strtotime($fh);
     if ($ts === false) return $fh;
@@ -23,16 +25,15 @@ function fmtHoraCli(?string $fh): string {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/mensajes.css">
 </head>
 <body>
 <?php
 $currentPage = 'mensajes';
-include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
+include_once __DIR__ . '/../../../layouts/sidebar-proveedor.php';
 ?>
 <main class="contenido">
-    <?php include_once __DIR__ . '/../../../layouts/header-cliente.php'; ?>
+    <?php include_once __DIR__ . '/../../../layouts/header-proveedor.php'; ?>
 
     <div class="container-fluid px-4 py-3">
 
@@ -40,15 +41,15 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
 
             <!-- Barra superior -->
             <div class="chat-topbar">
-                <a href="<?= BASE_URL ?>/cliente/mensajes"
+                <a href="<?= BASE_URL ?>/proveedor/mensajes"
                    class="btn btn-sm btn-outline-secondary me-2">
                     <i class="bi bi-arrow-left"></i>
                 </a>
                 <div class="chat-topbar-avatar">
-                    <i class="bi bi-person-workspace"></i>
+                    <i class="bi bi-person"></i>
                 </div>
                 <div class="chat-topbar-info">
-                    <p class="chat-topbar-nombre">Proveedor</p>
+                    <p class="chat-topbar-nombre">Cliente</p>
                     <p class="chat-topbar-tema"><?= htmlspecialchars($tema ?? 'Conversación') ?></p>
                 </div>
             </div>
@@ -72,7 +73,7 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
                         <div class="msg-row <?= $isMe ? 'mine' : 'theirs' ?>">
                             <div class="bubble">
                                 <?= nl2br(htmlspecialchars($m['contenido'] ?? '')) ?>
-                                <div class="bubble-time"><?= fmtHoraCli($m['fecha_hora'] ?? null) ?></div>
+                                <div class="bubble-time"><?= fmtHora($m['fecha_hora'] ?? null) ?></div>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -98,7 +99,7 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 
 <script>
 const BASE     = "<?= BASE_URL ?>";
@@ -106,18 +107,20 @@ const convId   = <?= (int)$convId ?>;
 const myId     = <?= (int)$uid ?>;
 let   lastTime = "<?= addslashes($last) ?>";
 
-const chatBox = document.getElementById('chatBox');
-const input   = document.getElementById('msgInput');
-const btnSend = document.getElementById('btnSend');
+const chatBox  = document.getElementById('chatBox');
+const input    = document.getElementById('msgInput');
+const btnSend  = document.getElementById('btnSend');
 
 function scrollBottom() { chatBox.scrollTop = chatBox.scrollHeight; }
 scrollBottom();
 
+// Auto-resize textarea
 input.addEventListener('input', function () {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
 });
 
+// Enviar con Enter (Shift+Enter = salto de línea)
 input.addEventListener('keydown', function (e) {
     if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();

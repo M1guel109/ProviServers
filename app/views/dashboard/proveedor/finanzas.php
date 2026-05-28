@@ -1,45 +1,120 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/config/database.php';
 
-// Datos de ejemplo (luego vendrán del controlador)
+$uid = (int)($_SESSION['user']['id'] ?? 0);
+
+$ingresosMes     = 0.0;
+$ingresosAnuales = 0.0;
+$contratos       = [];
+$ingresos_meses  = ['meses' => [], 'valores' => []];
+$gastos_meses    = ['meses' => [], 'valores' => []];
+
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
+
+    // Ingresos del mes actual
+    $st = $pdo->prepare("
+        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = ?
+          AND sc.estado = 'finalizado'
+          AND DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+    ");
+    $st->execute([$uid]);
+    $ingresosMes = (float)$st->fetchColumn();
+
+    // Ingresos totales del año
+    $st = $pdo->prepare("
+        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = ? AND sc.estado = 'finalizado'
+          AND YEAR(COALESCE(sc.fecha_ejecucion, sc.created_at)) = YEAR(CURDATE())
+    ");
+    $st->execute([$uid]);
+    $ingresosAnuales = (float)$st->fetchColumn();
+
+    // Contratos recientes para tabla de transacciones y facturas
+    $st = $pdo->prepare("
+        SELECT sc.id AS contrato_id,
+               COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at) AS fecha,
+               CONCAT(cl.nombres, ' ', cl.apellidos) AS cliente,
+               sv.nombre AS servicio,
+               COALESCE(cot.precio, sol.presupuesto_estimado, 0) AS monto,
+               sc.estado
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        INNER JOIN servicios sv  ON sv.id = sc.servicio_id
+        INNER JOIN clientes cl   ON cl.id = sc.cliente_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = :uid
+        ORDER BY sc.created_at DESC
+        LIMIT 10
+    ");
+    $st->execute([':uid' => $uid]);
+    $contratos = $st->fetchAll(PDO::FETCH_ASSOC);
+
+    // Ingresos mensuales (últimos 6 meses) para gráfica
+    $st = $pdo->prepare("
+        SELECT DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.created_at), '%b') AS mes,
+               DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.created_at), '%Y-%m') AS mes_key,
+               COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0) AS total
+        FROM servicios_contratados sc
+        INNER JOIN proveedores p ON p.id = sc.proveedor_id
+        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        WHERE p.usuario_id = :uid AND sc.estado = 'finalizado'
+          AND COALESCE(sc.fecha_ejecucion, sc.created_at) >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+        GROUP BY mes_key, mes
+        ORDER BY mes_key ASC
+    ");
+    $st->execute([':uid' => $uid]);
+    $rows = $st->fetchAll(PDO::FETCH_ASSOC);
+    if ($rows) {
+        $ingresos_meses = [
+            'meses'  => array_column($rows, 'mes'),
+            'valores' => array_map('floatval', array_column($rows, 'total')),
+        ];
+    }
+} catch (PDOException $e) {
+    error_log('finanzas.php: ' . $e->getMessage());
+}
+
 $finanzas = [
-    'balance_actual' => 8450000,
-    'ingresos_mes' => 3240000,
-    'gastos_mes' => 1250000,
-    'ganancias_mes' => 1990000,
-    'proximos_pagos' => 850000,
-    'facturas_pendientes' => 12,
-    'comisiones_plataforma' => 324000,
-    'retenciones' => 162000
+    'balance_actual'       => $ingresosAnuales,
+    'ingresos_mes'         => $ingresosMes,
+    'gastos_mes'           => 0,
+    'ganancias_mes'        => $ingresosMes,
+    'proximos_pagos'       => 0,
+    'facturas_pendientes'  => count(array_filter($contratos, fn($c) => $c['estado'] !== 'finalizado')),
+    'comisiones_plataforma'=> 0,
+    'retenciones'          => 0,
 ];
 
-$transacciones_recientes = [
-    ['fecha' => '2025-03-08', 'concepto' => 'Pago por servicio - Plomería', 'cliente' => 'Carlos López', 'monto' => 180000, 'tipo' => 'ingreso', 'estado' => 'completado'],
-    ['fecha' => '2025-03-07', 'concepto' => 'Comisión plataforma', 'cliente' => 'Proviservers', 'monto' => 18000, 'tipo' => 'gasto', 'estado' => 'completado'],
-    ['fecha' => '2025-03-07', 'concepto' => 'Pago por servicio - Electricidad', 'cliente' => 'Ana Gómez', 'monto' => 250000, 'tipo' => 'ingreso', 'estado' => 'completado'],
-    ['fecha' => '2025-03-06', 'concepto' => 'Compra de materiales', 'cliente' => 'Ferretería XYZ', 'monto' => 85000, 'tipo' => 'gasto', 'estado' => 'pendiente'],
-    ['fecha' => '2025-03-05', 'concepto' => 'Pago por servicio - Limpieza', 'cliente' => 'María Pérez', 'monto' => 150000, 'tipo' => 'ingreso', 'estado' => 'completado'],
-    ['fecha' => '2025-03-04', 'concepto' => 'Pago por servicio - Pintura', 'cliente' => 'Juan Rodríguez', 'monto' => 320000, 'tipo' => 'ingreso', 'estado' => 'completado'],
-    ['fecha' => '2025-03-03', 'concepto' => 'Retención de impuestos', 'cliente' => 'DIAN', 'monto' => 45000, 'tipo' => 'gasto', 'estado' => 'completado'],
-];
+$transacciones_recientes = array_map(fn($c) => [
+    'fecha'   => $c['fecha'] ? substr($c['fecha'], 0, 10) : date('Y-m-d'),
+    'concepto'=> 'Servicio: ' . ($c['servicio'] ?? ''),
+    'cliente' => $c['cliente'] ?? '',
+    'monto'   => (float)($c['monto'] ?? 0),
+    'tipo'    => 'ingreso',
+    'estado'  => $c['estado'] === 'finalizado' ? 'completado' : 'pendiente',
+], $contratos);
 
-$facturas = [
-    ['id' => 'FAC-2025-001', 'cliente' => 'Carlos López', 'fecha' => '2025-03-08', 'monto' => 180000, 'estado' => 'pagada'],
-    ['id' => 'FAC-2025-002', 'cliente' => 'Ana Gómez', 'fecha' => '2025-03-07', 'monto' => 250000, 'estado' => 'pagada'],
-    ['id' => 'FAC-2025-003', 'cliente' => 'María Pérez', 'fecha' => '2025-03-05', 'monto' => 150000, 'estado' => 'pagada'],
-    ['id' => 'FAC-2025-004', 'cliente' => 'Juan Rodríguez', 'fecha' => '2025-03-04', 'monto' => 320000, 'estado' => 'pagada'],
-    ['id' => 'FAC-2025-005', 'cliente' => 'Pedro Sánchez', 'fecha' => '2025-03-02', 'monto' => 95000, 'estado' => 'pendiente'],
-];
-
-$ingresos_meses = [
-    'meses' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    'valores' => [1850000, 2100000, 2450000, 2300000, 2680000, 2900000]
-];
-
-$gastos_meses = [
-    'meses' => ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    'valores' => [650000, 720000, 1250000, 840000, 950000, 1100000]
-];
+$facturas = array_map(fn($c) => [
+    'id'     => 'CTR-' . str_pad($c['contrato_id'], 4, '0', STR_PAD_LEFT),
+    'cliente'=> $c['cliente'] ?? '',
+    'fecha'  => $c['fecha'] ? substr($c['fecha'], 0, 10) : date('Y-m-d'),
+    'monto'  => (float)($c['monto'] ?? 0),
+    'estado' => $c['estado'] === 'finalizado' ? 'pagada' : 'pendiente',
+], $contratos);
 ?>
 
 <!DOCTYPE html>

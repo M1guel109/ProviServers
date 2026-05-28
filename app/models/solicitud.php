@@ -321,16 +321,8 @@ class Solicitud
                 $this->conexion->rollBack();
             }
 
-            // 🔴 LOG para el servidor
             error_log("Error en Solicitud::aceptar -> " . $e->getMessage());
-
-            // 🔴 OPCIONAL: mientras depuras, puedes ver el error en pantalla así:
-            // OJO: usa esto solo en desarrollo, no en producción.
-            echo "<pre>Error en Solicitud::aceptar:\n" . htmlspecialchars($e->getMessage()) . "</pre>";
-            exit;
-
-            // Si no quieres mostrarlo en pantalla, comenta las 2 líneas anteriores y deja solo:
-            // return false;
+            return false;
         }
     }
 

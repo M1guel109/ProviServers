@@ -1,6 +1,19 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/app/models/ServicioContratado.php';
+require_once BASE_PATH . '/app/models/Solicitud.php';
+require_once BASE_PATH . '/app/helpers/plan-helper.php';
 
+$uid = (int)($_SESSION['user']['id'] ?? 0);
+$scModel  = new ServicioContratado();
+$solModel = new Solicitud();
+
+$resumen            = $scModel->obtenerResumenDashboardProveedor($uid);
+$todosServicios     = $scModel->listarPorProveedorUsuario($uid);
+$serviciosRecientes = array_slice($todosServicios, 0, 4);
+$resenasRecientes   = $scModel->obtenerResenasRecientesProveedor($uid, 3);
+$proximasCitas      = $scModel->obtenerProximasCitasProveedor($uid, 3);
+$totalPendientes    = count($solModel->listarPorProveedor($uid));
 ?>
 
 
@@ -34,6 +47,24 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         ?>
 
         <!-- Secciones -->
+        <!-- BANNER RECORDATORIO MEMBRESÍA -->
+        <?php
+        $planDash = obtenerPlanActivoProveedor($uid);
+        if (planProximoAVencer($uid)):
+            $diasDash = (int)$planDash['dias_restantes'];
+            $colorDash = $diasDash <= 2 ? 'danger' : 'warning';
+        ?>
+        <div class="alert alert-<?= $colorDash ?> d-flex align-items-center gap-2 mb-4 rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>
+                <?= $diasDash === 0
+                    ? '<strong>Tu membresía venció.</strong> Renuévala para seguir publicando sin límites.'
+                    : "<strong>Tu plan vence en {$diasDash} " . ($diasDash === 1 ? 'día' : 'días') . ".</strong> Renuévalo para no perder tus beneficios." ?>
+                <a href="<?= BASE_URL ?>/proveedor/membresia" class="alert-link ms-1">Renovar ahora →</a>
+            </span>
+        </div>
+        <?php endif; ?>
+
         <!-- titulo con breadcrumb y explicación -->
         <section id="titulo-principal">
             <div class="row align-items-center">
@@ -56,37 +87,46 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         <section id="tarjetas-superiores">
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-cash-coin icono-estadistica"></i>
-                <div class="valor-estadistica">$2,450</div>
+                <div class="valor-estadistica">
+                    <?= $resumen['ingresos_mes'] > 0
+                        ? '$' . number_format($resumen['ingresos_mes'], 0, ',', '.')
+                        : '$0' ?>
+                </div>
                 <div class="etiqueta-estadistica">Ingresos del Mes</div>
                 <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> 12% vs mes anterior
+                    <i class="bi bi-graph-up"></i> Servicios finalizados
                 </div>
             </div>
 
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-briefcase icono-estadistica"></i>
-                <div class="valor-estadistica">24</div>
+                <div class="valor-estadistica"><?= $resumen['servicios_activos'] ?></div>
                 <div class="etiqueta-estadistica">Servicios Activos</div>
                 <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> 3 nuevos
+                    <i class="bi bi-hourglass-split"></i> En proceso o pendientes
                 </div>
             </div>
 
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-star icono-estadistica"></i>
-                <div class="valor-estadistica">4.8</div>
+                <div class="valor-estadistica">
+                    <?= $resumen['calificacion_promedio'] !== null
+                        ? number_format($resumen['calificacion_promedio'], 1)
+                        : 'N/A' ?>
+                </div>
                 <div class="etiqueta-estadistica">Calificación</div>
                 <div class="tendencia positiva">
-                    <i class="bi bi-arrow-up"></i> +0.2 este mes
+                    <i class="bi bi-star-fill"></i> Promedio de tus servicios
                 </div>
             </div>
 
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-clock icono-estadistica"></i>
-                <div class="valor-estadistica">18</div>
+                <div class="valor-estadistica"><?= $totalPendientes ?></div>
                 <div class="etiqueta-estadistica">Solicitudes Pendientes</div>
-                <div class="tendencia negativa">
-                    <i class="bi bi-arrow-down"></i> 5 desde ayer
+                <div class="tendencia <?= $totalPendientes > 0 ? 'positiva' : 'negativa' ?>">
+                    <i class="bi bi-bell"></i>
+                    <?= $totalPendientes > 0 ? 'Requieren atención' : 'Al día' ?>
                 </div>
             </div>
         </section>
@@ -110,38 +150,42 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
             <div class="tarjeta">
                 <h3>Servicios Recientes</h3>
                 <div class="servicios-recientes">
-                    <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
-                        <div class="servicio-info">
-                            <div class="servicio-nombre-item">Reparación de tuberías</div>
-                            <div class="servicio-categoria">Plomería</div>
+                    <?php if (!empty($serviciosRecientes)): ?>
+                        <?php foreach ($serviciosRecientes as $srv):
+                            $tituloSrv =
+                                $srv['servicio_nombre']
+                                ?? $srv['publicacion_titulo_cotizacion']
+                                ?? $srv['publicacion_titulo_solicitud']
+                                ?? $srv['cotizacion_titulo']
+                                ?? $srv['solicitud_titulo']
+                                ?? 'Servicio';
+
+                            $estadoSrv = $srv['estado'] ?? 'pendiente';
+                            $estadoClass = match($estadoSrv) {
+                                'finalizado'            => 'estado-inactivo',
+                                'pendiente', 'confirmado' => 'estado-pendiente',
+                                default                 => 'estado-activo'
+                            };
+                            $estadoLabel = match($estadoSrv) {
+                                'finalizado'  => 'Finalizado',
+                                'pendiente'   => 'Pendiente',
+                                'confirmado'  => 'Confirmado',
+                                'en_proceso'  => 'En proceso',
+                                default       => ucfirst($estadoSrv)
+                            };
+                        ?>
+                        <div class="servicio-item">
+                            <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
+                            <div class="servicio-info">
+                                <div class="servicio-nombre-item"><?= htmlspecialchars($tituloSrv) ?></div>
+                                <div class="servicio-categoria"><?= htmlspecialchars($srv['cliente_nombre'] ?? '') ?></div>
+                            </div>
+                            <span class="servicio-estado <?= $estadoClass ?>"><?= $estadoLabel ?></span>
                         </div>
-                        <span class="servicio-estado estado-activo">Activo</span>
-                    </div>
-                    <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
-                        <div class="servicio-info">
-                            <div class="servicio-nombre-item">Instalación eléctrica</div>
-                            <div class="servicio-categoria">Electricidad</div>
-                        </div>
-                        <span class="servicio-estado estado-pendiente">Pendiente</span>
-                    </div>
-                    <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
-                        <div class="servicio-info">
-                            <div class="servicio-nombre-item">Limpieza residencial</div>
-                            <div class="servicio-categoria">Limpieza</div>
-                        </div>
-                        <span class="servicio-estado estado-activo">Activo</span>
-                    </div>
-                    <div class="servicio-item">
-                        <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
-                        <div class="servicio-info">
-                            <div class="servicio-nombre-item">Pintura de interiores</div>
-                            <div class="servicio-categoria">Pintura</div>
-                        </div>
-                        <span class="servicio-estado estado-inactivo">Inactivo</span>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted small py-3">No tienes servicios contratados aún.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -149,38 +193,30 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
             <div class="tarjeta">
                 <h3>Reseñas Recientes</h3>
                 <div class="reseñas-recientes">
-                    <div class="reseña-item">
-                        <div class="reseña-header">
-                            <div class="reseña-cliente">María González</div>
-                            <div class="reseña-calificacion">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
+                    <?php if (!empty($resenasRecientes)): ?>
+                        <?php foreach ($resenasRecientes as $r):
+                            $n = (int)round((float)($r['calificacion'] ?? 0));
+                        ?>
+                        <div class="reseña-item">
+                            <div class="reseña-header">
+                                <div class="reseña-cliente"><?= htmlspecialchars($r['cliente_nombre'] ?? 'Cliente') ?></div>
+                                <div class="reseña-calificacion">
+                                    <?php for ($i = 0; $i < 5; $i++): ?>
+                                        <i class="bi bi-star<?= $i < $n ? '-fill' : '' ?>"></i>
+                                    <?php endfor; ?>
+                                </div>
+                            </div>
+                            <?php if (!empty($r['comentario'])): ?>
+                                <div class="reseña-comentario">"<?= htmlspecialchars($r['comentario']) ?>"</div>
+                            <?php endif; ?>
+                            <div class="reseña-fecha">
+                                <?= $r['created_at'] ? date('d/m/Y', strtotime($r['created_at'])) : '' ?>
                             </div>
                         </div>
-                        <div class="reseña-comentario">
-                            "Excelente servicio, muy profesional y puntual. Resolvió mi problema rápidamente."
-                        </div>
-                        <div class="reseña-fecha">Hace 2 días</div>
-                    </div>
-                    <div class="reseña-item">
-                        <div class="reseña-header">
-                            <div class="reseña-cliente">Juan Pérez</div>
-                            <div class="reseña-calificacion">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star"></i>
-                            </div>
-                        </div>
-                        <div class="reseña-comentario">
-                            "Buen trabajo, aunque llegó un poco tarde. El resultado final fue satisfactorio."
-                        </div>
-                        <div class="reseña-fecha">Hace 5 días</div>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted small py-3">Aún no tienes reseñas de clientes.</p>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -188,39 +224,27 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
             <div class="tarjeta">
                 <h3>Próximas Citas</h3>
                 <div class="citas-proximas">
-                    <div class="cita-item">
-                        <div class="cita-fecha">
-                            <span class="cita-dia">15</span>
-                            <span class="cita-mes">Nov</span>
+                    <?php if (!empty($proximasCitas)): ?>
+                        <?php foreach ($proximasCitas as $cita): ?>
+                        <div class="cita-item">
+                            <div class="cita-fecha">
+                                <span class="cita-dia">
+                                    <?= $cita['fecha_ejecucion'] ? date('d', strtotime($cita['fecha_ejecucion'])) : '--' ?>
+                                </span>
+                                <span class="cita-mes">
+                                    <?= $cita['fecha_ejecucion'] ? date('M', strtotime($cita['fecha_ejecucion'])) : '' ?>
+                                </span>
+                            </div>
+                            <div class="cita-info">
+                                <div class="cita-servicio"><?= htmlspecialchars($cita['servicio_nombre'] ?? 'Servicio') ?></div>
+                                <div class="cita-cliente"><?= htmlspecialchars($cita['cliente_nombre'] ?? '') ?></div>
+                                <div class="cita-hora"><?= htmlspecialchars($cita['franja_horaria'] ?? '') ?></div>
+                            </div>
                         </div>
-                        <div class="cita-info">
-                            <div class="cita-servicio">Reparación de grifo</div>
-                            <div class="cita-cliente">Ana Rodríguez</div>
-                            <div class="cita-hora">10:00 AM</div>
-                        </div>
-                    </div>
-                    <div class="cita-item">
-                        <div class="cita-fecha">
-                            <span class="cita-dia">17</span>
-                            <span class="cita-mes">Nov</span>
-                        </div>
-                        <div class="cita-info">
-                            <div class="cita-servicio">Instalación de luces</div>
-                            <div class="cita-cliente">Carlos López</div>
-                            <div class="cita-hora">2:30 PM</div>
-                        </div>
-                    </div>
-                    <div class="cita-item">
-                        <div class="cita-fecha">
-                            <span class="cita-dia">18</span>
-                            <span class="cita-mes">Nov</span>
-                        </div>
-                        <div class="cita-info">
-                            <div class="cita-servicio">Mantenimiento general</div>
-                            <div class="cita-cliente">Laura Martínez</div>
-                            <div class="cita-hora">9:00 AM</div>
-                        </div>
-                    </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted small py-3">No hay citas próximas programadas.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </section>
