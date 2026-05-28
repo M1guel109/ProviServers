@@ -174,45 +174,65 @@ class Membresia
     public function activarSiEsNecesario($usuario_id)
     {
         try {
-            // 1. Buscamos si el proveedor tiene una membresía 'inactiva' y con fechas NULL
-            $sqlCheck = "SELECT pm.id, pm.membresia_id, m.duracion_dias 
+            // 1. Activar registro inactivo pendiente (flujo normal: registro → primer login)
+            $sqlCheck = "SELECT pm.id, m.duracion_dias
                          FROM proveedor_membresia pm
                          JOIN proveedores p ON pm.proveedor_id = p.id
-                         JOIN membresias m ON pm.membresia_id = m.id
-                         WHERE p.usuario_id = :usuario_id 
-                         AND pm.estado = 'inactiva' 
-                         AND pm.fecha_inicio IS NULL";
-
+                         JOIN membresias m  ON pm.membresia_id = m.id
+                         WHERE p.usuario_id = :uid
+                           AND pm.estado = 'inactiva'
+                           AND pm.fecha_inicio IS NULL
+                         LIMIT 1";
             $stmt = $this->conexion->prepare($sqlCheck);
-            $stmt->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
-            $stmt->execute();
+            $stmt->execute([':uid' => $usuario_id]);
+            $pendiente = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $membresiaPendiente = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Si no hay membresía pendiente de activación, terminamos
-            if (!$membresiaPendiente) {
-                return false; 
+            if ($pendiente) {
+                $dias        = (int)($pendiente['duracion_dias'] ?? 90);
+                $fechaInicio = date('Y-m-d H:i:s');
+                $fechaFin    = date('Y-m-d H:i:s', strtotime("+$dias days"));
+                $sqlUp = "UPDATE proveedor_membresia
+                          SET fecha_inicio = :inicio, fecha_fin = :fin, estado = 'activa'
+                          WHERE id = :id";
+                $stUp = $this->conexion->prepare($sqlUp);
+                return $stUp->execute([':inicio' => $fechaInicio, ':fin' => $fechaFin, ':id' => $pendiente['id']]);
             }
 
-            // 2. Calcular fechas
-            $idRegistro = $membresiaPendiente['id'];
-            $dias = $membresiaPendiente['duracion_dias'] ?? 30; // Por defecto 30 si no existe
-            
+            // 2. Ya tiene plan activo — nada que hacer
+            $sqlActiva = "SELECT COUNT(*) FROM proveedor_membresia pm
+                          JOIN proveedores p ON pm.proveedor_id = p.id
+                          WHERE p.usuario_id = :uid AND pm.estado = 'activa'";
+            $stActiva = $this->conexion->prepare($sqlActiva);
+            $stActiva->execute([':uid' => $usuario_id]);
+            if ($stActiva->fetchColumn() > 0) return false;
+
+            // 3. Sin ningún registro — asignar Freemium desde cero
+            $stProv = $this->conexion->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+            $stProv->execute([':uid' => $usuario_id]);
+            $proveedorId = (int)$stProv->fetchColumn();
+            if (!$proveedorId) return false;
+
+            $stF = $this->conexion->prepare(
+                "SELECT id, duracion_dias FROM membresias
+                 WHERE UPPER(tipo) LIKE '%FREEMIUM%' AND UPPER(estado) = 'ACTIVO' LIMIT 1"
+            );
+            $stF->execute();
+            $freemium = $stF->fetch(PDO::FETCH_ASSOC);
+            if (!$freemium) return false;
+
+            $dias        = (int)($freemium['duracion_dias'] ?? 90);
             $fechaInicio = date('Y-m-d H:i:s');
-            $fechaFin = date('Y-m-d H:i:s', strtotime("+$dias days"));
+            $fechaFin    = date('Y-m-d H:i:s', strtotime("+$dias days"));
 
-            // 3. Actualizar la tabla
-            $sqlUpdate = "UPDATE proveedor_membresia 
-                          SET fecha_inicio = :inicio, 
-                              fecha_fin = :fin, 
-                              estado = 'activa' 
-                          WHERE id = :id";
-
-            $stmtUpdate = $this->conexion->prepare($sqlUpdate);
-            return $stmtUpdate->execute([
-                ':inicio' => $fechaInicio,
-                ':fin'    => $fechaFin,
-                ':id'     => $idRegistro
+            $stIns = $this->conexion->prepare(
+                "INSERT INTO proveedor_membresia (proveedor_id, membresia_id, fecha_inicio, fecha_fin, estado, created_at)
+                 VALUES (:proveedor_id, :membresia_id, :inicio, :fin, 'activa', NOW())"
+            );
+            return $stIns->execute([
+                ':proveedor_id' => $proveedorId,
+                ':membresia_id' => $freemium['id'],
+                ':inicio'       => $fechaInicio,
+                ':fin'          => $fechaFin,
             ]);
 
         } catch (PDOException $e) {

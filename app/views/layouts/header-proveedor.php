@@ -2,6 +2,7 @@
 require_once BASE_PATH . '/app/controllers/perfil-controller.php'; // ✅ kebab-case
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
 require_once BASE_PATH . '/app/helpers/notificaciones-proveedor.php';
+require_once BASE_PATH . '/app/helpers/plan-helper.php';
 
 $id = $_SESSION['user']['id'] ?? null;
 
@@ -26,6 +27,30 @@ $txtIdioma    = ($idiomaActual === 'es') ? 'Español' : 'English';
 
 $misNotificaciones = obtenerNotificacionesProveedor((int)($_SESSION['user']['id'] ?? 0));
 $cantidadNotif     = count($misNotificaciones);
+
+// Plan activo del proveedor
+$planActivo    = $id ? obtenerPlanActivoProveedor((int)$id) : null;
+$planNombre    = $planActivo['nombre']         ?? 'Básico';
+$diasRestantes = $planActivo['dias_restantes'] ?? null;
+$esGratuito    = $planActivo['plan_gratuito']  ?? true;
+
+if ($diasRestantes !== null && $diasRestantes <= 2) {
+    $pillClass = 'bg-danger bg-opacity-10 border border-danger border-opacity-25';
+    $textClass = 'text-danger';
+} elseif ($diasRestantes !== null && $diasRestantes <= 7) {
+    $pillClass = 'bg-warning bg-opacity-10 border border-warning border-opacity-25';
+    $textClass = 'text-warning';
+} elseif ($esGratuito) {
+    $pillClass = 'bg-success bg-opacity-10 border border-success border-opacity-25';
+    $textClass = 'text-success';
+} else {
+    $pillClass = 'bg-primary bg-opacity-10 border border-primary border-opacity-25';
+    $textClass = 'text-primary';
+}
+
+$planIcon   = $esGratuito ? 'bi-gift' : 'bi-gem';
+$badgeClass = ($diasRestantes !== null && $diasRestantes <= 7) ? 'bg-danger' : ($esGratuito ? 'bg-success' : 'bg-warning');
+$badgeLabel = strtoupper(explode(' ', $planNombre)[0]);
 ?>
 
 <header class="barra-superior d-flex align-items-center justify-content-between">
@@ -129,14 +154,18 @@ $cantidadNotif     = count($misNotificaciones);
             </ul>
         </div>
 
-        <!-- PLAN (hardcodeado hasta módulo membresía) -->
+        <!-- PLAN ACTIVO -->
         <div class="d-none d-xl-flex align-items-center me-2">
-            <div class="px-3 py-1 rounded-pill bg-primary bg-opacity-10 border border-primary border-opacity-25">
-                <small class="text-primary fw-bold" style="font-size:0.7rem;">
-                    <i class="bi bi-gem me-1"></i> PLAN GOLD
-                </small>
-                <span class="text-muted ms-1" style="font-size:0.65rem;">(15 días)</span>
-            </div>
+            <a href="<?= BASE_URL ?>/proveedor/membresia" class="text-decoration-none">
+                <div class="px-3 py-1 rounded-pill <?= $pillClass ?>">
+                    <small class="<?= $textClass ?> fw-bold" style="font-size:0.7rem;">
+                        <i class="bi <?= $planIcon ?> me-1"></i> <?= htmlspecialchars(strtoupper($planNombre)) ?>
+                    </small>
+                    <?php if ($diasRestantes !== null): ?>
+                    <span class="text-muted ms-1" style="font-size:0.65rem;">(<?= $diasRestantes ?> días)</span>
+                    <?php endif; ?>
+                </div>
+            </a>
         </div>
 
         <!-- MENÚ DE USUARIO -->
@@ -182,7 +211,7 @@ $cantidadNotif     = count($misNotificaciones);
                        href="<?= BASE_URL ?>/proveedor/membresia">
                         <i class="bi bi-arrow-up-circle me-2 text-success"></i>
                         <span>Mejorar Plan</span>
-                        <span class="badge bg-warning text-dark ms-auto">GOLD</span>
+                        <span class="badge <?= $badgeClass ?> text-dark ms-auto"><?= htmlspecialchars($badgeLabel) ?></span>
                     </a>
                 </li>
 
