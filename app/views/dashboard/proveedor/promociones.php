@@ -1,99 +1,68 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/config/database.php';
 
-// Datos de ejemplo para promociones
-$promociones_activas = [
-    [
-        'id' => 1,
-        'titulo' => 'Descuento del 20% en primera contratación',
-        'descripcion' => 'Ofrece un 20% de descuento a nuevos clientes que contraten tu servicio por primera vez.',
-        'tipo' => 'descuento',
-        'valor' => 20,
-        'usos' => 12,
-        'limite_usos' => 50,
-        'fecha_inicio' => '2025-03-01',
-        'fecha_fin' => '2025-04-30',
-        'estado' => 'activa',
-        'servicios' => ['Plomería', 'Electricidad'],
-        'imagen' => 'promo-descuento.png'
-    ],
-    [
-        'id' => 2,
-        'titulo' => 'Paquete de 3 servicios al precio de 2',
-        'descripcion' => 'Cliente que contrate 3 servicios, paga solo 2. Válido para servicios de mantenimiento.',
-        'tipo' => 'paquete',
-        'valor' => 33,
-        'usos' => 8,
-        'limite_usos' => 30,
-        'fecha_inicio' => '2025-03-15',
-        'fecha_fin' => '2025-05-15',
-        'estado' => 'activa',
-        'servicios' => ['Limpieza', 'Jardinería'],
-        'imagen' => 'promo-paquete.png'
-    ]
-];
+$uid = (int)($_SESSION['user']['id'] ?? 0);
+$promociones_activas    = [];
+$promociones_disponibles = [];
+$promociones_finalizadas = [];
+$estadisticas = ['total_promociones' => 0, 'activas' => 0, 'usos_totales' => 0, 'clientes_alcanzados' => 0, 'ingresos_extra' => 0];
 
-$promociones_disponibles = [
-    [
-        'id' => 3,
-        'titulo' => 'Primera visita gratis',
-        'descripcion' => 'Ofrece una visita de diagnóstico sin costo para nuevos clientes.',
-        'tipo' => 'gratis',
-        'valor' => 100,
-        'usos' => 0,
-        'limite_usos' => 20,
-        'fecha_inicio' => '2025-04-01',
-        'fecha_fin' => '2025-06-30',
-        'estado' => 'disponible',
-        'servicios' => ['Electricidad', 'Plomería', 'Carpintería'],
-        'imagen' => 'promo-gratis.png'
-    ],
-    [
-        'id' => 4,
-        'titulo' => '10% de descuento en mantenimiento anual',
-        'descripcion' => 'Clientes que contraten plan de mantenimiento anual reciben 10% de descuento.',
-        'tipo' => 'descuento',
-        'valor' => 10,
-        'usos' => 0,
-        'limite_usos' => 15,
-        'fecha_inicio' => '2025-04-15',
-        'fecha_fin' => '2025-07-15',
-        'estado' => 'disponible',
-        'servicios' => ['Jardinería', 'Limpieza'],
-        'imagen' => 'promo-mantenimiento.png'
-    ]
-];
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
 
-$promociones_finalizadas = [
-    [
-        'id' => 5,
-        'titulo' => '15% de descuento en reparaciones',
-        'descripcion' => 'Descuento especial en servicios de reparación durante enero.',
-        'tipo' => 'descuento',
-        'valor' => 15,
-        'usos' => 45,
-        'limite_usos' => 50,
-        'fecha_inicio' => '2025-01-01',
-        'fecha_fin' => '2025-01-31',
-        'estado' => 'finalizada',
-        'servicios' => ['Plomería', 'Electricidad'],
-        'imagen' => 'promo-reparacion.png'
-    ]
-];
+    $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+    $stProv->execute([':uid' => $uid]);
+    $proveedorId = (int)($stProv->fetchColumn() ?: 0);
 
-$estadisticas = [
-    'total_promociones' => 5,
-    'activas' => 2,
-    'usos_totales' => 65,
-    'clientes_alcanzados' => 48,
-    'ingresos_extra' => 1250000
-];
+    if ($proveedorId > 0) {
+        $stPromos = $pdo->prepare("
+            SELECT pr.id, pr.porcentaje_descuento, pr.fecha_inicio, pr.fecha_fin, pr.created_at,
+                   pub.titulo AS servicio_titulo
+            FROM promociones pr
+            LEFT JOIN publicaciones pub ON pr.publicacion_id = pub.id
+            WHERE pr.proveedor_id = :pid
+            ORDER BY pr.fecha_fin DESC
+        ");
+        $stPromos->execute([':pid' => $proveedorId]);
+        $promosRaw = $stPromos->fetchAll(PDO::FETCH_ASSOC);
+
+        $hoy = date('Y-m-d');
+        foreach ($promosRaw as $p) {
+            $inicio = $p['fecha_inicio'] ?? $hoy;
+            $fin    = $p['fecha_fin']    ?? $hoy;
+            $promo  = [
+                'id'          => $p['id'],
+                'titulo'      => $p['servicio_titulo'] ? htmlspecialchars($p['servicio_titulo']) . ' — ' . $p['porcentaje_descuento'] . '% desc.' : 'Descuento ' . $p['porcentaje_descuento'] . '%',
+                'descripcion' => 'Descuento del ' . $p['porcentaje_descuento'] . '% en este servicio.',
+                'tipo'        => 'descuento',
+                'valor'       => (int)$p['porcentaje_descuento'],
+                'usos'        => 0,
+                'limite_usos' => 0,
+                'fecha_inicio'=> $inicio,
+                'fecha_fin'   => $fin,
+                'estado'      => $fin < $hoy ? 'finalizada' : ($inicio > $hoy ? 'disponible' : 'activa'),
+                'servicios'   => [$p['servicio_titulo'] ?? 'Servicio'],
+            ];
+            if ($promo['estado'] === 'activa')      $promociones_activas[]    = $promo;
+            elseif ($promo['estado'] === 'disponible') $promociones_disponibles[] = $promo;
+            else                                    $promociones_finalizadas[] = $promo;
+        }
+
+        $estadisticas['total_promociones']  = count($promosRaw);
+        $estadisticas['activas']            = count($promociones_activas);
+    }
+} catch (PDOException $e) {
+    error_log('promociones.php: ' . $e->getMessage());
+}
 
 $tipos_promocion = [
     'descuento' => ['nombre' => 'Descuento', 'icono' => 'bi-percent', 'color' => 'primary'],
-    'paquete' => ['nombre' => 'Paquete', 'icono' => 'bi-box-seam', 'color' => 'success'],
-    'gratis' => ['nombre' => 'Gratis', 'icono' => 'bi-gift', 'color' => 'warning']
+    'paquete'   => ['nombre' => 'Paquete',   'icono' => 'bi-box-seam','color' => 'success'],
+    'gratis'    => ['nombre' => 'Gratis',    'icono' => 'bi-gift',    'color' => 'warning'],
 ];
+
 ?>
 
 <!DOCTYPE html>

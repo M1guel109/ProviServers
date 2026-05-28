@@ -1,83 +1,153 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/config/database.php';
 
-// Datos de ejemplo (luego vendrán del controlador)
-$facturacion = [
-    'saldo_actual' => 8450000,
-    'facturas_pendientes' => 3,
-    'facturas_pagadas' => 15,
-    'proximo_pago' => '2025-04-15',
-    'monto_proximo' => 1250000,
-    'metodo_pago_predeterminado' => 'Nequi',
-    'numero_cuenta' => '300 123 4567'
-];
+$uid = (int)($_SESSION['user']['id'] ?? 0);
 
-$facturas = [
-    [
-        'id' => 'FAC-2025-001',
-        'fecha_emision' => '2025-03-01',
-        'fecha_vencimiento' => '2025-03-15',
-        'concepto' => 'Membresía Premium - Marzo',
-        'monto' => 49000,
-        'estado' => 'pagada',
-        'metodo_pago' => 'Nequi',
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-002',
-        'fecha_emision' => '2025-03-05',
-        'fecha_vencimiento' => '2025-03-20',
-        'concepto' => 'Comisión por servicios',
-        'monto' => 324000,
-        'estado' => 'pagada',
-        'metodo_pago' => 'Tarjeta crédito',
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-003',
-        'fecha_emision' => '2025-03-10',
-        'fecha_vencimiento' => '2025-03-25',
-        'concepto' => 'Membresía Premium - Abril',
-        'monto' => 49000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-004',
-        'fecha_emision' => '2025-03-12',
-        'fecha_vencimiento' => '2025-03-27',
-        'concepto' => 'Servicio destacado',
-        'monto' => 25000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-005',
-        'fecha_emision' => '2025-03-15',
-        'fecha_vencimiento' => '2025-03-30',
-        'concepto' => 'Publicación destacada',
-        'monto' => 15000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ]
-];
+$facturacion  = ['saldo_actual' => 0, 'facturas_pendientes' => 0, 'facturas_pagadas' => 0, 'proximo_pago' => null, 'monto_proximo' => 0];
+$facturas     = [];
+$metodos_pago = [];
+$resumen_anual = ['total_facturado' => 0, 'total_comisiones' => 0, 'total_neto' => 0, 'promedio_mensual' => 0];
 
-$metodos_pago = [
-    ['tipo' => 'Nequi', 'icono' => 'bi-phone', 'numero' => '300 123 4567', 'predeterminado' => true],
-    ['tipo' => 'DaviPlata', 'icono' => 'bi-phone', 'numero' => '300 765 4321', 'predeterminado' => false],
-    ['tipo' => 'Bancolombia', 'icono' => 'bi-bank', 'numero' => '123-456789-01', 'predeterminado' => false],
-    ['tipo' => 'Tarjeta crédito', 'icono' => 'bi-credit-card', 'numero' => '**** **** **** 1234', 'predeterminado' => false]
-];
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
 
-$resumen_anual = [
-    'total_facturado' => 12500000,
-    'total_comisiones' => 1250000,
-    'total_neto' => 11250000,
-    'promedio_mensual' => 1041667
-];
+    $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+    $stProv->execute([':uid' => $uid]);
+    $proveedorId = (int)($stProv->fetchColumn() ?: 0);
+
+    if ($proveedorId > 0) {
+        // Saldo: ingresos de servicios finalizados este año
+        $stSaldo = $pdo->prepare("
+            SELECT COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0)
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+              AND YEAR(sc.created_at) = YEAR(CURDATE())
+        ");
+        $stSaldo->execute([':pid' => $proveedorId]);
+        $facturacion['saldo_actual'] = (float)($stSaldo->fetchColumn() ?: 0);
+
+        // Pagos de membresía
+        $stPagos = $pdo->prepare("
+            SELECT p.id, p.monto, p.estado_pago, p.metodo_pago, p.fecha_pago, p.created_at,
+                   m.tipo AS concepto
+            FROM pagos p
+            LEFT JOIN proveedor_membresia pm ON p.proveedor_membresia_id = pm.id
+            LEFT JOIN membresias m ON pm.membresia_id = m.id
+            WHERE p.proveedor_id = :pid
+            ORDER BY p.created_at DESC
+            LIMIT 20
+        ");
+        $stPagos->execute([':pid' => $proveedorId]);
+        $pagosRaw = $stPagos->fetchAll(PDO::FETCH_ASSOC);
+
+        $pagados  = 0;
+        $pendientes = 0;
+        foreach ($pagosRaw as $i => $p) {
+            $esPagado = in_array($p['estado_pago'] ?? '', ['aprobado', 'approved', 'pagado', 'completado']);
+            if ($esPagado) $pagados++;
+            else $pendientes++;
+            $facturas[] = [
+                'id'               => 'MEM-' . str_pad($p['id'], 4, '0', STR_PAD_LEFT),
+                'fecha_emision'    => $p['created_at']  ?? date('Y-m-d'),
+                'fecha_vencimiento'=> $p['fecha_pago']  ?? date('Y-m-d', strtotime('+15 days')),
+                'concepto'         => 'Membresía ' . ($p['concepto'] ?? 'Plan'),
+                'monto'            => (float)($p['monto'] ?? 0),
+                'estado'           => $esPagado ? 'pagada' : 'pendiente',
+                'metodo_pago'      => $p['metodo_pago'] ?? null,
+                'pdf_url'          => '#',
+            ];
+        }
+
+        // Completar con servicios finalizados recientes si no hay pagos
+        if (empty($facturas)) {
+            $stSrv = $pdo->prepare("
+                SELECT sc.id, sc.created_at,
+                       COALESCE(c.titulo, sol.titulo, 'Servicio') AS concepto,
+                       COALESCE(c.precio, sol.presupuesto_estimado, 0) AS monto
+                FROM servicios_contratados sc
+                LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+                LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+                WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+                ORDER BY sc.created_at DESC LIMIT 10
+            ");
+            $stSrv->execute([':pid' => $proveedorId]);
+            foreach ($stSrv->fetchAll(PDO::FETCH_ASSOC) as $srv) {
+                $pagados++;
+                $facturas[] = [
+                    'id'               => 'CTR-' . str_pad($srv['id'], 4, '0', STR_PAD_LEFT),
+                    'fecha_emision'    => $srv['created_at'],
+                    'fecha_vencimiento'=> $srv['created_at'],
+                    'concepto'         => htmlspecialchars($srv['concepto']),
+                    'monto'            => (float)$srv['monto'],
+                    'estado'           => 'pagada',
+                    'metodo_pago'      => null,
+                    'pdf_url'          => BASE_URL . '/proveedor/contrato-pdf?id=' . $srv['id'],
+                ];
+            }
+        }
+
+        $facturacion['facturas_pagadas']   = $pagados;
+        $facturacion['facturas_pendientes'] = $pendientes;
+
+        // Próximo pago de membresía
+        $stProx = $pdo->prepare("
+            SELECT pm.fecha_fin, m.costo
+            FROM proveedor_membresia pm
+            JOIN membresias m ON pm.membresia_id = m.id
+            WHERE pm.proveedor_id = :pid AND pm.estado = 'activa' AND m.costo > 0
+            ORDER BY pm.fecha_fin ASC LIMIT 1
+        ");
+        $stProx->execute([':pid' => $proveedorId]);
+        $proximo = $stProx->fetch(PDO::FETCH_ASSOC);
+        if ($proximo) {
+            $facturacion['proximo_pago']  = $proximo['fecha_fin'];
+            $facturacion['monto_proximo'] = (float)$proximo['costo'];
+        }
+
+        // Datos de facturación guardados
+        $stFact = $pdo->prepare("SELECT * FROM proveedores_pagos_facturacion WHERE proveedor_id = :pid LIMIT 1");
+        $stFact->execute([':pid' => $proveedorId]);
+        $factRow = $stFact->fetch(PDO::FETCH_ASSOC);
+        if ($factRow) {
+            $metodoIcono = match(strtolower($factRow['metodo_pago_preferido'] ?? '')) {
+                'nequi', 'daviplata' => 'bi-phone',
+                'pse', 'bancolombia' => 'bi-bank',
+                default => 'bi-credit-card',
+            };
+            $metodos_pago[] = [
+                'tipo'           => $factRow['metodo_pago_preferido'] ?? 'Sin método',
+                'icono'          => $metodoIcono,
+                'numero'         => $factRow['numero_cuenta'] ?? '—',
+                'predeterminado' => true,
+            ];
+        }
+
+        // Resumen anual
+        $stAnual = $pdo->prepare("
+            SELECT
+                COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0) AS total
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+              AND YEAR(sc.created_at) = YEAR(CURDATE())
+        ");
+        $stAnual->execute([':pid' => $proveedorId]);
+        $totalAnual = (float)($stAnual->fetchColumn() ?: 0);
+        $resumen_anual = [
+            'total_facturado'  => $totalAnual,
+            'total_comisiones' => 0,
+            'total_neto'       => $totalAnual,
+            'promedio_mensual' => round($totalAnual / 12),
+        ];
+    }
+} catch (PDOException $e) {
+    error_log('facturacion.php: ' . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>

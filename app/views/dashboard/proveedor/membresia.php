@@ -93,11 +93,13 @@ $planes_disponibles = [
     'crecimiento' => [
         'nombre' => 'Crecimiento',
         'precio' => 25000,
+        'precio_anual' => 250000,
         'periodo' => 'mes',
         'icono' => 'bi-rocket',
         'color' => 'primary',
         'destacado' => true,
         'db_id' => 0,
+        'db_id_anual' => 0,
         'beneficios' => [
             'Todo lo del Paquete Básico',
             'Publicar hasta 10 servicios',
@@ -110,11 +112,13 @@ $planes_disponibles = [
     'premium' => [
         'nombre' => 'Premium',
         'precio' => 49000,
+        'precio_anual' => 490000,
         'periodo' => 'mes',
         'icono' => 'bi-stars',
         'color' => 'warning',
         'destacado' => false,
         'db_id' => 0,
+        'db_id_anual' => 0,
         'beneficios' => [
             'Todo lo del Paquete Crecimiento',
             'Publicaciones ilimitadas',
@@ -135,8 +139,12 @@ try {
             ['a','e','i','o','u','u','n','a','e','i','o','u','u','n'],
             $pDB['tipo']
         ));
-        if ((str_contains($t, 'premium') || str_contains($t, 'premum')) && str_contains($t, 'mensual')) {
+        if ((str_contains($t, 'premium') || str_contains($t, 'premum')) && str_contains($t, 'anual')) {
+            $planes_disponibles['premium']['db_id_anual'] = (int)$pDB['id'];
+        } elseif ((str_contains($t, 'premium') || str_contains($t, 'premum')) && str_contains($t, 'mensual')) {
             $planes_disponibles['premium']['db_id'] = (int)$pDB['id'];
+        } elseif (str_contains($t, 'crecimiento') && str_contains($t, 'anual')) {
+            $planes_disponibles['crecimiento']['db_id_anual'] = (int)$pDB['id'];
         } elseif (str_contains($t, 'crecimiento') && str_contains($t, 'mensual')) {
             $planes_disponibles['crecimiento']['db_id'] = (int)$pDB['id'];
         } elseif (str_contains($t, 'freemium') || str_contains($t, 'basico')) {
@@ -296,8 +304,15 @@ try {
 
         <!-- PLANES DISPONIBLES -->
         <section class="row mb-4" id="planes">
-            <div class="col-12">
-                <h5 class="fw-bold mb-3">Planes disponibles para mejorar</h5>
+            <div class="col-12 d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+                <h5 class="fw-bold mb-0">Planes disponibles para mejorar</h5>
+                <div class="d-flex align-items-center gap-2 bg-light rounded-pill px-3 py-1">
+                    <span class="small fw-semibold" id="lbl-mensual">Mensual</span>
+                    <div class="form-check form-switch mb-0 mx-1">
+                        <input class="form-check-input" type="checkbox" id="toggle-anual" role="switch">
+                    </div>
+                    <span class="small fw-semibold" id="lbl-anual">Anual <span class="badge bg-success ms-1">–17%</span></span>
+                </div>
             </div>
 
             <?php foreach ($planes_disponibles as $key => $plan): ?>
@@ -311,9 +326,11 @@ try {
                             <div class="plan-header">
                                 <i class="bi <?= $plan['icono'] ?> plan-icono"></i>
                                 <h3>Plan <?= $plan['nombre'] ?></h3>
-                                <div class="plan-precio-card">
-                                    <span class="precio">$<?= number_format($plan['precio'], 0, ',', '.') ?></span>
-                                    <span class="periodo">/mes</span>
+                                <div class="plan-precio-card"
+                                    data-precio-mensual="<?= $plan['precio'] ?>"
+                                    data-precio-anual="<?= $plan['precio_anual'] ?? $plan['precio'] * 12 ?>">
+                                    <span class="precio precio-plan">$<?= number_format($plan['precio'], 0, ',', '.') ?></span>
+                                    <span class="periodo periodo-plan">/mes</span>
                                 </div>
                             </div>
 
@@ -331,14 +348,18 @@ try {
                                     <button class="btn btn-secondary w-100" disabled>
                                         <i class="bi bi-check-circle me-2"></i>Plan gratuito
                                     </button>
-                                <?php elseif ($plan['db_id'] <= 0): ?>
+                                <?php elseif ($plan['db_id'] <= 0 && $plan['db_id_anual'] <= 0): ?>
                                     <button class="btn btn-outline-secondary w-100" disabled title="Plan no disponible">
                                         <i class="bi bi-x-circle me-2"></i>No disponible
                                     </button>
                                 <?php else: ?>
                                     <button class="btn btn-<?= $plan['color'] ?> w-100 btn-pagar-mp"
+                                        data-plan-id-mensual="<?= $plan['db_id'] ?>"
+                                        data-plan-id-anual="<?= $plan['db_id_anual'] ?? 0 ?>"
                                         data-plan-id="<?= $plan['db_id'] ?>"
                                         data-plan="<?= htmlspecialchars($plan['nombre']) ?>"
+                                        data-precio-mensual="<?= $plan['precio'] ?>"
+                                        data-precio-anual="<?= $plan['precio_anual'] ?? ($plan['precio'] * 12) ?>"
                                         data-precio="<?= $plan['precio'] ?>">
                                         <i class="bi bi-credit-card me-2"></i>Pagar con MercadoPago
                                     </button>
@@ -461,6 +482,38 @@ try {
 
     <script>
         const BASE_URL = "<?= BASE_URL ?>";
+
+        // Toggle mensual / anual
+        const toggleAnual = document.getElementById('toggle-anual');
+        if (toggleAnual) {
+            toggleAnual.addEventListener('change', function () {
+                const esAnual = this.checked;
+                document.querySelectorAll('.btn-pagar-mp').forEach(btn => {
+                    const idMensual  = btn.dataset.planIdMensual;
+                    const idAnual    = btn.dataset.planIdAnual;
+                    const pMensual   = Number(btn.dataset.precioMensual);
+                    const pAnual     = Number(btn.dataset.precioAnual);
+                    btn.dataset.planId = esAnual ? idAnual : idMensual;
+                    btn.dataset.precio = esAnual ? pAnual  : pMensual;
+                });
+                // Actualizar precios mostrados en tarjetas
+                document.querySelectorAll('[data-precio-mensual]').forEach(el => {
+                    const pMensual = Number(el.dataset.precioMensual);
+                    const pAnual   = Number(el.dataset.precioAnual);
+                    el.dataset.precio = esAnual ? pAnual : pMensual;
+                });
+                // Actualizar texto de precio en las tarjetas
+                document.querySelectorAll('.precio-plan').forEach(el => {
+                    const btn = el.closest('.card-plan')?.querySelector('.btn-pagar-mp');
+                    if (!btn) return;
+                    const p = Number(btn.dataset.precio);
+                    el.textContent = '$' + p.toLocaleString('es-CO');
+                });
+                document.querySelectorAll('.periodo-plan').forEach(el => {
+                    el.textContent = esAnual ? '/año' : '/mes';
+                });
+            });
+        }
 
         document.querySelectorAll('.btn-pagar-mp').forEach(btn => {
             btn.addEventListener('click', async function () {

@@ -1,5 +1,104 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/config/database.php';
+
+$uid = (int)($_SESSION['user']['id'] ?? 0);
+$calStats   = ['hoy' => 0, 'pendientes' => 0, 'ingresos_hoy' => 0];
+$eventosJSON = '[]';
+$proximoServicio = null;
+$resumenMes = ['confirmado' => 0, 'pendiente_pago' => 0];
+
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
+
+    $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+    $stProv->execute([':uid' => $uid]);
+    $proveedorId = (int)($stProv->fetchColumn() ?: 0);
+
+    if ($proveedorId > 0) {
+        // Servicios para hoy
+        $stHoy = $pdo->prepare("
+            SELECT COUNT(*) FROM servicios_contratados
+            WHERE proveedor_id = :pid AND DATE(fecha_ejecucion) = CURDATE()
+              AND estado IN ('confirmado','en_proceso')
+        ");
+        $stHoy->execute([':pid' => $proveedorId]);
+        $calStats['hoy'] = (int)$stHoy->fetchColumn();
+
+        // Solicitudes pendientes
+        $stPend = $pdo->prepare("
+            SELECT COUNT(*) FROM solicitudes WHERE proveedor_id = :pid AND estado = 'pendiente'
+        ");
+        $stPend->execute([':pid' => $proveedorId]);
+        $calStats['pendientes'] = (int)$stPend->fetchColumn();
+
+        // Ingresos hoy (servicios finalizados hoy)
+        $stIngHoy = $pdo->prepare("
+            SELECT COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0)
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+              AND DATE(sc.modified_at) = CURDATE()
+        ");
+        $stIngHoy->execute([':pid' => $proveedorId]);
+        $calStats['ingresos_hoy'] = (float)($stIngHoy->fetchColumn() ?: 0);
+
+        // Eventos para el calendario (próximos 90 días)
+        $stEvt = $pdo->prepare("
+            SELECT sc.fecha_ejecucion, sc.estado,
+                   COALESCE(c.titulo, sol.titulo, 'Servicio') AS titulo,
+                   TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido,''))) AS cliente
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN clientes cl     ON sc.cliente_id    = cl.id
+            LEFT JOIN usuarios u      ON cl.usuario_id    = u.id
+            WHERE sc.proveedor_id = :pid
+              AND sc.fecha_ejecucion >= CURDATE()
+              AND sc.fecha_ejecucion <= DATE_ADD(CURDATE(), INTERVAL 90 DAY)
+              AND sc.estado IN ('confirmado','en_proceso','pendiente')
+            ORDER BY sc.fecha_ejecucion ASC
+        ");
+        $stEvt->execute([':pid' => $proveedorId]);
+        $eventos = $stEvt->fetchAll(PDO::FETCH_ASSOC);
+        $eventosJSON = json_encode(array_map(fn($e) => [
+            'date'    => $e['fecha_ejecucion'],
+            'title'   => $e['titulo'],
+            'cliente' => $e['cliente'],
+            'estado'  => $e['estado'],
+        ], $eventos));
+
+        // Próximo servicio
+        if (!empty($eventos)) {
+            $proximoServicio = $eventos[0];
+        }
+
+        // Resumen mes
+        $stMes = $pdo->prepare("
+            SELECT
+                COALESCE(SUM(CASE WHEN sc.estado IN ('confirmado','en_proceso','finalizado')
+                    THEN COALESCE(c.precio, sol.presupuesto_estimado, 0) ELSE 0 END), 0) AS confirmado,
+                COALESCE(SUM(CASE WHEN sc.estado = 'pendiente'
+                    THEN COALESCE(c.precio, sol.presupuesto_estimado, 0) ELSE 0 END), 0) AS pendiente_pago
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
+            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            WHERE sc.proveedor_id = :pid
+              AND MONTH(sc.fecha_ejecucion) = MONTH(CURDATE())
+              AND YEAR(sc.fecha_ejecucion)  = YEAR(CURDATE())
+        ");
+        $stMes->execute([':pid' => $proveedorId]);
+        $mesRow = $stMes->fetch(PDO::FETCH_ASSOC);
+        $resumenMes = [
+            'confirmado'    => (float)($mesRow['confirmado']    ?? 0),
+            'pendiente_pago'=> (float)($mesRow['pendiente_pago'] ?? 0),
+        ];
+    }
+} catch (PDOException $e) {
+    error_log('calendario.php: ' . $e->getMessage());
+}
 ?>
 
 <!DOCTYPE html>
@@ -59,11 +158,9 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-calendar-check icono-estadistica text-primary"></i>
                     <div>
-                        <div class="valor-estadistica">4</div>
+                        <div class="valor-estadistica"><?= $calStats['hoy'] ?></div>
                         <div class="etiqueta-estadistica">Servicios Hoy</div>
-                        <small class="text-success">
-                            <i class="bi bi-arrow-up"></i> 2 más que ayer
-                        </small>
+                        <small class="text-success">Confirmados o en proceso</small>
                     </div>
                 </div>
             </div>
@@ -72,9 +169,9 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-clock-history icono-estadistica text-warning"></i>
                     <div>
-                        <div class="valor-estadistica">3</div>
+                        <div class="valor-estadistica"><?= $calStats['pendientes'] ?></div>
                         <div class="etiqueta-estadistica">Solicitudes Pendientes</div>
-                        <small class="text-warning">Requieren confirmación</small>
+                        <small class="text-warning"><?= $calStats['pendientes'] > 0 ? 'Requieren confirmación' : 'Al día' ?></small>
                     </div>
                 </div>
             </div>
@@ -83,20 +180,20 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-cash-coin icono-estadistica text-success"></i>
                     <div>
-                        <div class="valor-estadistica">$320k</div>
+                        <div class="valor-estadistica">$<?= $calStats['ingresos_hoy'] > 0 ? number_format($calStats['ingresos_hoy'], 0, ',', '.') : '0' ?></div>
                         <div class="etiqueta-estadistica">Ingresos Hoy</div>
-                        <small class="text-primary">Confirmados</small>
+                        <small class="text-primary">Finalizados hoy</small>
                     </div>
                 </div>
             </div>
 
             <div class="col-md-3">
                 <div class="tarjeta-estadistica">
-                    <i class="bi bi-calendar-x icono-estadistica text-danger"></i>
+                    <i class="bi bi-calendar-event icono-estadistica text-info"></i>
                     <div>
-                        <div class="valor-estadistica">2</div>
-                        <div class="etiqueta-estadistica">Días Bloqueados</div>
-                        <small class="text-danger">No disponibles</small>
+                        <div class="valor-estadistica"><?= count(json_decode($eventosJSON, true)) ?></div>
+                        <div class="etiqueta-estadistica">Próximas Citas</div>
+                        <small class="text-info">Siguientes 90 días</small>
                     </div>
                 </div>
             </div>
@@ -167,33 +264,42 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                     </div>
                 </div>
 
-                <!-- INGRESOS DEL DÍA -->
+                <!-- RESUMEN MES -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header">
                         <h6 class="mb-0">
-                            <i class="bi bi-cash-stack"></i> Resumen Financiero
+                            <i class="bi bi-cash-stack"></i> Resumen del Mes
                         </h6>
                     </div>
                     <div class="card-body">
-                        <p>Total Confirmado: <strong>$450.000</strong></p>
-                        <p>Pendiente de Pago: <strong>$120.000</strong></p>
-                        <p>Comisión Plataforma: <strong>$45.000</strong></p>
+                        <p class="mb-1">Ingresos confirmados:</p>
+                        <strong class="text-success">$<?= number_format($resumenMes['confirmado'], 0, ',', '.') ?></strong>
+                        <hr>
+                        <p class="mb-1">Pendiente de confirmar:</p>
+                        <strong class="text-warning">$<?= number_format($resumenMes['pendiente_pago'], 0, ',', '.') ?></strong>
                     </div>
                 </div>
 
-                <!-- DISPONIBILIDAD -->
+                <!-- PRÓXIMO SERVICIO -->
                 <div class="card shadow-sm">
                     <div class="card-header">
                         <h6 class="mb-0">
-                            <i class="bi bi-calendar-x"></i> Disponibilidad
+                            <i class="bi bi-calendar-event"></i> Próximo Servicio
                         </h6>
                     </div>
                     <div class="card-body">
-                        <p>Próximo día libre completo:</p>
-                        <strong>18 de Diciembre 2025</strong>
-                        <hr>
-                        <p>Próximo servicio:</p>
-                        <strong>Instalación Eléctrica - Mañana 8:00 AM</strong>
+                        <?php if ($proximoServicio): ?>
+                            <p class="mb-1 fw-bold"><?= htmlspecialchars($proximoServicio['titulo']) ?></p>
+                            <small class="text-muted d-block mb-1">
+                                <i class="bi bi-person"></i> <?= htmlspecialchars($proximoServicio['cliente'] ?? '') ?>
+                            </small>
+                            <small class="text-primary">
+                                <i class="bi bi-calendar3"></i>
+                                <?= date('d M Y', strtotime($proximoServicio['fecha_ejecucion'])) ?>
+                            </small>
+                        <?php else: ?>
+                            <p class="text-muted small mb-0">No hay servicios programados próximamente.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -233,6 +339,7 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
+    <script>const EVENTOS_CALENDARIO = <?= $eventosJSON ?>;</script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/calendario.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>
