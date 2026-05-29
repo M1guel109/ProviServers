@@ -272,6 +272,94 @@ main {
     text-decoration: underline;
 }
 
+/* =====================================================
+   RESPONSIVE MÓVIL — registro.css
+   ===================================================== */
+
+/* Tablet (768px–991px) */
+@media (max-width: 991px) {
+    .custom-container {
+        height: auto;
+        min-height: auto;
+        max-height: none;
+    }
+
+    #registro {
+        overflow-y: visible;
+    }
+}
+
+/* Móvil (≤ 767px) */
+@media (max-width: 767px) {
+    .header-logo {
+        height: 56px;
+    }
+
+    .custom-container {
+        border-radius: 16px;
+        height: auto;
+        min-height: auto;
+    }
+
+    #registro {
+        padding: 24px 20px;
+        overflow-y: visible;
+    }
+
+    #registro h1 {
+        font-size: 1.7rem;
+    }
+
+    #registro .registro-header p {
+        font-size: 0.9rem;
+    }
+
+    .titulo-paso {
+        font-size: 1.1rem;
+        width: 100%;
+    }
+
+    /* Inputs — altura mínima 44px táctil */
+    #registro-wizard input,
+    #registro-wizard .form-select-custom,
+    #registro-wizard .form-control {
+        padding: 12px 14px;
+        font-size: 0.95rem;
+    }
+
+    /* Botón "Siguiente" — ancho completo en móvil */
+    .btn-login {
+        width: 100% !important;
+        margin: 20px 0 0 0 !important;
+    }
+
+    /* Botones en pares (Atrás/Siguiente) */
+    .d-flex.gap-2 .btn-login,
+    .d-flex.gap-2 .btn-prev {
+        flex: 1;
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 11px 12px;
+    }
+
+    /* Columnas del wizard — apilar en móvil */
+    .row.g-2 > [class*="col-md-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Móvil pequeño (≤ 380px) */
+@media (max-width: 380px) {
+    #registro {
+        padding: 20px 16px;
+    }
+
+    #registro h1 {
+        font-size: 1.5rem;
+    }
+}
+
 /* ---------- COLUMNA DERECHA: CARRUSEL (Igual al Login) ---------- */
 .info-section {
     flex: 1;

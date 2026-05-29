@@ -142,6 +142,7 @@ return [
     // ==========================================
     'cliente_bienvenido' => 'Panel Principal',
     'cliente_descripcion' => 'Bienvenido a tu panel de control. Aquí puedes explorar servicios, gestionar tus solicitudes y dar seguimiento a tus servicios contratados.',
+    'cliente_explorar_descripcion' => 'Encuentra los mejores proveedores y servicios cerca de ti.',
     'cliente_servicios_disponibles' => 'Servicios Disponibles',
     'cliente_solicitudes_activas' => 'Solicitudes Activas',
     'cliente_servicios_finalizados' => 'Servicios Finalizados',

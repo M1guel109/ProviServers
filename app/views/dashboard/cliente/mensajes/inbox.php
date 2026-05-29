@@ -37,9 +37,23 @@ include_once __DIR__ . '/../../../layouts/sidebar-cliente.php';
 
     <div class="container-fluid px-4 py-3">
 
-        <div class="inbox-header">
-            <h1><i class="bi bi-chat-dots me-2 text-primary"></i>Mensajes</h1>
-            <p>Comunícate con tus proveedores. Todos los tratos deben cerrarse dentro de la plataforma.</p>
+        <div id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1"><i class="bi bi-chat-dots me-2 text-primary"></i>Mensajes</h1>
+                    <p class="text-muted mb-0">Comunícate con tus proveedores. Todos los tratos deben cerrarse dentro de la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Mensajes</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </div>
 
         <div class="conv-list">

@@ -383,7 +383,7 @@ $categorias = $objCategoria->mostrar() ?: [];
         </div>
     </div>
 
-    <div class="modal fade" id="modalDetalleServicio" tabindex="-1">
+    <div class="modal fade modal-cliente" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
 

@@ -39,10 +39,12 @@
             <h1 class="fw-bold mb-1"><i class="bi bi-person-circle text-primary"></i> Mi Perfil</h1>
             <p class="text-secondary mb-0">Administra tu información personal y configuración de cuenta.</p>
           </div>
-          <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+          <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-              <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-              <li class="breadcrumb-item active" aria-current="page">Perfil</li>
+              <li class="breadcrumb-item">
+                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">Mi Perfil</li>
             </ol>
           </nav>
         </section>

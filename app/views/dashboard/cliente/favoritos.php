@@ -23,10 +23,23 @@ require_once BASE_PATH . '/app/helpers/session-cliente.php';
 
         <section id="favoritos">
             <div class="container">
-                <div class="section-hero mb-4">
-                    <p class="breadcrumb">Inicio &gt; Favoritos</p>
-                    <h1><i class="bi bi-heart-fill text-danger me-2"></i>Mis Favoritos</h1>
-                    <p>Tus proveedores preferidos, guardados para contratarlos fácilmente.</p>
+                <div id="titulo-principal" class="section-hero mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="mb-1"><i class="bi bi-heart-fill text-danger me-2"></i>Mis Favoritos</h1>
+                            <p class="text-muted mb-0">Tus proveedores preferidos, guardados para contratarlos fácilmente.</p>
+                        </div>
+                        <div class="col-md-4">
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0 justify-content-md-end">
+                                    <li class="breadcrumb-item">
+                                        <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                    </li>
+                                    <li class="breadcrumb-item active" aria-current="page">Favoritos</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="text-center py-5">

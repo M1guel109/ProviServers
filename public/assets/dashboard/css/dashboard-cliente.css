@@ -359,31 +359,116 @@
 /* ==========================================================================
    9. RESPONSIVE
    ========================================================================== */
+@media screen and (max-width: 576px) {
+    /* Modales: radio reducido en móvil para no sobresalir */
+    .modal-cliente .modal-content {
+        border-radius: 12px;
+    }
+
+    .modal-cliente .modal-body {
+        padding: 16px;
+    }
+
+    .modal-cliente .modal-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-cliente .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
 @media screen and (max-width: 768px) {
     .tarjeta-estadistica {
         padding: 15px;
     }
-    
+
     .icono-estadistica {
         font-size: 1.8rem;
         padding: 10px;
     }
-    
+
     .valor-estadistica {
         font-size: 1.3rem;
     }
-    
+
     .card-categoria {
         padding: 15px;
     }
-    
+
     .d-flex.gap-3 {
         flex-direction: column;
     }
-    
+
     .btn-primary-proviservers,
     .btn-secondary-proviservers {
         width: 100%;
         justify-content: center;
+    }
+
+    /* Explorar servicios — mapa con altura reducida en móvil */
+    #mapa-servicios {
+        height: 340px !important;
+    }
+
+    /* Toggle mapa/grid — full width en móvil */
+    #btn-grid, #btn-mapa {
+        font-size: 0.82rem;
+        padding: 6px 10px;
+    }
+
+    /* Historial — ocultar columna de calificación en móvil (poco espacio) */
+    #historial-servicios .table th:nth-child(6),
+    #historial-servicios .table td:nth-child(6) {
+        display: none;
+    }
+
+    /* Perfil — columna lateral debajo del formulario */
+    .profile .col-xl-4 {
+        margin-bottom: 1rem;
+    }
+
+    .profile .card-body.profile-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .profile .card-body.profile-card img {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    /* Servicios contratados — botones más compactos */
+    .service-card .btn {
+        font-size: 0.82rem;
+        padding: 8px 10px;
+    }
+
+    /* Breadcrumb — ocultar en vistas de cliente */
+    .section-hero nav.mb-4,
+    .section-hero ol.breadcrumb {
+        display: none;
+    }
+}
+
+/* ── 360px — ajustes finales del cliente ────────────────────────── */
+@media (max-width: 400px) {
+    /* Service card: imagen ligeramente más pequeña */
+    .service-card img.card-img-top,
+    .service-card .service-image img {
+        height: 150px !important;
+    }
+
+    /* Badges de estado: texto más pequeño */
+    .badge-estado {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+
+    /* Filtro: badge de filtros activos */
+    .badge.bg-primary.bg-opacity-10 {
+        font-size: 0.72rem;
     }
 }

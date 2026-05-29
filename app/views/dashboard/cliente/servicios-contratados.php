@@ -538,8 +538,8 @@
   </main>
 
   <!-- Modal Detalles del Servicio -->
-  <div class="modal fade" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+  <div class="modal fade modal-cliente" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content border-0 shadow">
         <div class="modal-header">
           <h5 class="modal-title fw-bold" id="det-titulo">Detalles del servicio</h5>
@@ -559,8 +559,8 @@
   </div>
 
   <!-- Modal Calificar -->
-  <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
+  <div class="modal fade modal-cliente" id="modalCalificar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
       <form method="POST"
         action="<?= BASE_URL ?>/cliente/servicios-contratados/calificar"
         class="modal-content">

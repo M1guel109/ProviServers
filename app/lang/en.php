@@ -1,49 +1,158 @@
 <?php
 return [
-    // Header
-    'header_buscar' => 'Search...',
-    'header_perfil' => 'My Profile',
-    'header_config' => 'Settings',
-    'header_salir'  => 'Logout',
+    // ==========================================
+    // GENERAL
+    // ==========================================
+    'bienvenido'       => 'Welcome',
+    'header_buscar'    => 'Search...',
+    'header_perfil'    => 'My Profile',
+    'header_config'    => 'Settings',
+    'header_salir'     => 'Logout',
     'header_ver_todas' => 'View all',
     'header_sin_notif' => 'No notifications',
-    
-    // --- SIDEBAR ADMIN ---
-    'admin_alt_logo'             => 'ProviServers Logo',
-    'admin_menu_panel'           => 'Dashboard',
-    'admin_header_gestion'       => 'MAIN MANAGEMENT',
-    
-    // Users
-    'admin_menu_usuarios'        => 'Users',
-    'admin_sub_registrar_usuario'=> 'Register User',
-    'admin_sub_listar_usuarios'  => 'List Users',
-    
-    // Services & Categories
-    'admin_menu_servicios'       => 'Service Moderation',
-    'admin_menu_categorias'      => 'Categories',
-    'admin_sub_nueva_categoria'  => 'New Category',
-    'admin_sub_listar_categorias'=> 'List Categories',
-    
-    // Memberships
-    'admin_menu_membresias'      => 'Memberships',
-    'admin_sub_crear_plan'       => 'Create Plan',
-    'admin_sub_planes'           => 'Available Plans',
-    'admin_sub_suscripciones'    => 'Active Subscriptions',
-    
-    // Administration
-    'admin_header_admin'         => 'ADMINISTRATION',
-    'admin_menu_finanzas'        => 'Finance',
-    'admin_sub_balance'          => 'Balance',
-    'admin_sub_facturacion'      => 'Billing',
-    'admin_menu_reportes'        => 'Reports',
-    'admin_sub_general'          => 'General',
-    
-    // Footer Sidebar
-    'admin_footer_ajustes'       => 'Settings',
-    'admin_footer_salir'         => 'Logout',
-    
-    // General
-    'bienvenido' => 'Welcome',
-    'rol_admin'  => 'Administrator'
+    'header_tienes'    => 'You have',
+    'header_sin_leer'  => 'unread',
+    'menu'             => 'Menu',
+    'perfil'           => 'Profile',
+    'configuracion'    => 'Settings',
+    'cerrar_sesion'    => 'Logout',
+    'mejorar_plan'     => 'Upgrade Plan',
+    'mi_perfil'        => 'My Profile',
+    'mis_favoritos'    => 'My Favorites',
+    'ayuda'            => 'Help',
+
+    // ==========================================
+    // DARK MODE
+    // ==========================================
+    'dark_mode'    => 'Dark mode',
+    'light_mode'   => 'Light mode',
+    'cambiar_tema' => 'Change theme',
+
+    // ==========================================
+    // ADMIN - SIDEBAR
+    // ==========================================
+    'admin_alt_logo'              => 'ProviServers Logo',
+    'admin_menu_panel'            => 'Dashboard',
+    'admin_header_gestion'        => 'MAIN MANAGEMENT',
+    'admin_menu_usuarios'         => 'Users',
+    'admin_sub_registrar_usuario' => 'Register User',
+    'admin_sub_listar_usuarios'   => 'List Users',
+    'admin_menu_servicios'        => 'Service Moderation',
+    'admin_menu_categorias'       => 'Categories',
+    'admin_sub_nueva_categoria'   => 'New Category',
+    'admin_sub_listar_categorias' => 'List Categories',
+    'admin_menu_membresias'       => 'Memberships',
+    'admin_sub_crear_plan'        => 'Create Plan',
+    'admin_sub_planes'            => 'Available Plans',
+    'admin_sub_suscripciones'     => 'Active Subscriptions',
+    'admin_header_admin'          => 'ADMINISTRATION',
+    'admin_menu_finanzas'         => 'Finance',
+    'admin_sub_balance'           => 'Balance',
+    'admin_sub_facturacion'       => 'Billing',
+    'admin_menu_reportes'         => 'Reports',
+    'admin_sub_general'           => 'General',
+    'admin_footer_ajustes'        => 'Settings',
+    'admin_footer_salir'          => 'Logout',
+    'rol_admin'                   => 'Administrator',
+
+    // ==========================================
+    // PROVEEDOR - SIDEBAR
+    // ==========================================
+    'proveedor_alt_logo'                => 'ProviServers Logo',
+    'proveedor_menu_panel'              => 'Dashboard',
+    'proveedor_header_servicios'        => 'MY SERVICES',
+    'proveedor_registrar_servicio'      => 'Register Service',
+    'proveedor_mis_servicios'           => 'My Services',
+    'proveedor_mis_publicaciones'       => 'My Listings',
+    'proveedor_header_solicitudes'      => 'REQUESTS',
+    'proveedor_solicitudes'             => 'Requests',
+    'proveedor_oportunidades'           => 'Opportunities',
+    'proveedor_resenas'                 => 'Reviews',
+    'proveedor_header_negocio'          => 'MY BUSINESS',
+    'proveedor_calendario'              => 'Calendar',
+    'proveedor_estadisticas'            => 'Statistics',
+    'proveedor_finanzas'                => 'Finance',
+    'proveedor_facturacion'             => 'Billing',
+    'proveedor_promociones'             => 'Promotions',
+    'proveedor_membresia'               => 'Membership',
+    'proveedor_header_configuracion'    => 'SETTINGS',
+    'proveedor_configuracion'           => 'Settings',
+    'proveedor_perfil'                  => 'My Profile',
+    'proveedor_salir'                   => 'Logout',
+    'proveedor_dark_mode'               => 'Dark mode',
+    'proveedor_ver_todas'               => 'View all',
+    'proveedor_tienes'                  => 'You have',
+    'proveedor_sin_leer'                => 'unread',
+    'proveedor_notificaciones'          => 'Notifications',
+    'proveedor_buscar'                  => 'Search services, clients...',
+    'proveedor_mejorar_plan'            => 'Upgrade Plan',
+    'proveedor_mi_perfil'               => 'My Profile',
+    'proveedor_cerrar_sesion'           => 'Logout',
+    'proveedor_bienvenido'              => 'Provider Dashboard',
+    'proveedor_descripcion'             => 'Welcome to your control panel. Here you can manage your services, review requests, track your income and keep your professional information up to date.',
+    'proveedor_ingresos_mes'            => 'Monthly Income',
+    'proveedor_servicios_activos'       => 'Active Services',
+    'proveedor_calificacion'            => 'Rating',
+    'proveedor_solicitudes_pendientes'  => 'Pending Requests',
+    'proveedor_vs_mes_anterior'         => 'vs last month',
+    'proveedor_nuevos'                  => 'new',
+    'proveedor_este_mes'                => 'this month',
+    'proveedor_desde_ayer'              => 'since yesterday',
+    'proveedor_rendimiento_servicios'   => 'Service Performance',
+    'proveedor_semanal'                 => 'Weekly',
+    'proveedor_mensual'                 => 'Monthly',
+    'proveedor_anual'                   => 'Annual',
+    'proveedor_servicios_recientes'     => 'Recent Services',
+    'proveedor_reparacion_tuberias'     => 'Pipe repair',
+    'proveedor_instalacion_electrica'   => 'Electrical installation',
+    'proveedor_plomeria'                => 'Plumbing',
+    'proveedor_electricidad'            => 'Electricity',
+    'proveedor_activo'                  => 'Active',
+    'proveedor_pendiente'               => 'Pending',
+
+    // ==========================================
+    // CLIENTE - SIDEBAR
+    // ==========================================
+    'cliente_alt_logo'           => 'ProviServers Logo',
+    'cliente_menu_panel'         => 'Dashboard',
+    'cliente_header_servicios'   => 'MY SERVICES',
+    'cliente_explorar_servicios' => 'Explore Services',
+    'cliente_mis_solicitudes'    => 'My Requests',
+    'cliente_servicios_contratados' => 'Contracted Services',
+    'cliente_historial'          => 'History',
+    'cliente_favoritos'          => 'Favorites',
+    'cliente_header_comunicacion'=> 'COMMUNICATION',
+    'cliente_mensajes'           => 'Messages',
+    'cliente_ayuda'              => 'Help',
+    'cliente_header_configuracion' => 'SETTINGS',
+    'cliente_perfil'             => 'Profile',
+    'cliente_mi_perfil'          => 'My Profile',
+    'cliente_salir'              => 'Logout',
+    'cliente_dark_mode'          => 'Dark mode',
+    'cliente_ver_todas'          => 'View all',
+    'cliente_tienes'             => 'You have',
+    'cliente_sin_leer'           => 'unread',
+    'cliente_notificaciones'     => 'Notifications',
+    'cliente_buscar_servicios'   => 'Search services...',
+    'cliente_cerrar_sesion'      => 'Logout',
+    'cliente_mis_favoritos'      => 'My Favorites',
+
+    // ==========================================
+    // CLIENTE - DASHBOARD
+    // ==========================================
+    'cliente_bienvenido'             => 'Main Dashboard',
+    'cliente_descripcion'            => 'Welcome to your control panel. Here you can explore services, manage your requests and track your contracted services.',
+    'cliente_explorar_descripcion'   => 'Find the best providers and services near you.',
+    'cliente_servicios_disponibles'  => 'Available Services',
+    'cliente_solicitudes_activas'    => 'Active Requests',
+    'cliente_servicios_finalizados'  => 'Completed Services',
+    'cliente_proveedores_favoritos'  => 'Favorite Providers',
+    'cliente_que_necesitas'          => 'What do you need today?',
+    'cliente_buscar_servicio'        => 'Search Service',
+    'cliente_mis_servicios'          => 'My Services',
+    'cliente_publicar_necesidad'     => 'Post a Need',
+    'cliente_servicios_curso'        => 'Services in Progress',
+    'cliente_ver_todos'              => 'View all',
+    'cliente_categorias_populares'   => 'Popular Categories',
+    'cliente_ver_proveedores'        => 'View providers',
 ];
-?>

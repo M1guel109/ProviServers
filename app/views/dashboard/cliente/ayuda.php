@@ -31,12 +31,24 @@
     <!-- Sección Ayuda -->
     <section id="servicios-ayuda" class="section-servicios">
       <div class="container">
-        <!-- Encabezado -->
-        <div class="section-header">
-          <h2 class="section-title">Centro de Ayuda</h2>
-          <p class="section-subtitle">
-            Encuentra respuestas rápidas, soporte especializado y recursos útiles para resolver tus dudas.
-          </p>
+        <!-- Encabezado con breadcrumb -->
+        <div id="titulo-principal" class="section-hero mb-4">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h1 class="mb-1">Centro de Ayuda</h1>
+              <p class="text-muted mb-0">Encuentra respuestas rápidas, soporte especializado y recursos útiles.</p>
+            </div>
+            <div class="col-md-4">
+              <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 justify-content-md-end">
+                  <li class="breadcrumb-item">
+                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                  </li>
+                  <li class="breadcrumb-item active" aria-current="page">Ayuda</li>
+                </ol>
+              </nav>
+            </div>
+          </div>
         </div>
 
         <!-- Preguntas Frecuentes -->

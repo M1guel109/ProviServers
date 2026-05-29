@@ -56,7 +56,11 @@
       "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SHOW TABLES LIKE '%proveedor%';\")",
       "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedor_perfil;\")",
       "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SELECT id, nombre FROM categorias LIMIT 10; SELECT id, nombre FROM servicios LIMIT 10;\")",
-      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedores_disponibilidad;\")"
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedores_disponibilidad;\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root -e \"SELECT 1;\" 2>$null)",
+      "Bash(Select-String cliente *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\core\" -Recurse -Include \"*.php\")",
+      "Bash(Select-Object -First 20)"
     ]
   }
 }

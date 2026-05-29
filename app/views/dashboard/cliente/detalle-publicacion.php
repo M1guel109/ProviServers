@@ -54,14 +54,26 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
 
         <section id="detalle-servicio" class="mb-4">
             <!-- Breadcrumb + título -->
-            <div class="section-hero mb-4">
-                <p class="breadcrumb">
-                    Inicio > Explorar Servicios > Detalle del servicio
-                </p>
-                <h1><?= htmlspecialchars($titulo) ?></h1>
-                <p class="text-muted mb-0">
-                    Revisa la información del servicio y del proveedor antes de solicitarlo.
-                </p>
+            <div id="titulo-principal" class="section-hero mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-1"><?= htmlspecialchars($titulo) ?></h1>
+                        <p class="text-muted mb-0">Revisa la información del servicio y del proveedor antes de solicitarlo.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 justify-content-md-end">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios">Explorar</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </div>
 
             <div class="row g-4">

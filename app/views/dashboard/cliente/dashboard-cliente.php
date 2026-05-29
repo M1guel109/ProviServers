@@ -55,10 +55,12 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
                     </p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Panel Principal</li>
                         </ol>
                     </nav>
                 </div>

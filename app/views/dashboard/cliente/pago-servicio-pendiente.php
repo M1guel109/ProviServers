@@ -17,7 +17,19 @@ include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
 <main class="contenido">
     <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
-    <div class="d-flex align-items-center justify-content-center" style="min-height:70vh;">
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="<?= BASE_URL ?>/cliente/servicios-contratados">Servicios</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Estado de pago</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center justify-content-center" style="min-height:65vh;">
         <div class="text-center" style="max-width:480px;">
             <div class="mb-4">
                 <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-10"

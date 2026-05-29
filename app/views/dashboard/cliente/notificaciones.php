@@ -27,10 +27,23 @@ $notificaciones = obtenerNotificacionesCliente((int)($_SESSION['user']['id'] ?? 
         <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
         <section class="p-3">
-            <div class="section-hero mb-4">
-                <p class="breadcrumb">Inicio > Notificaciones</p>
-                <h1>Notificaciones</h1>
-                <p>Historial de alertas y eventos relacionados con tus servicios.</p>
+            <div id="titulo-principal" class="section-hero mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-1">Notificaciones</h1>
+                        <p class="text-muted mb-0">Historial de alertas y eventos relacionados con tus servicios.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 justify-content-md-end">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">Notificaciones</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </div>
 
             <div class="card border-0 shadow-sm">

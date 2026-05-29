@@ -20,7 +20,7 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
             <ul>
                 <!-- Dashboard -->
                 <li>
-                    <a href="<?= BASE_URL ?>/cliente/dashboard" class="active" data-title="<?= __('cliente_menu_panel') ?>">
+                    <a href="<?= BASE_URL ?>/cliente/dashboard" data-title="<?= __('cliente_menu_panel') ?>">
                         <i class="bi bi-grid-1x2-fill"></i>
                         <span class="nav-text"><?= __('cliente_menu_panel') ?></span>
                     </a>

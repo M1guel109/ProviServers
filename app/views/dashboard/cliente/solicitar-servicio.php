@@ -68,12 +68,26 @@ $imagenUrl = (!empty($imagen))
 
         <section id="solicitar-servicio" class="mt-2">
             <!-- Migas de pan -->
-            <div class="section-hero mb-4">
-                <p class="breadcrumb">
-                    Inicio &gt; Explorar servicios &gt; Solicitar servicio
-                </p>
-                <h1>Solicitar servicio</h1>
-                <p>Cuéntale al proveedor qué necesitas y cuándo te gustaría que te atienda.</p>
+            <div id="titulo-principal" class="section-hero mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-1">Solicitar Servicio</h1>
+                        <p class="text-muted mb-0">Cuéntale al proveedor qué necesitas y cuándo te gustaría que te atienda.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 justify-content-md-end">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios">Explorar</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">Solicitar</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </div>
 
             <div class="row">

@@ -674,6 +674,99 @@ body.toggle-sidebar .contenido {
     box-shadow: var(--shadow-sm);
     margin-bottom: 30px;
     border: 1px solid var(--border-color);
+    position: sticky;
+    top: 15px;
+    z-index: 99;
+}
+
+/* ── Nuevos helpers del header (cliente/proveedor) ── */
+.hdr-left,
+.hdr-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.hdr-btn-icon {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--dark-color);
+    transition: background var(--transition-base);
+    flex-shrink: 0;
+}
+
+.hdr-btn-icon:hover {
+    background: rgba(0, 102, 255, 0.08);
+    color: var(--primary-color);
+}
+
+/* badge de notificaciones */
+.hdr-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 30px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    border: 2px solid var(--white-color);
+    pointer-events: none;
+}
+
+.hdr-btn-user {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 30px;
+    transition: background var(--transition-base);
+    flex-shrink: 0;
+}
+
+.hdr-btn-user:hover {
+    background: rgba(0, 102, 255, 0.06);
+}
+
+.hdr-btn-lang {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+}
+
+.hdr-btn-lang:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: rgba(0, 102, 255, 0.05);
 }
 
 .btn-toggle {
@@ -1002,9 +1095,9 @@ body.toggle-sidebar .contenido {
     width: 0 !important;
 }
 
-/* Eliminar cualquier otro scroll no deseado */
+/* clip no crea scroll-container, así position:sticky del header funciona */
 .contenido {
-    overflow-x: hidden !important;
+    overflow-x: clip !important;
 }
 
 /* Responsive: mantener scroll oculto también */
@@ -1150,24 +1243,26 @@ body.toggle-sidebar .contenido {
         padding: 15px;
     }
 
-    /* Sidebar oculto por defecto */
+    /* ── SIDEBAR MÓVIL — slide desde la izquierda ── */
     .sidebar {
         position: fixed;
         left: -100%;
-        width: 85%;
-        max-width: 320px;
+        right: auto;
+        width: min(320px, 85%);
         height: 100vh;
-        background: var(--white-color);
+        background: linear-gradient(160deg, #ffffff 0%, #f0f4ff 100%);
         transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 2px 0 20px rgba(0, 0, 0, 0.15);
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.12);
         z-index: 1050;
-        padding: 20px 0;
         overflow-y: auto;
+        border-right: 1px solid rgba(0, 102, 255, 0.1);
     }
 
     /* Sidebar visible */
     body.toggle-sidebar .sidebar {
         left: 0;
+        right: auto;
+        width: min(320px, 85%);
     }
 
     /* Overlay oscuro */
@@ -1188,80 +1283,99 @@ body.toggle-sidebar .contenido {
         margin-left: 0;
     }
 
-    /* Mostrar textos siempre en móvil */
-    .menu-principal a span,
-    .menu-footer a span {
+    /* ── Texto siempre visible en móvil (override del modo colapsado desktop) ── */
+    .sidebar .nav-text,
+    .sidebar .menu-header,
+    .sidebar .menu-footer a span,
+    .sidebar .mode-text,
+    .sidebar .switch-wrap {
         display: inline-block !important;
+        opacity: 1 !important;
+        width: auto !important;
+        overflow: visible !important;
     }
 
-    body.toggle-sidebar .sidebar span {
-        display: inline-block !important;
-    }
-
-    /* Estilo de enlaces en móvil */
+    /* Links siempre con layout horizontal + texto */
     .menu-principal a,
-    .menu-footer a {
+    .menu-link,
+    .menu-footer a,
+    .mode-row {
         justify-content: flex-start !important;
-        padding: 14px 20px !important;
+        gap: 14px !important;
+        padding: 13px 20px !important;
         font-size: 1rem !important;
-        width: 100%;
-        text-align: left;
-        border-radius: 0;
-    }
-
-    .menu-principal a:hover,
-    .menu-footer a:hover {
-        background-color: var(--primary-color);
-        color: white;
-        transform: translateX(5px);
+        width: 100% !important;
+        border-radius: 10px !important;
+        margin: 2px 8px !important;
+        width: calc(100% - 16px) !important;
     }
 
     .menu-principal a i,
     .menu-footer a i {
-        margin-right: 15px !important;
-        font-size: 1.3rem !important;
-        min-width: 24px;
+        font-size: 1.25rem !important;
+        min-width: 22px;
+        color: var(--text-muted);
     }
 
-    /* Botón cerrar móvil */
+    .menu-principal a:hover,
+    .menu-footer a:hover {
+        background: rgba(0, 102, 255, 0.08);
+        color: var(--primary-color);
+        transform: translateX(4px);
+    }
+
+    /* Línea decorativa izquierda en link activo */
+    .menu-principal a.active::before {
+        display: block !important;
+        left: -8px;
+    }
+
+    /* ── Logo en sidebar móvil: mostrar completo + X inline ── */
+    .sidebar .logo {
+        justify-content: space-between;
+        padding: 0 14px 0 16px;
+    }
+
+    .logo .logo-completo {
+        display: block;
+        height: 38px;
+        width: auto;
+    }
+
+    .logo .logo-favicon {
+        display: none;
+    }
+
+    /* ── Botón cerrar (X) — inline en la barra del logo ── */
     .sidebar .close-menu-mobile {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        width: 40px;
-        height: 40px;
-        background: #f0f0f0;
+        position: static;
+        flex-shrink: 0;
+        width: 34px;
+        height: 34px;
+        background: rgba(0, 0, 0, 0.06);
         border: none;
         border-radius: 50%;
         color: var(--dark-color);
-        font-size: 1.3rem;
+        font-size: 1rem;
         cursor: pointer;
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
-        z-index: 1060;
-        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
     }
 
     .sidebar .close-menu-mobile:hover {
         background: var(--primary-color);
         color: white;
+        transform: rotate(90deg);
     }
 
-    .logo .logo-completo {
-        display: none;
-    }
-
-    .logo .logo-favicon {
-        display: block;
-    }
-
-    /* Animación escalonada para móvil */
+    /* ── Animación escalonada para los items ── */
     .menu-principal li {
         opacity: 0;
-        transform: translateX(30px);
-        transition: all 0.4s ease;
-        transition-delay: calc(0.1s * var(--item-index, 1));
+        transform: translateX(20px);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+        transition-delay: calc(0.07s * var(--item-index, 1));
     }
 
     body.toggle-sidebar .menu-principal li {
@@ -1293,6 +1407,23 @@ body.toggle-sidebar .contenido {
     /* Ocultar buscador en móvil */
     .buscador {
         display: none;
+    }
+
+    /* ── Header móvil: una sola línea compacta, sticky ── */
+    .barra-superior {
+        padding: 6px 12px;
+        min-height: 52px;
+        top: 10px;
+    }
+
+    .hdr-left,
+    .hdr-right {
+        gap: 6px;
+    }
+
+    /* Dropdown notification: asegurar ancho máximo en pantallas pequeñas */
+    .hdr-right .dropdown-menu {
+        width: min(300px, 90vw) !important;
     }
 }
 
@@ -1339,10 +1470,10 @@ body.toggle-sidebar .contenido {
 }
 
 /* ==========================================================================
-   FIX: CENTRADO DE ICONOS EN MODO COLAPSADO
+   FIX: CENTRADO DE ICONOS EN MODO COLAPSADO — solo desktop (≥1025px)
    ========================================================================== */
-
-/* Eliminar hueco de menu-headers (display:none en vez de opacity) */
+@media (min-width: 1025px) {
+/* Eliminar hueco de menu-headers */
 body.toggle-sidebar .menu-header {
     display: none !important;
     padding: 0 !important;
@@ -1367,7 +1498,7 @@ body.toggle-sidebar .mode-row {
     gap: 0 !important;
 }
 
-/* Liberar ancho fijo de los iconos para que el centrado funcione */
+/* Liberar ancho fijo de los iconos */
 body.toggle-sidebar .menu-principal a i,
 body.toggle-sidebar .menu-link i:not(.toggle-icon),
 body.toggle-sidebar .menu-footer a i,
@@ -1378,7 +1509,7 @@ body.toggle-sidebar .mode-row .sun-moon {
     flex-shrink: 0;
 }
 
-/* Ocultar textos sin que ocupen espacio */
+/* Ocultar textos */
 body.toggle-sidebar .nav-text,
 body.toggle-sidebar .menu-footer a span,
 body.toggle-sidebar .mode-text,
@@ -1428,5 +1559,135 @@ body.toggle-sidebar .menu-principal a.active::before {
     /* Reducir tamaño de notificaciones dropdown en móvil */
     .notifications {
         width: 280px !important;
+    }
+}
+
+/* ==========================================================================
+   18. DASHBOARD — FIXES MÓVIL GLOBAL (aplica a cliente, proveedor y admin)
+   Prioridad: 360px sin scroll horizontal
+   ========================================================================== */
+
+/* ── Títulos de sección ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #titulo-principal h1,
+    .section-hero h1 {
+        font-size: 1.4rem !important;
+    }
+
+    #titulo-principal .text-muted,
+    .section-hero p {
+        font-size: 0.85rem;
+    }
+
+    /* Breadcrumb: ocultar en móvil para ganar espacio */
+    #titulo-principal nav,
+    .section-hero nav {
+        display: none;
+    }
+
+    /* Separador inferior */
+    #titulo-principal {
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+    }
+}
+
+/* ── Nav tabs: scroll horizontal si hay muchas pestañas ─────────────────── */
+@media (max-width: 768px) {
+    .nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+
+    .nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-tabs .nav-item {
+        flex-shrink: 0;
+    }
+
+    .nav-tabs .nav-link {
+        white-space: nowrap;
+        font-size: 0.82rem;
+        padding: 0.4rem 0.75rem;
+    }
+}
+
+/* ── Filtros container: reducir padding ─────────────────────────────────── */
+@media (max-width: 576px) {
+    .filtros-container {
+        padding: 12px !important;
+        border-radius: 10px;
+    }
+
+    /* Cards con hover: desactivar transform en táctil */
+    .tarjeta-estadistica,
+    .card-cliente,
+    .service-card {
+        transform: none !important;
+    }
+
+    /* Reducir padding de tarjetas en móvil */
+    .tarjeta-estadistica {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .valor-estadistica {
+        font-size: 1.3rem;
+    }
+
+    .icono-estadistica {
+        font-size: 1.8rem;
+        padding: 10px;
+    }
+}
+
+/* ── Header barra superior: ajuste fino en 360px ────────────────────────── */
+@media (max-width: 400px) {
+    .barra-superior {
+        padding: 4px 8px !important;
+    }
+
+    .hdr-left,
+    .hdr-right {
+        gap: 4px !important;
+    }
+}
+
+/* ── Tablas: siempre con scroll horizontal ──────────────────────────────── */
+@media (max-width: 768px) {
+    .table-responsive {
+        border-radius: 8px;
+    }
+
+    table th,
+    table td {
+        font-size: 0.82rem;
+        padding: 8px 10px;
+    }
+}
+
+/* ── Modales: ancho completo en móvil ───────────────────────────────────── */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 8px;
+    }
+
+    .modal-dialog:not(.modal-dialog-centered) {
+        margin-top: 60px;
+    }
+
+    .modal-content {
+        border-radius: 12px;
+    }
+
+    .modal-body {
+        padding: 16px;
     }
 }
