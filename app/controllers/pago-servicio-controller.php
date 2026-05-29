@@ -44,16 +44,21 @@ function ensurePagosServiciosTable(): void
         $pdo = $db->getConexion();
         $pdo->exec("CREATE TABLE IF NOT EXISTS pagos_servicios (
             id                     INT AUTO_INCREMENT PRIMARY KEY,
-            servicio_contratado_id INT         NOT NULL,
-            cliente_id             INT         NOT NULL,
-            proveedor_id           INT         NOT NULL,
+            servicio_contratado_id INT           NOT NULL,
+            cliente_id             INT           NOT NULL,
+            proveedor_id           INT           NOT NULL,
             monto                  DECIMAL(12,2) NOT NULL DEFAULT 0,
-            mp_payment_id          BIGINT      NULL DEFAULT NULL,
-            mp_status              VARCHAR(20) DEFAULT 'approved',
-            metodo                 VARCHAR(50) DEFAULT 'mercadopago',
-            created_at             DATETIME    DEFAULT NOW(),
+            mp_payment_id          BIGINT        NULL DEFAULT NULL,
+            mp_status              VARCHAR(20)   DEFAULT 'approved',
+            metodo                 VARCHAR(50)   DEFAULT 'mercadopago',
+            liberado               TINYINT(1)    NOT NULL DEFAULT 0,
+            fecha_liberacion       DATETIME      NULL DEFAULT NULL,
+            created_at             DATETIME      DEFAULT NOW(),
             UNIQUE KEY uk_pagos_sc (servicio_contratado_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        // Agregar columnas si la tabla ya existía sin ellas
+        try { $pdo->exec("ALTER TABLE pagos_servicios ADD COLUMN liberado TINYINT(1) NOT NULL DEFAULT 0"); } catch (PDOException $e) {}
+        try { $pdo->exec("ALTER TABLE pagos_servicios ADD COLUMN fecha_liberacion DATETIME NULL DEFAULT NULL"); } catch (PDOException $e) {}
     } catch (PDOException $e) {
         error_log('pago-servicio::ensurePagosServiciosTable: ' . $e->getMessage());
     }
@@ -81,14 +86,14 @@ function iniciarPagoServicio(): void
 
         $st = $pdo->prepare("
             SELECT sc.id, sc.estado, sc.proveedor_id,
-                   COALESCE(cot.precio, sol.presupuesto_estimado, nec.presupuesto_estimado, 0) AS monto,
+                   COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto,
                    COALESCE(cot.titulo, sol.titulo, sv.nombre, 'Servicio') AS titulo
             FROM servicios_contratados sc
-            INNER JOIN clientes cl   ON sc.cliente_id = cl.id
-            LEFT JOIN cotizaciones cot ON sc.cotizacion_id = cot.id
-            LEFT JOIN solicitudes sol  ON sc.solicitud_id  = sol.id
-            LEFT JOIN necesidades nec  ON cot.necesidad_id = nec.id
-            LEFT JOIN servicios sv     ON sc.servicio_id   = sv.id
+            INNER JOIN clientes cl        ON sc.cliente_id       = cl.id
+            LEFT JOIN cotizaciones cot    ON sc.cotizacion_id    = cot.id
+            LEFT JOIN solicitudes sol     ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
+            LEFT JOIN servicios sv        ON sc.servicio_id      = sv.id
             WHERE sc.id = :id AND cl.usuario_id = :uid
             LIMIT 1
         ");
@@ -279,17 +284,27 @@ function registrarPagoServicio(array $pago): void
 
         if (!$sc) return;
 
-        $pdo->prepare("
+        $inserted = $pdo->prepare("
             INSERT IGNORE INTO pagos_servicios
-                (servicio_contratado_id, cliente_id, proveedor_id, monto, mp_payment_id, mp_status, metodo, created_at)
-            VALUES (:sc_id, :cl_id, :prov_id, :monto, :mp_id, 'approved', 'mercadopago', NOW())
-        ")->execute([
+                (servicio_contratado_id, cliente_id, proveedor_id, monto, mp_payment_id, mp_status, metodo, liberado, created_at)
+            VALUES (:sc_id, :cl_id, :prov_id, :monto, :mp_id, 'approved', 'mercadopago', 0, NOW())
+        ");
+        $inserted->execute([
             ':sc_id'   => $contratoId,
             ':cl_id'   => $sc['cliente_id'],
             ':prov_id' => $sc['proveedor_id'],
             ':monto'   => $monto,
             ':mp_id'   => $mpPaymentId,
         ]);
+
+        // Pago registrado → mover el servicio a en_proceso (dinero retenido en plataforma)
+        if ($inserted->rowCount() > 0) {
+            $pdo->prepare("
+                UPDATE servicios_contratados
+                SET estado = 'en_proceso', modified_at = NOW()
+                WHERE id = :id AND estado = 'confirmado'
+            ")->execute([':id' => $contratoId]);
+        }
 
     } catch (PDOException $e) {
         error_log('registrarPagoServicio: ' . $e->getMessage());

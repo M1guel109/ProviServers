@@ -505,16 +505,71 @@ function actualizarEstadoServicio()
         exit();
     }
 
+    // Bloquear avance si el servicio tiene precio y el cliente no ha pagado
+    if (in_array($nuevoEstado, ['en_proceso', 'finalizado'], true)) {
+        try {
+            $dbPago  = new Conexion();
+            $pdoPago = $dbPago->getConexion();
+
+            // Obtener precio real de la publicación
+            $stPrecio = $pdoPago->prepare("
+                SELECT COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto
+                FROM servicios_contratados sc
+                LEFT JOIN cotizaciones cot      ON sc.cotizacion_id    = cot.id
+                LEFT JOIN solicitudes sol        ON sc.solicitud_id     = sol.id
+                LEFT JOIN publicaciones pub_sol  ON sol.publicacion_id  = pub_sol.id
+                LEFT JOIN servicios sv           ON sc.servicio_id      = sv.id
+                WHERE sc.id = :id LIMIT 1
+            ");
+            $stPrecio->execute([':id' => $contratoId]);
+            $monto = (float)($stPrecio->fetchColumn() ?: 0);
+
+            if ($monto > 0) {
+                $stPago = $pdoPago->prepare("
+                    SELECT COUNT(*) FROM pagos_servicios
+                    WHERE servicio_contratado_id = :id
+                ");
+                $stPago->execute([':id' => $contratoId]);
+                if ((int)$stPago->fetchColumn() === 0) {
+                    http_response_code(402);
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'El cliente aún no ha realizado el pago. El servicio no puede avanzar hasta que se complete.',
+                    ]);
+                    exit();
+                }
+            }
+        } catch (PDOException $e) {
+            // pagos_servicios puede no existir aún — se permite continuar
+            error_log('actualizarEstadoServicio::checkPago: ' . $e->getMessage());
+        }
+    }
+
     if (!$modelo->actualizarEstado($contratoId, $nuevoEstado)) {
         http_response_code(422);
         echo json_encode(['success' => false, 'message' => 'No se pudo actualizar el estado del servicio.']);
         exit();
     }
 
+    // Al finalizar: marcar el pago como liberado (escrow → proveedor)
+    if ($nuevoEstado === 'finalizado') {
+        try {
+            $db  = new Conexion();
+            $pdo = $db->getConexion();
+            $pdo->prepare("
+                UPDATE pagos_servicios
+                SET liberado = 1, fecha_liberacion = NOW()
+                WHERE servicio_contratado_id = :id AND liberado = 0
+            ")->execute([':id' => $contratoId]);
+        } catch (PDOException $e) {
+            error_log('actualizarEstadoServicio::liberarPago: ' . $e->getMessage());
+        }
+    }
+
     echo json_encode([
         'success' => true,
         'message' => $nuevoEstado === 'finalizado'
-            ? 'El servicio fue marcado como finalizado.'
+            ? 'El servicio fue marcado como finalizado y el pago fue liberado al proveedor.'
             : 'El estado del servicio fue actualizado correctamente.',
         'estado'  => $nuevoEstado,
     ]);

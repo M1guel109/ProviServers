@@ -32,10 +32,11 @@ try {
         $stats['calificacion'] = $stRating->fetchColumn() ?: null;
 
         $stIngresos = $pdo->prepare("
-            SELECT COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0)
+            SELECT COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0)
             FROM servicios_contratados sc
-            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN cotizaciones c     ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol    ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
             WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
         ");
         $stIngresos->execute([':pid' => $proveedorId]);
@@ -45,7 +46,7 @@ try {
             SELECT
                 sc.id, sc.fecha_solicitud, sc.fecha_ejecucion, sc.created_at AS fecha_completado,
                 COALESCE(c.titulo, sol.titulo, pub.titulo, 'Servicio') AS titulo,
-                COALESCE(c.precio, sol.presupuesto_estimado, 0)        AS monto,
+                COALESCE(c.precio, pub.precio, 0)                       AS monto,
                 cat.nombre                                              AS categoria,
                 TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido, '')))  AS cliente_nombre,
                 cal.puntaje  AS calificacion,

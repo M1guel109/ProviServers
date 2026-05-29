@@ -39,11 +39,12 @@ try {
 
     // Ingresos anuales
     $st = $pdo->prepare("
-        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        SELECT COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0)
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot    ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol     ON sol.id  = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = ? AND sc.estado = 'finalizado'
           AND YEAR(COALESCE(sc.fecha_ejecucion, sc.created_at)) = YEAR(CURDATE())
     ");
@@ -54,7 +55,7 @@ try {
     $st = $pdo->prepare("
         SELECT DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%b') AS mes,
                DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%Y-%m') AS mes_key,
-               COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0) AS total
+               COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0) AS total
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
         LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id

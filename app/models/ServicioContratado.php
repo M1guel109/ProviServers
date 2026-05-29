@@ -161,7 +161,7 @@ class ServicioContratado
 
             pub_cot.titulo AS publicacion_titulo_cotizacion,
 
-            COALESCE(cot.precio, sol.presupuesto_estimado, nec.presupuesto_estimado, 0) AS monto,
+            COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto,
 
             CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
             v.calificacion AS mi_calificacion,

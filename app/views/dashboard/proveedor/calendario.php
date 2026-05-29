@@ -35,10 +35,11 @@ try {
 
         // Ingresos hoy (servicios finalizados hoy)
         $stIngHoy = $pdo->prepare("
-            SELECT COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0)
+            SELECT COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0)
             FROM servicios_contratados sc
-            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
             WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
               AND DATE(sc.modified_at) = CURDATE()
         ");
@@ -79,12 +80,13 @@ try {
         $stMes = $pdo->prepare("
             SELECT
                 COALESCE(SUM(CASE WHEN sc.estado IN ('confirmado','en_proceso','finalizado')
-                    THEN COALESCE(c.precio, sol.presupuesto_estimado, 0) ELSE 0 END), 0) AS confirmado,
+                    THEN COALESCE(c.precio, pub_sol.precio, 0) ELSE 0 END), 0) AS confirmado,
                 COALESCE(SUM(CASE WHEN sc.estado = 'pendiente'
-                    THEN COALESCE(c.precio, sol.presupuesto_estimado, 0) ELSE 0 END), 0) AS pendiente_pago
+                    THEN COALESCE(c.precio, pub_sol.precio, 0) ELSE 0 END), 0) AS pendiente_pago
             FROM servicios_contratados sc
-            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
             WHERE sc.proveedor_id = :pid
               AND MONTH(sc.fecha_ejecucion) = MONTH(CURDATE())
               AND YEAR(sc.fecha_ejecucion)  = YEAR(CURDATE())

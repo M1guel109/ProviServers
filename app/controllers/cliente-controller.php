@@ -425,8 +425,9 @@ function crearNecesidad()
 function generarComprobantePDFCliente()
 {
     $usuarioId   = (int)$_SESSION['user']['id'];
-    $solicitudId = isset($_GET['solicitud_id']) ? (int)$_GET['solicitud_id'] : 0;
-    $contratoId  = isset($_GET['contrato_id'])  ? (int)$_GET['contrato_id']  : 0;
+    // Acepta ?id=, ?contrato_id= o ?solicitud_id=
+    $contratoId  = (int)($_GET['id'] ?? $_GET['contrato_id'] ?? 0);
+    $solicitudId = (int)($_GET['solicitud_id'] ?? 0);
 
     $scModel = new ServicioContratado();
 
@@ -436,14 +437,14 @@ function generarComprobantePDFCliente()
     }
 
     if ($contratoId <= 0) {
-        mostrarSweetAlert('error', 'No encontrado', 'El comprobante no existe o no tienes acceso.', BASE_URL . '/cliente/mis-solicitudes');
+        mostrarSweetAlert('error', 'No encontrado', 'El comprobante no existe o no tienes acceso.', BASE_URL . '/cliente/servicios-contratados');
         exit();
     }
 
     $contrato = $scModel->obtenerDetalleParaPDF($contratoId, $usuarioId, 'cliente');
 
     if (empty($contrato)) {
-        mostrarSweetAlert('error', 'Acceso denegado', 'No tienes permiso para ver este comprobante.', BASE_URL . '/cliente/mis-solicitudes');
+        mostrarSweetAlert('error', 'Acceso denegado', 'No tienes permiso para ver este comprobante.', BASE_URL . '/cliente/servicios-contratados');
         exit();
     }
 

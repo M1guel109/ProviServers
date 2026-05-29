@@ -165,11 +165,19 @@
                         </div>
                       </div>
 
-                      <!-- ✅ "Ver detalles" pendiente de ruta real -->
-                      <a href="<?= BASE_URL ?>/cliente/mis-solicitudes"
-                        class="btn btn-primary w-100 mb-2">
-                        Ver detalles
-                      </a>
+                      <button type="button"
+                        class="btn btn-primary w-100 mb-2 btn-ver-detalles"
+                        data-contrato-id="<?= $contratoId ?>"
+                        data-titulo="<?= htmlspecialchars($tituloServicio) ?>"
+                        data-proveedor="<?= htmlspecialchars($proveedorNombre) ?>"
+                        data-estado="<?= htmlspecialchars($estadoContrato) ?>"
+                        data-fecha="<?= $fechaTexto ?? '—' ?>"
+                        data-ciudad="<?= htmlspecialchars($ciudad ?: '—') ?>"
+                        data-zona="<?= htmlspecialchars($zona) ?>"
+                        data-descripcion="<?= htmlspecialchars($srv['solicitud_descripcion'] ?? $srv['cotizacion_mensaje'] ?? '') ?>"
+                        data-monto="<?= (float)($srv['monto'] ?? 0) ?>">
+                        <i class="bi bi-eye me-1"></i> Ver detalles
+                      </button>
 
                       <?php
                       $montoSrv   = (float)($srv['monto']     ?? 0);
@@ -266,10 +274,19 @@
                         </p>
                       <?php endif; ?>
 
-                      <a href="<?= BASE_URL ?>/cliente/mis-solicitudes"
-                        class="btn btn-primary w-100 mb-2">
-                        Ver detalles
-                      </a>
+                      <button type="button"
+                        class="btn btn-primary w-100 mb-2 btn-ver-detalles"
+                        data-contrato-id="<?= $contratoId ?>"
+                        data-titulo="<?= htmlspecialchars($tituloServicio) ?>"
+                        data-proveedor="<?= htmlspecialchars($proveedorNombre) ?>"
+                        data-estado="<?= htmlspecialchars($estadoContrato) ?>"
+                        data-fecha="<?= $fechaTexto ?? '—' ?>"
+                        data-ciudad="<?= htmlspecialchars($ciudad ?: '—') ?>"
+                        data-zona="<?= htmlspecialchars($zona) ?>"
+                        data-descripcion="<?= htmlspecialchars($srv['solicitud_descripcion'] ?? $srv['cotizacion_mensaje'] ?? '') ?>"
+                        data-monto="<?= (float)($srv['monto'] ?? 0) ?>">
+                        <i class="bi bi-eye me-1"></i> Ver detalles
+                      </button>
 
                       <?php
                       $montoSrv2 = (float)($srv['monto']     ?? 0);
@@ -377,10 +394,27 @@
                         </p>
                       <?php endif; ?>
 
-                      <a href="<?= BASE_URL ?>/cliente/mis-solicitudes"
-                        class="btn btn-primary w-100 mb-2">
-                        Ver detalles
-                      </a>
+                      <button type="button"
+                        class="btn btn-outline-primary w-100 mb-2 btn-ver-detalles"
+                        data-contrato-id="<?= $contratoId ?>"
+                        data-titulo="<?= htmlspecialchars($tituloServicio) ?>"
+                        data-proveedor="<?= htmlspecialchars($proveedorNombre) ?>"
+                        data-estado="<?= htmlspecialchars($estadoContrato) ?>"
+                        data-fecha="<?= $fechaTexto ?? '—' ?>"
+                        data-ciudad="<?= htmlspecialchars(($srv['solicitud_ciudad'] ?? '') ?: '—') ?>"
+                        data-zona="<?= htmlspecialchars($srv['solicitud_zona'] ?? '') ?>"
+                        data-descripcion="<?= htmlspecialchars($srv['solicitud_descripcion'] ?? $srv['cotizacion_mensaje'] ?? '') ?>"
+                        data-monto="<?= (float)($srv['monto'] ?? 0) ?>">
+                        <i class="bi bi-eye me-1"></i> Ver detalles
+                      </button>
+
+                      <?php if ($contratoId > 0): ?>
+                        <a href="<?= BASE_URL ?>/cliente/contrato-pdf?id=<?= $contratoId ?>"
+                          class="btn btn-outline-secondary w-100 mb-2"
+                          target="_blank">
+                          <i class="bi bi-file-pdf me-1"></i> Descargar comprobante
+                        </a>
+                      <?php endif; ?>
 
                       <?php if ($estadoContrato === 'finalizado'): ?>
                         <?php if ($tieneValoracion === 0): ?>
@@ -503,6 +537,27 @@
     </section>
   </main>
 
+  <!-- Modal Detalles del Servicio -->
+  <div class="modal fade" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header">
+          <h5 class="modal-title fw-bold" id="det-titulo">Detalles del servicio</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="det-body">
+          <!-- llenado por JS -->
+        </div>
+        <div class="modal-footer justify-content-between">
+          <a href="#" id="det-pdf-link" class="btn btn-outline-secondary btn-sm" target="_blank">
+            <i class="bi bi-file-pdf me-1"></i> Comprobante PDF
+          </a>
+          <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Calificar -->
   <div class="modal fade" id="modalCalificar" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
@@ -601,6 +656,60 @@
           document.getElementById('form-cancelar-' + contratoId)?.submit();
         }
       });
+    });
+  </script>
+
+  <!-- ── Modal detalles ──────────────────────────────── -->
+  <script>
+    const ESTADO_LABELS = {
+      pendiente: 'Pendiente', confirmado: 'Confirmado', en_proceso: 'En proceso',
+      finalizado: 'Finalizado', cancelado: 'Cancelado',
+      cancelado_cliente: 'Cancelado por ti', cancelado_proveedor: 'Cancelado por proveedor'
+    };
+    const ESTADO_COLORS = {
+      pendiente: 'secondary', confirmado: 'primary', en_proceso: 'info',
+      finalizado: 'success', cancelado: 'danger',
+      cancelado_cliente: 'danger', cancelado_proveedor: 'danger'
+    };
+
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn-ver-detalles');
+      if (!btn) return;
+
+      const titulo      = btn.dataset.titulo      || 'Servicio';
+      const proveedor   = btn.dataset.proveedor   || '—';
+      const estado      = btn.dataset.estado      || '';
+      const fecha       = btn.dataset.fecha       || '—';
+      const ciudad      = btn.dataset.ciudad      || '—';
+      const zona        = btn.dataset.zona        || '';
+      const descripcion = btn.dataset.descripcion || '';
+      const monto       = parseFloat(btn.dataset.monto || 0);
+      const contratoId  = btn.dataset.contratoId  || '';
+
+      document.getElementById('det-titulo').textContent = titulo;
+
+      const badge  = `<span class="badge bg-${ESTADO_COLORS[estado] || 'secondary'}">${ESTADO_LABELS[estado] || estado}</span>`;
+      const montoHtml = monto > 0
+        ? `<strong class="text-success">$${monto.toLocaleString('es-CO')} COP</strong>`
+        : '<span class="text-muted fst-italic">Sin monto definido</span>';
+      const descHtml = descripcion
+        ? `<dt class="col-sm-5">Descripción</dt><dd class="col-sm-7"><small class="text-muted">${descripcion}</small></dd>`
+        : '';
+
+      document.getElementById('det-body').innerHTML = `
+        <dl class="row mb-0">
+          <dt class="col-sm-5">Proveedor</dt><dd class="col-sm-7">${proveedor}</dd>
+          <dt class="col-sm-5">Estado</dt><dd class="col-sm-7">${badge}</dd>
+          <dt class="col-sm-5">Fecha</dt><dd class="col-sm-7">${fecha}</dd>
+          <dt class="col-sm-5">Ubicación</dt><dd class="col-sm-7">${ciudad}${zona ? ' — ' + zona : ''}</dd>
+          <dt class="col-sm-5">Monto</dt><dd class="col-sm-7">${montoHtml}</dd>
+          ${descHtml}
+        </dl>`;
+
+      const pdfLink = document.getElementById('det-pdf-link');
+      if (pdfLink) pdfLink.href = '<?= BASE_URL ?>/cliente/contrato-pdf?id=' + contratoId;
+
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalleServicio')).show();
     });
   </script>
 

@@ -16,11 +16,12 @@ try {
 
     // Ingresos del mes actual
     $st = $pdo->prepare("
-        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        SELECT COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0)
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot    ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol     ON sol.id  = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = ?
           AND sc.estado = 'finalizado'
           AND DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at), '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
@@ -30,11 +31,12 @@ try {
 
     // Ingresos totales del año
     $st = $pdo->prepare("
-        SELECT COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0)
+        SELECT COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0)
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot    ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol     ON sol.id  = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = ? AND sc.estado = 'finalizado'
           AND YEAR(COALESCE(sc.fecha_ejecucion, sc.created_at)) = YEAR(CURDATE())
     ");
@@ -47,14 +49,15 @@ try {
                COALESCE(sc.fecha_ejecucion, sc.modified_at, sc.created_at) AS fecha,
                CONCAT(cl.nombres, ' ', cl.apellidos) AS cliente,
                sv.nombre AS servicio,
-               COALESCE(cot.precio, sol.presupuesto_estimado, 0) AS monto,
+               COALESCE(cot.precio, pub_sol.precio, 0) AS monto,
                sc.estado
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
         INNER JOIN servicios sv  ON sv.id = sc.servicio_id
         INNER JOIN clientes cl   ON cl.id = sc.cliente_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot    ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol     ON sol.id  = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = :uid
         ORDER BY sc.created_at DESC
         LIMIT 10
@@ -66,11 +69,12 @@ try {
     $st = $pdo->prepare("
         SELECT DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.created_at), '%b') AS mes,
                DATE_FORMAT(COALESCE(sc.fecha_ejecucion, sc.created_at), '%Y-%m') AS mes_key,
-               COALESCE(SUM(COALESCE(cot.precio, sol.presupuesto_estimado, 0)), 0) AS total
+               COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0) AS total
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot    ON cot.id = sc.cotizacion_id
+        LEFT JOIN solicitudes sol     ON sol.id  = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = :uid AND sc.estado = 'finalizado'
           AND COALESCE(sc.fecha_ejecucion, sc.created_at) >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
         GROUP BY mes_key, mes

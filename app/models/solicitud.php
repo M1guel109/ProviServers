@@ -302,7 +302,7 @@ class Solicitud
                         :proveedor_id,
                         :servicio_id,
                         :fecha,
-                        'en_proceso'
+                        'confirmado'
                     )";
 
             $stmtIns = $this->conexion->prepare($sqlIns);

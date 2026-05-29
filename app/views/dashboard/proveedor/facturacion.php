@@ -20,10 +20,11 @@ try {
     if ($proveedorId > 0) {
         // Saldo: ingresos de servicios finalizados este año
         $stSaldo = $pdo->prepare("
-            SELECT COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0)
+            SELECT COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0)
             FROM servicios_contratados sc
-            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
             WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
               AND YEAR(sc.created_at) = YEAR(CURDATE())
         ");
@@ -67,10 +68,11 @@ try {
             $stSrv = $pdo->prepare("
                 SELECT sc.id, sc.created_at,
                        COALESCE(c.titulo, sol.titulo, 'Servicio') AS concepto,
-                       COALESCE(c.precio, sol.presupuesto_estimado, 0) AS monto
+                       COALESCE(c.precio, pub_sol.precio, 0) AS monto
                 FROM servicios_contratados sc
-                LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-                LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+                LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+                LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+                LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
                 WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
                 ORDER BY sc.created_at DESC LIMIT 10
             ");
@@ -129,10 +131,11 @@ try {
         // Resumen anual
         $stAnual = $pdo->prepare("
             SELECT
-                COALESCE(SUM(COALESCE(c.precio, sol.presupuesto_estimado, 0)), 0) AS total
+                COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0) AS total
             FROM servicios_contratados sc
-            LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
-            LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
             WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
               AND YEAR(sc.created_at) = YEAR(CURDATE())
         ");
