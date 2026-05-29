@@ -14,7 +14,20 @@
     <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
-        <div class="d-flex flex-column align-items-center justify-content-center py-5">
+
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="<?= BASE_URL ?>/proveedor/membresia">Membresía</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Pago aprobado</li>
+            </ol>
+        </nav>
+
+        <div class="d-flex flex-column align-items-center justify-content-center" style="min-height:65vh;">
             <div class="card shadow border-0 rounded-4 p-5 text-center" style="max-width:480px;">
                 <div class="mb-4">
                     <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-4">

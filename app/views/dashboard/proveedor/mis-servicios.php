@@ -28,27 +28,27 @@ $datos     = obtenerServiciosDelProveedor($usuarioId);
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
         <!-- Título -->
-        <section id="titulo-principal"
-            class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Mis Servicios</h1>
-                <p class="text-muted mb-0">
-                    Aquí puedes ver tus servicios publicados, su estado y gestionar sus acciones.
-                </p>
-                <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor"
-                    target="_blank"
-                    class="btn btn-primary mt-3">
-                    <i class="bi bi-file-earmark-pdf-fill"></i> Generar Reporte PDF
-                </a>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Mis Servicios</h1>
+                    <p class="text-muted mb-0">Aquí puedes ver tus servicios publicados, su estado y gestionar sus acciones.</p>
+                    <a href="<?= BASE_URL ?>/proveedor/reporte?tipo=serviciosProveedor"
+                       target="_blank" class="btn btn-primary btn-sm mt-3">
+                        <i class="bi bi-file-earmark-pdf-fill me-1"></i> Generar Reporte PDF
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Mis Servicios</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item">
-                        <a href="<?= BASE_URL ?>/proveedor/dashboard">Panel</a>
-                    </li>
-                    <li class="breadcrumb-item active">Mis Servicios</li>
-                </ol>
-            </nav>
         </section>
 
         <!-- Listado en tarjetas -->
@@ -247,7 +247,7 @@ $datos     = obtenerServiciosDelProveedor($usuarioId);
         </section>
 
         <!-- MODAL DETALLE SERVICIO -->
-        <div class="modal fade" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
+        <div class="modal fade modal-cliente" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow">
 

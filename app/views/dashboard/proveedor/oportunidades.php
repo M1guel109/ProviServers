@@ -23,9 +23,23 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
     <main class="contenido oportunidades-page">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <section class="mb-4">
-            <h1 class="fw-bold mb-2">Explorar oportunidades</h1>
-            <p class="text-muted">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Explorar Oportunidades</h1>
+                    <p class="text-muted mb-0">Encuentra nuevos clientes que necesitan tus servicios hoy mismo.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Oportunidades</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <section class="filtros-container">
@@ -165,8 +179,8 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         </section>
     </main>
 
-    <div class="modal fade" id="modalCotizar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade modal-cliente" id="modalCotizar" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <form method="POST" action="<?= rtrim(BASE_URL, '/') ?>/proveedor/oportunidades/enviar-cotizacion">
                     <input type="hidden" name="accion" value="enviar_cotizacion">

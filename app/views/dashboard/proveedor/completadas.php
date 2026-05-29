@@ -108,10 +108,23 @@ try {
         <!-- CONTENIDO INTERNO QUE SÍ DEBE MOVERSE -->
         <div class="contenido-completados">
 
-            <!-- Título -->
-            <section id="titulo-principal">
-                <h1>Servicios Completados</h1>
-                <p class="subtitulo">Historial de servicios finalizados y evaluaciones recibidas</p>
+            <section id="titulo-principal" class="section-hero mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-1">Servicios Completados</h1>
+                        <p class="text-muted mb-0">Historial de servicios finalizados y evaluaciones recibidas.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 justify-content-md-end">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">Completados</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </section>
 
             <!-- Estadísticas -->

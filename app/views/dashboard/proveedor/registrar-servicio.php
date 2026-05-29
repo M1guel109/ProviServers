@@ -23,22 +23,23 @@ $categorias = obtenerCategorias();
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap mb-4">
-            <div>
-                <h1 class="mb-2">Registrar Servicio</h1>
-                <p class="text-muted mb-0" style="max-width:600px;">
-                    Registra tu nuevo servicio para que sea visible en la plataforma.
-                    Completa todos los campos obligatorios.
-                </p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Registrar Servicio</h1>
+                    <p class="text-muted mb-0">Completa todos los campos para publicar tu servicio en la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Registrar Servicio</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 mt-2 mt-md-0">
-                    <li class="breadcrumb-item">
-                        <a href="<?= BASE_URL ?>/proveedor/dashboard">Panel</a>
-                    </li>
-                    <li class="breadcrumb-item active">Registrar Servicio</li>
-                </ol>
-            </nav>
         </section>
 
         <section id="formulario-servicio">

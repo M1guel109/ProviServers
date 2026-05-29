@@ -29,9 +29,9 @@
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
             <li class="breadcrumb-item">
-              <a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a>
+              <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
             </li>
-            <li class="breadcrumb-item active">Servicios Contratados</li>
+            <li class="breadcrumb-item active" aria-current="page">Servicios Contratados</li>
           </ol>
         </nav>
         <h1>Servicios Contratados</h1>

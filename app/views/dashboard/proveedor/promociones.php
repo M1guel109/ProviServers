@@ -107,19 +107,18 @@ $tipos_promocion = [
         <!-- Header Proveedor -->
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- TÍTULO CON BREADCRUMB -->
-        <section id="titulo-principal">
+        <section id="titulo-principal" class="section-hero mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1>Promociones</h1>
-                    <p class="text-muted mb-0">
-                        Crea y gestiona promociones para atraer más clientes y aumentar tus ventas.
-                    </p>
+                    <h1 class="mb-1">Promociones</h1>
+                    <p class="text-muted mb-0">Crea y gestiona promociones para atraer más clientes y aumentar tus ventas.</p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Promociones</li>
                         </ol>
                     </nav>
@@ -415,7 +414,7 @@ $tipos_promocion = [
     </main>
 
     <!-- MODAL CREAR PROMOCIÓN -->
-    <div class="modal fade" id="modalCrearPromocion" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalCrearPromocion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-primary text-white">
@@ -480,7 +479,7 @@ $tipos_promocion = [
     </div>
 
     <!-- MODAL ESTADÍSTICAS DE PROMOCIONES -->
-    <div class="modal fade" id="modalEstadisticas" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalEstadisticas" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">
@@ -551,7 +550,7 @@ $tipos_promocion = [
     </div>
 
     <!-- MODAL EDITAR PROMOCIÓN -->
-    <div class="modal fade" id="modalEditarPromocion" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalEditarPromocion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-warning text-white">

@@ -64,8 +64,10 @@ $ultimaFecha = !empty($historial)
             <div class="section-hero mb-4">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a></li>
-                        <li class="breadcrumb-item active">Historial</li>
+                        <li class="breadcrumb-item">
+                            <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Historial</li>
                     </ol>
                 </nav>
                 <h1>Historial de Pagos</h1>

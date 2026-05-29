@@ -211,19 +211,18 @@ try {
         <!-- Header Proveedor -->
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- TÍTULO CON BREADCRUMB -->
-        <section id="titulo-principal">
+        <section id="titulo-principal" class="section-hero mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1>Facturación</h1>
-                    <p class="text-muted mb-0">
-                        Gestiona tus facturas, métodos de pago y visualiza el resumen de tus transacciones.
-                    </p>
+                    <h1 class="mb-1">Facturación</h1>
+                    <p class="text-muted mb-0">Gestiona tus facturas, métodos de pago y visualiza el resumen de tus transacciones.</p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Facturación</li>
                         </ol>
                     </nav>
@@ -591,7 +590,7 @@ try {
     </main>
 
     <!-- MODAL PAGAR FACTURA -->
-    <div class="modal fade" id="modalPagarFactura" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalPagarFactura" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">
@@ -642,7 +641,7 @@ try {
     </div>
 
     <!-- MODAL AGREGAR MÉTODO DE PAGO -->
-    <div class="modal fade" id="modalAgregarMetodo" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalAgregarMetodo" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-primary text-white">
@@ -691,7 +690,7 @@ try {
     </div>
 
     <!-- MODAL EXPORTAR REPORTES -->
-    <div class="modal fade" id="modalExportar" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalExportar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">

@@ -73,12 +73,23 @@ if ($idUsuario > 0) {
         include_once __DIR__ . '/../../layouts/header-proveedor.php';
         ?>
 
-        <!-- Título principal -->
-        <section id="titulo-principal" class="mb-4">
-            <h1>Configuración del Proveedor</h1>
-            <p class="text-muted mb-0">
-                Administra tu perfil, seguridad, notificaciones y forma de trabajo en la plataforma.
-            </p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Configuración</h1>
+                    <p class="text-muted mb-0">Administra tu perfil, seguridad, notificaciones y forma de trabajo en la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Configuración</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <!-- Contenedor principal de configuración -->
@@ -1042,8 +1053,8 @@ if ($idUsuario > 0) {
     </main>
 
     <!-- Modal de confirmación para eliminar cuenta -->
-    <div class="modal fade" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade modal-cliente" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="modalEliminarCuentaLabel">

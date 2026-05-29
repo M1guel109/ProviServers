@@ -679,6 +679,33 @@ body.toggle-sidebar .contenido {
     z-index: 99;
 }
 
+/* ── Breadcrumb global ── */
+.breadcrumb {
+    margin-bottom: 0;
+    background: transparent;
+    padding: 0;
+    font-size: 0.82rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: var(--text-muted);
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
 /* ── Nuevos helpers del header (cliente/proveedor) ── */
 .hdr-left,
 .hdr-right {
@@ -1579,10 +1606,18 @@ body.toggle-sidebar .menu-principal a.active::before {
         font-size: 0.85rem;
     }
 
-    /* Breadcrumb: ocultar en móvil para ganar espacio */
+    /* Breadcrumb: pequeño y sutil en móvil */
     #titulo-principal nav,
     .section-hero nav {
-        display: none;
+        display: block;
+    }
+
+    #titulo-principal .breadcrumb,
+    .section-hero .breadcrumb {
+        font-size: 0.75rem;
+        margin-top: 4px;
+        margin-bottom: 0;
+        justify-content: flex-start !important;
     }
 
     /* Separador inferior */

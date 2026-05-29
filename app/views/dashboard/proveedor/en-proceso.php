@@ -26,9 +26,23 @@
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <section id="titulo-principal">
-            <h1>Servicios en Proceso</h1>
-            <p class="subtitulo">Gestiona los servicios que actualmente estás realizando</p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Servicios en Proceso</h1>
+                    <p class="text-muted mb-0">Gestiona los servicios que actualmente estás realizando.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">En Proceso</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <section id="estadisticas-proceso">

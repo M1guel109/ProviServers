@@ -144,19 +144,18 @@ $estadisticas = [
         <!-- Header Proveedor -->
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- TÍTULO CON BREADCRUMB -->
-        <section id="titulo-principal">
+        <section id="titulo-principal" class="section-hero mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1>Estadísticas</h1>
-                    <p class="text-muted mb-0">
-                        Visualiza el rendimiento de tu negocio, ingresos, servicios y más.
-                    </p>
+                    <h1 class="mb-1">Estadísticas</h1>
+                    <p class="text-muted mb-0">Visualiza el rendimiento de tu negocio, ingresos, servicios y más.</p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Estadísticas</li>
                         </ol>
                     </nav>

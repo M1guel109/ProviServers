@@ -50,9 +50,11 @@ $categorias = $objCategoria->mostrar() ?: [];
                     <p class="text-muted mb-0"><?= __('cliente_explorar_descripcion') ?></p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a></li>
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Explorar Servicios</li>
                         </ol>
                     </nav>
