@@ -1,3 +1,4 @@
+<?php $usuario = $usuario ?? []; ?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -88,9 +89,6 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" role="tab">Editar Perfil</button>
                   </li>
                   <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-settings" role="tab">Configuración</button>
-                  </li>
-                  <li class="nav-item">
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" role="tab">Cambiar Contraseña</button>
                   </li>
                 </ul>
@@ -119,55 +117,45 @@
 
                   <!-- Editar Perfil -->
                   <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
-                    <form >
+                    <form action="<?= BASE_URL ?>/cliente/perfil"
+                          method="POST"
+                          enctype="multipart/form-data">
+                      <input type="hidden" name="accion" value="actualizar-perfil">
+                      <input type="hidden" name="foto_actual"
+                             value="<?= htmlspecialchars($usuario['foto'] ?? 'default_user.png') ?>">
+
                       <div class="row g-3">
                         <div class="col-md-6">
-                          <label class="form-label">Nombre completo</label>
-                          <input type="text" class="form-control" value="<?= $usuario['nombres'] ?>">
+                          <label class="form-label">Nombres <span class="text-danger">*</span></label>
+                          <input type="text" name="nombres" class="form-control" required
+                                 value="<?= htmlspecialchars($usuario['nombres'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                          <label class="form-label">Correo electrónico</label>
-                          <input type="email" class="form-control" value="<?= $usuario['correo'] ?>">
+                          <label class="form-label">Apellidos</label>
+                          <input type="text" name="apellidos" class="form-control"
+                                 value="<?= htmlspecialchars($usuario['apellidos'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                           <label class="form-label">Teléfono</label>
-                          <input type="text" class="form-control" value="<?= $usuario['telefono'] ?>">
+                          <input type="text" name="telefono" class="form-control"
+                                 value="<?= htmlspecialchars($usuario['telefono'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                          <label class="form-label">Dirección</label>
-                          <input type="text" class="form-control" value="<?= $usuario['direccion'] ?>">
+                          <label class="form-label">Ciudad / Dirección</label>
+                          <input type="text" name="ubicacion" class="form-control"
+                                 value="<?= htmlspecialchars($usuario['ubicacion'] ?? $usuario['direccion'] ?? '') ?>">
+                        </div>
+                        <div class="col-12">
+                          <label class="form-label">Foto de perfil</label>
+                          <input type="file" name="foto" class="form-control" accept="image/*">
+                          <small class="text-muted">JPG, PNG o WEBP — máx 2MB. Deja vacío para mantener la actual.</small>
                         </div>
                       </div>
 
-
                       <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                      </div>
-                    </form>
-                  </div>
-
-                  <!-- Configuración -->
-                  <div class="tab-pane fade pt-3" id="profile-settings">
-                    <h5 class="card-title">Notificaciones por correo</h5>
-                    <form>
-                      <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="changesMade" checked>
-                        <label class="form-check-label" for="changesMade">Cambios realizados en tu cuenta</label>
-                      </div>
-                      <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="newProducts" checked>
-                        <label class="form-check-label" for="newProducts">Información sobre nuevos servicios</label>
-                      </div>
-                      <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="proOffers">
-                        <label class="form-check-label" for="proOffers">Ofertas y promociones</label>
-                      </div>
-                      <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="securityNotify" checked disabled>
-                        <label class="form-check-label" for="securityNotify">Alertas de seguridad</label>
-                      </div>
-                      <div class="text-center mt-3">
-                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        <button type="submit" class="btn btn-primary">
+                          <i class="bi bi-save me-1"></i> Guardar cambios
+                        </button>
                       </div>
                     </form>
                   </div>
