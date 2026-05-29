@@ -57,16 +57,16 @@ class ProveedorPerfil
     public function crearPerfil($idUsuario, array $data)
     {
         try {
-            $sql = "INSERT INTO proveedor_perfil 
+            $sql = "INSERT INTO proveedor_perfil
                     (
                         id_usuario, nombre_comercial, tipo_proveedor, eslogan, descripcion,
-                        anios_experiencia, idiomas, categorias, ciudad, zona, foto,
+                        anios_experiencia, idiomas, categorias, ciudad, zona, latitud, longitud, foto,
                         telefono_contacto, whatsapp, correo_alternativo, created_at, updated_at
                     )
                     VALUES
                     (
                         :id_usuario, :nombre_comercial, :tipo_proveedor, :eslogan, :descripcion,
-                        :anios_experiencia, :idiomas, :categorias, :ciudad, :zona, :foto,
+                        :anios_experiencia, :idiomas, :categorias, :ciudad, :zona, :latitud, :longitud, :foto,
                         :telefono_contacto, :whatsapp, :correo_alternativo, NOW(), NOW()
                     )";
 
@@ -93,6 +93,8 @@ class ProveedorPerfil
                         categorias         = :categorias,
                         ciudad             = :ciudad,
                         zona               = :zona,
+                        latitud            = :latitud,
+                        longitud           = :longitud,
                         foto               = :foto,
                         telefono_contacto  = :telefono_contacto,
                         whatsapp           = :whatsapp,
@@ -123,6 +125,8 @@ class ProveedorPerfil
         $stmt->bindValue(':categorias',         $data['categorias']);    
         $stmt->bindValue(':ciudad',             $data['ciudad']);
         $stmt->bindValue(':zona',               $data['zona']);
+        $stmt->bindValue(':latitud',            $data['latitud']  ?? null);
+        $stmt->bindValue(':longitud',           $data['longitud'] ?? null);
         $stmt->bindValue(':foto',               $data['foto']);
         $stmt->bindValue(':telefono_contacto',  $data['telefono_contacto']);
         $stmt->bindValue(':whatsapp',           $data['whatsapp']);

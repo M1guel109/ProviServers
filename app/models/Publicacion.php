@@ -209,9 +209,11 @@ class Publicacion
                 c.nombre       AS categoria_nombre,
 
                 CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
-                pr.foto                               AS proveedor_foto,
-                pr.ciudad                             AS proveedor_ciudad,
-                pr.zona                               AS proveedor_zona,
+                COALESCE(pp.foto, pr.foto)            AS proveedor_foto,
+                pp.ciudad                             AS proveedor_ciudad,
+                pp.zona                               AS proveedor_zona,
+                pp.latitud                            AS proveedor_lat,
+                pp.longitud                           AS proveedor_lng,
 
                 COALESCE(AVG(v.calificacion), 0) AS calificacion_promedio,
                 COUNT(v.id)                      AS total_resenas,
@@ -220,10 +222,11 @@ class Publicacion
                 promo.fecha_fin                  AS promo_hasta
 
             FROM publicaciones AS pub
-            INNER JOIN servicios   AS s  ON pub.servicio_id  = s.id
-            LEFT  JOIN categorias  AS c  ON s.id_categoria   = c.id
-            INNER JOIN proveedores AS pr ON pub.proveedor_id = pr.id
-            LEFT  JOIN valoraciones AS v ON v.proveedor_id   = pr.id
+            INNER JOIN servicios      AS s   ON pub.servicio_id  = s.id
+            LEFT  JOIN categorias     AS c   ON s.id_categoria   = c.id
+            INNER JOIN proveedores    AS pr  ON pub.proveedor_id = pr.id
+            LEFT  JOIN proveedor_perfil AS pp ON pp.id_usuario   = pr.usuario_id
+            LEFT  JOIN valoraciones   AS v   ON v.proveedor_id   = pr.id
             LEFT  JOIN promociones promo
                 ON promo.publicacion_id = pub.id
                 AND promo.fecha_inicio <= CURDATE()
@@ -240,7 +243,8 @@ class Publicacion
                     OR s.nombre      LIKE :busqueda
                     OR s.descripcion LIKE :busqueda
                     OR c.nombre      LIKE :busqueda
-                    OR pr.ciudad     LIKE :busqueda
+                    OR pp.ciudad     LIKE :busqueda
+                    OR pp.zona       LIKE :busqueda
                 )";
                 $params[':busqueda'] = '%' . $busqueda . '%';
             }
@@ -251,7 +255,7 @@ class Publicacion
             }
 
             if (!empty($ciudad)) {
-                $sql .= " AND (pr.ciudad LIKE :ciudad OR pr.zona LIKE :ciudad)";
+                $sql .= " AND (pp.ciudad LIKE :ciudad OR pp.zona LIKE :ciudad)";
                 $params[':ciudad'] = '%' . $ciudad . '%';
             }
 

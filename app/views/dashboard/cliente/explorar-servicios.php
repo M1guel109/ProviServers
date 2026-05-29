@@ -29,6 +29,12 @@ $categorias = $objCategoria->mostrar() ?: [];
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/explorar-servicios.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <style>
+        #mapa-servicios { height: 520px; border-radius: 12px; display: none; }
+        .leaflet-popup-content h6 { margin: 0 0 4px; font-size: .9rem; }
+        .leaflet-popup-content .precio { color: #198754; font-weight: 700; }
+    </style>
 </head>
 
 <body>
@@ -165,9 +171,25 @@ $categorias = $objCategoria->mostrar() ?: [];
             </form>
         </section>
 
+        <!-- Toggle vista -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small"><?= count($publicaciones) ?> servicio(s) encontrado(s)</span>
+            <div class="btn-group btn-group-sm" role="group">
+                <button id="btn-grid" class="btn btn-primary active" onclick="toggleVista('grid')">
+                    <i class="bi bi-grid-3x3-gap-fill me-1"></i>Tarjetas
+                </button>
+                <button id="btn-mapa" class="btn btn-outline-primary" onclick="toggleVista('mapa')">
+                    <i class="bi bi-map me-1"></i>Mapa
+                </button>
+            </div>
+        </div>
+
+        <!-- Mapa Leaflet -->
+        <div id="mapa-servicios" class="mb-4 shadow-sm"></div>
+
         <section>
             <?php if (empty($publicaciones)): ?>
-                <div class="empty-state">
+                <div id="resultados-grid" class="empty-state">
                     <i class="bi bi-inbox display-1 text-muted"></i>
                     <h4 class="text-muted mt-3">No hay servicios disponibles</h4>
                     <p class="text-muted">No encontramos servicios que coincidan con tu búsqueda.</p>
@@ -176,7 +198,7 @@ $categorias = $objCategoria->mostrar() ?: [];
                     </a>
                 </div>
             <?php else: ?>
-                <div class="row g-4">
+                <div class="row g-4" id="resultados-grid">
                     <?php foreach ($publicaciones as $pub):
                         $titulo = $pub['titulo'] ?? $pub['servicio_nombre'] ?? 'Servicio';
                         $descripcion = $pub['descripcion'] ?? $pub['servicio_descripcion'] ?? '';
@@ -416,6 +438,106 @@ $categorias = $objCategoria->mostrar() ?: [];
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <?php
+    // Construir array de marcadores para el mapa
+    $marcadores = [];
+    foreach ($publicaciones as $pub) {
+        $lat = (float)($pub['proveedor_lat'] ?? 0);
+        $lng = (float)($pub['proveedor_lng'] ?? 0);
+        if ($lat == 0 && $lng == 0) continue;
+        $descuento   = (int)($pub['promo_descuento'] ?? 0);
+        $precioBase  = (float)($pub['precio'] ?? 0);
+        $precioFinal = $descuento > 0 ? round($precioBase * (1 - $descuento / 100)) : $precioBase;
+        $marcadores[] = [
+            'lat'       => $lat,
+            'lng'       => $lng,
+            'titulo'    => $pub['titulo'] ?? $pub['servicio_nombre'] ?? 'Servicio',
+            'precio'    => '$' . number_format($precioFinal, 0, ',', '.'),
+            'proveedor' => $pub['proveedor_nombre'] ?? '',
+            'ciudad'    => trim(($pub['proveedor_ciudad'] ?? '') . ($pub['proveedor_zona'] ? ' — ' . $pub['proveedor_zona'] : '')),
+            'url'       => BASE_URL . '/cliente/publicacion?id=' . $pub['id'],
+            'descuento' => $descuento,
+        ];
+    }
+    ?>
+    <script>
+    const MARCADORES = <?= json_encode($marcadores) ?>;
+    let mapaLeaflet = null;
+
+    function toggleVista(vista) {
+        const gridEl = document.getElementById('resultados-grid');
+        const mapaEl = document.getElementById('mapa-servicios');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnMapa = document.getElementById('btn-mapa');
+
+        if (vista === 'mapa') {
+            gridEl.style.display = 'none';
+            mapaEl.style.display = 'block';
+            btnGrid.classList.replace('btn-primary','btn-outline-primary');
+            btnMapa.classList.replace('btn-outline-primary','btn-primary');
+            iniciarMapa();
+        } else {
+            mapaEl.style.display = 'none';
+            gridEl.style.display = '';
+            btnMapa.classList.replace('btn-primary','btn-outline-primary');
+            btnGrid.classList.replace('btn-outline-primary','btn-primary');
+        }
+    }
+
+    function iniciarMapa() {
+        if (mapaLeaflet) { mapaLeaflet.invalidateSize(); return; }
+
+        // Centro por defecto: Colombia
+        mapaLeaflet = L.map('mapa-servicios').setView([4.5709, -74.2973], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+        }).addTo(mapaLeaflet);
+
+        if (MARCADORES.length === 0) {
+            L.control.scale().addTo(mapaLeaflet);
+            return;
+        }
+
+        const bounds = [];
+        MARCADORES.forEach(m => {
+            const badge = m.descuento > 0
+                ? `<span style="background:#dc3545;color:#fff;padding:1px 6px;border-radius:4px;font-size:.75rem;">-${m.descuento}%</span> `
+                : '';
+            const popup = `
+                <div style="min-width:180px;">
+                    <h6>${m.titulo}</h6>
+                    <p style="margin:2px 0;font-size:.8rem;color:#555;">
+                        <i class="bi bi-person-fill"></i> ${m.proveedor}
+                    </p>
+                    ${m.ciudad ? `<p style="margin:2px 0;font-size:.78rem;color:#888;">📍 ${m.ciudad}</p>` : ''}
+                    <p class="precio" style="margin:4px 0;">${badge}${m.precio}</p>
+                    <a href="${m.url}" style="display:inline-block;margin-top:4px;padding:4px 10px;background:#0d6efd;color:#fff;border-radius:6px;text-decoration:none;font-size:.8rem;">
+                        Ver servicio
+                    </a>
+                </div>`;
+
+            const marker = L.marker([m.lat, m.lng]).addTo(mapaLeaflet).bindPopup(popup);
+            bounds.push([m.lat, m.lng]);
+        });
+
+        if (bounds.length > 0) mapaLeaflet.fitBounds(bounds, { padding: [40, 40] });
+
+        // Geolocalización del usuario (opcional)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                L.circleMarker([lat, lng], {
+                    radius: 8, color: '#0d6efd', fillColor: '#0d6efd', fillOpacity: 0.6
+                }).addTo(mapaLeaflet).bindPopup('<b>Tu ubicación</b>').openPopup();
+            }, () => {});
+        }
+    }
+    </script>
 
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>

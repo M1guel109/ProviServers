@@ -47,7 +47,16 @@
       "Bash(curl -s -b /tmp/cookie_cli3.txt -X POST http://localhost/ProviServers/cliente/servicios-contratados/calificar -d 'accion=calificar_servicio&contrato_id=29&calificacion=5&comentario=Excelente+servicio' -H 'Content-Type: application/x-www-form-urlencoded' -L -o /tmp/calificar2.html)",
       "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\views\\\\dashboard\" -Recurse -Filter \"*.php\")",
       "Bash(Get-Content \"C:\\\\xampp\\\\apache\\\\logs\\\\error.log\" -Tail 30)",
-      "Read(//c/Users/luism/Downloads/**)"
+      "Read(//c/Users/luism/Downloads/**)",
+      "Bash(mysql\\\\bin\\\\mysql.exe -u root proviservers -e \"SELECT u.id, u.nombre, u.apellido, u.correo, p.id as proveedor_id, p.nombre_comercial, p.ciudad, p.zona FROM usuarios u LEFT JOIN proveedores p ON p.usuario_id = u.id WHERE u.correo = 'miguelozano913@gmail.com';\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SELECT u.id, u.nombre, u.apellido, u.correo, p.id as proveedor_id, p.nombre_comercial, p.ciudad, p.zona FROM usuarios u LEFT JOIN proveedores p ON p.usuario_id = u.id WHERE u.correo = 'miguelozano913@gmail.com';\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE usuarios;\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedores; DESCRIBE clientes;\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SELECT u.id, u.email, u.rol, p.id as proveedor_id, p.nombres, p.apellidos, p.ubicacion FROM usuarios u LEFT JOIN proveedores p ON p.usuario_id = u.id WHERE u.email = 'miguelozano913@gmail.com';\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SHOW TABLES LIKE '%proveedor%';\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedor_perfil;\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"SELECT id, nombre FROM categorias LIMIT 10; SELECT id, nombre FROM servicios LIMIT 10;\")",
+      "PowerShell(& \"C:\\\\xampp\\\\mysql\\\\bin\\\\mysql.exe\" -u root proviservers -e \"DESCRIBE proveedores_disponibilidad;\")"
     ]
   }
 }

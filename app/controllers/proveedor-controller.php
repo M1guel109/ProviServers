@@ -584,6 +584,37 @@ function actualizarEstadoServicio()
 // PROMOCIONES
 // =====================================================================
 
+// =====================================================================
+// GEOCODIFICACIÓN — Nominatim (OpenStreetMap, gratuito)
+// =====================================================================
+
+function geocodificarCiudad(string $ciudad): array
+{
+    if (empty(trim($ciudad))) return [null, null];
+
+    try {
+        $query = urlencode($ciudad . ', Colombia');
+        $url   = "https://nominatim.openstreetmap.org/search?q={$query}&format=json&limit=1&countrycodes=co";
+
+        $ctx = stream_context_create(['http' => [
+            'timeout' => 5,
+            'header'  => "User-Agent: ProviServers/1.0 (miguelozano913@gmail.com)\r\n",
+        ]]);
+
+        $response = @file_get_contents($url, false, $ctx);
+        if ($response === false) return [null, null];
+
+        $data = json_decode($response, true);
+        if (!empty($data[0]['lat']) && !empty($data[0]['lon'])) {
+            return [(float)$data[0]['lat'], (float)$data[0]['lon']];
+        }
+    } catch (Exception $e) {
+        error_log('geocodificarCiudad: ' . $e->getMessage());
+    }
+
+    return [null, null];
+}
+
 function crearPromocion(): void
 {
     $uid            = (int)$_SESSION['user']['id'];
@@ -799,19 +830,28 @@ function guardarPerfilProfesional()
 {
     $idUsuario = (int)$_SESSION['user']['id'];
 
-    $nombreComercial  = trim($_POST['nombre_comercial']   ?? '');
-    $tipoProveedor    = trim($_POST['tipo_proveedor']     ?? '');
-    $eslogan          = trim($_POST['eslogan']            ?? '');
-    $descripcion      = trim($_POST['descripcion']        ?? '');
-    $aniosExp         = trim($_POST['anios_experiencia']  ?? '');
-    $ciudad           = trim($_POST['ciudad']             ?? '');
-    $zona             = trim($_POST['zona']               ?? '');
-    $telefonoContacto = trim($_POST['telefono_contacto']  ?? '');
-    $whatsapp         = trim($_POST['whatsapp']           ?? '');
-    $correoAlt        = trim($_POST['correo_alternativo'] ?? '');
-    $idiomas          = $_POST['idiomas']    ?? [];
-    $categorias       = $_POST['categorias'] ?? [];
+    // Cargar perfil existente para usar como fallback en campos vacíos
+    $modelo       = new ProveedorPerfil();
+    $perfilActual = $modelo->obtenerPerfilPorUsuario($idUsuario) ?: [];
 
+    // Para cada campo: usar el valor del POST si viene, o el que ya estaba en BD
+    $nombreComercial  = trim($_POST['nombre_comercial']   ?? '') ?: ($perfilActual['nombre_comercial']   ?? '');
+    $tipoProveedor    = trim($_POST['tipo_proveedor']     ?? '') ?: ($perfilActual['tipo_proveedor']     ?? '');
+    $eslogan          = trim($_POST['eslogan']            ?? '') ?: ($perfilActual['eslogan']            ?? '');
+    $descripcion      = trim($_POST['descripcion']        ?? '') ?: ($perfilActual['descripcion']        ?? '');
+    $aniosExp         = trim($_POST['anios_experiencia']  ?? '') ?: ($perfilActual['anios_experiencia']  ?? '');
+    $ciudad           = trim($_POST['ciudad']             ?? '') ?: ($perfilActual['ciudad']             ?? '');
+    $zona             = trim($_POST['zona']               ?? '') ?: ($perfilActual['zona']               ?? '');
+    $telefonoContacto = trim($_POST['telefono_contacto']  ?? '') ?: ($perfilActual['telefono_contacto']  ?? '');
+    $whatsapp         = trim($_POST['whatsapp']           ?? '') ?: ($perfilActual['whatsapp']           ?? '');
+    $correoAlt        = trim($_POST['correo_alternativo'] ?? '') ?: ($perfilActual['correo_alternativo'] ?? '');
+
+    $idiomasPost  = $_POST['idiomas']    ?? null;
+    $categoriasPost = $_POST['categorias'] ?? null;
+    $idiomas    = $idiomasPost    ?? (array)($perfilActual['idiomas']    ?? []);
+    $categorias = $categoriasPost ?? (array)($perfilActual['categorias'] ?? []);
+
+    // Solo bloquear si siguen faltando campos requeridos incluso con fallback de BD
     if (empty($nombreComercial) || empty($tipoProveedor) || empty($eslogan) || empty($descripcion) || empty($ciudad)) {
         mostrarSweetAlert('error', 'Campos obligatorios', 'Nombre comercial, tipo, eslogan, descripción y ciudad son requeridos.', BASE_URL . '/proveedor/configuracion');
         exit();
@@ -821,9 +861,6 @@ function guardarPerfilProfesional()
         mostrarSweetAlert('error', 'Categoría requerida', 'Debes seleccionar al menos una categoría.', BASE_URL . '/proveedor/configuracion');
         exit();
     }
-
-    $modelo       = new ProveedorPerfil();
-    $perfilActual = $modelo->obtenerPerfilPorUsuario($idUsuario);
     $fotoFinal    = $perfilActual['foto'] ?? 'default_user.png';
 
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
@@ -848,6 +885,14 @@ function guardarPerfilProfesional()
         $fotoFinal = $nuevoNombre;
     }
 
+    // Geocodificar ciudad si cambió (o si aún no tiene coordenadas)
+    $latitud  = $perfilActual['latitud']  ?? null;
+    $longitud = $perfilActual['longitud'] ?? null;
+    $ciudadAnterior = $perfilActual['ciudad'] ?? '';
+    if ($ciudad !== $ciudadAnterior || ($latitud === null && $longitud === null)) {
+        [$latitud, $longitud] = geocodificarCiudad($ciudad);
+    }
+
     $data = [
         'nombre_comercial'   => $nombreComercial,
         'tipo_proveedor'     => $tipoProveedor,
@@ -858,6 +903,8 @@ function guardarPerfilProfesional()
         'categorias'         => is_array($categorias) ? implode(',', $categorias) : '',
         'ciudad'             => $ciudad,
         'zona'               => $zona,
+        'latitud'            => $latitud,
+        'longitud'           => $longitud,
         'foto'               => $fotoFinal,
         'telefono_contacto'  => $telefonoContacto,
         'whatsapp'           => $whatsapp,
