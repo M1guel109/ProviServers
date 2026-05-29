@@ -8,6 +8,7 @@ $facturacion  = ['saldo_actual' => 0, 'facturas_pendientes' => 0, 'facturas_paga
 $facturas     = [];
 $metodos_pago = [];
 $resumen_anual = ['total_facturado' => 0, 'total_comisiones' => 0, 'total_neto' => 0, 'promedio_mensual' => 0];
+$escrow = ['retenido' => 0.0, 'liberado' => 0.0, 'pagos' => []];
 
 try {
     $db  = new Conexion();
@@ -151,6 +152,32 @@ try {
 } catch (PDOException $e) {
     error_log('facturacion.php: ' . $e->getMessage());
 }
+
+// Datos de escrow desde pagos_servicios
+try {
+    $db2 = new Conexion();
+    $pdo2 = $db2->getConexion();
+    $stE = $pdo2->prepare("
+        SELECT ps.id, ps.monto, ps.liberado, ps.fecha_liberacion, ps.created_at,
+               COALESCE(sv.nombre, sol.titulo, cot.titulo, 'Servicio') AS servicio,
+               TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido,''))) AS cliente
+        FROM pagos_servicios ps
+        JOIN servicios_contratados sc ON ps.servicio_contratado_id = sc.id
+        JOIN servicios sv             ON sc.servicio_id = sv.id
+        JOIN clientes cl              ON ps.cliente_id  = cl.id
+        JOIN usuarios u               ON cl.usuario_id  = u.id
+        LEFT JOIN solicitudes sol     ON sc.solicitud_id = sol.id
+        LEFT JOIN cotizaciones cot    ON sc.cotizacion_id = cot.id
+        WHERE ps.proveedor_id = :pid
+        ORDER BY ps.created_at DESC
+    ");
+    $stE->execute([':pid' => $proveedorId ?? 0]);
+    $escrow['pagos'] = $stE->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($escrow['pagos'] as $ep) {
+        if ($ep['liberado']) $escrow['liberado'] += (float)$ep['monto'];
+        else                 $escrow['retenido'] += (float)$ep['monto'];
+    }
+} catch (PDOException $e) { /* tabla puede no existir aún */ }
 ?>
 
 <!DOCTYPE html>
@@ -290,6 +317,99 @@ try {
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- PANEL ESCROW -->
+        <section class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-15"
+                              style="width:56px;height:56px;flex-shrink:0;">
+                            <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                        </span>
+                        <div>
+                            <div class="text-muted small mb-1">Dinero retenido (por liberar)</div>
+                            <div class="fw-bold fs-4 text-warning">
+                                $<?= number_format($escrow['retenido'], 0, ',', '.') ?>
+                            </div>
+                            <small class="text-muted">Se libera al finalizar cada servicio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-15"
+                              style="width:56px;height:56px;flex-shrink:0;">
+                            <i class="bi bi-check-circle text-success fs-4"></i>
+                        </span>
+                        <div>
+                            <div class="text-muted small mb-1">Dinero liberado (disponible)</div>
+                            <div class="fw-bold fs-4 text-success">
+                                $<?= number_format($escrow['liberado'], 0, ',', '.') ?>
+                            </div>
+                            <small class="text-muted">Listo para transferencia a tu cuenta</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($escrow['pagos'])): ?>
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-safe2 me-2 text-primary"></i>Pagos de servicios recibidos
+                        </h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha cobro</th>
+                                    <th class="text-end">Monto</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Liberado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($escrow['pagos'] as $ep): ?>
+                            <tr>
+                                <td class="fw-semibold small"><?= htmlspecialchars($ep['servicio']) ?></td>
+                                <td class="text-muted small"><?= htmlspecialchars($ep['cliente']) ?></td>
+                                <td class="text-muted small"><?= date('d M Y', strtotime($ep['created_at'])) ?></td>
+                                <td class="text-end fw-bold text-success">
+                                    $<?= number_format((float)$ep['monto'], 0, ',', '.') ?>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">Pagado</span>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ($ep['liberado']): ?>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-lg me-1"></i>Liberado
+                                        </span>
+                                        <div class="text-muted" style="font-size:.7rem;">
+                                            <?= date('d/m/Y', strtotime($ep['fecha_liberacion'])) ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-hourglass me-1"></i>Retenido
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
         </section>
 
         <!-- TABLA DE FACTURAS -->
