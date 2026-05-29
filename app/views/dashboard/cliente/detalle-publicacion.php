@@ -9,7 +9,10 @@ $servicioImg     = $publicacion['servicio_imagen'] ?? 'default_service.png';
 $categoriaNombre = $publicacion['categoria_nombre'] ?? 'Sin categoría';
 
 $precioRaw       = isset($publicacion['precio']) ? (float)$publicacion['precio'] : 0;
-$precioFormato   = $precioRaw > 0 ? number_format($precioRaw, 2) : null;
+$descuento       = (int)($publicacion['promo_descuento'] ?? 0);
+$precioFinal     = $descuento > 0 ? round($precioRaw * (1 - $descuento / 100)) : $precioRaw;
+$precioFormato   = $precioRaw > 0 ? number_format($precioFinal, 0, ',', '.') : null;
+$promoHasta      = $publicacion['promo_hasta'] ?? null;
 
 $proveedorNombre    = $publicacion['proveedor_nombre'] ?? 'Proveedor';
 $proveedorUbicacion = $publicacion['proveedor_ubicacion'] ?? 'Ubicación no especificada';
@@ -77,10 +80,23 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 <?= htmlspecialchars($categoriaNombre) ?>
                             </p>
 
-                            <?php if ($precioFormato !== null): ?>
+                            <?php if ($precioRaw > 0): ?>
                                 <p class="mb-2">
                                     <strong>Precio desde:</strong>
-                                    $ <?= $precioFormato ?>
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="text-decoration-line-through text-muted small">
+                                            $<?= number_format($precioRaw, 0, ',', '.') ?>
+                                        </span>
+                                        <span class="text-danger fw-bold ms-1">
+                                            $<?= $precioFormato ?>
+                                        </span>
+                                        <span class="badge bg-danger ms-1">-<?= $descuento ?>%</span>
+                                        <?php if ($promoHasta): ?>
+                                            <small class="text-muted d-block">Promo hasta <?= date('d/m/Y', strtotime($promoHasta)) ?></small>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-primary fw-bold">$<?= $precioFormato ?></span>
+                                    <?php endif; ?>
                                 </p>
                             <?php endif; ?>
 
@@ -163,10 +179,20 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 <?php endif; ?>
                             </p>
 
-                            <?php if ($precioFormato !== null): ?>
+                            <?php if ($precioRaw > 0): ?>
                                 <p class="mb-3" style="font-size: 0.9rem;">
                                     <strong>Precio de referencia:</strong><br>
-                                    <span class="fs-5 fw-bold">$ <?= $precioFormato ?></span>
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="text-decoration-line-through text-muted">
+                                            $<?= number_format($precioRaw, 0, ',', '.') ?>
+                                        </span>
+                                        <span class="fs-5 fw-bold text-danger ms-2">
+                                            $<?= $precioFormato ?>
+                                        </span>
+                                        <span class="badge bg-danger ms-1">-<?= $descuento ?>%</span>
+                                    <?php else: ?>
+                                        <span class="fs-5 fw-bold">$<?= $precioFormato ?></span>
+                                    <?php endif; ?>
                                 </p>
                             <?php endif; ?>
 

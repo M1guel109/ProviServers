@@ -75,6 +75,10 @@ switch ($method) {
 
         if (str_contains($uri, '/proveedor/resenas/responder')) {
             guardarRespuestaProveedor();
+        } elseif (str_contains($uri, '/proveedor/promociones/crear')) {
+            crearPromocion();
+        } elseif (str_contains($uri, '/proveedor/promociones/eliminar')) {
+            eliminarPromocion();
         } elseif (str_contains($uri, '/proveedor/oportunidades')) {
             enviarCotizacion();
         } elseif (str_contains($uri, '/proveedor/actualizar-estado') || $accion === 'actualizar_estado_servicio') {
@@ -574,6 +578,112 @@ function actualizarEstadoServicio()
         'estado'  => $nuevoEstado,
     ]);
     exit();
+}
+
+// =====================================================================
+// PROMOCIONES
+// =====================================================================
+
+function crearPromocion(): void
+{
+    $uid            = (int)$_SESSION['user']['id'];
+    $publicacionId  = (int)($_POST['publicacion_id']       ?? 0);
+    $descuento      = (int)($_POST['porcentaje_descuento'] ?? 0);
+    $fechaInicio    = trim($_POST['fecha_inicio'] ?? '');
+    $fechaFin       = trim($_POST['fecha_fin']    ?? '');
+
+    if ($publicacionId <= 0 || $descuento < 1 || $descuento > 100 || !$fechaInicio || !$fechaFin) {
+        mostrarSweetAlert('error', 'Datos incompletos', 'Completa todos los campos correctamente.', BASE_URL . '/proveedor/promociones');
+        exit;
+    }
+
+    if ($fechaFin <= $fechaInicio) {
+        mostrarSweetAlert('error', 'Fechas inválidas', 'La fecha de fin debe ser posterior a la de inicio.', BASE_URL . '/proveedor/promociones');
+        exit;
+    }
+
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+        $stProv->execute([':uid' => $uid]);
+        $proveedorId = (int)($stProv->fetchColumn() ?: 0);
+
+        if (!$proveedorId) {
+            mostrarSweetAlert('error', 'Error', 'No se encontró tu perfil de proveedor.', BASE_URL . '/proveedor/promociones');
+            exit;
+        }
+
+        // Verificar que la publicación pertenece a este proveedor
+        $stCheck = $pdo->prepare("SELECT id FROM publicaciones WHERE id = :pid AND proveedor_id = :prov LIMIT 1");
+        $stCheck->execute([':pid' => $publicacionId, ':prov' => $proveedorId]);
+        if (!$stCheck->fetchColumn()) {
+            mostrarSweetAlert('error', 'No autorizado', 'La publicación no te pertenece.', BASE_URL . '/proveedor/promociones');
+            exit;
+        }
+
+        // Crear tabla si no existe
+        $pdo->exec("CREATE TABLE IF NOT EXISTS promociones (
+            id                   INT AUTO_INCREMENT PRIMARY KEY,
+            proveedor_id         INT  NOT NULL,
+            publicacion_id       INT  NULL,
+            porcentaje_descuento INT  NOT NULL DEFAULT 0,
+            fecha_inicio         DATE NOT NULL,
+            fecha_fin            DATE NOT NULL,
+            created_at           DATETIME DEFAULT NOW()
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $pdo->prepare("
+            INSERT INTO promociones (proveedor_id, publicacion_id, porcentaje_descuento, fecha_inicio, fecha_fin, created_at)
+            VALUES (:prov, :pub, :desc, :inicio, :fin, NOW())
+        ")->execute([
+            ':prov'  => $proveedorId,
+            ':pub'   => $publicacionId,
+            ':desc'  => $descuento,
+            ':inicio'=> $fechaInicio,
+            ':fin'   => $fechaFin,
+        ]);
+
+        mostrarSweetAlert('success', 'Promoción creada', 'Tu promoción fue creada correctamente.', BASE_URL . '/proveedor/promociones');
+    } catch (PDOException $e) {
+        error_log('crearPromocion: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo crear la promoción.', BASE_URL . '/proveedor/promociones');
+    }
+    exit;
+}
+
+function eliminarPromocion(): void
+{
+    $uid     = (int)$_SESSION['user']['id'];
+    $promoId = (int)($_POST['promo_id'] ?? 0);
+
+    if ($promoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Promoción no válida.', BASE_URL . '/proveedor/promociones');
+        exit;
+    }
+
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+        $stProv->execute([':uid' => $uid]);
+        $proveedorId = (int)($stProv->fetchColumn() ?: 0);
+
+        $st = $pdo->prepare("DELETE FROM promociones WHERE id = :id AND proveedor_id = :prov");
+        $st->execute([':id' => $promoId, ':prov' => $proveedorId]);
+
+        if ($st->rowCount() > 0) {
+            mostrarSweetAlert('success', 'Eliminada', 'La promoción fue eliminada.', BASE_URL . '/proveedor/promociones');
+        } else {
+            mostrarSweetAlert('error', 'No encontrada', 'No se pudo eliminar la promoción.', BASE_URL . '/proveedor/promociones');
+        }
+    } catch (PDOException $e) {
+        error_log('eliminarPromocion: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar.', BASE_URL . '/proveedor/promociones');
+    }
+    exit;
 }
 
 function aceptarSolicitud($id)

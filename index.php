@@ -333,6 +333,11 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/solicitudes/index.php';
         break;
 
+    case '/proveedor/promociones/crear':
+    case '/proveedor/promociones/eliminar':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
     case '/proveedor/solicitudes':
     case '/proveedor/en-proceso':
     case '/proveedor/actualizar-estado':

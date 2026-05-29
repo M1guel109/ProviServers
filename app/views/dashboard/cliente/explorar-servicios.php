@@ -191,12 +191,20 @@ $categorias = $objCategoria->mostrar() ?: [];
                         $proveedorCiudad  = $pub['proveedor_ciudad']   ?? '';
                         $proveedorZona    = $pub['proveedor_zona']     ?? '';
                         $ubicacion        = trim($proveedorCiudad . ($proveedorZona ? ' — ' . $proveedorZona : ''));
+                        $descuento        = (int)($pub['promo_descuento'] ?? 0);
+                        $precioFinal      = $descuento > 0 ? round($precio * (1 - $descuento / 100)) : $precio;
+                        $promoHasta       = $pub['promo_hasta'] ?? null;
                     ?>
                         <div class="col-md-6 col-lg-4">
                             <div class="card-cliente service-card h-100 d-flex flex-column">
                                 <div class="service-image position-relative">
                                     <img src="<?= $rutaImagen ?>" alt="<?= htmlspecialchars($titulo) ?>" class="w-100" style="height: 180px; object-fit: cover;">
                                     <!-- ✅ Solo mostrar si tiene reseñas reales -->
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="position-absolute top-0 start-0 m-2 badge bg-danger fs-6 fw-bold">
+                                            -<?= $descuento ?>%
+                                        </span>
+                                    <?php endif; ?>
                                     <?php if ($totalResenas > 0): ?>
                                         <span class="badge-categoria position-absolute top-0 end-0 m-2 bg-white text-dark shadow-sm">
                                             <i class="bi bi-star-fill text-warning"></i>
@@ -234,8 +242,22 @@ $categorias = $objCategoria->mostrar() ?: [];
 
                                 <div class="card-footer bg-white border-0 p-3 pt-0">
                                     <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <small class="text-muted">Precio desde</small>
-                                        <span class="fw-bold text-primary fs-5">$<?= number_format($precio, 0, ',', '.') ?></span>
+                                        <?php if ($descuento > 0): ?>
+                                            <div>
+                                                <small class="text-muted text-decoration-line-through d-block">
+                                                    $<?= number_format($precio, 0, ',', '.') ?>
+                                                </small>
+                                                <span class="fw-bold text-danger fs-5">$<?= number_format($precioFinal, 0, ',', '.') ?></span>
+                                                <?php if ($promoHasta): ?>
+                                                    <small class="text-muted d-block" style="font-size:.7rem;">
+                                                        Hasta <?= date('d/m/Y', strtotime($promoHasta)) ?>
+                                                    </small>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <small class="text-muted">Precio desde</small>
+                                            <span class="fw-bold text-primary fs-5">$<?= number_format($precio, 0, ',', '.') ?></span>
+                                        <?php endif; ?>
                                     </div>
                                     <!-- TARJETA — pasar TODOS los datos completos al botón -->
                                     <div class="d-grid gap-2">

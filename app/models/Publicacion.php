@@ -214,13 +214,20 @@ class Publicacion
                 pr.zona                               AS proveedor_zona,
 
                 COALESCE(AVG(v.calificacion), 0) AS calificacion_promedio,
-                COUNT(v.id)                      AS total_resenas
+                COUNT(v.id)                      AS total_resenas,
+
+                promo.porcentaje_descuento       AS promo_descuento,
+                promo.fecha_fin                  AS promo_hasta
 
             FROM publicaciones AS pub
             INNER JOIN servicios   AS s  ON pub.servicio_id  = s.id
             LEFT  JOIN categorias  AS c  ON s.id_categoria   = c.id
             INNER JOIN proveedores AS pr ON pub.proveedor_id = pr.id
             LEFT  JOIN valoraciones AS v ON v.proveedor_id   = pr.id
+            LEFT  JOIN promociones promo
+                ON promo.publicacion_id = pub.id
+                AND promo.fecha_inicio <= CURDATE()
+                AND promo.fecha_fin    >= CURDATE()
             WHERE pub.estado = 'aprobado'
               AND s.disponibilidad = 1
         ";
@@ -324,16 +331,23 @@ class Publicacion
 
                     c.nombre AS categoria_nombre,
 
-                    pr.id AS proveedor_id, 
+                    pr.id AS proveedor_id,
                     CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
                     pr.ubicacion AS proveedor_ubicacion,
                     pr.foto AS proveedor_foto,
-                    pr.usuario_id AS proveedor_usuario_id
+                    pr.usuario_id AS proveedor_usuario_id,
+
+                    promo.porcentaje_descuento AS promo_descuento,
+                    promo.fecha_fin            AS promo_hasta
 
                 FROM publicaciones p
-                INNER JOIN servicios s ON p.servicio_id = s.id
-                LEFT JOIN categorias c ON s.id_categoria = c.id
+                INNER JOIN servicios s   ON p.servicio_id  = s.id
+                LEFT  JOIN categorias c  ON s.id_categoria = c.id
                 INNER JOIN proveedores pr ON p.proveedor_id = pr.id
+                LEFT  JOIN promociones promo
+                    ON promo.publicacion_id = p.id
+                    AND promo.fecha_inicio <= CURDATE()
+                    AND promo.fecha_fin    >= CURDATE()
                 WHERE p.id = :id
                   AND p.estado = 'aprobado'
                 LIMIT 1

@@ -86,14 +86,19 @@ function iniciarPagoServicio(): void
 
         $st = $pdo->prepare("
             SELECT sc.id, sc.estado, sc.proveedor_id,
-                   COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto,
+                   COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS precio_base,
+                   COALESCE(promo.porcentaje_descuento, 0)            AS promo_descuento,
                    COALESCE(cot.titulo, sol.titulo, sv.nombre, 'Servicio') AS titulo
             FROM servicios_contratados sc
-            INNER JOIN clientes cl        ON sc.cliente_id       = cl.id
-            LEFT JOIN cotizaciones cot    ON sc.cotizacion_id    = cot.id
-            LEFT JOIN solicitudes sol     ON sc.solicitud_id     = sol.id
-            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
-            LEFT JOIN servicios sv        ON sc.servicio_id      = sv.id
+            INNER JOIN clientes cl          ON sc.cliente_id       = cl.id
+            LEFT JOIN cotizaciones cot      ON sc.cotizacion_id    = cot.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
+            LEFT JOIN servicios sv          ON sc.servicio_id      = sv.id
+            LEFT JOIN promociones promo
+                ON promo.publicacion_id = pub_sol.id
+                AND promo.fecha_inicio <= CURDATE()
+                AND promo.fecha_fin    >= CURDATE()
             WHERE sc.id = :id AND cl.usuario_id = :uid
             LIMIT 1
         ");
@@ -115,7 +120,10 @@ function iniciarPagoServicio(): void
         exit;
     }
 
-    $monto = (float)$contrato['monto'];
+    $precioBase = (float)$contrato['precio_base'];
+    $descuento  = (int)($contrato['promo_descuento'] ?? 0);
+    $monto      = $descuento > 0 ? round($precioBase * (1 - $descuento / 100)) : $precioBase;
+
     if ($monto <= 0) {
         echo json_encode(['ok' => false, 'error' => 'El monto del servicio no está definido. Contacta al proveedor.']);
         exit;

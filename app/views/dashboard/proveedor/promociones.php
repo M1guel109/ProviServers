@@ -52,10 +52,21 @@ try {
 
         $estadisticas['total_promociones']  = count($promosRaw);
         $estadisticas['activas']            = count($promociones_activas);
+
+        // Publicaciones activas del proveedor para el selector del modal
+        $stPubs = $pdo->prepare("
+            SELECT pub.id, pub.titulo, pub.precio
+            FROM publicaciones pub
+            WHERE pub.proveedor_id = :pid AND pub.estado = 'aprobado'
+            ORDER BY pub.titulo ASC
+        ");
+        $stPubs->execute([':pid' => $proveedorId]);
+        $misPublicaciones = $stPubs->fetchAll(PDO::FETCH_ASSOC);
     }
 } catch (PDOException $e) {
     error_log('promociones.php: ' . $e->getMessage());
 }
+$misPublicaciones = $misPublicaciones ?? [];
 
 $tipos_promocion = [
     'descuento' => ['nombre' => 'Descuento', 'icono' => 'bi-percent', 'color' => 'primary'],
@@ -275,7 +286,14 @@ $tipos_promocion = [
                                         </div>
                                         
                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalEditarPromocion">
+                                            <form method="POST" action="<?= BASE_URL ?>/proveedor/promociones/eliminar"
+                                                  onsubmit="return confirm('¿Eliminar esta promoción?')">
+                                                <input type="hidden" name="promo_id" value="<?= $promo['id'] ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-trash"></i> Eliminar
+                                                </button>
+                                            </form>
+                                            <button class="btn btn-sm btn-outline-primary d-none" data-bs-toggle="modal" data-bs-target="#modalEditarPromocion">
                                                 <i class="bi bi-pencil"></i> Editar
                                             </button>
                                             <button class="btn btn-sm btn-outline-danger">
@@ -398,90 +416,65 @@ $tipos_promocion = [
 
     <!-- MODAL CREAR PROMOCIÓN -->
     <div class="modal fade" id="modalCrearPromocion" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title">
-                        <i class="bi bi-plus-circle me-2"></i>Crear nueva promoción
+                        <i class="bi bi-plus-circle me-2"></i>Nueva promoción
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
+                <form method="POST" action="<?= BASE_URL ?>/proveedor/promociones/crear">
                 <div class="modal-body p-4">
-                    <form id="form-crear-promocion">
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Título de la promoción</label>
-                                <input type="text" class="form-control" placeholder="Ej: 20% de descuento en plomería" required>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Tipo de promoción</label>
-                                <select class="form-select" required>
-                                    <option value="">Seleccionar...</option>
-                                    <option value="descuento">Descuento (%)</option>
-                                    <option value="paquete">Paquete de servicios</option>
-                                    <option value="gratis">Primera visita gratis</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-12">
-                                <label class="form-label fw-bold">Descripción</label>
-                                <textarea class="form-control" rows="3" placeholder="Describe los detalles de la promoción..." required></textarea>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Valor</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" placeholder="20" required>
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Fecha inicio</label>
-                                <input type="date" class="form-control" required>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Fecha fin</label>
-                                <input type="date" class="form-control" required>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Límite de usos</label>
-                                <input type="number" class="form-control" placeholder="50" required>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Servicios aplicables</label>
-                                <select class="form-select" multiple size="3">
-                                    <option value="plomeria">Plomería</option>
-                                    <option value="electricidad">Electricidad</option>
-                                    <option value="limpieza">Limpieza</option>
-                                    <option value="pintura">Pintura</option>
-                                    <option value="jardineria">Jardinería</option>
-                                    <option value="carpinteria">Carpintería</option>
-                                </select>
-                                <small class="text-muted">Selecciona múltiples (Ctrl+clic)</small>
-                            </div>
-                            
-                            <div class="col-md-12">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="activarAhora">
-                                    <label class="form-check-label" for="activarAhora">
-                                        Activar inmediatamente después de crear
-                                    </label>
-                                </div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Publicación <span class="text-danger">*</span></label>
+                            <select name="publicacion_id" class="form-select" required>
+                                <option value="">Selecciona un servicio publicado...</option>
+                                <?php foreach ($misPublicaciones as $pub): ?>
+                                    <option value="<?= $pub['id'] ?>">
+                                        <?= htmlspecialchars($pub['titulo']) ?>
+                                        <?= $pub['precio'] > 0 ? ' — $'.number_format((float)$pub['precio'],0,',','.') : '' ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <?php if (empty($misPublicaciones)): ?>
+                                <small class="text-warning">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>
+                                    No tienes publicaciones aprobadas. Debes publicar un servicio primero.
+                                </small>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Descuento (%) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="number" name="porcentaje_descuento" class="form-control"
+                                    min="1" max="100" placeholder="Ej: 20" required>
+                                <span class="input-group-text">%</span>
                             </div>
                         </div>
-                    </form>
+
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+                            <input type="date" name="fecha_inicio" class="form-control"
+                                min="<?= date('Y-m-d') ?>" required>
+                        </div>
+
+                        <div class="col-6">
+                            <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
+                            <input type="date" name="fecha_fin" class="form-control"
+                                min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btn-guardar-promocion">
+                    <button type="submit" class="btn btn-primary" <?= empty($misPublicaciones) ? 'disabled' : '' ?>>
                         <i class="bi bi-save me-2"></i>Crear promoción
                     </button>
                 </div>
+                </form>
             </div>
         </div>
     </div>
