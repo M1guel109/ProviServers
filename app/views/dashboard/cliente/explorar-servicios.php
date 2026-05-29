@@ -3,8 +3,11 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
 require_once BASE_PATH . '/app/models/Categoria.php';
 
 // Aseguramos que las variables existan para evitar errores de notice
-$busqueda = $busqueda ?? '';
-$catActual = $catActual ?? '';
+$busqueda    = $busqueda    ?? '';
+$catActual   = $catActual   ?? '';
+$ciudad      = $ciudad      ?? '';
+$precioMax   = $precioMax   ?? null;
+$orden       = $orden       ?? 'recientes';
 $publicaciones = $publicaciones ?? [];
 $objCategoria = new Categoria();
 $categorias = $objCategoria->mostrar() ?: [];
@@ -52,52 +55,114 @@ $categorias = $objCategoria->mostrar() ?: [];
         </section>
 
         <section class="filtros-container mb-4">
-            <div class="row g-3">
-                <div class="col-md-5">
-                    <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios" class="d-flex gap-2">
+            <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios">
+                <!-- Fila 1: búsqueda + ciudad + precio + orden -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-search text-muted"></i>
                             </span>
                             <input type="text" name="q" class="form-control border-start-0 bg-light"
-                                value="<?= htmlspecialchars($busqueda) ?>" placeholder="Buscar servicios, proveedores...">
+                                value="<?= htmlspecialchars($busqueda) ?>"
+                                placeholder="Buscar servicios o categoría...">
                         </div>
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
-                    </form>
-                </div>
-
-                <div class="col-md-7">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="<?= BASE_URL ?>/cliente/explorar-servicios"
-                            class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
-                            <i class="bi bi-grid-3x3-gap-fill"></i> Todas
-                        </a>
-                        <?php foreach ($categorias as $cat):
-                            $catId = $cat['id'] ?? 0;
-                            $catNombre = $cat['nombre'] ?? 'Categoría';
-                            $icono = match (strtolower(trim($catNombre))) {
-                                'hogar' => 'bi-house',
-                                'tecnología', 'tecnologia' => 'bi-laptop',
-                                'mascotas' => 'bi-heart',
-                                'transporte' => 'bi-truck',
-                                'salud' => 'bi-heart-pulse',
-                                'educación', 'educacion' => 'bi-book',
-                                'plomería', 'plomeria' => 'bi-wrench',
-                                'electricidad' => 'bi-lightning-charge',
-                                'limpieza' => 'bi-brush',
-                                'pintura' => 'bi-palette',
-                                'jardineria' => 'bi-tree',
-                                default => 'bi-tag'
-                            };
-                        ?>
-                            <a href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=<?= $catId ?>"
-                                class="btn btn-outline-primary <?= (string)$catActual === (string)$catId ? 'active' : '' ?>">
-                                <i class="bi <?= $icono ?>"></i> <?= htmlspecialchars($catNombre) ?>
-                            </a>
-                        <?php endforeach; ?>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-geo-alt text-muted"></i>
+                            </span>
+                            <input type="text" name="ciudad" class="form-control border-start-0 bg-light"
+                                value="<?= htmlspecialchars($ciudad) ?>"
+                                placeholder="Ciudad o zona...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 small">$</span>
+                            <input type="number" name="precio_max" class="form-control border-start-0 bg-light"
+                                value="<?= $precioMax !== null ? (int)$precioMax : '' ?>"
+                                placeholder="Precio máx." min="0" step="1000">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="orden" class="form-select bg-light">
+                            <option value="recientes"   <?= $orden === 'recientes'   ? 'selected' : '' ?>>Más recientes</option>
+                            <option value="precio_asc"  <?= $orden === 'precio_asc'  ? 'selected' : '' ?>>Precio: menor</option>
+                            <option value="precio_desc" <?= $orden === 'precio_desc' ? 'selected' : '' ?>>Precio: mayor</option>
+                            <option value="valorados"   <?= $orden === 'valorados'   ? 'selected' : '' ?>>Mejor valorados</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i>
+                        </button>
                     </div>
                 </div>
-            </div>
+
+                <!-- Fila 2: filtros de categoría (mantienen los otros filtros activos) -->
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios<?= $orden !== 'recientes' ? '?orden='.$orden : '' ?>"
+                        class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
+                        <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                    </a>
+                    <?php foreach ($categorias as $cat):
+                        $catId = $cat['id'] ?? 0;
+                        $catNombre = $cat['nombre'] ?? 'Categoría';
+                        $icono = match (strtolower(trim($catNombre))) {
+                            'hogar'                          => 'bi-house',
+                            'tecnología', 'tecnologia'       => 'bi-laptop',
+                            'mascotas'                       => 'bi-heart',
+                            'transporte'                     => 'bi-truck',
+                            'salud'                          => 'bi-heart-pulse',
+                            'educación', 'educacion'         => 'bi-book',
+                            'plomería', 'plomeria'           => 'bi-wrench',
+                            'electricidad'                   => 'bi-lightning-charge',
+                            'limpieza'                       => 'bi-brush',
+                            'pintura'                        => 'bi-palette',
+                            'jardineria'                     => 'bi-tree',
+                            default                          => 'bi-tag'
+                        };
+                        // Preservar búsqueda y ciudad al cambiar categoría
+                        $qsCat = http_build_query(array_filter([
+                            'cat'       => $catId,
+                            'q'         => $busqueda,
+                            'ciudad'    => $ciudad,
+                            'precio_max'=> $precioMax ? (int)$precioMax : '',
+                            'orden'     => $orden !== 'recientes' ? $orden : '',
+                        ]));
+                    ?>
+                        <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsCat ?>"
+                            class="btn btn-outline-primary <?= (string)$catActual === (string)$catId ? 'active' : '' ?>">
+                            <i class="bi <?= $icono ?>"></i> <?= htmlspecialchars($catNombre) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Badge de filtros activos -->
+                <?php
+                $filtrosActivos = array_filter([
+                    $busqueda  ? "Búsqueda: \"$busqueda\"" : null,
+                    $ciudad    ? "Ciudad: \"$ciudad\""      : null,
+                    $precioMax ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
+                    $catActual ? 'Categoría seleccionada'   : null,
+                ]);
+                if ($filtrosActivos): ?>
+                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                    <small class="text-muted">Filtros activos:</small>
+                    <?php foreach ($filtrosActivos as $f): ?>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                            <?= htmlspecialchars($f) ?>
+                        </span>
+                    <?php endforeach; ?>
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios" class="small text-danger ms-1">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar todo
+                    </a>
+                    <span class="ms-auto small text-muted"><?= count($publicaciones) ?> resultado(s)</span>
+                </div>
+                <?php endif; ?>
+            </form>
         </section>
 
         <section>
@@ -120,9 +185,12 @@ $categorias = $objCategoria->mostrar() ?: [];
                         $imagenServicio = $pub['servicio_imagen'] ?? 'default_service.png';
                         $rutaImagen = BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($imagenServicio);
                         // ✅ CORREGIDO: usa calificación real, oculta si no hay
-                        $calificacion   = (float)($pub['calificacion_promedio'] ?? 0);
-                        $totalResenas   = (int)($pub['total_resenas'] ?? 0);
-                        $proveedorNombre = $pub['proveedor_nombre'] ?? 'Proveedor';
+                        $calificacion     = (float)($pub['calificacion_promedio'] ?? 0);
+                        $totalResenas     = (int)($pub['total_resenas'] ?? 0);
+                        $proveedorNombre  = $pub['proveedor_nombre']   ?? 'Proveedor';
+                        $proveedorCiudad  = $pub['proveedor_ciudad']   ?? '';
+                        $proveedorZona    = $pub['proveedor_zona']     ?? '';
+                        $ubicacion        = trim($proveedorCiudad . ($proveedorZona ? ' — ' . $proveedorZona : ''));
                     ?>
                         <div class="col-md-6 col-lg-4">
                             <div class="card-cliente service-card h-100 d-flex flex-column">
@@ -148,9 +216,16 @@ $categorias = $objCategoria->mostrar() ?: [];
                                         <span class="badge bg-light text-primary border"><?= htmlspecialchars($categoriaNombre) ?></span>
                                     </div>
 
-                                    <p class="text-muted small mb-3">
+                                    <p class="text-muted small mb-2">
                                         <?= htmlspecialchars(mb_strimwidth($descripcion, 0, 70, '...')) ?>
                                     </p>
+
+                                    <?php if ($ubicacion): ?>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-geo-alt me-1 text-primary"></i>
+                                        <?= htmlspecialchars($ubicacion) ?>
+                                    </p>
+                                    <?php endif; ?>
 
                                     <div class="small text-muted">
                                         <i class="bi bi-person-badge"></i> <strong><?= htmlspecialchars($proveedorNombre) ?></strong>

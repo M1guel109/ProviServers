@@ -79,11 +79,23 @@ switch ($method) {
 
 function mostrarCatalogoPublico()
 {
-    $busqueda    = $_GET['q']   ?? null;
+    $busqueda    = trim($_GET['q']      ?? '');
     $categoriaId = isset($_GET['cat']) && $_GET['cat'] !== '' ? (int)$_GET['cat'] : null;
+    $ciudad      = trim($_GET['ciudad'] ?? '');
+    $precioMax   = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
+    $orden       = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
+                   ? $_GET['orden'] : 'recientes';
+
+    $catActual = $categoriaId ?? '';
 
     $modelo        = new Publicacion();
-    $publicaciones = $modelo->listarPublicasActivas($busqueda, $categoriaId);
+    $publicaciones = $modelo->listarPublicasActivas(
+        $busqueda ?: null,
+        $categoriaId,
+        $ciudad ?: null,
+        $precioMax,
+        $orden
+    );
 
     require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
     exit();

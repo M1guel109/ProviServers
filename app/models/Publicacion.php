@@ -184,11 +184,16 @@ class Publicacion
      */
     // app/models/Publicacion.php
 
-    public function listarPublicasActivas(?string $busqueda = null, ?int $categoriaId = null): array
-    {
+    public function listarPublicasActivas(
+        ?string $busqueda   = null,
+        ?int    $categoriaId = null,
+        ?string $ciudad      = null,
+        ?float  $precioMax   = null,
+        string  $orden       = 'recientes'
+    ): array {
         try {
             $sql = "
-            SELECT 
+            SELECT
                 pub.id,
                 pub.servicio_id,
                 pub.titulo,
@@ -203,44 +208,60 @@ class Publicacion
 
                 c.nombre       AS categoria_nombre,
 
-                -- ✅ Datos del proveedor (nombre real)
                 CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
-                pr.foto                                AS proveedor_foto,
+                pr.foto                               AS proveedor_foto,
+                pr.ciudad                             AS proveedor_ciudad,
+                pr.zona                               AS proveedor_zona,
 
-                -- ✅ Calificación promedio real (NULL si no hay reseñas)
-                COALESCE(AVG(v.calificacion), 0)       AS calificacion_promedio,
-                COUNT(v.id)                            AS total_resenas
+                COALESCE(AVG(v.calificacion), 0) AS calificacion_promedio,
+                COUNT(v.id)                      AS total_resenas
 
             FROM publicaciones AS pub
-            INNER JOIN servicios     AS s  ON pub.servicio_id  = s.id
-            LEFT  JOIN categorias    AS c  ON s.id_categoria   = c.id
-            INNER JOIN proveedores   AS pr ON pub.proveedor_id = pr.id
-            LEFT  JOIN valoraciones  AS v  ON v.proveedor_id   = pr.id
-            WHERE pub.estado = 'aprobado' 
+            INNER JOIN servicios   AS s  ON pub.servicio_id  = s.id
+            LEFT  JOIN categorias  AS c  ON s.id_categoria   = c.id
+            INNER JOIN proveedores AS pr ON pub.proveedor_id = pr.id
+            LEFT  JOIN valoraciones AS v ON v.proveedor_id   = pr.id
+            WHERE pub.estado = 'aprobado'
               AND s.disponibilidad = 1
         ";
 
             $params = [];
 
             if (!empty($busqueda)) {
-                $sql .= " 
-                AND (
-                    pub.titulo      LIKE :busqueda
-                    OR s.nombre     LIKE :busqueda
+                $sql .= " AND (
+                    pub.titulo       LIKE :busqueda
+                    OR s.nombre      LIKE :busqueda
                     OR s.descripcion LIKE :busqueda
-                    OR c.nombre     LIKE :busqueda
-                )
-            ";
+                    OR c.nombre      LIKE :busqueda
+                    OR pr.ciudad     LIKE :busqueda
+                )";
                 $params[':busqueda'] = '%' . $busqueda . '%';
             }
 
             if (!empty($categoriaId)) {
                 $sql .= " AND s.id_categoria = :categoriaId";
-                $params[':categoriaId'] = (int) $categoriaId;
+                $params[':categoriaId'] = (int)$categoriaId;
             }
 
-            // ✅ GROUP BY para que AVG() funcione correctamente
-            $sql .= " GROUP BY pub.id ORDER BY pub.created_at DESC";
+            if (!empty($ciudad)) {
+                $sql .= " AND (pr.ciudad LIKE :ciudad OR pr.zona LIKE :ciudad)";
+                $params[':ciudad'] = '%' . $ciudad . '%';
+            }
+
+            if ($precioMax !== null && $precioMax > 0) {
+                $sql .= " AND pub.precio <= :precioMax";
+                $params[':precioMax'] = $precioMax;
+            }
+
+            $ordenMap = [
+                'precio_asc'  => 'pub.precio ASC',
+                'precio_desc' => 'pub.precio DESC',
+                'valorados'   => 'calificacion_promedio DESC, total_resenas DESC',
+                'recientes'   => 'pub.created_at DESC',
+            ];
+            $orderBy = $ordenMap[$orden] ?? 'pub.created_at DESC';
+
+            $sql .= " GROUP BY pub.id ORDER BY $orderBy";
 
             $stmt = $this->conexion->prepare($sql);
 
