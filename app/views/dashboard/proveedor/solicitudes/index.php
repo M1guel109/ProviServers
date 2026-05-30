@@ -1,8 +1,8 @@
-<?php
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+﻿<?php
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 // Modelos
-require_once BASE_PATH . '/app/models/solicitud.php';
+require_once BASE_PATH . '/app/models/Solicitud.php';
 require_once BASE_PATH . '/app/models/ServicioContratado.php';
 
 $usuarioId = (int)($_SESSION['user']['id'] ?? 0);
@@ -187,23 +187,25 @@ $totalCompletadas  = count($serviciosCompletados);
 
 <body>
   <!-- SIDEBAR -->
-  <?php include_once __DIR__ . '/../../../layouts/sidebar_proveedor.php'; ?>
+  <?php include_once __DIR__ . '/../../../layouts/sidebar-proveedor.php'; ?>
 
   <main class="contenido">
-    <?php include_once __DIR__ . '/../../../layouts/header_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../../layouts/header-proveedor.php'; ?>
 
-    <!-- Título -->
-    <section id="titulo-principal">
+    <section id="titulo-principal" class="section-hero mb-4">
       <div class="row align-items-center">
         <div class="col-md-8">
-          <h1>Solicitudes</h1>
-          <p class="text-muted mb-0">
-            Gestiona solicitudes nuevas, servicios en proceso y completadas desde un solo lugar.
-          </p>
+          <h1 class="mb-1">Solicitudes</h1>
+          <p class="text-muted mb-0">Gestiona solicitudes nuevas, servicios en proceso y completadas desde un solo lugar.</p>
         </div>
         <div class="col-md-4">
-          <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-            <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0 justify-content-md-end">
+              <li class="breadcrumb-item">
+                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+              </li>
+              <li class="breadcrumb-item active" aria-current="page">Solicitudes</li>
+            </ol>
           </nav>
         </div>
       </div>
@@ -292,7 +294,7 @@ $totalCompletadas  = count($serviciosCompletados);
         </div>
 
         <div class="tab-pane fade <?= $tab === 'proceso' ? 'show active' : '' ?>" id="tab-proceso" role="tabpanel">
-          <?php include __DIR__ . '/partials/enProceso.php'; ?>
+          <?php include __DIR__ . '/partials/en-proceso.php'; ?>
         </div>
 
         <div class="tab-pane fade <?= $tab === 'completadas' ? 'show active' : '' ?>" id="tab-completadas" role="tabpanel">
@@ -303,7 +305,7 @@ $totalCompletadas  = count($serviciosCompletados);
   </main>
 
   <!-- Modal Detalle de Solicitud -->
-  <div class="modal fade" id="modalDetalleSolicitud" tabindex="-1" aria-hidden="true">
+  <div class="modal fade modal-cliente" id="modalDetalleSolicitud" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
         <div class="modal-header">
@@ -325,7 +327,7 @@ $totalCompletadas  = count($serviciosCompletados);
   </div>
 
   <!-- Modal de Seguimiento -->
-  <div class="modal fade" id="modalSeguimiento" tabindex="-1" aria-hidden="true">
+  <div class="modal fade modal-cliente" id="modalSeguimiento" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content border-0 shadow">
 
@@ -579,7 +581,7 @@ $totalCompletadas  = count($serviciosCompletados);
     const BASE_URL = "<?= BASE_URL ?>";
   </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/enProceso.js"></script>
+  <script src="<?= BASE_URL ?>/public/assets/dashboard/js/en-proceso.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/completadas.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
 </body>

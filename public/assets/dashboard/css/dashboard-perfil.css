@@ -1,0 +1,209 @@
+
+
+/* 5. Sección Título Principal */
+#titulo-principal {
+    margin-bottom: 30px;
+    border-bottom: 1px solid #9e9e9e;
+}
+
+#titulo-principal h1 {
+    font-size: var(--fs-title1);
+    font-weight: 700;
+    color: var(--dark-color);
+    font-family: var(--font-title);
+}
+
+/* 1. Estilos generales para la sección del formulario */
+#formulario {
+    margin-bottom: 30px;
+}
+
+.contenedor-formulario {
+    background-color: var(--white-color);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    margin: 0 auto;
+}
+
+/* 2. Sección de foto de perfil centrada */
+/* --- Estilos para la sección profile --- */
+.section.profile .card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+}
+
+/* Estilos del perfil izquierdo */
+.section.profile .profile-card img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border: 4px solid var(--white-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.section.profile .profile-card img:hover {
+  transform: scale(1.05);
+}
+
+.section.profile .profile-card h2 {
+  margin-top: 15px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.section.profile .profile-card h3 {
+  font-size: 16px;
+  color: #6c757d; /* color de subtítulo */
+  margin-bottom: 10px;
+}
+
+.section.profile .social-links a {
+  margin: 0 8px;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.section.profile .social-links a:hover {
+  color: darken(var(--primary-color), 10%);
+}
+
+/* --- Estilos para los tabs --- */
+.section.profile .nav-tabs.nav-tabs-bordered .nav-link {
+  font-weight: 500;
+  color: var(--dark-color);
+  border: none;
+  padding: 10px 20px;
+}
+
+.section.profile .nav-tabs.nav-tabs-bordered .nav-link.active {
+  color: var(--white-color);
+  background-color: var(--primary-color);
+  border-radius: 8px 8px 0 0;
+}
+
+.section.profile .tab-content {
+  padding: 20px;
+  border-top: 1px solid #e9ecef;
+}
+
+/* Titulos de sección dentro del overview */
+.section.profile .card-title {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: var(--dark-color);
+}
+
+.section.profile .label {
+  font-weight: 600;
+  color: #495057;
+}
+
+.section.profile .row > div {
+  margin-bottom: 16px;
+}
+
+
+/* 12. Animación sutil al cargar */
+.contenedor-formulario {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 13. Estilos para el input file personalizado */
+#foto-input {
+    display: none;
+}
+
+/* 14. Mensaje de éxito */
+.mensaje-exito {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #a7f3d0;
+    text-align: center;
+    font-weight: 500;
+}
+
+/* 15. Estados de carga */
+.btn-primary:disabled {
+    background-color: #94a3b8;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-primary:disabled:hover {
+    background-color: #94a3b8;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 16. Espaciado consistente */
+.form-group {
+    margin-bottom: 0;
+}
+
+
+/* 9. Responsive Tablet */
+@media screen and (min-width: 768px) and (max-width: 1080px) {
+    #tarjetas-inferiores {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .barra-superior {
+        padding: 10px 20px;
+    }
+}
+
+/* 10. Responsive Móvil */
+@media screen and (max-width: 767px) {
+    .contenido {
+        padding: 15px;
+    }
+
+    .barra-superior {
+        padding: 8px 12px;
+    }
+
+    .acciones-barra {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    #tarjetas-inferiores {
+        grid-template-columns: 1fr;
+    }
+
+    #titulo-principal h1 {
+        font-size: var(--fs-title2);
+    }
+
+    #grafica-principal {
+        padding: 20px;
+    }
+
+    #periodo {
+        position: static;
+        margin-bottom: 15px;
+        width: 100%;
+    }
+}

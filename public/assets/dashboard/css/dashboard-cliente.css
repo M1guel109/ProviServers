@@ -1,0 +1,474 @@
+/* ==========================================================================
+   DASHBOARD CLIENTE - Estilos específicos
+   Basado en los lineamientos del proyecto
+   ========================================================================== */
+
+/* ==========================================================================
+   1. TARJETAS DE ESTADÍSTICAS (consistentes con admin/proveedor)
+   ========================================================================== */
+.tarjeta-estadistica {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.tarjeta-estadistica:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.icono-estadistica {
+    font-size: 2.2rem;
+    background-color: rgba(0, 102, 255, 0.1);
+    padding: 12px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.valor-estadistica {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: var(--font-title);
+    color: var(--dark-color);
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
+.etiqueta-estadistica {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+/* ==========================================================================
+   2. TARJETAS DE CLIENTE (cards)
+   ========================================================================== */
+.card-cliente {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+}
+
+.card-cliente:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-color);
+}
+
+.icono-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-primary-light { background-color: rgba(0, 102, 255, 0.1); }
+.bg-success-light { background-color: rgba(39, 174, 96, 0.1); }
+.bg-danger-light { background-color: rgba(231, 76, 60, 0.1); }
+.bg-warning-light { background-color: rgba(243, 156, 18, 0.1); }
+.bg-info-light { background-color: rgba(52, 152, 219, 0.1); }
+.bg-secondary-light { background-color: rgba(100, 116, 139, 0.1); }
+
+.text-primary { color: var(--primary-color); }
+.text-success { color: #27ae60; }
+.text-danger { color: #e74c3c; }
+.text-warning { color: #f39c12; }
+.text-info { color: #3498db; }
+.text-secondary { color: #64748b; }
+
+/* ==========================================================================
+   3. BADGES DE ESTADO
+   ========================================================================== */
+.badge-estado {
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.badge-en-curso {
+    background-color: rgba(0, 102, 255, 0.1);
+    color: var(--primary-color);
+}
+
+.badge-programado {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.badge-completado {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+/* ==========================================================================
+   4. BOTONES DE ACCIÓN
+   ========================================================================== */
+.btn-card {
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1.5px solid transparent;
+}
+
+.btn-card-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.3);
+}
+
+.btn-card-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+}
+
+.btn-card-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-card-outline:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   5. TARJETAS DE CATEGORÍAS
+   ========================================================================== */
+.card-categoria {
+    background-color: var(--white-color);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.card-categoria:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   6. BARRA DE PROGRESO
+   ========================================================================== */
+.progress-cliente {
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-cliente-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #60a5fa);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+
+/* ==========================================================================
+   7. MODALES (centrados)
+   ========================================================================== */
+.modal-cliente .modal-content {
+    border-radius: 20px;
+    overflow: hidden;
+    border: none;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-cliente .modal-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    border-bottom: none;
+    padding: 15px 20px;
+}
+
+.modal-cliente .modal-body {
+    padding: 25px;
+}
+
+.modal-cliente .modal-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 15px 25px;
+}
+
+.modal-cliente .btn-close-white {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 8px;
+    opacity: 1;
+}
+
+/* Info rows en modal */
+.info-row:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   8. BOTONES PRINCIPALES (consistentes)
+   ========================================================================== */
+.btn-primary-proviservers {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-primary-proviservers:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 102, 255, 0.4);
+    color: white;
+}
+
+.btn-secondary-proviservers {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn-secondary-proviservers:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   EXPLORAR SERVICIOS - Estilos específicos
+   ========================================================================== */
+
+/* Badge de categoría en imagen */
+.badge-categoria {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    padding: 5px 12px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+}
+
+/* Badge de disponibilidad */
+.badge-disponible {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+/* Tarjeta de servicio */
+.service-card {
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+}
+
+.service-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.service-image img {
+    transition: transform 0.5s ease;
+}
+
+.service-card:hover .service-image img {
+    transform: scale(1.05);
+}
+
+/* Filtros */
+.filtros-container {
+    background-color: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 2rem;
+}
+
+.btn-outline-primary.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+    color: white;
+    border-color: transparent;
+}
+
+/* Paginación */
+.page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.page-link {
+    color: var(--primary-color);
+    border-radius: 8px;
+    margin: 0 3px;
+}
+
+.page-link:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* ==========================================================================
+   9. RESPONSIVE
+   ========================================================================== */
+@media screen and (max-width: 576px) {
+    /* Modales: radio reducido en móvil para no sobresalir */
+    .modal-cliente .modal-content {
+        border-radius: 12px;
+    }
+
+    .modal-cliente .modal-body {
+        padding: 16px;
+    }
+
+    .modal-cliente .modal-footer {
+        padding: 12px 16px;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .modal-cliente .modal-footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .tarjeta-estadistica {
+        padding: 15px;
+    }
+
+    .icono-estadistica {
+        font-size: 1.8rem;
+        padding: 10px;
+    }
+
+    .valor-estadistica {
+        font-size: 1.3rem;
+    }
+
+    .card-categoria {
+        padding: 15px;
+    }
+
+    .d-flex.gap-3 {
+        flex-direction: column;
+    }
+
+    .btn-primary-proviservers,
+    .btn-secondary-proviservers {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Explorar servicios — mapa con altura reducida en móvil */
+    #mapa-servicios {
+        height: 340px !important;
+    }
+
+    /* Toggle mapa/grid — full width en móvil */
+    #btn-grid, #btn-mapa {
+        font-size: 0.82rem;
+        padding: 6px 10px;
+    }
+
+    /* Historial — ocultar columna de calificación en móvil (poco espacio) */
+    #historial-servicios .table th:nth-child(6),
+    #historial-servicios .table td:nth-child(6) {
+        display: none;
+    }
+
+    /* Perfil — columna lateral debajo del formulario */
+    .profile .col-xl-4 {
+        margin-bottom: 1rem;
+    }
+
+    .profile .card-body.profile-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .profile .card-body.profile-card img {
+        width: 90px !important;
+        height: 90px !important;
+    }
+
+    /* Servicios contratados — botones más compactos */
+    .service-card .btn {
+        font-size: 0.82rem;
+        padding: 8px 10px;
+    }
+
+    /* Breadcrumb — ocultar en vistas de cliente */
+    .section-hero nav.mb-4,
+    .section-hero ol.breadcrumb {
+        display: none;
+    }
+}
+
+/* ── 360px — ajustes finales del cliente ────────────────────────── */
+@media (max-width: 400px) {
+    /* Service card: imagen ligeramente más pequeña */
+    .service-card img.card-img-top,
+    .service-card .service-image img {
+        height: 150px !important;
+    }
+
+    /* Badges de estado: texto más pequeño */
+    .badge-estado {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+
+    /* Filtro: badge de filtros activos */
+    .badge.bg-primary.bg-opacity-10 {
+        font-size: 0.72rem;
+    }
+}

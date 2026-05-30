@@ -33,58 +33,96 @@ class Publicacion
     }
 
     /**
-     * Crea una publicación para un servicio creado por un proveedor.
-     * - Se deja en estado 'pendiente' para flujo de moderación.
+     * Crea una publicación para un servicio recién registrado por un proveedor.
+     * Si el proveedor tiene auto_aprobacion_activa = 1, la publica directo como 'aprobado'.
+     * Si no, la deja en 'pendiente' para revisión del admin.
+     *
+     * @param int   $usuarioId  ID del usuario (tabla usuarios)
+     * @param int   $servicioId ID del servicio recién creado
+     * @param array $data       ['nombre', 'descripcion', 'precio']
+     * @return bool
      */
-    public function crearParaServicioDeProveedor(
-        int $usuarioId,
-        int $servicioId,
-        array $data = []
-    ): bool {
-        $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
+    public function crearParaServicioDeProveedor(int $usuarioId, int $servicioId, array $data): bool
+    {
+        try {
+            $this->conexion->beginTransaction();
 
-        if (!$proveedorId) {
-            throw new Exception("No se encontró proveedor asociado al usuario {$usuarioId}");
+            // 1. Obtener el proveedor_id y verificar si tiene auto-aprobación activa
+            $sqlProv = "SELECT id, auto_aprobacion_activa 
+                    FROM proveedores 
+                    WHERE usuario_id = :usuario_id 
+                    LIMIT 1";
+
+            $stmtProv = $this->conexion->prepare($sqlProv);
+            $stmtProv->bindParam(':usuario_id', $usuarioId, PDO::PARAM_INT);
+            $stmtProv->execute();
+            $proveedor = $stmtProv->fetch(PDO::FETCH_ASSOC);
+
+            // Si no se encuentra el proveedor, cancelamos
+            if (!$proveedor) {
+                $this->conexion->rollBack();
+                error_log("Publicacion::crearParaServicioDeProveedor — proveedor no encontrado para usuario_id {$usuarioId}");
+                return false;
+            }
+
+            $proveedorId     = (int) $proveedor['id'];
+            $esVip           = (int) $proveedor['auto_aprobacion_activa'] === 1;
+
+            // 2. Determinar estado según reputación del proveedor
+            // VIP (>= 3 publicaciones aprobadas) → aprobado directo
+            // Nuevo proveedor → pendiente de revisión del admin
+            $estadoPublicacion = $esVip ? 'aprobado' : 'pendiente';
+
+            // 3. Insertar la publicación
+            $sql = "INSERT INTO publicaciones (
+                    tipo_publicacion,
+                    proveedor_id,
+                    servicio_id,
+                    titulo,
+                    descripcion,
+                    precio,
+                    estado,
+                    fecha_publicacion,
+                    created_at
+                ) VALUES (
+                    'proveedor',
+                    :proveedor_id,
+                    :servicio_id,
+                    :titulo,
+                    :descripcion,
+                    :precio,
+                    :estado,
+                    NOW(),
+                    NOW()
+                )";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':proveedor_id', $proveedorId,           PDO::PARAM_INT);
+            $stmt->bindParam(':servicio_id',  $servicioId,            PDO::PARAM_INT);
+            $stmt->bindValue(':titulo',       $data['nombre']         ?? '');
+            $stmt->bindValue(':descripcion',  $data['descripcion']    ?? '');
+            $stmt->bindValue(':precio',       $data['precio']         ?? 0);
+            $stmt->bindParam(':estado',       $estadoPublicacion,     PDO::PARAM_STR);
+            $stmt->execute();
+
+            // 4. Si es VIP y se aprobó automáticamente, sumar al contador de reputación
+            if ($esVip) {
+                $sqlCount = "UPDATE proveedores 
+                         SET publicaciones_aprobadas_count = publicaciones_aprobadas_count + 1 
+                         WHERE id = :proveedor_id";
+                $stmtCount = $this->conexion->prepare($sqlCount);
+                $stmtCount->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
+                $stmtCount->execute();
+            }
+
+            $this->conexion->commit();
+            return true;
+        } catch (PDOException $e) {
+            $this->conexion->rollBack();
+            error_log("Error en Publicacion::crearParaServicioDeProveedor -> " . $e->getMessage());
+            return false;
         }
-
-        $titulo      = $data['nombre'] ?? $data['titulo'] ?? 'Servicio ofertado';
-        $descripcion = $data['descripcion'] ?? null;
-        $precio      = isset($data['precio']) ? (float)$data['precio'] : 0.00;
-
-        $tipoPublicacion = 'proveedor';
-        $estado          = 'pendiente';
-
-        $sql = "INSERT INTO publicaciones (
-                tipo_publicacion,
-                proveedor_id,
-                servicio_id,
-                titulo,
-                descripcion,
-                precio,
-                estado
-            ) VALUES (
-                :tipo_publicacion,
-                :proveedor_id,
-                :servicio_id,
-                :titulo,
-                :descripcion,
-                :precio,
-                :estado
-            )";
-
-        $stmt = $this->conexion->prepare($sql);
-
-        $stmt->bindParam(':tipo_publicacion', $tipoPublicacion);
-        $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
-        $stmt->bindParam(':servicio_id', $servicioId, PDO::PARAM_INT);
-        $stmt->bindParam(':titulo', $titulo);
-        $stmt->bindParam(':descripcion', $descripcion);
-        $stmt->bindParam(':precio', $precio);
-        $stmt->bindParam(':estado', $estado);
-
-        return $stmt->execute();
     }
-
     /**
      * Lista todas las publicaciones asociadas a un proveedor (para el panel del proveedor).
      * Retorna alias pensados para la vista:
@@ -101,9 +139,7 @@ class Publicacion
         try {
             $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
 
-            if (!$proveedorId) {
-                return [];
-            }
+            if (!$proveedorId) return [];
 
             $sql = "
             SELECT 
@@ -112,7 +148,7 @@ class Publicacion
                 pub.titulo              AS titulo,
                 pub.descripcion         AS descripcion,
                 pub.precio              AS precio,
-                pub.estado              AS estado,
+                pub.estado              AS estado_publicacion,
                 pub.motivo_rechazo      AS motivo_rechazo,
                 pub.fecha_publicacion   AS fecha_publicacion,
                 pub.created_at          AS publicacion_created_at,
@@ -121,11 +157,12 @@ class Publicacion
                 s.descripcion           AS servicio_descripcion,
                 s.imagen                AS servicio_imagen,
                 s.disponibilidad        AS servicio_disponible,
+                s.precio                AS servicio_precio,
 
                 c.nombre                AS categoria_nombre
             FROM publicaciones AS pub
             INNER JOIN servicios  AS s ON pub.servicio_id = s.id
-            LEFT JOIN categorias  AS c ON s.id_categoria = c.id
+            LEFT  JOIN categorias AS c ON s.id_categoria  = c.id
             WHERE pub.proveedor_id = :proveedor_id
             ORDER BY pub.fecha_publicacion DESC, pub.id DESC
         ";
@@ -134,9 +171,7 @@ class Publicacion
             $stmt->bindParam(':proveedor_id', $proveedorId, PDO::PARAM_INT);
             $stmt->execute();
 
-            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $filas ?: [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("Error en Publicacion::listarPorProveedorUsuario -> " . $e->getMessage());
             return [];
@@ -149,11 +184,16 @@ class Publicacion
      */
     // app/models/Publicacion.php
 
-    public function listarPublicasActivas(?string $busqueda = null, ?int $categoriaId = null): array
-    {
+    public function listarPublicasActivas(
+        ?string $busqueda   = null,
+        ?int    $categoriaId = null,
+        ?string $ciudad      = null,
+        ?float  $precioMax   = null,
+        string  $orden       = 'recientes'
+    ): array {
         try {
             $sql = "
-            SELECT 
+            SELECT
                 pub.id,
                 pub.servicio_id,
                 pub.titulo,
@@ -166,102 +206,92 @@ class Publicacion
                 s.descripcion  AS servicio_descripcion,
                 s.imagen       AS servicio_imagen,
 
-                c.nombre       AS categoria_nombre
+                c.nombre       AS categoria_nombre,
+
+                CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                COALESCE(pp.foto, pr.foto)            AS proveedor_foto,
+                pp.ciudad                             AS proveedor_ciudad,
+                pp.zona                               AS proveedor_zona,
+                pp.latitud                            AS proveedor_lat,
+                pp.longitud                           AS proveedor_lng,
+
+                COALESCE(AVG(v.calificacion), 0) AS calificacion_promedio,
+                COUNT(v.id)                      AS total_resenas,
+
+                promo.porcentaje_descuento       AS promo_descuento,
+                promo.fecha_fin                  AS promo_hasta
+
             FROM publicaciones AS pub
-            INNER JOIN servicios   AS s ON pub.servicio_id = s.id
-            LEFT  JOIN categorias  AS c ON s.id_categoria = c.id
+            INNER JOIN servicios      AS s   ON pub.servicio_id  = s.id
+            LEFT  JOIN categorias     AS c   ON s.id_categoria   = c.id
+            INNER JOIN proveedores    AS pr  ON pub.proveedor_id = pr.id
+            LEFT  JOIN proveedor_perfil AS pp ON pp.id_usuario   = pr.usuario_id
+            LEFT  JOIN valoraciones   AS v   ON v.proveedor_id   = pr.id
+            LEFT  JOIN promociones promo
+                ON promo.publicacion_id = pub.id
+                AND promo.fecha_inicio <= CURDATE()
+                AND promo.fecha_fin    >= CURDATE()
             WHERE pub.estado = 'aprobado'
+              AND s.disponibilidad = 1
         ";
 
             $params = [];
 
-            // Búsqueda por texto (opcional)
             if (!empty($busqueda)) {
-                $sql .= " 
-                AND (
-                    pub.titulo      LIKE :busqueda
-                    OR s.nombre     LIKE :busqueda
+                $sql .= " AND (
+                    pub.titulo       LIKE :busqueda
+                    OR s.nombre      LIKE :busqueda
                     OR s.descripcion LIKE :busqueda
-                    OR c.nombre     LIKE :busqueda
-                )
-            ";
+                    OR c.nombre      LIKE :busqueda
+                    OR pp.ciudad     LIKE :busqueda
+                    OR pp.zona       LIKE :busqueda
+                )";
                 $params[':busqueda'] = '%' . $busqueda . '%';
             }
 
-            // Filtro por categoría (opcional)
             if (!empty($categoriaId)) {
                 $sql .= " AND s.id_categoria = :categoriaId";
-                $params[':categoriaId'] = (int) $categoriaId;
+                $params[':categoriaId'] = (int)$categoriaId;
             }
 
-            $sql .= " ORDER BY pub.created_at DESC";
+            if (!empty($ciudad)) {
+                $sql .= " AND (pp.ciudad LIKE :ciudad OR pp.zona LIKE :ciudad)";
+                $params[':ciudad'] = '%' . $ciudad . '%';
+            }
+
+            if ($precioMax !== null && $precioMax > 0) {
+                $sql .= " AND pub.precio <= :precioMax";
+                $params[':precioMax'] = $precioMax;
+            }
+
+            $ordenMap = [
+                'precio_asc'  => 'pub.precio ASC',
+                'precio_desc' => 'pub.precio DESC',
+                'valorados'   => 'calificacion_promedio DESC, total_resenas DESC',
+                'recientes'   => 'pub.created_at DESC',
+            ];
+            $orderBy = $ordenMap[$orden] ?? 'pub.created_at DESC';
+
+            $sql .= " GROUP BY pub.id ORDER BY $orderBy";
 
             $stmt = $this->conexion->prepare($sql);
 
             foreach ($params as $key => $value) {
-                if ($key === ':categoriaId') {
-                    $stmt->bindValue($key, $value, PDO::PARAM_INT);
-                } else {
-                    $stmt->bindValue($key, $value, PDO::PARAM_STR);
-                }
+                $stmt->bindValue(
+                    $key,
+                    $value,
+                    $key === ':categoriaId' ? PDO::PARAM_INT : PDO::PARAM_STR
+                );
             }
 
             $stmt->execute();
-            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $filas ?: [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("Error en Publicacion::listarPublicasActivas -> " . $e->getMessage());
             return [];
         }
     }
-    public function obtenerPublicaActivaPorId(int $id): ?array
-    {
-        try {
-            $sql = "
-            SELECT 
-                pub.id,
-                pub.titulo,
-                pub.descripcion       AS publicacion_descripcion,
-                pub.precio,
-                pub.estado,
-                pub.created_at        AS publicacion_created_at,
 
-                s.id                  AS servicio_id,
-                s.nombre              AS servicio_nombre,
-                s.descripcion         AS servicio_descripcion,
-                s.imagen              AS servicio_imagen,
-                s.disponibilidad      AS servicio_disponible,
-
-                c.nombre              AS categoria_nombre,
-
-                p.id AS proveedor_id, 
-                p.usuario_id AS proveedor_usuario_id,
-                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
-                p.ubicacion AS proveedor_ubicacion,
-                p.foto AS proveedor_foto
-
-            FROM publicaciones AS pub
-            INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
-            LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
-            INNER JOIN proveedores AS p ON pub.proveedor_id = p.id
-            WHERE pub.id = :id
-              AND pub.estado = 'aprobado'
-            LIMIT 1
-        ";
-
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $fila ?: null;
-        } catch (PDOException $e) {
-            error_log("Error en Publicacion::obtenerPublicaActivaPorId -> " . $e->getMessage());
-            return null;
-        }
-    }
 
     public function listarPublicacionesAprobadasParaSolicitudes(): array
     {
@@ -283,5 +313,59 @@ class Publicacion
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function obtenerDetallePublicacion(int $id): ?array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    p.id AS publicacion_id,
+                    p.titulo AS publicacion_titulo,
+                    p.descripcion AS publicacion_descripcion,
+                    p.precio AS publicacion_precio,
+                    p.estado AS publicacion_estado,
+                    p.created_at AS publicacion_fecha,
+
+                    s.id AS servicio_id,
+                    s.nombre AS servicio_nombre,
+                    s.descripcion AS servicio_descripcion,
+                    s.imagen AS servicio_imagen,
+                    s.disponibilidad AS servicio_disponible,
+
+                    c.nombre AS categoria_nombre,
+
+                    pr.id AS proveedor_id,
+                    CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                    pr.ubicacion AS proveedor_ubicacion,
+                    pr.foto AS proveedor_foto,
+                    pr.usuario_id AS proveedor_usuario_id,
+
+                    promo.porcentaje_descuento AS promo_descuento,
+                    promo.fecha_fin            AS promo_hasta
+
+                FROM publicaciones p
+                INNER JOIN servicios s   ON p.servicio_id  = s.id
+                LEFT  JOIN categorias c  ON s.id_categoria = c.id
+                INNER JOIN proveedores pr ON p.proveedor_id = pr.id
+                LEFT  JOIN promociones promo
+                    ON promo.publicacion_id = p.id
+                    AND promo.fecha_inicio <= CURDATE()
+                    AND promo.fecha_fin    >= CURDATE()
+                WHERE p.id = :id
+                  AND p.estado = 'aprobado'
+                LIMIT 1
+            ";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Publicacion::obtenerDetallePublicacion -> " . $e->getMessage());
+            return null;
+        }
     }
 }

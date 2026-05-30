@@ -1,50 +1,158 @@
 <?php
 return [
-    // Header
+    // ==========================================
+    // GENERAL
+    // ==========================================
+    'bienvenido' => 'Bienvenido',
     'header_buscar' => 'Buscar...',
     'header_perfil' => 'Mi Perfil',
     'header_config' => 'Configuración',
     'header_salir'  => 'Cerrar Sesión',
     'header_ver_todas' => 'Ver todas',
     'header_sin_notif' => 'No hay notificaciones',
-    
-    // --- SIDEBAR ---
-// --- SIDEBAR ADMIN ---
-    'admin_alt_logo'             => 'Logo Proviservers',
-    'admin_menu_panel'           => 'Panel Principal',
-    'admin_header_gestion'       => 'GESTIÓN PRINCIPAL',
-    
-    // Usuarios
-    'admin_menu_usuarios'        => 'Usuarios',
-    'admin_sub_registrar_usuario'=> 'Registrar Usuario',
-    'admin_sub_listar_usuarios'  => 'Listar Usuarios',
-    
-    // Servicios & Categorías
-    'admin_menu_servicios'       => 'Moderación de Servicios',
-    'admin_menu_categorias'      => 'Categorías',
-    'admin_sub_nueva_categoria'  => 'Nueva Categoría',
-    'admin_sub_listar_categorias'=> 'Listar Categorías',
-    
-    // Membresías
-    'admin_menu_membresias'      => 'Membresías',
-    'admin_sub_crear_plan'       => 'Crear Plan',
-    'admin_sub_planes'           => 'Planes Disponibles',
-    'admin_sub_suscripciones'    => 'Suscripciones Activas',
-    
-    // Administración
-    'admin_header_admin'         => 'ADMINISTRACIÓN',
-    'admin_menu_finanzas'        => 'Finanzas',
-    'admin_sub_balance'          => 'Balance',
-    'admin_sub_facturacion'      => 'Facturación',
-    'admin_menu_reportes'        => 'Reportes',
-    'admin_sub_general'          => 'General',
-    
-    // Footer Sidebar
-    'admin_footer_ajustes'       => 'Ajustes',
-    'admin_footer_salir'         => 'Salir',
-    
-    // General
-    'bienvenido' => 'Bienvenido',
-    'rol_admin'  => 'Administrador'
+    'header_tienes' => 'Tienes',
+    'header_sin_leer' => 'sin leer',
+    'menu' => 'Menú',
+    'perfil' => 'Perfil',
+    'configuracion' => 'Configuración',
+    'cerrar_sesion' => 'Cerrar Sesión',
+    'mejorar_plan' => 'Mejorar Plan',
+    'mi_perfil' => 'Mi Perfil',
+    'mis_favoritos' => 'Mis Favoritos',
+    'ayuda' => 'Ayuda',
+
+    // ==========================================
+    // DARK MODE
+    // ==========================================
+    'dark_mode' => 'Modo oscuro',
+    'light_mode' => 'Modo claro',
+    'cambiar_tema' => 'Cambiar tema',
+
+    // ==========================================
+    // ADMIN - SIDEBAR
+    // ==========================================
+    'admin_alt_logo' => 'Logo Proviservers',
+    'admin_menu_panel' => 'Panel Principal',
+    'admin_header_gestion' => 'GESTIÓN PRINCIPAL',
+    'admin_menu_usuarios' => 'Usuarios',
+    'admin_sub_registrar_usuario' => 'Registrar Usuario',
+    'admin_sub_listar_usuarios' => 'Listar Usuarios',
+    'admin_menu_servicios' => 'Moderación de Servicios',
+    'admin_menu_categorias' => 'Categorías',
+    'admin_sub_nueva_categoria' => 'Nueva Categoría',
+    'admin_sub_listar_categorias' => 'Listar Categorías',
+    'admin_menu_membresias' => 'Membresías',
+    'admin_sub_crear_plan' => 'Crear Plan',
+    'admin_sub_planes' => 'Planes Disponibles',
+    'admin_sub_suscripciones' => 'Suscripciones Activas',
+    'admin_header_admin' => 'ADMINISTRACIÓN',
+    'admin_menu_finanzas' => 'Finanzas',
+    'admin_sub_balance' => 'Balance',
+    'admin_sub_facturacion' => 'Facturación',
+    'admin_menu_reportes' => 'Reportes',
+    'admin_sub_general' => 'General',
+    'admin_footer_ajustes' => 'Ajustes',
+    'admin_footer_salir' => 'Salir',
+    'rol_admin' => 'Administrador',
+
+    // ==========================================
+    // PROVEEDOR - SIDEBAR
+    // ==========================================
+    'proveedor_alt_logo' => 'Logo Proviservers',
+    'proveedor_menu_panel' => 'Panel Principal',
+    'proveedor_header_servicios' => 'MIS SERVICIOS',
+    'proveedor_registrar_servicio' => 'Registrar Servicio',
+    'proveedor_mis_servicios' => 'Mis Servicios',
+    'proveedor_mis_publicaciones' => 'Mis Publicaciones',
+    'proveedor_header_solicitudes' => 'SOLICITUDES',
+    'proveedor_solicitudes' => 'Solicitudes',
+    'proveedor_oportunidades' => 'Oportunidades',
+    'proveedor_resenas' => 'Reseñas',
+    'proveedor_header_negocio' => 'MI NEGOCIO',
+    'proveedor_calendario' => 'Calendario',
+    'proveedor_estadisticas' => 'Estadísticas',
+    'proveedor_finanzas' => 'Finanzas',
+    'proveedor_facturacion' => 'Facturación',
+    'proveedor_promociones' => 'Promociones',
+    'proveedor_membresia' => 'Membresía',
+    'proveedor_header_configuracion' => 'CONFIGURACIÓN',
+    'proveedor_configuracion' => 'Configuración',
+    'proveedor_perfil' => 'Mi Perfil',
+    'proveedor_salir' => 'Salir',
+    'proveedor_dark_mode' => 'Modo oscuro',
+    'proveedor_ver_todas' => 'Ver todas',
+    'proveedor_tienes' => 'Tienes',
+    'proveedor_sin_leer' => 'sin leer',
+    'proveedor_notificaciones' => 'Notificaciones',
+    'proveedor_buscar' => 'Buscar servicios, clientes...',
+    'proveedor_mejorar_plan' => 'Mejorar Plan',
+    'proveedor_mi_perfil' => 'Mi Perfil',
+    'proveedor_cerrar_sesion' => 'Cerrar Sesión',
+    'proveedor_bienvenido' => 'Panel de Proveedor',
+    'proveedor_descripcion' => 'Bienvenido a tu panel de control. Aquí puedes gestionar tus servicios, revisar solicitudes, dar seguimiento a tus ingresos y mantener actualizada tu información profesional.',
+    'proveedor_ingresos_mes' => 'Ingresos del Mes',
+    'proveedor_servicios_activos' => 'Servicios Activos',
+    'proveedor_calificacion' => 'Calificación',
+    'proveedor_solicitudes_pendientes' => 'Solicitudes Pendientes',
+    'proveedor_vs_mes_anterior' => 'vs mes anterior',
+    'proveedor_nuevos' => 'nuevos',
+    'proveedor_este_mes' => 'este mes',
+    'proveedor_desde_ayer' => 'desde ayer',
+    'proveedor_rendimiento_servicios' => 'Rendimiento de Servicios',
+    'proveedor_semanal' => 'Semanal',
+    'proveedor_mensual' => 'Mensual',
+    'proveedor_anual' => 'Anual',
+    'proveedor_servicios_recientes' => 'Servicios Recientes',
+    'proveedor_reparacion_tuberias' => 'Reparación de tuberías',
+    'proveedor_instalacion_electrica' => 'Instalación eléctrica',
+    'proveedor_plomeria' => 'Plomería',
+    'proveedor_electricidad' => 'Electricidad',
+    'proveedor_activo' => 'Activo',
+    'proveedor_pendiente' => 'Pendiente',
+
+    // ==========================================
+    // CLIENTE - SIDEBAR
+    // ==========================================
+    'cliente_alt_logo' => 'Logo Proviservers',
+    'cliente_menu_panel' => 'Panel Principal',
+    'cliente_header_servicios' => 'MIS SERVICIOS',
+    'cliente_explorar_servicios' => 'Explorar Servicios',
+    'cliente_mis_solicitudes' => 'Mis Solicitudes',
+    'cliente_servicios_contratados' => 'Servicios Contratados',
+    'cliente_historial' => 'Historial',
+    'cliente_favoritos' => 'Favoritos',
+    'cliente_header_comunicacion' => 'COMUNICACIÓN',
+    'cliente_mensajes' => 'Mensajes',
+    'cliente_ayuda' => 'Ayuda',
+    'cliente_header_configuracion' => 'CONFIGURACIÓN',
+    'cliente_perfil' => 'Perfil',
+    'cliente_mi_perfil' => 'Mi Perfil',
+    'cliente_salir' => 'Salir',
+    'cliente_dark_mode' => 'Modo oscuro',
+    'cliente_ver_todas' => 'Ver todas',
+    'cliente_tienes' => 'Tienes',
+    'cliente_sin_leer' => 'sin leer',
+    'cliente_notificaciones' => 'Notificaciones',
+    'cliente_buscar_servicios' => 'Buscar servicios...',
+    'cliente_cerrar_sesion' => 'Cerrar Sesión',
+    'cliente_mis_favoritos' => 'Mis Favoritos',
+
+    // ==========================================
+    // CLIENTE - DASHBOARD (nuevas variables)
+    // ==========================================
+    'cliente_bienvenido' => 'Panel Principal',
+    'cliente_descripcion' => 'Bienvenido a tu panel de control. Aquí puedes explorar servicios, gestionar tus solicitudes y dar seguimiento a tus servicios contratados.',
+    'cliente_explorar_descripcion' => 'Encuentra los mejores proveedores y servicios cerca de ti.',
+    'cliente_servicios_disponibles' => 'Servicios Disponibles',
+    'cliente_solicitudes_activas' => 'Solicitudes Activas',
+    'cliente_servicios_finalizados' => 'Servicios Finalizados',
+    'cliente_proveedores_favoritos' => 'Proveedores Favoritos',
+    'cliente_que_necesitas' => '¿Qué necesitas hoy?',
+    'cliente_buscar_servicio' => 'Buscar Servicio',
+    'cliente_mis_servicios' => 'Mis Servicios',
+    'cliente_publicar_necesidad' => 'Publicar Necesidad',
+    'cliente_servicios_curso' => 'Servicios en Curso',
+    'cliente_ver_todos' => 'Ver todos',
+    'cliente_categorias_populares' => 'Categorías Populares',
+    'cliente_ver_proveedores' => 'Ver proveedores',
 ];
-?>

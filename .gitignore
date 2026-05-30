@@ -2,5 +2,9 @@
 config/config.php
 .htaccess
 
-# Archivo de conexión a la base de datos (MUY IMPORTANTE)
+# Archivos de credenciales sensibles (MUY IMPORTANTE)
 config/database.php
+config/mercadopago.php
+
+# Configuraciones de asistentes IA
+.claude/

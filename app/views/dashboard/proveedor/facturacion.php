@@ -1,83 +1,183 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session_proveedor.php';
+require_once BASE_PATH . '/app/helpers/session-proveedor.php';
+require_once BASE_PATH . '/config/database.php';
 
-// Datos de ejemplo (luego vendrán del controlador)
-$facturacion = [
-    'saldo_actual' => 8450000,
-    'facturas_pendientes' => 3,
-    'facturas_pagadas' => 15,
-    'proximo_pago' => '2025-04-15',
-    'monto_proximo' => 1250000,
-    'metodo_pago_predeterminado' => 'Nequi',
-    'numero_cuenta' => '300 123 4567'
-];
+$uid = (int)($_SESSION['user']['id'] ?? 0);
 
-$facturas = [
-    [
-        'id' => 'FAC-2025-001',
-        'fecha_emision' => '2025-03-01',
-        'fecha_vencimiento' => '2025-03-15',
-        'concepto' => 'Membresía Premium - Marzo',
-        'monto' => 49000,
-        'estado' => 'pagada',
-        'metodo_pago' => 'Nequi',
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-002',
-        'fecha_emision' => '2025-03-05',
-        'fecha_vencimiento' => '2025-03-20',
-        'concepto' => 'Comisión por servicios',
-        'monto' => 324000,
-        'estado' => 'pagada',
-        'metodo_pago' => 'Tarjeta crédito',
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-003',
-        'fecha_emision' => '2025-03-10',
-        'fecha_vencimiento' => '2025-03-25',
-        'concepto' => 'Membresía Premium - Abril',
-        'monto' => 49000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-004',
-        'fecha_emision' => '2025-03-12',
-        'fecha_vencimiento' => '2025-03-27',
-        'concepto' => 'Servicio destacado',
-        'monto' => 25000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ],
-    [
-        'id' => 'FAC-2025-005',
-        'fecha_emision' => '2025-03-15',
-        'fecha_vencimiento' => '2025-03-30',
-        'concepto' => 'Publicación destacada',
-        'monto' => 15000,
-        'estado' => 'pendiente',
-        'metodo_pago' => null,
-        'pdf_url' => '#'
-    ]
-];
+$facturacion  = ['saldo_actual' => 0, 'facturas_pendientes' => 0, 'facturas_pagadas' => 0, 'proximo_pago' => null, 'monto_proximo' => 0];
+$facturas     = [];
+$metodos_pago = [];
+$resumen_anual = ['total_facturado' => 0, 'total_comisiones' => 0, 'total_neto' => 0, 'promedio_mensual' => 0];
+$escrow = ['retenido' => 0.0, 'liberado' => 0.0, 'pagos' => []];
 
-$metodos_pago = [
-    ['tipo' => 'Nequi', 'icono' => 'bi-phone', 'numero' => '300 123 4567', 'predeterminado' => true],
-    ['tipo' => 'DaviPlata', 'icono' => 'bi-phone', 'numero' => '300 765 4321', 'predeterminado' => false],
-    ['tipo' => 'Bancolombia', 'icono' => 'bi-bank', 'numero' => '123-456789-01', 'predeterminado' => false],
-    ['tipo' => 'Tarjeta crédito', 'icono' => 'bi-credit-card', 'numero' => '**** **** **** 1234', 'predeterminado' => false]
-];
+try {
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
 
-$resumen_anual = [
-    'total_facturado' => 12500000,
-    'total_comisiones' => 1250000,
-    'total_neto' => 11250000,
-    'promedio_mensual' => 1041667
-];
+    $stProv = $pdo->prepare("SELECT id FROM proveedores WHERE usuario_id = :uid LIMIT 1");
+    $stProv->execute([':uid' => $uid]);
+    $proveedorId = (int)($stProv->fetchColumn() ?: 0);
+
+    if ($proveedorId > 0) {
+        // Saldo: ingresos de servicios finalizados este año
+        $stSaldo = $pdo->prepare("
+            SELECT COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0)
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
+            WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+              AND YEAR(sc.created_at) = YEAR(CURDATE())
+        ");
+        $stSaldo->execute([':pid' => $proveedorId]);
+        $facturacion['saldo_actual'] = (float)($stSaldo->fetchColumn() ?: 0);
+
+        // Pagos de membresía
+        $stPagos = $pdo->prepare("
+            SELECT p.id, p.monto, p.estado_pago, p.metodo_pago, p.fecha_pago, p.created_at,
+                   m.tipo AS concepto
+            FROM pagos p
+            LEFT JOIN proveedor_membresia pm ON p.proveedor_membresia_id = pm.id
+            LEFT JOIN membresias m ON pm.membresia_id = m.id
+            WHERE p.proveedor_id = :pid
+            ORDER BY p.created_at DESC
+            LIMIT 20
+        ");
+        $stPagos->execute([':pid' => $proveedorId]);
+        $pagosRaw = $stPagos->fetchAll(PDO::FETCH_ASSOC);
+
+        $pagados  = 0;
+        $pendientes = 0;
+        foreach ($pagosRaw as $i => $p) {
+            $esPagado = in_array($p['estado_pago'] ?? '', ['aprobado', 'approved', 'pagado', 'completado']);
+            if ($esPagado) $pagados++;
+            else $pendientes++;
+            $facturas[] = [
+                'id'               => 'MEM-' . str_pad($p['id'], 4, '0', STR_PAD_LEFT),
+                'fecha_emision'    => $p['created_at']  ?? date('Y-m-d'),
+                'fecha_vencimiento'=> $p['fecha_pago']  ?? date('Y-m-d', strtotime('+15 days')),
+                'concepto'         => 'Membresía ' . ($p['concepto'] ?? 'Plan'),
+                'monto'            => (float)($p['monto'] ?? 0),
+                'estado'           => $esPagado ? 'pagada' : 'pendiente',
+                'metodo_pago'      => $p['metodo_pago'] ?? null,
+                'pdf_url'          => '#',
+            ];
+        }
+
+        // Completar con servicios finalizados recientes si no hay pagos
+        if (empty($facturas)) {
+            $stSrv = $pdo->prepare("
+                SELECT sc.id, sc.created_at,
+                       COALESCE(c.titulo, sol.titulo, 'Servicio') AS concepto,
+                       COALESCE(c.precio, pub_sol.precio, 0) AS monto
+                FROM servicios_contratados sc
+                LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+                LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+                LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
+                WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+                ORDER BY sc.created_at DESC LIMIT 10
+            ");
+            $stSrv->execute([':pid' => $proveedorId]);
+            foreach ($stSrv->fetchAll(PDO::FETCH_ASSOC) as $srv) {
+                $pagados++;
+                $facturas[] = [
+                    'id'               => 'CTR-' . str_pad($srv['id'], 4, '0', STR_PAD_LEFT),
+                    'fecha_emision'    => $srv['created_at'],
+                    'fecha_vencimiento'=> $srv['created_at'],
+                    'concepto'         => htmlspecialchars($srv['concepto']),
+                    'monto'            => (float)$srv['monto'],
+                    'estado'           => 'pagada',
+                    'metodo_pago'      => null,
+                    'pdf_url'          => BASE_URL . '/proveedor/contrato-pdf?id=' . $srv['id'],
+                ];
+            }
+        }
+
+        $facturacion['facturas_pagadas']   = $pagados;
+        $facturacion['facturas_pendientes'] = $pendientes;
+
+        // Próximo pago de membresía
+        $stProx = $pdo->prepare("
+            SELECT pm.fecha_fin, m.costo
+            FROM proveedor_membresia pm
+            JOIN membresias m ON pm.membresia_id = m.id
+            WHERE pm.proveedor_id = :pid AND pm.estado = 'activa' AND m.costo > 0
+            ORDER BY pm.fecha_fin ASC LIMIT 1
+        ");
+        $stProx->execute([':pid' => $proveedorId]);
+        $proximo = $stProx->fetch(PDO::FETCH_ASSOC);
+        if ($proximo) {
+            $facturacion['proximo_pago']  = $proximo['fecha_fin'];
+            $facturacion['monto_proximo'] = (float)$proximo['costo'];
+        }
+
+        // Datos de facturación guardados
+        $stFact = $pdo->prepare("SELECT * FROM proveedores_pagos_facturacion WHERE proveedor_id = :pid LIMIT 1");
+        $stFact->execute([':pid' => $proveedorId]);
+        $factRow = $stFact->fetch(PDO::FETCH_ASSOC);
+        if ($factRow) {
+            $metodoIcono = match(strtolower($factRow['metodo_pago_preferido'] ?? '')) {
+                'nequi', 'daviplata' => 'bi-phone',
+                'pse', 'bancolombia' => 'bi-bank',
+                default => 'bi-credit-card',
+            };
+            $metodos_pago[] = [
+                'tipo'           => $factRow['metodo_pago_preferido'] ?? 'Sin método',
+                'icono'          => $metodoIcono,
+                'numero'         => $factRow['numero_cuenta'] ?? '—',
+                'predeterminado' => true,
+            ];
+        }
+
+        // Resumen anual
+        $stAnual = $pdo->prepare("
+            SELECT
+                COALESCE(SUM(COALESCE(c.precio, pub_sol.precio, 0)), 0) AS total
+            FROM servicios_contratados sc
+            LEFT JOIN cotizaciones c        ON sc.cotizacion_id    = c.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id     = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id  = pub_sol.id
+            WHERE sc.proveedor_id = :pid AND sc.estado = 'finalizado'
+              AND YEAR(sc.created_at) = YEAR(CURDATE())
+        ");
+        $stAnual->execute([':pid' => $proveedorId]);
+        $totalAnual = (float)($stAnual->fetchColumn() ?: 0);
+        $resumen_anual = [
+            'total_facturado'  => $totalAnual,
+            'total_comisiones' => 0,
+            'total_neto'       => $totalAnual,
+            'promedio_mensual' => round($totalAnual / 12),
+        ];
+    }
+} catch (PDOException $e) {
+    error_log('facturacion.php: ' . $e->getMessage());
+}
+
+// Datos de escrow desde pagos_servicios
+try {
+    $db2 = new Conexion();
+    $pdo2 = $db2->getConexion();
+    $stE = $pdo2->prepare("
+        SELECT ps.id, ps.monto, ps.liberado, ps.fecha_liberacion, ps.created_at,
+               COALESCE(sv.nombre, sol.titulo, cot.titulo, 'Servicio') AS servicio,
+               TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido,''))) AS cliente
+        FROM pagos_servicios ps
+        JOIN servicios_contratados sc ON ps.servicio_contratado_id = sc.id
+        JOIN servicios sv             ON sc.servicio_id = sv.id
+        JOIN clientes cl              ON ps.cliente_id  = cl.id
+        JOIN usuarios u               ON cl.usuario_id  = u.id
+        LEFT JOIN solicitudes sol     ON sc.solicitud_id = sol.id
+        LEFT JOIN cotizaciones cot    ON sc.cotizacion_id = cot.id
+        WHERE ps.proveedor_id = :pid
+        ORDER BY ps.created_at DESC
+    ");
+    $stE->execute([':pid' => $proveedorId ?? 0]);
+    $escrow['pagos'] = $stE->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($escrow['pagos'] as $ep) {
+        if ($ep['liberado']) $escrow['liberado'] += (float)$ep['monto'];
+        else                 $escrow['retenido'] += (float)$ep['monto'];
+    }
+} catch (PDOException $e) { /* tabla puede no existir aún */ }
 ?>
 
 <!DOCTYPE html>
@@ -105,25 +205,24 @@ $resumen_anual = [
 
 <body>
     <!-- Sidebar Proveedor -->
-    <?php include_once __DIR__ . '/../../layouts/sidebar_proveedor.php'; ?>
+    <?php include_once __DIR__ . '/../../layouts/sidebar-proveedor.php'; ?>
 
     <main class="contenido">
         <!-- Header Proveedor -->
-        <?php include_once __DIR__ . '/../../layouts/header_proveedor.php'; ?>
+        <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- TÍTULO CON BREADCRUMB -->
-        <section id="titulo-principal">
+        <section id="titulo-principal" class="section-hero mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1>Facturación</h1>
-                    <p class="text-muted mb-0">
-                        Gestiona tus facturas, métodos de pago y visualiza el resumen de tus transacciones.
-                    </p>
+                    <h1 class="mb-1">Facturación</h1>
+                    <p class="text-muted mb-0">Gestiona tus facturas, métodos de pago y visualiza el resumen de tus transacciones.</p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Facturación</li>
                         </ol>
                     </nav>
@@ -217,6 +316,99 @@ $resumen_anual = [
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- PANEL ESCROW -->
+        <section class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-warning bg-opacity-15"
+                              style="width:56px;height:56px;flex-shrink:0;">
+                            <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                        </span>
+                        <div>
+                            <div class="text-muted small mb-1">Dinero retenido (por liberar)</div>
+                            <div class="fw-bold fs-4 text-warning">
+                                $<?= number_format($escrow['retenido'], 0, ',', '.') ?>
+                            </div>
+                            <small class="text-muted">Se libera al finalizar cada servicio</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-15"
+                              style="width:56px;height:56px;flex-shrink:0;">
+                            <i class="bi bi-check-circle text-success fs-4"></i>
+                        </span>
+                        <div>
+                            <div class="text-muted small mb-1">Dinero liberado (disponible)</div>
+                            <div class="fw-bold fs-4 text-success">
+                                $<?= number_format($escrow['liberado'], 0, ',', '.') ?>
+                            </div>
+                            <small class="text-muted">Listo para transferencia a tu cuenta</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php if (!empty($escrow['pagos'])): ?>
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="bi bi-safe2 me-2 text-primary"></i>Pagos de servicios recibidos
+                        </h6>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Servicio</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha cobro</th>
+                                    <th class="text-end">Monto</th>
+                                    <th class="text-center">Estado</th>
+                                    <th class="text-center">Liberado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($escrow['pagos'] as $ep): ?>
+                            <tr>
+                                <td class="fw-semibold small"><?= htmlspecialchars($ep['servicio']) ?></td>
+                                <td class="text-muted small"><?= htmlspecialchars($ep['cliente']) ?></td>
+                                <td class="text-muted small"><?= date('d M Y', strtotime($ep['created_at'])) ?></td>
+                                <td class="text-end fw-bold text-success">
+                                    $<?= number_format((float)$ep['monto'], 0, ',', '.') ?>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">Pagado</span>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ($ep['liberado']): ?>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-lg me-1"></i>Liberado
+                                        </span>
+                                        <div class="text-muted" style="font-size:.7rem;">
+                                            <?= date('d/m/Y', strtotime($ep['fecha_liberacion'])) ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-hourglass me-1"></i>Retenido
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
         </section>
 
         <!-- TABLA DE FACTURAS -->
@@ -398,7 +590,7 @@ $resumen_anual = [
     </main>
 
     <!-- MODAL PAGAR FACTURA -->
-    <div class="modal fade" id="modalPagarFactura" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalPagarFactura" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">
@@ -449,7 +641,7 @@ $resumen_anual = [
     </div>
 
     <!-- MODAL AGREGAR MÉTODO DE PAGO -->
-    <div class="modal fade" id="modalAgregarMetodo" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalAgregarMetodo" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-primary text-white">
@@ -498,7 +690,7 @@ $resumen_anual = [
     </div>
 
     <!-- MODAL EXPORTAR REPORTES -->
-    <div class="modal fade" id="modalExportar" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalExportar" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-success text-white">

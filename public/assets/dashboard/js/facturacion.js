@@ -3,8 +3,6 @@
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Facturación cargada');
-    
     // Inicializar tooltips de Bootstrap
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function(tooltipTriggerEl) {
@@ -18,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aplicarFiltro) {
         aplicarFiltro.addEventListener('click', function() {
             const periodo = periodoSelect ? periodoSelect.value : 'año';
-            console.log('Filtrar por período:', periodo);
             alert(`Filtrando facturas por: ${periodo}`);
         });
     }

@@ -1,0 +1,320 @@
+/* ==========================================================================
+   CLIENTE - EXPLORAR SERVICIOS
+   Estilos para tarjetas de servicios, filtros y modal
+   ========================================================================== */
+
+/* ==========================================================================
+   1. FILTROS Y BÚSQUEDA
+   ========================================================================== */
+.filtros-container {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.input-group .input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+}
+
+.input-group .form-control {
+    border-left: none;
+    background-color: #f8f9fa;
+    border-radius: 0 12px 12px 0;
+}
+
+.input-group .form-control:focus {
+    background-color: #ffffff;
+    border-color: #0066ff;
+    box-shadow: none;
+}
+
+.btn-outline-primary {
+    border-radius: 40px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-color: #dee2e6;
+    color: #4a5568;
+}
+
+.btn-outline-primary i {
+    margin-right: 6px;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary.active {
+    background-color: #0066ff;
+    border-color: #0066ff;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 102, 255, 0.2);
+}
+
+/* ==========================================================================
+   2. TARJETAS DE SERVICIOS (card-cliente)
+   ========================================================================== */
+.card-cliente {
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.card-cliente:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.12);
+    border-color: #e2e8f0;
+}
+
+/* Imagen del servicio */
+.service-image {
+    position: relative;
+    background-color: #f1f5f9;
+    overflow: hidden;
+}
+
+.service-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.card-cliente:hover .service-image img {
+    transform: scale(1.03);
+}
+
+/* Badge de calificación */
+.badge-categoria {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.badge-categoria i {
+    font-size: 0.75rem;
+}
+
+/* Badge de disponibilidad */
+.badge-estado {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.7rem;
+    border-radius: 30px;
+    font-weight: 600;
+    background-color: #e6f7e6;
+    color: #2e7d32;
+}
+
+.badge-disponible {
+    background-color: #e3f7ec;
+    color: #1e7b48;
+}
+
+.badge-no-disponible {
+    background-color: #ffe6e5;
+    color: #c62828;
+}
+
+/* Cuerpo de la tarjeta */
+.card-cliente .card-body {
+    padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+}
+
+.card-cliente h6 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a2a3a;
+    line-height: 1.4;
+}
+
+/* Footer de la tarjeta */
+.card-cliente .card-footer {
+    background: transparent;
+    border-top: none;
+    padding: 0 1.25rem 1.25rem 1.25rem;
+}
+
+.card-cliente .card-footer .fw-bold {
+    font-size: 1.35rem;
+    font-weight: 800;
+}
+
+/* Botones dentro de la tarjeta */
+.card-cliente .btn {
+    border-radius: 40px;
+    padding: 0.6rem 0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.card-cliente .btn-outline-primary {
+    border: 1.5px solid #0066ff;
+    color: #0066ff;
+    background: white;
+}
+
+.card-cliente .btn-outline-primary:hover {
+    background: #0066ff;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.card-cliente .btn-primary {
+    background: linear-gradient(105deg, #0066ff, #0052cc);
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+}
+
+.card-cliente .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 102, 255, 0.35);
+}
+
+/* ==========================================================================
+   3. ESTADO VACÍO
+   ========================================================================== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: #f8fafc;
+    border-radius: 32px;
+    border: 1px dashed #cbd5e1;
+}
+
+.empty-state i {
+    font-size: 3.5rem;
+    color: #94a3b8;
+    opacity: 0.6;
+}
+
+.empty-state h4 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #334155;
+    margin-top: 1rem;
+}
+
+.empty-state p {
+    color: #64748b;
+}
+
+/* ==========================================================================
+   4. MODAL DE SOLICITUD
+   ========================================================================== */
+.modal-cliente .modal-content {
+    border: none;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.modal-cliente .modal-header {
+    background: linear-gradient(135deg, #0066ff, #004bb5);
+    border-bottom: none;
+    padding: 1.2rem 1.5rem;
+}
+
+.modal-cliente .modal-header .modal-title {
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.modal-cliente .modal-body {
+    padding: 1.8rem;
+}
+
+.modal-cliente .bg-light {
+    background-color: #f1f5f9 !important;
+    border-radius: 16px;
+}
+
+.modal-cliente .form-control,
+.modal-cliente .form-select {
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 0.7rem 1rem;
+    transition: all 0.2s;
+}
+
+.modal-cliente .form-control:focus,
+.modal-cliente .form-select:focus {
+    border-color: #0066ff;
+    box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.modal-cliente .modal-footer {
+    background-color: #fefefe;
+    border-top: 1px solid #edf2f7;
+    padding: 1rem 1.8rem;
+}
+
+.modal-cliente .btn-secondary {
+    background-color: #f1f5f9;
+    border: none;
+    color: #1e293b;
+    border-radius: 40px;
+    padding: 0.6rem 1.5rem;
+}
+
+.modal-cliente .btn-primary {
+    background: #0066ff;
+    border-radius: 40px;
+    padding: 0.6rem 1.8rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(0, 102, 255, 0.3);
+}
+
+/* ==========================================================================
+   5. RESPONSIVE (ajustes finos)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .filtros-container {
+        padding: 1rem;
+    }
+    
+    .btn-outline-primary {
+        padding: 0.4rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .card-cliente .card-body {
+        padding: 1rem;
+    }
+    
+    .card-cliente .card-footer {
+        padding: 0 1rem 1rem 1rem;
+    }
+    
+    .modal-cliente .modal-body {
+        padding: 1.2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .service-image img {
+        height: 170px;
+    }
+    
+    .badge-categoria {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+    }
+    
+    .card-cliente h6 {
+        font-size: 0.95rem;
+    }
+}

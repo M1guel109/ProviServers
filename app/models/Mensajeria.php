@@ -232,9 +232,32 @@ class Mensajeria
         return $st->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    private function contieneContacto(string $texto): bool
+    {
+        $patrones = [
+            '/\b3\d{9}\b/',                          // teléfono colombiano 3XXXXXXXXX
+            '/\+\d{1,3}[\s\-]?\d{6,14}/',            // tel internacional +XX XXXXXX
+            '/[\w.+\-]+@[\w\-]+\.[a-z]{2,}/i',       // email
+            '/wa\.me\//i',                            // enlace wa.me
+            '/whatsapp\.com/i',
+            '/t\.me\//i',                             // Telegram
+            '/telegram\.me\//i',
+        ];
+        foreach ($patrones as $p) {
+            if (preg_match($p, $texto)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function crearMensaje(int $convId, int $emisorId, int $receptorId, string $contenido): int
     {
-        $sql = "INSERT INTO mensajes (conversacion_id, emisor_id, receptor_id, contenido, leido, fecha_hora, created_at) 
+        if ($this->contieneContacto($contenido)) {
+            throw new Exception('CONTACTO_BLOQUEADO');
+        }
+
+        $sql = "INSERT INTO mensajes (conversacion_id, emisor_id, receptor_id, contenido, leido, fecha_hora, created_at)
                 VALUES (:cid, :e, :r, :c, 0, current_timestamp(), current_timestamp())";
         $st = $this->conexion->prepare($sql);
         $st->execute([

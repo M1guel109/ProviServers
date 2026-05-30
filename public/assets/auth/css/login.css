@@ -298,12 +298,36 @@ main {
 }
 
 @media (max-width: 576px) {
+    .header-logo {
+        height: 56px;
+    }
+
+    .custom-container {
+        min-height: auto;
+        border-radius: 16px;
+    }
+
     #login {
-        padding: 40px 25px;
+        padding: 32px 20px;
     }
 
     #login h1 {
-        font-size: 1.8rem;
+        font-size: 1.7rem;
+    }
+
+    #login > p {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+        padding: 13px 14px; /* mínimo 44px de altura táctil */
+        font-size: 0.95rem;
+    }
+
+    .btn-login {
+        padding: 13px 20px;
+        font-size: 0.95rem;
     }
 
     .carousel-caption-content h2 {

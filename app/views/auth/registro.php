@@ -7,7 +7,7 @@
   <title>Proviservers | Registro</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="public/assets/estilosGenerales/style.css">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
   <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/auth/css/registro.css">
 </head>
 
@@ -15,7 +15,7 @@
   <header>
     <div class="header-container">
       <a href="<?= BASE_URL ?>/">
-        <img src="public/assets/img/logos/LOGO PRINCIPAL.png" alt="Proviservers" class="header-logo">
+        <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png" alt="Proviservers" class="header-logo">
       </a>
     </div>
   </header>

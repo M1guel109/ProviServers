@@ -3,8 +3,6 @@
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Estadísticas cargadas');
-    
     // Inicializar gráficas
     initCharts();
     
@@ -15,9 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aplicarFiltro) {
         aplicarFiltro.addEventListener('click', function() {
             const periodo = periodoSelect ? periodoSelect.value : 'mes';
-            console.log('Filtrar por período:', periodo);
-            // Aquí iría la lógica para actualizar datos según el período
-            // Por ahora solo mostramos un mensaje
             alert(`Filtrando datos por: ${periodo}`);
         });
     }
@@ -202,7 +197,6 @@ function actualizarTipoGrafico(tipo) {
 // Función para actualizar datos (cuando se implemente el backend)
 function actualizarEstadisticas(periodo) {
     // Aquí iría un fetch al backend para obtener nuevos datos
-    console.log('Actualizando estadísticas para período:', periodo);
     
     // Ejemplo de actualización:
     /*

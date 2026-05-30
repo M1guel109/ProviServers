@@ -149,6 +149,16 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
             $comentario = trim((string)($s['mi_comentario'] ?? ''));
 
             $contratoId = (int)($s['contrato_id'] ?? 0);
+
+            $solicitudIdMsg  = (int)($s['solicitud_id'] ?? 0);
+            $cotizacionIdMsg = (int)($s['cotizacion_id'] ?? 0);
+            if ($solicitudIdMsg > 0) {
+                $urlContactarComp = BASE_URL . '/mensajes/abrir?tipo=solicitud&id=' . $solicitudIdMsg;
+            } elseif ($cotizacionIdMsg > 0) {
+                $urlContactarComp = BASE_URL . '/mensajes/abrir?tipo=cotizacion&id=' . $cotizacionIdMsg;
+            } else {
+                $urlContactarComp = BASE_URL . '/proveedor/mensajes';
+            }
             ?>
 
             <div class="tarjeta-completada">
@@ -242,9 +252,10 @@ $ingresos = !empty($montos) ? array_sum($montos) : null;
                         <i class="bi bi-download"></i> Factura
                     </button>
 
-                    <button class="btn-accion btn-contactar" type="button">
+                    <a href="<?= $urlContactarComp ?>"
+                       class="btn-accion btn-contactar">
                         <i class="bi bi-chat-dots"></i> Contactar
-                    </button>
+                    </a>
                 </div>
 
             </div>
