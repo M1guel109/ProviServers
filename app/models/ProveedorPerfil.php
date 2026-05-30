@@ -57,16 +57,16 @@ class ProveedorPerfil
     public function crearPerfil($idUsuario, array $data)
     {
         try {
-            $sql = "INSERT INTO proveedor_perfil 
+            $sql = "INSERT INTO proveedor_perfil
                     (
                         id_usuario, nombre_comercial, tipo_proveedor, eslogan, descripcion,
-                        anios_experiencia, idiomas, categorias, ciudad, zona, foto,
+                        anios_experiencia, idiomas, categorias, ciudad, zona, latitud, longitud, foto,
                         telefono_contacto, whatsapp, correo_alternativo, created_at, updated_at
                     )
                     VALUES
                     (
                         :id_usuario, :nombre_comercial, :tipo_proveedor, :eslogan, :descripcion,
-                        :anios_experiencia, :idiomas, :categorias, :ciudad, :zona, :foto,
+                        :anios_experiencia, :idiomas, :categorias, :ciudad, :zona, :latitud, :longitud, :foto,
                         :telefono_contacto, :whatsapp, :correo_alternativo, NOW(), NOW()
                     )";
 
@@ -93,6 +93,8 @@ class ProveedorPerfil
                         categorias         = :categorias,
                         ciudad             = :ciudad,
                         zona               = :zona,
+                        latitud            = :latitud,
+                        longitud           = :longitud,
                         foto               = :foto,
                         telefono_contacto  = :telefono_contacto,
                         whatsapp           = :whatsapp,
@@ -123,6 +125,8 @@ class ProveedorPerfil
         $stmt->bindValue(':categorias',         $data['categorias']);    
         $stmt->bindValue(':ciudad',             $data['ciudad']);
         $stmt->bindValue(':zona',               $data['zona']);
+        $stmt->bindValue(':latitud',            $data['latitud']  ?? null);
+        $stmt->bindValue(':longitud',           $data['longitud'] ?? null);
         $stmt->bindValue(':foto',               $data['foto']);
         $stmt->bindValue(':telefono_contacto',  $data['telefono_contacto']);
         $stmt->bindValue(':whatsapp',           $data['whatsapp']);
@@ -395,6 +399,68 @@ class ProveedorPerfil
         } catch (PDOException $e) {
             error_log('Error en Proveedor::guardarSeguridad -> ' . $e->getMessage());
             return false;
+        }
+    }
+
+    // ======================================================================
+    // 5. ACTUALIZAR CREDENCIALES (email y/o contraseña en tabla usuarios)
+    // ======================================================================
+
+    public function actualizarCredenciales(int $usuarioId, string $claveActual, array $cambios): string
+    {
+        try {
+            if (empty($cambios['email']) && empty($cambios['clave'])) {
+                return 'sin_cambios';
+            }
+
+            $stmt = $this->conexion->prepare(
+                "SELECT email, clave FROM usuarios WHERE id = :id LIMIT 1"
+            );
+            $stmt->bindParam(':id', $usuarioId, PDO::PARAM_INT);
+            $stmt->execute();
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) {
+                return 'error';
+            }
+
+            if (!password_verify($claveActual, $usuario['clave'])) {
+                return 'clave_incorrecta';
+            }
+
+            $campos = [];
+            $params = [':id' => $usuarioId];
+
+            if (!empty($cambios['email'])) {
+                $stmtCheck = $this->conexion->prepare(
+                    "SELECT id FROM usuarios WHERE email = :email AND id <> :id LIMIT 1"
+                );
+                $stmtCheck->bindParam(':email', $cambios['email'], PDO::PARAM_STR);
+                $stmtCheck->bindParam(':id',    $usuarioId,        PDO::PARAM_INT);
+                $stmtCheck->execute();
+
+                if ($stmtCheck->fetch()) {
+                    return 'email_duplicado';
+                }
+
+                $campos[]         = 'email = :email';
+                $params[':email'] = $cambios['email'];
+            }
+
+            if (!empty($cambios['clave'])) {
+                $campos[]         = 'clave = :clave';
+                $params[':clave'] = password_hash($cambios['clave'], PASSWORD_DEFAULT);
+            }
+
+            $stmtUpd = $this->conexion->prepare(
+                "UPDATE usuarios SET " . implode(', ', $campos) . " WHERE id = :id"
+            );
+            $stmtUpd->execute($params);
+
+            return 'ok';
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorPerfil::actualizarCredenciales -> ' . $e->getMessage());
+            return 'error';
         }
     }
 }

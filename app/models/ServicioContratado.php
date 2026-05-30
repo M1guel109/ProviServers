@@ -161,6 +161,8 @@ class ServicioContratado
 
             pub_cot.titulo AS publicacion_titulo_cotizacion,
 
+            COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto,
+
             CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
             v.calificacion AS mi_calificacion,
             v.comentario AS mi_comentario,
@@ -312,6 +314,89 @@ class ServicioContratado
         $stmt->execute([$estado, $contratoId, $proveedorId]);
 
         return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Datos completos de un contrato para generar el comprobante PDF.
+     * $rol = 'cliente' | 'proveedor' — restringe el acceso al dueño del contrato.
+     */
+    public function obtenerDetalleParaPDF(int $contratoId, int $usuarioId, string $rol): array
+    {
+        $condicion = $rol === 'cliente'
+            ? 'AND uc.id = :usuario_id'
+            : 'AND up.id = :usuario_id';
+
+        $sql = "
+        SELECT
+            sc.id            AS contrato_id,
+            sc.estado,
+            sc.created_at    AS fecha_contrato,
+            sc.fecha_ejecucion,
+            sc.fecha_solicitud,
+
+            sv.nombre        AS servicio_nombre,
+            sv.descripcion   AS servicio_descripcion,
+            COALESCE(cot.precio, sol.presupuesto_estimado, sv.precio, 0) AS precio,
+
+            cat.nombre       AS categoria_nombre,
+
+            CONCAT(cl.nombres, ' ', cl.apellidos) AS cliente_nombre,
+            uc.email         AS cliente_email,
+            cl.telefono      AS cliente_telefono,
+            cl.ubicacion     AS cliente_ubicacion,
+            cl.foto          AS cliente_foto,
+
+            CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+            up.email         AS proveedor_email,
+            pr.telefono      AS proveedor_telefono,
+            pr.ubicacion     AS proveedor_ubicacion,
+            pr.foto          AS proveedor_foto,
+
+            sol.titulo       AS solicitud_titulo,
+            sol.descripcion  AS solicitud_descripcion,
+            sol.direccion    AS solicitud_direccion,
+            sol.ciudad       AS solicitud_ciudad,
+            sol.fecha_preferida  AS solicitud_fecha_preferida,
+            sol.franja_horaria   AS solicitud_franja_horaria
+
+        FROM servicios_contratados sc
+        INNER JOIN servicios   sv ON sv.id  = sc.servicio_id
+        INNER JOIN clientes    cl ON cl.id  = sc.cliente_id
+        INNER JOIN usuarios    uc ON uc.id  = cl.usuario_id
+        INNER JOIN proveedores pr ON pr.id  = sc.proveedor_id
+        INNER JOIN usuarios    up ON up.id  = pr.usuario_id
+        LEFT  JOIN solicitudes sol ON sol.id = sc.solicitud_id
+        LEFT  JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
+        LEFT  JOIN categorias  cat ON cat.id = sv.id_categoria
+
+        WHERE sc.id = :contrato_id
+          {$condicion}
+        LIMIT 1
+        ";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':contrato_id' => $contratoId, ':usuario_id' => $usuarioId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    /**
+     * Devuelve el contrato_id correspondiente a una solicitud, validando que
+     * pertenezca al cliente logueado. Retorna null si no existe o no es suyo.
+     */
+    public function obtenerContratoIdPorSolicitud(int $solicitudId, int $usuarioId): ?int
+    {
+        $sql = "
+        SELECT sc.id
+        FROM servicios_contratados sc
+        INNER JOIN clientes c ON sc.cliente_id = c.id
+        WHERE sc.solicitud_id = :solicitud_id
+          AND c.usuario_id    = :usuario_id
+        LIMIT 1
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':solicitud_id' => $solicitudId, ':usuario_id' => $usuarioId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ? (int)$row['id'] : null;
     }
 
     private function obtenerProveedorIdPorUsuario(int $usuarioId): ?int

@@ -1,15 +1,16 @@
 <?php
 
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-// Validamos si hay una sesión activa
 if (!isset($_SESSION['user'])) {
-    header('Location: ' . BASE_URL . $redirect_path);
+    header('Location: ' . BASE_URL . '/login');
     exit();
 }
 
-// Validamos que el rol sea 'proveedor'
-if ($_SESSION['user']['rol'] != 'admin') {
-    header('Location: ' . BASE_URL . $redirect_path);
+if ($_SESSION['user']['rol'] !== 'admin') {
+    $destinos = ['proveedor' => '/proveedor/dashboard', 'cliente' => '/cliente/dashboard'];
+    header('Location: ' . BASE_URL . ($destinos[$_SESSION['user']['rol']] ?? '/login'));
     exit();
 }

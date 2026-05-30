@@ -1,17 +1,5 @@
 <?php
-require_once BASE_PATH . '/app/helpers/session-proveedor.php';
-require_once BASE_PATH . '/app/controllers/proveedorServiciosContratadosController.php';
-
-// Llamamos al controlador para obtener los datos
-$servicios = mostrarServiciosContratadosProveedor();
-
-// Estadísticas simples (puedes refinarlas luego)
-$stats = [
-    'en_proceso' => count($servicios),
-    'para_hoy'   => 0, 
-    'vencen'     => 0,
-    'promedio'   => 0,
-];
+// $servicios y $stats son inyectados por mostrarEnProceso() en proveedor-controller.php
 ?>
 
 <!DOCTYPE html>
@@ -38,9 +26,23 @@ $stats = [
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <section id="titulo-principal">
-            <h1>Servicios en Proceso</h1>
-            <p class="subtitulo">Gestiona los servicios que actualmente estás realizando</p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Servicios en Proceso</h1>
+                    <p class="text-muted mb-0">Gestiona los servicios que actualmente estás realizando.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">En Proceso</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <section id="estadisticas-proceso">
@@ -137,10 +139,10 @@ $stats = [
         </section>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" 
-            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
             crossorigin="anonymous"></script>
-
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>

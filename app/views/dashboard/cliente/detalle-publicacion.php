@@ -9,7 +9,10 @@ $servicioImg     = $publicacion['servicio_imagen'] ?? 'default_service.png';
 $categoriaNombre = $publicacion['categoria_nombre'] ?? 'Sin categoría';
 
 $precioRaw       = isset($publicacion['precio']) ? (float)$publicacion['precio'] : 0;
-$precioFormato   = $precioRaw > 0 ? number_format($precioRaw, 2) : null;
+$descuento       = (int)($publicacion['promo_descuento'] ?? 0);
+$precioFinal     = $descuento > 0 ? round($precioRaw * (1 - $descuento / 100)) : $precioRaw;
+$precioFormato   = $precioRaw > 0 ? number_format($precioFinal, 0, ',', '.') : null;
+$promoHasta      = $publicacion['promo_hasta'] ?? null;
 
 $proveedorNombre    = $publicacion['proveedor_nombre'] ?? 'Proveedor';
 $proveedorUbicacion = $publicacion['proveedor_ubicacion'] ?? 'Ubicación no especificada';
@@ -51,14 +54,26 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
 
         <section id="detalle-servicio" class="mb-4">
             <!-- Breadcrumb + título -->
-            <div class="section-hero mb-4">
-                <p class="breadcrumb">
-                    Inicio > Explorar Servicios > Detalle del servicio
-                </p>
-                <h1><?= htmlspecialchars($titulo) ?></h1>
-                <p class="text-muted mb-0">
-                    Revisa la información del servicio y del proveedor antes de solicitarlo.
-                </p>
+            <div id="titulo-principal" class="section-hero mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="mb-1"><?= htmlspecialchars($titulo) ?></h1>
+                        <p class="text-muted mb-0">Revisa la información del servicio y del proveedor antes de solicitarlo.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 justify-content-md-end">
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                                </li>
+                                <li class="breadcrumb-item">
+                                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios">Explorar</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">Detalle</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </div>
 
             <div class="row g-4">
@@ -77,10 +92,23 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 <?= htmlspecialchars($categoriaNombre) ?>
                             </p>
 
-                            <?php if ($precioFormato !== null): ?>
+                            <?php if ($precioRaw > 0): ?>
                                 <p class="mb-2">
                                     <strong>Precio desde:</strong>
-                                    $ <?= $precioFormato ?>
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="text-decoration-line-through text-muted small">
+                                            $<?= number_format($precioRaw, 0, ',', '.') ?>
+                                        </span>
+                                        <span class="text-danger fw-bold ms-1">
+                                            $<?= $precioFormato ?>
+                                        </span>
+                                        <span class="badge bg-danger ms-1">-<?= $descuento ?>%</span>
+                                        <?php if ($promoHasta): ?>
+                                            <small class="text-muted d-block">Promo hasta <?= date('d/m/Y', strtotime($promoHasta)) ?></small>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span class="text-primary fw-bold">$<?= $precioFormato ?></span>
+                                    <?php endif; ?>
                                 </p>
                             <?php endif; ?>
 
@@ -163,10 +191,20 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 <?php endif; ?>
                             </p>
 
-                            <?php if ($precioFormato !== null): ?>
+                            <?php if ($precioRaw > 0): ?>
                                 <p class="mb-3" style="font-size: 0.9rem;">
                                     <strong>Precio de referencia:</strong><br>
-                                    <span class="fs-5 fw-bold">$ <?= $precioFormato ?></span>
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="text-decoration-line-through text-muted">
+                                            $<?= number_format($precioRaw, 0, ',', '.') ?>
+                                        </span>
+                                        <span class="fs-5 fw-bold text-danger ms-2">
+                                            $<?= $precioFormato ?>
+                                        </span>
+                                        <span class="badge bg-danger ms-1">-<?= $descuento ?>%</span>
+                                    <?php else: ?>
+                                        <span class="fs-5 fw-bold">$<?= $precioFormato ?></span>
+                                    <?php endif; ?>
                                 </p>
                             <?php endif; ?>
 
@@ -193,7 +231,7 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS propio -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
 </body>
 

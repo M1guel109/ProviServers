@@ -1,11 +1,18 @@
 <?php
-require_once BASE_PATH . '/app/models/categoria.php';
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/models/Categoria.php';
 
+// Aseguramos que las variables existan para evitar errores de notice
+$busqueda    = $busqueda    ?? '';
+$catActual   = $catActual   ?? '';
+$ciudad      = $ciudad      ?? '';
+$precioMax   = $precioMax   ?? null;
+$orden       = $orden       ?? 'recientes';
+$publicaciones = $publicaciones ?? [];
 $objCategoria = new Categoria();
 $categorias = $objCategoria->mostrar() ?: [];
-$catActual = $_GET['cat'] ?? '';
-$busqueda = $_GET['q'] ?? '';
+
+
 ?>
 
 <!DOCTYPE html>
@@ -16,13 +23,18 @@ $busqueda = $_GET['q'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Explorar Servicios</title>
 
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <!-- Estilos -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/explorar-servicios.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+    <style>
+        #mapa-servicios { height: 520px; border-radius: 12px; display: none; }
+        .leaflet-popup-content h6 { margin: 0 0 4px; font-size: .9rem; }
+        .leaflet-popup-content .precio { color: #198754; font-weight: 700; }
+    </style>
 </head>
 
 <body>
@@ -31,19 +43,18 @@ $busqueda = $_GET['q'] ?? '';
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
-        <!-- TÍTULO CON BREADCRUMB -->
         <section id="titulo-principal">
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1><?= __('cliente_explorar_servicios') ?></h1>
-                    <p class="text-muted mb-0">
-                        <?= __('cliente_explorar_descripcion') ?>
-                    </p>
+                    <p class="text-muted mb-0"><?= __('cliente_explorar_descripcion') ?></p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                    <nav aria-label="breadcrumb">
                         <ol class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a></li>
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">Explorar Servicios</li>
                         </ol>
                     </nav>
@@ -51,134 +62,241 @@ $busqueda = $_GET['q'] ?? '';
             </div>
         </section>
 
-        <!-- FILTROS Y BÚSQUEDA -->
         <section class="filtros-container mb-4">
-            <div class="row g-3">
-                <div class="col-md-5">
-                    <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios" class="d-flex gap-2">
+            <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios">
+                <!-- Fila 1: búsqueda + ciudad + precio + orden -->
+                <div class="row g-2 mb-3">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0">
                                 <i class="bi bi-search text-muted"></i>
                             </span>
-                            <input type="text" 
-                                   name="q" 
-                                   class="form-control border-start-0 bg-light" 
-                                   value="<?= htmlspecialchars($busqueda) ?>"
-                                   placeholder="Buscar servicios, proveedores...">
+                            <input type="text" name="q" class="form-control border-start-0 bg-light"
+                                value="<?= htmlspecialchars($busqueda) ?>"
+                                placeholder="Buscar servicios o categoría...">
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-search"></i>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0">
+                                <i class="bi bi-geo-alt text-muted"></i>
+                            </span>
+                            <input type="text" name="ciudad" class="form-control border-start-0 bg-light"
+                                value="<?= htmlspecialchars($ciudad) ?>"
+                                placeholder="Ciudad o zona...">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0 small">$</span>
+                            <input type="number" name="precio_max" class="form-control border-start-0 bg-light"
+                                value="<?= $precioMax !== null ? (int)$precioMax : '' ?>"
+                                placeholder="Precio máx." min="0" step="1000">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <select name="orden" class="form-select bg-light">
+                            <option value="recientes"   <?= $orden === 'recientes'   ? 'selected' : '' ?>>Más recientes</option>
+                            <option value="precio_asc"  <?= $orden === 'precio_asc'  ? 'selected' : '' ?>>Precio: menor</option>
+                            <option value="precio_desc" <?= $orden === 'precio_desc' ? 'selected' : '' ?>>Precio: mayor</option>
+                            <option value="valorados"   <?= $orden === 'valorados'   ? 'selected' : '' ?>>Mejor valorados</option>
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel"></i>
                         </button>
-                    </form>
-                </div>
-                
-                <div class="col-md-7">
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="<?= BASE_URL ?>/cliente/explorar-servicios" 
-                           class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
-                            <i class="bi bi-grid-3x3-gap-fill"></i> Todas
-                        </a>
-
-                        <?php foreach ($categorias as $cat): 
-                            $catId = $cat['id'] ?? 0;
-                            $catNombre = $cat['nombre'] ?? 'Categoría';
-                            $icono = match(strtolower(trim($catNombre))) {
-                                'hogar' => 'bi-house',
-                                'tecnología', 'tecnologia' => 'bi-laptop',
-                                'mascotas' => 'bi-heart',
-                                'transporte' => 'bi-truck',
-                                'salud' => 'bi-heart-pulse',
-                                'educación', 'educacion' => 'bi-book',
-                                'plomería', 'plomeria' => 'bi-wrench',
-                                'electricidad' => 'bi-lightning-charge',
-                                'limpieza' => 'bi-brush',
-                                'pintura' => 'bi-palette',
-                                'jardineria' => 'bi-tree',
-                                default => 'bi-tag'
-                            };
-                        ?>
-                            <a href="<?= BASE_URL ?>/cliente/explorar-servicios?cat=<?= $catId ?>"
-                               class="btn btn-outline-primary <?= (string)$catActual === (string)$catId ? 'active' : '' ?>">
-                                <i class="bi <?= $icono ?>"></i> <?= htmlspecialchars($catNombre) ?>
-                            </a>
-                        <?php endforeach; ?>
                     </div>
                 </div>
-            </div>
+
+                <!-- Fila 2: filtros de categoría (mantienen los otros filtros activos) -->
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios<?= $orden !== 'recientes' ? '?orden='.$orden : '' ?>"
+                        class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
+                        <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                    </a>
+                    <?php foreach ($categorias as $cat):
+                        $catId = $cat['id'] ?? 0;
+                        $catNombre = $cat['nombre'] ?? 'Categoría';
+                        $icono = match (strtolower(trim($catNombre))) {
+                            'hogar'                          => 'bi-house',
+                            'tecnología', 'tecnologia'       => 'bi-laptop',
+                            'mascotas'                       => 'bi-heart',
+                            'transporte'                     => 'bi-truck',
+                            'salud'                          => 'bi-heart-pulse',
+                            'educación', 'educacion'         => 'bi-book',
+                            'plomería', 'plomeria'           => 'bi-wrench',
+                            'electricidad'                   => 'bi-lightning-charge',
+                            'limpieza'                       => 'bi-brush',
+                            'pintura'                        => 'bi-palette',
+                            'jardineria'                     => 'bi-tree',
+                            default                          => 'bi-tag'
+                        };
+                        // Preservar búsqueda y ciudad al cambiar categoría
+                        $qsCat = http_build_query(array_filter([
+                            'cat'       => $catId,
+                            'q'         => $busqueda,
+                            'ciudad'    => $ciudad,
+                            'precio_max'=> $precioMax ? (int)$precioMax : '',
+                            'orden'     => $orden !== 'recientes' ? $orden : '',
+                        ]));
+                    ?>
+                        <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsCat ?>"
+                            class="btn btn-outline-primary <?= (string)$catActual === (string)$catId ? 'active' : '' ?>">
+                            <i class="bi <?= $icono ?>"></i> <?= htmlspecialchars($catNombre) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+
+                <!-- Badge de filtros activos -->
+                <?php
+                $filtrosActivos = array_filter([
+                    $busqueda  ? "Búsqueda: \"$busqueda\"" : null,
+                    $ciudad    ? "Ciudad: \"$ciudad\""      : null,
+                    $precioMax ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
+                    $catActual ? 'Categoría seleccionada'   : null,
+                ]);
+                if ($filtrosActivos): ?>
+                <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+                    <small class="text-muted">Filtros activos:</small>
+                    <?php foreach ($filtrosActivos as $f): ?>
+                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                            <?= htmlspecialchars($f) ?>
+                        </span>
+                    <?php endforeach; ?>
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios" class="small text-danger ms-1">
+                        <i class="bi bi-x-circle me-1"></i>Limpiar todo
+                    </a>
+                    <span class="ms-auto small text-muted"><?= count($publicaciones) ?> resultado(s)</span>
+                </div>
+                <?php endif; ?>
+            </form>
         </section>
 
-        <!-- RESULTADOS -->
+        <!-- Toggle vista -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted small"><?= count($publicaciones) ?> servicio(s) encontrado(s)</span>
+            <div class="btn-group btn-group-sm" role="group">
+                <button id="btn-grid" class="btn btn-primary active" onclick="toggleVista('grid')">
+                    <i class="bi bi-grid-3x3-gap-fill me-1"></i>Tarjetas
+                </button>
+                <button id="btn-mapa" class="btn btn-outline-primary" onclick="toggleVista('mapa')">
+                    <i class="bi bi-map me-1"></i>Mapa
+                </button>
+            </div>
+        </div>
+
+        <!-- Mapa Leaflet -->
+        <div id="mapa-servicios" class="mb-4 shadow-sm"></div>
+
         <section>
             <?php if (empty($publicaciones)): ?>
-                <div class="empty-state">
+                <div id="resultados-grid" class="empty-state">
                     <i class="bi bi-inbox display-1 text-muted"></i>
                     <h4 class="text-muted mt-3">No hay servicios disponibles</h4>
-                    <p class="text-muted">No encontramos servicios que coincidan con tu búsqueda. Prueba con otros filtros.</p>
+                    <p class="text-muted">No encontramos servicios que coincidan con tu búsqueda.</p>
                     <a href="<?= BASE_URL ?>/cliente/explorar-servicios" class="btn btn-outline-primary mt-2">
                         <i class="bi bi-arrow-repeat me-2"></i>Limpiar filtros
                     </a>
                 </div>
             <?php else: ?>
-                <div class="row g-4">
-                    <?php foreach ($publicaciones as $pub): 
+                <div class="row g-4" id="resultados-grid">
+                    <?php foreach ($publicaciones as $pub):
                         $titulo = $pub['titulo'] ?? $pub['servicio_nombre'] ?? 'Servicio';
                         $descripcion = $pub['descripcion'] ?? $pub['servicio_descripcion'] ?? '';
                         $categoriaNombre = $pub['categoria_nombre'] ?? 'Sin categoría';
                         $precio = isset($pub['precio']) ? (float)$pub['precio'] : 0;
                         $imagenServicio = $pub['servicio_imagen'] ?? 'default_service.png';
                         $rutaImagen = BASE_URL . '/public/uploads/servicios/' . htmlspecialchars($imagenServicio);
-                        $calificacion = $pub['calificacion'] ?? 4.5;
-                        $proveedorNombre = $pub['proveedor_nombre'] ?? 'Proveedor';
+                        // ✅ CORREGIDO: usa calificación real, oculta si no hay
+                        $calificacion     = (float)($pub['calificacion_promedio'] ?? 0);
+                        $totalResenas     = (int)($pub['total_resenas'] ?? 0);
+                        $proveedorNombre  = $pub['proveedor_nombre']   ?? 'Proveedor';
+                        $proveedorCiudad  = $pub['proveedor_ciudad']   ?? '';
+                        $proveedorZona    = $pub['proveedor_zona']     ?? '';
+                        $ubicacion        = trim($proveedorCiudad . ($proveedorZona ? ' — ' . $proveedorZona : ''));
+                        $descuento        = (int)($pub['promo_descuento'] ?? 0);
+                        $precioFinal      = $descuento > 0 ? round($precio * (1 - $descuento / 100)) : $precio;
+                        $promoHasta       = $pub['promo_hasta'] ?? null;
                     ?>
                         <div class="col-md-6 col-lg-4">
-                            <div class="card-cliente service-card h-100">
+                            <div class="card-cliente service-card h-100 d-flex flex-column">
                                 <div class="service-image position-relative">
-                                    <img src="<?= $rutaImagen ?>" 
-                                         alt="<?= htmlspecialchars($titulo) ?>" 
-                                         class="w-100" 
-                                         style="height: 200px; object-fit: cover;">
-                                    <span class="badge-categoria position-absolute top-0 end-0 m-2">
-                                        <i class="bi bi-star-fill text-warning"></i> <?= number_format($calificacion, 1) ?>
-                                    </span>
+                                    <img src="<?= $rutaImagen ?>" alt="<?= htmlspecialchars($titulo) ?>" class="w-100" style="height: 180px; object-fit: cover;">
+                                    <!-- ✅ Solo mostrar si tiene reseñas reales -->
+                                    <?php if ($descuento > 0): ?>
+                                        <span class="position-absolute top-0 start-0 m-2 badge bg-danger fs-6 fw-bold">
+                                            -<?= $descuento ?>%
+                                        </span>
+                                    <?php endif; ?>
+                                    <?php if ($totalResenas > 0): ?>
+                                        <span class="badge-categoria position-absolute top-0 end-0 m-2 bg-white text-dark shadow-sm">
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            <?= number_format($calificacion, 1) ?>
+                                            <small class="text-muted">(<?= $totalResenas ?>)</small>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge-categoria position-absolute top-0 end-0 m-2 bg-light text-muted shadow-sm">
+                                            <i class="bi bi-star"></i> Sin reseñas
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
-                                
-                                <div class="card-body p-4">
+
+                                <div class="card-body p-3 flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h6 class="fw-bold mb-0"><?= htmlspecialchars($titulo) ?></h6>
-                                        <span class="badge-estado badge-disponible">Disponible</span>
+                                        <span class="badge bg-light text-primary border"><?= htmlspecialchars($categoriaNombre) ?></span>
                                     </div>
-                                    
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <i class="bi bi-tag text-primary"></i>
-                                        <span class="text-muted small"><?= htmlspecialchars($categoriaNombre) ?></span>
-                                    </div>
-                                    
-                                    <p class="text-muted small mb-3" style="line-height: 1.5;">
-                                        <?= htmlspecialchars(mb_strimwidth($descripcion, 0, 120, '...')) ?>
+
+                                    <p class="text-muted small mb-2">
+                                        <?= htmlspecialchars(mb_strimwidth($descripcion, 0, 70, '...')) ?>
                                     </p>
-                                    
-                                    <div class="d-flex align-items-center gap-2 mb-3">
-                                        <div class="icono-wrapper bg-primary-light p-2 rounded-3">
-                                            <i class="bi bi-person-circle text-primary"></i>
-                                        </div>
-                                        <div>
-                                            <span class="d-block fw-semibold small">Proveedor</span>
-                                            <span class="text-muted small"><?= htmlspecialchars($proveedorNombre) ?></span>
-                                        </div>
+
+                                    <?php if ($ubicacion): ?>
+                                    <p class="text-muted small mb-2">
+                                        <i class="bi bi-geo-alt me-1 text-primary"></i>
+                                        <?= htmlspecialchars($ubicacion) ?>
+                                    </p>
+                                    <?php endif; ?>
+
+                                    <div class="small text-muted">
+                                        <i class="bi bi-person-badge"></i> <strong><?= htmlspecialchars($proveedorNombre) ?></strong>
                                     </div>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
-                                        <div>
-                                            <small class="text-muted d-block">Desde</small>
+                                </div>
+
+                                <div class="card-footer bg-white border-0 p-3 pt-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <?php if ($descuento > 0): ?>
+                                            <div>
+                                                <small class="text-muted text-decoration-line-through d-block">
+                                                    $<?= number_format($precio, 0, ',', '.') ?>
+                                                </small>
+                                                <span class="fw-bold text-danger fs-5">$<?= number_format($precioFinal, 0, ',', '.') ?></span>
+                                                <?php if ($promoHasta): ?>
+                                                    <small class="text-muted d-block" style="font-size:.7rem;">
+                                                        Hasta <?= date('d/m/Y', strtotime($promoHasta)) ?>
+                                                    </small>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php else: ?>
+                                            <small class="text-muted">Precio desde</small>
                                             <span class="fw-bold text-primary fs-5">$<?= number_format($precio, 0, ',', '.') ?></span>
-                                        </div>
-                                        <button class="btn-card btn-card-primary" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#modalSolicitarServicio"
-                                                data-servicio-id="<?= $pub['id'] ?>"
-                                                data-servicio-titulo="<?= htmlspecialchars($titulo) ?>"
-                                                data-servicio-precio="<?= $precio ?>">
-                                            <i class="bi bi-calendar-plus"></i> Solicitar
+                                        <?php endif; ?>
+                                    </div>
+                                    <!-- TARJETA — pasar TODOS los datos completos al botón -->
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-ver-detalle"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalDetalleServicio"
+                                            data-id="<?= (int)$pub['id'] ?>"
+                                            data-titulo="<?= htmlspecialchars($titulo) ?>"
+                                            data-descripcion="<?= htmlspecialchars($descripcion) ?>"
+                                            data-precio="<?= number_format($precio, 0, ',', '.') ?>"
+                                            data-precio-raw="<?= $precio ?>"
+                                            data-proveedor="<?= htmlspecialchars($proveedorNombre) ?>"
+                                            data-categoria="<?= htmlspecialchars($categoriaNombre) ?>"
+                                            data-imagen="<?= $rutaImagen ?>">
+                                            <i class="bi bi-eye"></i> Ver Detalles
                                         </button>
                                     </div>
                                 </div>
@@ -186,40 +304,27 @@ $busqueda = $_GET['q'] ?? '';
                         </div>
                     <?php endforeach; ?>
                 </div>
-                
-                <!-- Paginación (si aplica) -->
-                <?php if (isset($pagination) && $pagination['total_paginas'] > 1): ?>
-                <nav class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        <?php for ($i = 1; $i <= $pagination['total_paginas']; $i++): ?>
-                            <li class="page-item <?= $i == $pagination['pagina_actual'] ? 'active' : '' ?>">
-                                <a class="page-link" href="?page=<?= $i ?>&cat=<?= $catActual ?>&q=<?= urlencode($busqueda) ?>">
-                                    <?= $i ?>
-                                </a>
-                            </li>
-                        <?php endfor; ?>
-                    </ul>
-                </nav>
-                <?php endif; ?>
             <?php endif; ?>
         </section>
-
     </main>
 
-    <!-- MODAL SOLICITAR SERVICIO -->
     <div class="modal fade modal-cliente" id="modalSolicitarServicio" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">
-                        <i class="bi bi-calendar-plus me-2"></i>Solicitar Servicio
-                    </h5>
+                    <h5 class="modal-title"><i class="bi bi-calendar-plus me-2"></i>Solicitar Servicio</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <form action="<?= BASE_URL ?>/cliente/solicitar-servicio" method="POST">
+                <form action="<?= BASE_URL ?>/cliente/guardar-solicitud" method="POST" enctype="multipart/form-data">
                     <div class="modal-body p-4">
-                        <input type="hidden" name="id_publicacion" id="modal_servicio_id">
-                        
+
+                        <!-- ✅ AGREGAR: acción y campo correcto -->
+                        <input type="hidden" name="accion" value="guardar_solicitud_cliente">
+                        <input type="hidden" name="publicacion_id" id="modal_servicio_id">
+
+                        <!-- ✅ AGREGAR: titulo (auto-generado del servicio) -->
+                        <input type="hidden" name="titulo" id="modal_servicio_titulo_input">
+
                         <div class="bg-light p-3 rounded-3 mb-4">
                             <small class="text-muted d-block mb-1">Estás solicitando:</small>
                             <strong id="modal_servicio_titulo" class="text-primary fs-5"></strong>
@@ -231,28 +336,43 @@ $busqueda = $_GET['q'] ?? '';
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Fecha preferida <span class="text-danger">*</span></label>
-                            <input type="date" name="fecha_preferida" class="form-control" min="<?= date('Y-m-d') ?>" required>
+                            <input type="date" name="fecha_preferida" class="form-control"
+                                min="<?= date('Y-m-d') ?>" required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">Horario <span class="text-danger">*</span></label>
                             <select name="franja_horaria" class="form-select" required>
                                 <option value="">Seleccionar horario</option>
-                                <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                <option value="manana">Mañana (8:00 - 12:00)</option>
                                 <option value="tarde">Tarde (12:00 - 18:00)</option>
                                 <option value="noche">Noche (18:00 - 22:00)</option>
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Dirección <span class="text-danger">*</span></label>
-                            <input type="text" name="direccion" class="form-control" placeholder="Ingresa tu dirección" required>
+                        <!-- ✅ AGREGAR: ciudad obligatoria -->
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label fw-bold">Dirección <span class="text-danger">*</span></label>
+                                <input type="text" name="direccion" class="form-control"
+                                    placeholder="Calle 123 # 45-67" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Ciudad <span class="text-danger">*</span></label>
+                                <input type="text" name="ciudad" class="form-control"
+                                    placeholder="Bogotá" required>
+                            </div>
                         </div>
 
+                        <!-- ✅ Cambiar 'mensaje' por 'descripcion' -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Descripción adicional</label>
-                            <textarea name="mensaje" class="form-control" rows="3" placeholder="Detalles adicionales sobre el servicio..."></textarea>
+                            <label class="form-label fw-bold">
+                                Descripción del trabajo <span class="text-danger">*</span>
+                            </label>
+                            <textarea name="descripcion" class="form-control" rows="3"
+                                placeholder="Cuéntale al proveedor qué necesitas..." required></textarea>
                         </div>
+
                     </div>
                     <div class="modal-footer bg-light">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -265,26 +385,165 @@ $busqueda = $_GET['q'] ?? '';
         </div>
     </div>
 
+    <div class="modal fade modal-cliente" id="modalDetalleServicio" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-seam"></i> Detalle del servicio
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body p-0">
+                    <div class="position-relative">
+                        <img id="detalle_imagen" class="w-100" style="height: 200px; object-fit:cover;">
+                    </div>
+
+                    <div class="p-4">
+                        <h3 id="detalle_titulo" class="fw-bold mb-1"></h3>
+                        <p class="text-primary mb-3 fw-bold" id="detalle_categoria"></p>
+
+                        <div class="d-flex align-items-center mb-4 p-2 bg-light rounded">
+                            <i class="bi bi-person-circle fs-4 me-2 text-muted"></i>
+                            <div>
+                                <small class="d-block text-muted">Proveedor</small>
+                                <strong id="detalle_proveedor"></strong>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold">Sobre este servicio</h6>
+                        <p id="detalle_descripcion" class="text-muted"></p>
+
+                        <div class="alert alert-success d-flex justify-content-between align-items-center mt-3">
+                            <span>Precio base:</span>
+                            <strong class="fs-4" id="detalle_precio"></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                    <!-- ✅ CORREGIDO: id en el botón solicitar para pasarlo al siguiente modal -->
+                    <button class="btn btn-primary"
+                        id="btn-ir-a-solicitar"
+                        data-bs-target="#modalSolicitarServicio"
+                        data-bs-toggle="modal"
+                        data-bs-dismiss="modal">
+                        <i class="bi bi-calendar-plus"></i> Solicitar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <?php
+    // Construir array de marcadores para el mapa
+    $marcadores = [];
+    foreach ($publicaciones as $pub) {
+        $lat = (float)($pub['proveedor_lat'] ?? 0);
+        $lng = (float)($pub['proveedor_lng'] ?? 0);
+        if ($lat == 0 && $lng == 0) continue;
+        $descuento   = (int)($pub['promo_descuento'] ?? 0);
+        $precioBase  = (float)($pub['precio'] ?? 0);
+        $precioFinal = $descuento > 0 ? round($precioBase * (1 - $descuento / 100)) : $precioBase;
+        $marcadores[] = [
+            'lat'       => $lat,
+            'lng'       => $lng,
+            'titulo'    => $pub['titulo'] ?? $pub['servicio_nombre'] ?? 'Servicio',
+            'precio'    => '$' . number_format($precioFinal, 0, ',', '.'),
+            'proveedor' => $pub['proveedor_nombre'] ?? '',
+            'ciudad'    => trim(($pub['proveedor_ciudad'] ?? '') . ($pub['proveedor_zona'] ? ' — ' . $pub['proveedor_zona'] : '')),
+            'url'       => BASE_URL . '/cliente/publicacion?id=' . $pub['id'],
+            'descuento' => $descuento,
+        ];
+    }
+    ?>
     <script>
-        // Pasar datos al modal
-        const modalSolicitar = document.getElementById('modalSolicitarServicio');
-        if (modalSolicitar) {
-            modalSolicitar.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const servicioId = button.getAttribute('data-servicio-id');
-                const servicioTitulo = button.getAttribute('data-servicio-titulo');
-                const servicioPrecio = button.getAttribute('data-servicio-precio');
-                
-                document.getElementById('modal_servicio_id').value = servicioId;
-                document.getElementById('modal_servicio_titulo').textContent = servicioTitulo;
-                document.getElementById('modal_servicio_precio').textContent = 
-                    '$' + parseInt(servicioPrecio).toLocaleString('es-CO');
-            });
+    const MARCADORES = <?= json_encode($marcadores) ?>;
+    let mapaLeaflet = null;
+
+    function toggleVista(vista) {
+        const gridEl = document.getElementById('resultados-grid');
+        const mapaEl = document.getElementById('mapa-servicios');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnMapa = document.getElementById('btn-mapa');
+
+        if (vista === 'mapa') {
+            gridEl.style.display = 'none';
+            mapaEl.style.display = 'block';
+            btnGrid.classList.replace('btn-primary','btn-outline-primary');
+            btnMapa.classList.replace('btn-outline-primary','btn-primary');
+            iniciarMapa();
+        } else {
+            mapaEl.style.display = 'none';
+            gridEl.style.display = '';
+            btnMapa.classList.replace('btn-primary','btn-outline-primary');
+            btnGrid.classList.replace('btn-outline-primary','btn-primary');
         }
+    }
+
+    function iniciarMapa() {
+        if (mapaLeaflet) { mapaLeaflet.invalidateSize(); return; }
+
+        // Centro por defecto: Colombia
+        mapaLeaflet = L.map('mapa-servicios').setView([4.5709, -74.2973], 6);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 18
+        }).addTo(mapaLeaflet);
+
+        if (MARCADORES.length === 0) {
+            L.control.scale().addTo(mapaLeaflet);
+            return;
+        }
+
+        const bounds = [];
+        MARCADORES.forEach(m => {
+            const badge = m.descuento > 0
+                ? `<span style="background:#dc3545;color:#fff;padding:1px 6px;border-radius:4px;font-size:.75rem;">-${m.descuento}%</span> `
+                : '';
+            const popup = `
+                <div style="min-width:180px;">
+                    <h6>${m.titulo}</h6>
+                    <p style="margin:2px 0;font-size:.8rem;color:#555;">
+                        <i class="bi bi-person-fill"></i> ${m.proveedor}
+                    </p>
+                    ${m.ciudad ? `<p style="margin:2px 0;font-size:.78rem;color:#888;">📍 ${m.ciudad}</p>` : ''}
+                    <p class="precio" style="margin:4px 0;">${badge}${m.precio}</p>
+                    <a href="${m.url}" style="display:inline-block;margin-top:4px;padding:4px 10px;background:#0d6efd;color:#fff;border-radius:6px;text-decoration:none;font-size:.8rem;">
+                        Ver servicio
+                    </a>
+                </div>`;
+
+            const marker = L.marker([m.lat, m.lng]).addTo(mapaLeaflet).bindPopup(popup);
+            bounds.push([m.lat, m.lng]);
+        });
+
+        if (bounds.length > 0) mapaLeaflet.fitBounds(bounds, { padding: [40, 40] });
+
+        // Geolocalización del usuario (opcional)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                L.circleMarker([lat, lng], {
+                    radius: 8, color: '#0d6efd', fillColor: '#0d6efd', fillOpacity: 0.6
+                }).addTo(mapaLeaflet).bindPopup('<b>Tu ubicación</b>').openPopup();
+            }, () => {});
+        }
+    }
     </script>
+
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/explorar-servicios.js"></script>
 </body>
 
 </html>

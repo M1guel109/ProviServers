@@ -544,7 +544,7 @@
             </div>
         </section>
 
-        <section id="contact" class="contact-section" id="contacto">
+        <section id="contact" class="contact-section">
             <div class="container contact-container">
                 <div class="contact-info">
                     <h2>CONTÁCTANOS</h2>

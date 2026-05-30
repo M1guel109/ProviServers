@@ -1,11 +1,25 @@
-<?php
+﻿<?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
-require_once BASE_PATH . '/app/models/categoria.php';
+require_once BASE_PATH . '/app/models/Categoria.php';
+require_once BASE_PATH . '/app/models/ServicioContratado.php';
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
 
 $objCategoria = new Categoria();
-$categorias = $objCategoria->mostrar() ?: [];
+$categorias   = $objCategoria->mostrar() ?: [];
 $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
+
+$uid      = (int)($_SESSION['user']['id'] ?? 0);
+$scModel  = new ServicioContratado();
+$contratos = $scModel->listarPorClienteUsuario($uid);
+
+$activos     = array_values(array_filter($contratos, fn($c) => in_array($c['estado'], ['pendiente','confirmado','en_proceso'])));
+$completados = array_filter($contratos, fn($c) => $c['estado'] === 'finalizado');
+
+$totalActivos     = count($activos);
+$totalCompletados = count($completados);
+
+$ratings = array_filter(array_column(array_values($completados), 'mi_calificacion'), fn($v) => is_numeric($v));
+$califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings), 1) : null;
 ?>
 
 <!DOCTYPE html>
@@ -41,10 +55,12 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                     </p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end">
-                            <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/cliente/dashboard">Inicio</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Panel Principal</li>
                         </ol>
                     </nav>
                 </div>
@@ -57,9 +73,9 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-clock-history icono-estadistica text-primary"></i>
                     <div>
-                        <div class="valor-estadistica">3</div>
+                        <div class="valor-estadistica"><?= $totalActivos ?></div>
                         <div class="etiqueta-estadistica">Servicios Activos</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +2 esta semana</small>
+                        <small class="text-primary"><i class="bi bi-hourglass-split"></i> En proceso o pendientes</small>
                     </div>
                 </div>
             </div>
@@ -67,9 +83,9 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-check-circle icono-estadistica text-success"></i>
                     <div>
-                        <div class="valor-estadistica">12</div>
+                        <div class="valor-estadistica"><?= $totalCompletados ?></div>
                         <div class="etiqueta-estadistica">Completados</div>
-                        <small class="text-success"><i class="bi bi-check-circle"></i> +3 este mes</small>
+                        <small class="text-success"><i class="bi bi-check-circle"></i> Total acumulado</small>
                     </div>
                 </div>
             </div>
@@ -77,9 +93,9 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-heart icono-estadistica text-danger"></i>
                     <div>
-                        <div class="valor-estadistica">8</div>
-                        <div class="etiqueta-estadistica">Favoritos</div>
-                        <small class="text-primary"><i class="bi bi-star"></i> Guardados</small>
+                        <div class="valor-estadistica"><?= count($contratos) ?></div>
+                        <div class="etiqueta-estadistica">Servicios totales</div>
+                        <small class="text-primary"><i class="bi bi-briefcase"></i> Contratados</small>
                     </div>
                 </div>
             </div>
@@ -87,9 +103,11 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                 <div class="tarjeta-estadistica">
                     <i class="bi bi-star icono-estadistica text-warning"></i>
                     <div>
-                        <div class="valor-estadistica">4.8</div>
-                        <div class="etiqueta-estadistica">Calificación</div>
-                        <small class="text-success"><i class="bi bi-arrow-up"></i> +0.2 este mes</small>
+                        <div class="valor-estadistica">
+                            <?= $califPromedio !== null ? number_format($califPromedio, 1) : 'N/A' ?>
+                        </div>
+                        <div class="etiqueta-estadistica">Calificación dada</div>
+                        <small class="text-success"><i class="bi bi-star-fill"></i> Promedio a proveedores</small>
                     </div>
                 </div>
             </div>
@@ -121,53 +139,69 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
             </div>
 
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card-cliente">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div class="icono-wrapper bg-primary-light">
-                                    <i class="bi bi-tree fs-3 text-primary"></i>
-                                </div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Jardinería y Paisajismo</h6>
-                                    <span class="badge-estado badge-en-curso">En curso</span>
-                                </div>
-                            </div>
-                            <p class="text-muted small mb-2"><i class="bi bi-person"></i> Miguel Torres</p>
-                            <div class="progress-cliente mb-3">
-                                <div class="progress-cliente-fill" style="width: 65%"></div>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Progreso: 65%</small>
-                                <button class="btn-card btn-card-outline" data-bs-toggle="modal" data-bs-target="#modalDetalleServicio">
-                                    <i class="bi bi-eye"></i> Ver detalles
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <?php if (!empty($activos)): ?>
+                    <?php foreach (array_slice($activos, 0, 4) as $sc):
+                        $tituloSc =
+                            $sc['servicio_nombre']
+                            ?? $sc['publicacion_titulo_cotizacion']
+                            ?? $sc['publicacion_titulo_solicitud']
+                            ?? $sc['cotizacion_titulo']
+                            ?? $sc['solicitud_titulo']
+                            ?? $sc['necesidad_titulo']
+                            ?? 'Servicio';
 
-                <div class="col-md-6">
-                    <div class="card-cliente">
-                        <div class="card-body p-4">
-                            <div class="d-flex align-items-center gap-3 mb-3">
-                                <div class="icono-wrapper bg-primary-light">
-                                    <i class="bi bi-wrench fs-3 text-primary"></i>
+                        $estadoMap = [
+                            'pendiente'  => ['label' => 'Pendiente',  'badge' => 'badge-programado', 'progress' => 25],
+                            'confirmado' => ['label' => 'Confirmado', 'badge' => 'badge-programado', 'progress' => 40],
+                            'en_proceso' => ['label' => 'En curso',   'badge' => 'badge-en-curso',   'progress' => 70],
+                        ];
+                        $est = $estadoMap[$sc['estado']] ?? ['label' => ucfirst($sc['estado']), 'badge' => 'badge-programado', 'progress' => 30];
+
+                        $fechaInicio = $sc['solicitud_fecha_preferida'] ?? $sc['necesidad_fecha_preferida'] ?? null;
+                    ?>
+                    <div class="col-md-6">
+                        <div class="card-cliente">
+                            <div class="card-body p-4">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="icono-wrapper bg-primary-light">
+                                        <i class="bi bi-briefcase fs-3 text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-1"><?= htmlspecialchars($tituloSc) ?></h6>
+                                        <span class="badge-estado <?= $est['badge'] ?>"><?= $est['label'] ?></span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h6 class="fw-bold mb-1">Plomería</h6>
-                                    <span class="badge-estado badge-programado">Programado</span>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-person"></i>
+                                    <?= htmlspecialchars($sc['proveedor_nombre'] ?? 'Proveedor') ?>
+                                </p>
+                                <?php if ($fechaInicio): ?>
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-calendar3"></i>
+                                    <?= date('d M Y', strtotime($fechaInicio)) ?>
+                                </p>
+                                <?php endif; ?>
+                                <div class="progress-cliente mb-3">
+                                    <div class="progress-cliente-fill" style="width: <?= $est['progress'] ?>%"></div>
                                 </div>
-                            </div>
-                            <p class="text-muted small mb-2"><i class="bi bi-person"></i> Carlos Ruiz</p>
-                            <p class="text-muted small mb-2"><i class="bi bi-calendar3"></i> 28 Nov 2025 - 10:00 AM</p>
-                            <div class="d-flex gap-2">
-                                <button class="btn-card btn-card-outline flex-fill">Reprogramar</button>
-                                <button class="btn-card btn-card-primary flex-fill">Ver detalles</button>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">Progreso: <?= $est['progress'] ?>%</small>
+                                    <a href="<?= BASE_URL ?>/cliente/servicios-contratados"
+                                       class="btn-card btn-card-outline">
+                                        <i class="bi bi-eye"></i> Ver detalles
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="col-12">
+                        <p class="text-muted">No tienes servicios activos en este momento.
+                            <a href="<?= BASE_URL ?>/cliente/explorar">Explorar servicios</a>
+                        </p>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
 
@@ -258,7 +292,7 @@ $nombreSaludo = isset($usuarioC['nombres']) ? $usuarioC['nombres'] : 'Cliente';
                                 <label class="form-label fw-bold">Franja horaria <span class="text-danger">*</span></label>
                                 <select class="form-select" name="franja_horaria" id="franja_nec" required>
                                     <option value="">Seleccionar</option>
-                                    <option value="mañana">Mañana (8:00 - 12:00)</option>
+                                    <option value="manana">Mañana (8:00 - 12:00)</option>
                                     <option value="tarde">Tarde (12:00 - 18:00)</option>
                                     <option value="noche">Noche (18:00 - 22:00)</option>
                                 </select>

@@ -1,7 +1,7 @@
-<?php
+﻿<?php
 // Importamos las dependencias
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/finanza.php';
+require_once __DIR__ . '/../models/Finanza.php';
 
 // Capturamos en una variable el método o solicitud hecha al servidor
 $method = $_SERVER['REQUEST_METHOD'];

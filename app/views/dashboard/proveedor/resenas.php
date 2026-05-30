@@ -34,18 +34,20 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         <!-- HEADER -->
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <!-- Título con breadcrumb (IGUAL QUE DASHBOARD) -->
-        <section id="titulo-principal">
+        <section id="titulo-principal" class="section-hero mb-4">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1>Reseñas y Calificaciones</h1>
-                    <p class="text-muted mb-0">
-                        Gestiona las opiniones de tus clientes. Las reseñas ayudan a mejorar tu reputación.
-                    </p>
+                    <h1 class="mb-1">Reseñas y Calificaciones</h1>
+                    <p class="text-muted mb-0">Gestiona las opiniones de tus clientes. Las reseñas ayudan a mejorar tu reputación.</p>
                 </div>
                 <div class="col-md-4">
-                    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                        <ol id="breadcrumb" class="breadcrumb mb-0 justify-content-md-end"></ol>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Reseñas</li>
+                        </ol>
                     </nav>
                 </div>
             </div>
@@ -191,7 +193,7 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
     </main>
 
     <!-- Modal de Respuesta -->
-    <div class="modal fade" id="modalResponder" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalResponder" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header bg-primary text-white">

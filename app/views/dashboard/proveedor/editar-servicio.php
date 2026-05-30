@@ -39,25 +39,26 @@ $categorias = obtenerCategorias();
     <main class="contenido">
         <?php include_once __DIR__ . '/../../layouts/header-proveedor.php'; ?>
 
-        <section id="titulo-principal"
-                 class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Actualizar Servicio</h1>
-                <p class="text-muted mb-0">
-                    Modifica la información de tu servicio publicado en la plataforma.
-                </p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Editar Servicio</h1>
+                    <p class="text-muted mb-0">Modifica la información de tu servicio publicado en la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/listar-servicio">Mis Servicios</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Editar</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol class="breadcrumb mb-0 mt-2">
-                    <li class="breadcrumb-item">
-                        <a href="<?= BASE_URL ?>/proveedor/dashboard">Panel</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="<?= BASE_URL ?>/proveedor/listar-servicio">Mis Servicios</a>
-                    </li>
-                    <li class="breadcrumb-item active">Editar</li>
-                </ol>
-            </nav>
         </section>
 
         <section id="formulario-servicio">

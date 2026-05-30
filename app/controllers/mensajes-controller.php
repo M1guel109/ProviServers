@@ -1,157 +1,236 @@
-<?php
-require_once __DIR__ . '/../models/conversacion.php';
-require_once __DIR__ . '/../models/mensaje.php';
+﻿<?php
 
-session_start();
+require_once __DIR__ . '/../helpers/alert-helper.php';
+require_once __DIR__ . '/../models/Mensajeria.php';
 
-class MensajesController
-{
-    private Conversacion $convModel;
-    private Mensaje $msgModel;
+// ===================================================================
+// GUARD DE SESIÓN Y ROL
+// ===================================================================
 
-    public function __construct()
-    {
-        if (!isset($_SESSION['user']['id'])) {
-            die('Acceso denegado');
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$_rolMensajes = $_SESSION['user']['rol'] ?? '';
+
+if (!isset($_SESSION['user']['id']) || !in_array($_rolMensajes, ['cliente', 'proveedor'], true)) {
+    mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para acceder a mensajes.', BASE_URL . '/login');
+    exit();
+}
+
+// ===================================================================
+// ROUTER INTERNO — Dispatch por método HTTP y URI
+// ===================================================================
+
+$method = $_SERVER['REQUEST_METHOD'];
+$uri    = $_SERVER['REQUEST_URI'];
+
+switch ($method) {
+
+    case 'GET':
+        if (str_contains($uri, '/mensajes/abrir')) {
+            abrirConversacion();
+        } elseif (str_contains($uri, '/mensajes/ver')) {
+            verConversacion();
+        } elseif (str_contains($uri, '/mensajes/poll')) {
+            obtenerMensajesNuevos();
+        } else {
+            mostrarInbox();
         }
-        $this->convModel = new Conversacion();
-        $this->msgModel  = new Mensaje();
-    }
+        break;
 
-    public function inbox()
-    {
-        $uid   = (int)$_SESSION['user']['id'];
-        $convs = $this->convModel->listarInbox($uid);
-
-        // ✅ Usa vista por rol (cliente/proveedor)
-        require $this->vista('inbox');
-    }
-
-    /**
-     * /mensajes/abrir?tipo=solicitud&id=5
-     * /mensajes/abrir?tipo=cotizacion&id=12
-     */
-    public function abrir()
-    {
-        $uid  = (int)$_SESSION['user']['id'];
-        $tipo = $_GET['tipo'] ?? '';
-        $id   = (int)($_GET['id'] ?? 0);
-
-        if ($id <= 0 || !in_array($tipo, ['solicitud', 'cotizacion'], true)) {
-            die('Parámetros inválidos');
-        }
-
-        try {
-            $convId = ($tipo === 'solicitud')
-                ? $this->convModel->getOrCreateFromSolicitud($id, $uid)
-                : $this->convModel->getOrCreateFromCotizacion($id, $uid);
-
-            // ✅ No hardcodear /ProviServers
-            $base = $this->baseUrl();
-            header("Location: {$base}/mensajes/ver?id=" . $convId);
+    case 'POST':
+        $accion = $_POST['accion'] ?? '';
+        if ($accion === 'enviar' || str_contains($uri, '/mensajes/enviar')) {
+            enviarMensaje();
+        } else {
+            http_response_code(400);
+            mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
             exit();
-        } catch (Exception $e) {
-            die($e->getMessage());
         }
+        break;
+
+    default:
+        http_response_code(405);
+        mostrarSweetAlert('error', 'Método no permitido', 'Esta ruta no acepta ese tipo de petición.');
+        exit();
+}
+
+// ===================================================================
+// FUNCIONES DEL CONTROLADOR
+// ===================================================================
+
+function mostrarInbox()
+{
+    $uid    = (int)$_SESSION['user']['id'];
+    $modelo = new Mensajeria();
+
+    $convs = $modelo->listarInbox($uid);
+    $vista = resolverVistaRol('inbox');
+
+    require $vista;
+    exit();
+}
+
+function abrirConversacion()
+{
+    $uid  = (int)$_SESSION['user']['id'];
+    $tipo = $_GET['tipo'] ?? '';
+    $id   = (int)($_GET['id'] ?? 0);
+
+    if ($id <= 0 || !in_array($tipo, ['solicitud', 'cotizacion'], true)) {
+        mostrarSweetAlert('error', 'Parámetros inválidos', 'Los parámetros solicitados no son válidos.', BASE_URL . '/cliente/mensajes');
+        exit();
     }
 
-    public function ver()
-    {
-        $uid    = (int)$_SESSION['user']['id'];
-        $convId = (int)($_GET['id'] ?? 0);
+    try {
+        $modelo = new Mensajeria();
+        $convId = ($tipo === 'solicitud')
+            ? $modelo->getOrCreateFromSolicitud($id, $uid)
+            : $modelo->getOrCreateFromCotizacion($id, $uid);
 
-        if ($convId <= 0) die('Conversación inválida');
+        header('Location: ' . BASE_URL . '/mensajes/ver?id=' . $convId);
+        exit();
+    } catch (Exception $e) {
+        error_log('Error en abrirConversacion -> ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo abrir la conversación. Verifica que tengas acceso.', BASE_URL . '/cliente/mensajes');
+        exit();
+    }
+}
 
-        if (!$this->convModel->usuarioTieneAcceso($convId, $uid)) {
-            die('Acceso denegado');
-        }
+function verConversacion()
+{
+    $uid    = (int)$_SESSION['user']['id'];
+    $convId = (int)($_GET['id'] ?? 0);
 
-        $conv = $this->convModel->obtenerPorId($convId);
-        if (!$conv) die('No existe conversación');
-
-        $tema          = $this->convModel->obtenerTema($convId);
-        $otroUsuarioId = $this->convModel->obtenerOtroUsuarioId($conv, $uid);
-
-        $mensajes = $this->msgModel->listarPorConversacion($convId, 80);
-        $this->msgModel->marcarLeidos($convId, $uid);
-
-        // ✅ Usa vista por rol (cliente/proveedor)
-        require $this->vista('chat');
+    if ($convId <= 0) {
+        mostrarSweetAlert('error', 'Conversación inválida', 'La conversación solicitada no existe.', BASE_URL . '/cliente/mensajes');
+        exit();
     }
 
-    public function enviar()
-    {
-        header('Content-Type: application/json; charset=utf-8');
+    $modelo = new Mensajeria();
 
-        $uid    = (int)$_SESSION['user']['id'];
-        $convId = (int)($_POST['conversacion_id'] ?? 0);
-        $texto  = trim($_POST['mensaje'] ?? '');
-
-        if ($convId <= 0 || $texto === '') {
-            http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'Datos inválidos']);
-            return;
-        }
-
-        $conv = $this->convModel->obtenerPorId($convId);
-        if (!$conv || !$this->convModel->usuarioTieneAcceso($convId, $uid)) {
-            http_response_code(403);
-            echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
-            return;
-        }
-
-        $receptorId = $this->convModel->obtenerOtroUsuarioId($conv, $uid);
-        $msgId      = $this->msgModel->crear($convId, $uid, $receptorId, $texto);
-
-        echo json_encode(['ok' => true, 'id' => $msgId]);
+    if (!$modelo->usuarioTieneAcceso($convId, $uid)) {
+        mostrarSweetAlert('error', 'Acceso denegado', 'No tienes acceso a esta conversación.', BASE_URL . '/cliente/mensajes');
+        exit();
     }
 
-    public function poll()
-    {
-        header('Content-Type: application/json; charset=utf-8');
-
-        $uid    = (int)$_SESSION['user']['id'];
-        $convId = (int)($_GET['id'] ?? 0);
-        $after  = $_GET['after'] ?? null;
-
-        if ($convId <= 0) {
-            http_response_code(400);
-            echo json_encode(['ok' => false, 'error' => 'Parámetros inválidos']);
-            return;
-        }
-
-        if (!$this->convModel->usuarioTieneAcceso($convId, $uid)) {
-            http_response_code(403);
-            echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
-            return;
-        }
-
-        $nuevos = $this->msgModel->listarNuevos($convId, $after);
-        if (!empty($nuevos)) {
-            $this->msgModel->marcarLeidos($convId, $uid);
-        }
-
-        echo json_encode(['ok' => true, 'mensajes' => $nuevos]);
+    $conversacion = $modelo->obtenerConversacionPorId($convId);
+    if (!$conversacion) {
+        mostrarSweetAlert('error', 'Error', 'No existe la conversación.', BASE_URL . '/cliente/mensajes');
+        exit();
     }
 
-    private function vista(string $nombre): string
-    {
-        $rol = $_SESSION['user']['rol'] ?? '';
+    $tema          = $modelo->obtenerTema($convId);
+    $otroUsuarioId = $modelo->obtenerOtroUsuarioId($conversacion, $uid);
+    $mensajes      = $modelo->listarMensajesPorConversacion($convId, 80);
+    $modelo->marcarMensajesLeidos($convId, $uid);
 
-        if ($rol === 'cliente') {
-            return BASE_PATH . "/app/views/dashboard/cliente/mensajes/{$nombre}.php";
-        }
+    $vista = resolverVistaRol('chat');
 
-        if ($rol === 'proveedor') {
-            return BASE_PATH . "/app/views/dashboard/proveedor/mensajes/{$nombre}.php";
-        }
+    require $vista;
+    exit();
+}
 
-        die('Rol no permitido');
+function enviarMensaje()
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    $uid    = (int)$_SESSION['user']['id'];
+    $convId = (int)($_POST['conversacion_id'] ?? 0);
+    $texto  = trim($_POST['mensaje'] ?? '');
+
+    if ($convId <= 0 || empty($texto)) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Datos inválidos']);
+        exit;
     }
 
-    private function baseUrl(): string
-    {
-        // BASE_URL normalmente ya incluye /ProviServers
-        return defined('BASE_URL') ? rtrim(BASE_URL, '/') : '/ProviServers';
+    $modelo       = new Mensajeria();
+    $conversacion = $modelo->obtenerConversacionPorId($convId);
+
+    if (!$conversacion || !$modelo->usuarioTieneAcceso($convId, $uid)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
+        exit;
     }
+
+    $receptorId = $modelo->obtenerOtroUsuarioId($conversacion, $uid);
+
+    try {
+        $msgId = $modelo->crearMensaje($convId, $uid, $receptorId, $texto);
+    } catch (Exception $e) {
+        if ($e->getMessage() === 'CONTACTO_BLOQUEADO') {
+            http_response_code(422);
+            echo json_encode([
+                'ok'      => false,
+                'bloqueado' => true,
+                'error'   => 'Por políticas de ProviServers no está permitido compartir datos de contacto (teléfonos, emails o links externos). Todos los tratos deben cerrarse dentro de la plataforma.',
+            ]);
+            exit;
+        }
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'error' => 'Error al enviar el mensaje.']);
+        exit;
+    }
+
+    echo json_encode(['ok' => true, 'id' => $msgId]);
+    exit;
+}
+
+function obtenerMensajesNuevos()
+{
+    header('Content-Type: application/json; charset=utf-8');
+
+    $uid    = (int)$_SESSION['user']['id'];
+    $convId = (int)($_GET['id'] ?? 0);
+    $after  = $_GET['after'] ?? null;
+
+    if ($convId <= 0) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'error' => 'Parámetros inválidos']);
+        exit;
+    }
+
+    $modelo = new Mensajeria();
+
+    if (!$modelo->usuarioTieneAcceso($convId, $uid)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'error' => 'Acceso denegado']);
+        exit;
+    }
+
+    $nuevos = $modelo->listarMensajesNuevos($convId, $after);
+    if (!empty($nuevos)) {
+        $modelo->marcarMensajesLeidos($convId, $uid);
+    }
+
+    echo json_encode(['ok' => true, 'mensajes' => $nuevos]);
+    exit;
+}
+
+// ===================================================================
+// UTILIDAD — Resolver vista según rol del usuario
+// ===================================================================
+
+function resolverVistaRol(string $nombre): string
+{
+    $rol = $_SESSION['user']['rol'] ?? '';
+
+    $rutas = [
+        'cliente'   => BASE_PATH . "/app/views/dashboard/cliente/mensajes/{$nombre}.php",
+        'proveedor' => BASE_PATH . "/app/views/dashboard/proveedor/mensajes/{$nombre}.php",
+    ];
+
+    if (!isset($rutas[$rol])) {
+        mostrarSweetAlert('error', 'Rol no permitido', 'Tu rol no tiene acceso a esta sección.', BASE_URL . '/login');
+        exit();
+    }
+
+    if (!file_exists($rutas[$rol])) {
+        mostrarSweetAlert('error', 'Vista no encontrada', "La vista {$nombre}.php no existe para tu rol.", BASE_URL . '/login');
+        exit();
+    }
+
+    return $rutas[$rol];
 }

@@ -48,21 +48,23 @@ if ($usuarioId) {
         ?>
 
         <!-- Título principal -->
-        <section id="titulo-principal" class="d-flex justify-content-between align-items-start flex-wrap">
-            <div>
-                <h1 class="mb-1">Mis publicaciones</h1>
-                <p class="text-muted mb-0">
-                    Aquí ves el estado de las publicaciones que los clientes podrán encontrar en la plataforma:
-                    pendientes de aprobación, activas, pausadas o rechazadas.
-                </p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Mis Publicaciones</h1>
+                    <p class="text-muted mb-0">Aquí ves el estado de las publicaciones que los clientes podrán encontrar en la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Mis Publicaciones</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
-
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Mis publicaciones</li>
-                </ol>
-            </nav>
         </section>
 
 
@@ -215,7 +217,7 @@ if ($usuarioId) {
     </main>
 
     <!-- Modal de Detalle de Publicación -->
-    <div class="modal fade" id="modalDetallePublicacion" tabindex="-1" aria-hidden="true">
+    <div class="modal fade modal-cliente" id="modalDetallePublicacion" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content border-0 shadow">
 

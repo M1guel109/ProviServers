@@ -1,33 +1,7 @@
 // JavaScript para el dashboard de proveedores
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Toggle del menú lateral
-    const btnToggleMenu = document.getElementById('btn-toggle-menu');
-    const sidebar = document.querySelector('.sidebar');
-
-    if (btnToggleMenu) {
-        btnToggleMenu.addEventListener('click', function () {
-            sidebar.classList.toggle('plegado');
-        });
-    }
-
-    // Toggle de submenús
-    const toggleSubmenuButtons = document.querySelectorAll('.toggle-submenu');
-
-    toggleSubmenuButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const submenu = this.parentElement.querySelector('.submenu');
-            const hasSubmenu = this.parentElement;
-
-            hasSubmenu.classList.toggle('active');
-
-            if (hasSubmenu.classList.contains('active')) {
-                submenu.style.maxHeight = submenu.scrollHeight + 'px';
-            } else {
-                submenu.style.maxHeight = '0';
-            }
-        });
-    });
+    // Nota: sidebar toggle y submenús los maneja main.js
 
     // Inicializar gráficos (ejemplo con ApexCharts)
     if (typeof ApexCharts !== 'undefined') {
@@ -80,18 +54,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (periodoSelect) {
             periodoSelect.addEventListener('change', function () {
                 // Aquí podrías actualizar la gráfica según el período seleccionado
-                console.log('Período cambiado a:', this.value);
             });
         }
     }
 
-    // Ejemplo de funcionalidad para notificaciones
-    const notificaciones = document.querySelector('.notificaciones');
-    if (notificaciones) {
-        notificaciones.addEventListener('click', function () {
-            alert('Tienes 3 notificaciones nuevas');
-        });
-    }
 });
 
 

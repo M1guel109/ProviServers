@@ -24,8 +24,6 @@ function sweetProyecto(icon, title, text, callback = null, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Script de Seguimiento (En Proceso) cargado.');
-
     const formSeguimientoModal = document.getElementById('formSeguimientoModal');
     const selectEstado = document.getElementById('seg-estado-modal');
 
@@ -40,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
         selectEstado.addEventListener('change', toggleCamposSeguimiento);
         toggleCamposSeguimiento();
     }
+
 });
 
 /**
@@ -101,13 +100,6 @@ function toggleCamposSeguimiento() {
  * abrirSeguimiento(id, nombreServicio, estadoActual, nombreCliente)
  */
 window.abrirSeguimiento = function (idContrato, nombreServicio, estadoActual, nombreCliente) {
-    console.log('abrirSeguimiento llamado', {
-        idContrato,
-        nombreServicio,
-        estadoActual,
-        nombreCliente
-    });
-
     if (!idContrato || Number(idContrato) === 0) {
         sweetProyecto('error', 'Error', 'No se encontró el ID del contrato.');
         return;
@@ -227,7 +219,7 @@ async function guardarNuevoAvance(formulario) {
     // Acción que espera tu controlador general
     formData.set('accion', 'actualizar_estado_servicio');
 
-    const CONTROLLER_URL = `${BASE_URL}/app/controllers/ProveedorOperacionController.php`;
+    const CONTROLLER_URL = `${BASE_URL}/proveedor/actualizar-estado`;
 
     const btnSubmit = getBotonGuardarSeguimiento();
     const originalHtml = btnSubmit ? btnSubmit.innerHTML : 'Guardar';

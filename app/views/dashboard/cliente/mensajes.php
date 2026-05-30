@@ -29,10 +29,23 @@
 
         <section id="mensajes">
         <div class="container">
-            <div class="section-hero mb-4">
-            <p class="breadcrumb">Inicio > Mensajes</p>
-            <h1><i class="bi text-primary"></i>Mensajes</h1>
-            <p>Comunícate directamente con tus proveedores. Revisa tus conversaciones y responde cuando lo necesites.</p>
+            <div id="titulo-principal" class="section-hero mb-4">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <h1 class="mb-1"><i class="bi bi-chat-dots text-primary me-2"></i>Mensajes</h1>
+                  <p class="text-muted mb-0">Comunícate directamente con tus proveedores.</p>
+                </div>
+                <div class="col-md-4">
+                  <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 justify-content-md-end">
+                      <li class="breadcrumb-item">
+                        <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                      </li>
+                      <li class="breadcrumb-item active" aria-current="page">Mensajes</li>
+                    </ol>
+                  </nav>
+                </div>
+              </div>
             </div>
 
             <div class="messages-list">
@@ -76,7 +89,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS propio -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
 </body>
 </html>

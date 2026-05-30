@@ -1,410 +1,250 @@
 <?php
-// Importamos las dependencias
-require_once __DIR__ . '/../helpers/alert-helper.php';
+// =====================================================
+// membresia-controller.php
+// Gestiona el flujo de pago de membresías con MercadoPago
+// =====================================================
 
-// Modelos a utilizar (Si los unificas en uno solo, cambia esto)
-require_once __DIR__ . '/../models/membresia.php';
-require_once __DIR__ . '/../models/suscripcion.php';
-require_once __DIR__ . '/../models/proveedor-pagos-facturacion.php';
+require_once BASE_PATH . '/config/mercadopago.php';
+require_once BASE_PATH . '/config/database.php';
+require_once BASE_PATH . '/app/helpers/alert-helper.php';
 
-// // Iniciar sesión
-// session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
-// // Validar que el usuario esté logueado (Aplica para todas las rutas)
-// if (!isset($_SESSION['user']['id'])) {
-//     mostrarSweetAlert('error', 'Acceso denegado', 'Debes iniciar sesión para realizar esta acción.', BASE_URL.'/login');
-//     exit();
-// }
-
-$rolActual = $_SESSION['user']['rol'] ?? '';
-
-// Capturamos el método de solicitud
+$uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 
-switch ($method) {
-    case 'POST':
-        $accion = $_POST['accion'] ?? '';
+// Webhook no requiere sesión (viene de MercadoPago)
+$esWebhook = str_contains($uri, '/proveedor/membresia/webhook');
 
-        // Acciones de Administrador
-        if ($accion === 'registrar_membresia') {
-            registrarMembresia();
-        } elseif ($accion === 'actualizar_membresia') {
-            actualizarMembresia();
-        }
-        // Acciones de Proveedor
-        elseif ($accion === 'actualizar_pagos_facturacion') {
-            actualizarPagosFacturacion();
-        } else {
-            http_response_code(400);
-            echo "Acción POST no válida";
-        }
-        break;
-
-    case 'GET':
-        $accion = $_GET['accion'] ?? '';
-
-        if ($accion === '') {
-            return; // 🔥 NO error si no hay acción
-        }
-
-        if ($accion === 'listar_membresias') {
-            $lista = mostrarMembresias();
-            return;
-        } elseif ($accion === 'eliminar_membresia') {
-            eliminarMembresia($_GET['id'] ?? null);
-        } elseif ($accion === 'cancelar_suscripcion') {
-            cancelarSuscripcion($_GET['id'] ?? null);
-        } elseif ($accion === 'eliminar_suscripcion') {
-            eliminarSuscripcion($_GET['id'] ?? null);
-        } elseif ($accion === 'detalle_suscripcion_json') {
-            obtenerDetalleJSON($_GET['id'] ?? null);
-        } elseif ($accion === 'obtener_membresia_json') {
-            $id = $_GET['id'] ?? null;
-            if ($id) {
-                echo json_encode(mostrarMembresiaId($id));
-                exit;
-            }
-        } else {
-            http_response_code(400);
-            echo "Acción GET no válida";
-        }
-        break;
+if (!$esWebhook && (!isset($_SESSION['user']['id']) || ($_SESSION['user']['rol'] ?? '') !== 'proveedor')) {
+    header('Location: ' . BASE_URL . '/login');
+    exit;
 }
 
-// ==========================================================
-// 1. FUNCIONES CRUD MEMBRESÍAS (ADMIN)
-// ==========================================================
+if (str_contains($uri, '/proveedor/membresia/pagar') && $method === 'POST') {
+    crearPreferenciaMP();
+} elseif ($esWebhook) {
+    procesarWebhookMP();
+} elseif (str_contains($uri, '/proveedor/membresia/pago-exitoso')) {
+    mostrarPagoExitoso();
+} elseif (str_contains($uri, '/proveedor/membresia/pago-pendiente')) {
+    require BASE_PATH . '/app/views/dashboard/proveedor/membresia-pago-pendiente.php';
+} elseif (str_contains($uri, '/proveedor/membresia/pago-fallido')) {
+    require BASE_PATH . '/app/views/dashboard/proveedor/membresia-pago-fallido.php';
+}
 
-function registrarMembresia()
+// =====================================================
+// Crea la preferencia de pago en MercadoPago
+// Devuelve JSON con la URL de checkout
+// =====================================================
+function crearPreferenciaMP(): void
 {
-    if ($_SESSION['user']['rol'] !== 'admin') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo administradores.');
+    header('Content-Type: application/json');
+
+    $uid    = (int)$_SESSION['user']['id'];
+    $planId = (int)($_POST['plan_id'] ?? 0);
+
+    if ($planId <= 0) {
+        echo json_encode(['ok' => false, 'error' => 'Plan no especificado.']);
         exit;
     }
 
-    $tipo          = trim($_POST['tipo'] ?? '');
-    $costo         = $_POST['costo'] ?? '';
-    $duracion      = $_POST['duracion_dias'] ?? '';
-    $descripcion   = trim($_POST['descripcion'] ?? '');
-    $max_servicios = $_POST['max_servicios_activos'] ?? '';
-    $orden_visual  = $_POST['orden_visual'] ?? null;
-
-    $es_destacado   = isset($_POST['es_destacado']) ? 1 : 0;
-    $permite_videos = isset($_POST['permite_videos']) ? 1 : 0;
-    $acceso_stats   = isset($_POST['acceso_estadisticas_pro']) ? 1 : 0;
-    $estado         = isset($_POST['estado']) ? 'ACTIVO' : 'INACTIVO';
-
-    if (empty($tipo) || $costo === '' || empty($duracion) || empty($descripcion)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa Tipo, Costo, Duración y Descripción.');
+    // Buscar el plan en la BD por ID
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        $st  = $pdo->prepare("SELECT id, tipo, costo, duracion_dias FROM membresias WHERE id = :id AND UPPER(estado) = 'ACTIVO' LIMIT 1");
+        $st->execute([':id' => $planId]);
+        $plan = $st->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log('membresia-controller::crearPreferenciaMP DB: ' . $e->getMessage());
+        echo json_encode(['ok' => false, 'error' => 'Error al obtener el plan.']);
         exit;
     }
 
-    if (!is_numeric($costo) || !is_numeric($duracion) || !is_numeric($max_servicios)) {
-        mostrarSweetAlert('error', 'Formato inválido', 'Costo, Duración y Máx Servicios deben ser números.');
+    if (!$plan) {
+        echo json_encode(['ok' => false, 'error' => 'Plan no encontrado.']);
         exit;
     }
 
-    if ($orden_visual === '') {
-        $orden_visual = null;
-    }
+    $externalRef = 'uid-' . $uid . '-plan-' . $plan['id'];
 
-    $objMembresia = new Membresia();
-    $data = [
-        'tipo'                    => $tipo,
-        'costo'                   => (float)$costo,
-        'duracion_dias'           => (int)$duracion,
-        'descripcion'             => $descripcion,
-        'max_servicios_activos'   => (int)$max_servicios,
-        'orden_visual'            => $orden_visual,
-        'acceso_estadisticas_pro' => $acceso_stats,
-        'permite_videos'          => $permite_videos,
-        'es_destacado'            => $es_destacado,
-        'estado'                  => $estado
+    $preference = [
+        'items' => [[
+            'id'          => 'plan-' . $plan['id'],
+            'title'       => 'ProviServers — Plan ' . $plan['tipo'],
+            'description' => 'Membresía por ' . $plan['duracion_dias'] . ' días',
+            'quantity'    => 1,
+            'unit_price'  => (float)$plan['costo'],
+            'currency_id' => 'COP',
+        ]],
+        'payer' => [
+            'email' => $_SESSION['user']['email'] ?? 'test@test.com',
+        ],
+        'back_urls' => [
+            'success' => BASE_URL . '/proveedor/membresia/pago-exitoso',
+            'pending' => BASE_URL . '/proveedor/membresia/pago-pendiente',
+            'failure' => BASE_URL . '/proveedor/membresia/pago-fallido',
+        ],
+        'external_reference' => $externalRef,
+        'notification_url'   => BASE_URL . '/proveedor/membresia/webhook',
+        'statement_descriptor' => 'PROVISERVERS',
     ];
 
-    $resultado = $objMembresia->registrar($data);
+    $ch = curl_init('https://api.mercadopago.com/checkout/preferences');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode($preference),
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . MP_ACCESS_TOKEN,
+        ],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
 
-    if ($resultado) {
-        mostrarSweetAlert('success', 'Membresía creada', 'El plan ha sido registrado correctamente.', BASE_URL . '/admin/consultar-membresias');
-    } else {
-        mostrarSweetAlert('error', 'Error al registrar', 'No se pudo guardar en la base de datos.');
+    $response  = curl_exec($ch);
+    $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlError || $httpCode !== 201) {
+        error_log("MercadoPago preference error [HTTP $httpCode]: " . ($curlError ?: substr($response, 0, 300)));
+        echo json_encode(['ok' => false, 'error' => 'Error al conectar con MercadoPago. Intenta de nuevo.']);
+        exit;
     }
+
+    $data = json_decode($response, true);
+    $url  = MP_ES_SANDBOX
+        ? ($data['sandbox_init_point'] ?? $data['init_point'] ?? '')
+        : ($data['init_point'] ?? '');
+
+    if (!$url) {
+        echo json_encode(['ok' => false, 'error' => 'No se pudo obtener la URL de pago.']);
+        exit;
+    }
+
+    echo json_encode(['ok' => true, 'url' => $url]);
     exit;
 }
 
-function actualizarMembresia()
+// =====================================================
+// Procesa notificación IPN/Webhook de MercadoPago
+// =====================================================
+function procesarWebhookMP(): void
 {
-    if ($_SESSION['user']['rol'] !== 'admin') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo administradores.');
+    $body = file_get_contents('php://input');
+    $data = json_decode($body, true) ?? [];
+
+    $tipo      = $data['type']         ?? ($_GET['topic'] ?? '');
+    $paymentId = $data['data']['id']   ?? ($_GET['id']    ?? null);
+
+    if ($tipo !== 'payment' || !$paymentId) {
+        http_response_code(200);
         exit;
     }
 
-    $id = $_POST['id'] ?? null;
-    if (!$id) {
-        mostrarSweetAlert('error', 'Error', 'Identificador de membresía no válido.');
+    $pago = consultarPagoMP((int)$paymentId);
+
+    if (!$pago || $pago['status'] !== 'approved') {
+        http_response_code(200);
         exit;
     }
 
-    $tipo          = trim($_POST['tipo'] ?? '');
-    $costo         = $_POST['costo'] ?? '';
-    $duracion      = $_POST['duracion_dias'] ?? '';
-    $descripcion   = trim($_POST['descripcion'] ?? '');
-    $max_servicios = $_POST['max_servicios_activos'] ?? '';
-    $orden_visual  = $_POST['orden_visual'] ?? null;
+    activarPlanDesdePago($pago);
 
-    $es_destacado   = (int)($_POST['es_destacado'] ?? 0);
-    $permite_videos = (int)($_POST['permite_videos'] ?? 0);
-    $acceso_stats   = (int)($_POST['acceso_estadisticas_pro'] ?? 0);
-    $estado         = ($_POST['estado'] === 'ACTIVO') ? 'ACTIVO' : 'INACTIVO';
-
-    if (empty($tipo) || $costo === '' || empty($duracion)) {
-        mostrarSweetAlert('error', 'Campos vacíos', 'Faltan datos obligatorios.');
-        exit;
-    }
-
-    if ($orden_visual === '') $orden_visual = null;
-
-    $obj = new Membresia();
-    $data = [
-        'id'                      => $id,
-        'tipo'                    => $tipo,
-        'costo'                   => (float)$costo,
-        'duracion_dias'           => (int)$duracion,
-        'descripcion'             => $descripcion,
-        'max_servicios_activos'   => (int)$max_servicios,
-        'orden_visual'            => $orden_visual,
-        'acceso_estadisticas_pro' => $acceso_stats,
-        'permite_videos'          => $permite_videos,
-        'es_destacado'            => $es_destacado,
-        'estado'                  => $estado
-    ];
-
-    if ($obj->actualizar($data)) {
-        mostrarSweetAlert('success', 'Actualizado', 'La membresía se actualizó correctamente.', BASE_URL . '/admin/consultar-membresias');
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudieron guardar los cambios.');
-    }
+    http_response_code(200);
     exit;
 }
 
-function eliminarMembresia($id)
+// =====================================================
+// Página de pago exitoso — también activa el plan
+// como fallback si el webhook no llegó primero
+// =====================================================
+function mostrarPagoExitoso(): void
 {
-    if ($_SESSION['user']['rol'] !== 'admin') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo administradores.');
-        exit;
+    $paymentId = (int)($_GET['payment_id'] ?? 0);
+
+    if ($paymentId > 0) {
+        $pago = consultarPagoMP($paymentId);
+        if ($pago && $pago['status'] === 'approved') {
+            activarPlanDesdePago($pago);
+        }
     }
 
-    if (!$id) {
-        mostrarSweetAlert('error', 'Error', 'ID inválido.');
-        exit;
-    }
-
-    $obj = new Membresia();
-
-    if ($obj->tieneProveedores($id)) {
-        mostrarSweetAlert('warning', 'No se puede eliminar', 'Esta membresía está asignada a proveedores activos. No se puede borrar.', BASE_URL . '/admin/consultar-membresias');
-        exit;
-    }
-
-    if ($obj->eliminar($id)) {
-        mostrarSweetAlert('success', 'Eliminado', 'La membresía ha sido eliminada.', BASE_URL . '/admin/consultar-membresias');
-    } else {
-        mostrarSweetAlert('error', 'Error', 'Ocurrió un error al intentar eliminar.');
-    }
-    exit;
+    require BASE_PATH . '/app/views/dashboard/proveedor/membresia-pago-exitoso.php';
 }
 
-function mostrarMembresias()
+// =====================================================
+// Consulta el estado de un pago en MercadoPago
+// =====================================================
+function consultarPagoMP(int $paymentId): ?array
 {
-    // ejemplo
-    // session_start();
+    $ch = curl_init("https://api.mercadopago.com/v1/payments/{$paymentId}");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . MP_ACCESS_TOKEN],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $response = curl_exec($ch);
+    curl_close($ch);
 
-    $resultado = new Membresia();
-    $datos = $resultado->mostrar();
-
-    return $datos;
+    $data = json_decode($response, true);
+    return is_array($data) ? $data : null;
 }
 
-function mostrarMembresiaId($id)
+// =====================================================
+// Activa el plan del proveedor en la BD
+// =====================================================
+function activarPlanDesdePago(array $pago): void
 {
-    $obj = new Membresia();
-    return $obj->mostrarId($id);
-}
+    $ref = $pago['external_reference'] ?? '';
 
-// ==========================================================
-// 2. FUNCIONES SUSCRIPCIONES (ADMIN)
-// ==========================================================
-
-function cancelarSuscripcion($id)
-{
-    if ($_SESSION['user']['rol'] !== 'admin') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo administradores.');
-        exit;
-    }
-
-    if (!$id) {
-        mostrarSweetAlert('error', 'Error', 'ID inválido.');
-        exit;
-    }
-
-    $obj = new Suscripcion();
-
-    if ($obj->cancelar($id)) {
-        mostrarSweetAlert('success', 'Suscripción Cancelada', 'El proveedor ya no tendrá acceso a los beneficios del plan.', BASE_URL . '/admin/consultar-suscripciones');
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo cancelar la suscripción.');
-    }
-    exit;
-}
-
-function eliminarSuscripcion($id)
-{
-    if ($_SESSION['user']['rol'] !== 'admin') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo administradores.');
-        exit;
-    }
-
-    if (!$id) {
-        mostrarSweetAlert('error', 'Error', 'ID inválido.');
-        exit;
-    }
-
-    $obj = new Suscripcion();
-    if ($obj->eliminar($id)) {
-        mostrarSweetAlert('success', 'Eliminado', 'Registro eliminado correctamente.', BASE_URL . '/admin/consultar-suscripciones');
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar el registro.');
-    }
-    exit;
-}
-
-function obtenerDetalleJSON($id)
-{
-    if (!$id) {
-        echo json_encode(['error' => 'ID no proporcionado']);
+    // Formato: uid-{usuario_id}-plan-{membresia_id}
+    if (!preg_match('/^uid-(\d+)-plan-(\d+)$/', $ref, $m)) {
+        error_log('activarPlanDesdePago: external_reference inválido: ' . $ref);
         return;
     }
 
-    $obj = new Suscripcion();
-    $dato = $obj->obtenerPorId($id);
+    $usuarioId  = (int)$m[1];
+    $membresiaId = (int)$m[2];
 
-    if ($dato) {
-        $response = [
-            'id'               => $dato['id'],
-            'estado'           => $dato['estado'],
-            'nombre_proveedor' => $dato['nombre_proveedor'],
-            'email'            => $dato['email'],
-            'telefono'         => $dato['telefono'] ?? 'N/A',
-            'ubicacion'        => $dato['ubicacion'] ?? 'N/A',
-            'foto_proveedor'   => $dato['foto_proveedor'] ?? null,
-            'nombre_plan'      => $dato['nombre_plan'],
-            'costo'            => $dato['costo'],
-            'fecha_inicio'     => date('d/m/Y', strtotime($dato['fecha_inicio'])),
-            'fecha_fin'        => date('d/m/Y', strtotime($dato['fecha_fin'])),
-            'fecha_fin_raw'    => $dato['fecha_fin']
-        ];
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
 
-        header('Content-Type: application/json');
-        echo json_encode($response);
-    } else {
-        header('Content-Type: application/json');
-        echo json_encode(['error' => 'Suscripción no encontrada']);
+        // Obtener proveedor_id y duracion del plan
+        $st = $pdo->prepare("
+            SELECT p.id AS proveedor_id, m.duracion_dias
+            FROM proveedores p
+            INNER JOIN membresias m ON m.id = :mid
+            WHERE p.usuario_id = :uid
+            LIMIT 1
+        ");
+        $st->execute([':uid' => $usuarioId, ':mid' => $membresiaId]);
+        $datos = $st->fetch(PDO::FETCH_ASSOC);
+
+        if (!$datos) return;
+
+        $proveedorId  = (int)$datos['proveedor_id'];
+        $duracionDias = (int)($datos['duracion_dias'] ?? 30);
+
+        // Desactivar planes anteriores
+        $pdo->prepare("
+            UPDATE proveedor_membresia SET estado = 'inactiva'
+            WHERE proveedor_id = ? AND estado = 'activa'
+        ")->execute([$proveedorId]);
+
+        // Insertar el nuevo plan activo
+        $pdo->prepare("
+            INSERT INTO proveedor_membresia (proveedor_id, membresia_id, fecha_inicio, fecha_fin, estado, created_at)
+            VALUES (:pid, :mid, CURDATE(), DATE_ADD(CURDATE(), INTERVAL :dias DAY), 'activa', NOW())
+        ")->execute([
+            ':pid'  => $proveedorId,
+            ':mid'  => $membresiaId,
+            ':dias' => $duracionDias,
+        ]);
+    } catch (PDOException $e) {
+        error_log('activarPlanDesdePago: ' . $e->getMessage());
     }
-    exit;
-}
-
-// ==========================================================
-// 3. FUNCIONES PAGOS Y FACTURACIÓN (PROVEEDOR)
-// ==========================================================
-
-function actualizarPagosFacturacion()
-{
-    if ($_SESSION['user']['rol'] !== 'proveedor') {
-        mostrarSweetAlert('error', 'Acceso denegado', 'Solo proveedores.', BASE_URL . '/login');
-        exit;
-    }
-
-    $usuarioId = (int) $_SESSION['user']['id'];
-
-    $data = [
-        'tipo_documento'         => trim($_POST['tipo_documento'] ?? ''),
-        'numero_documento'       => trim($_POST['numero_documento'] ?? ''),
-        'razon_social'           => trim($_POST['razon_social'] ?? ''),
-        'regimen_fiscal'         => trim($_POST['regimen_fiscal'] ?? ''),
-        'direccion_facturacion'  => trim($_POST['direccion_facturacion'] ?? ''),
-        'ciudad_facturacion'     => trim($_POST['ciudad_facturacion'] ?? ''),
-        'pais_facturacion'       => trim($_POST['pais_facturacion'] ?? ''),
-        'correo_facturacion'     => trim($_POST['correo_facturacion'] ?? ''),
-        'telefono_facturacion'   => trim($_POST['telefono_facturacion'] ?? ''),
-
-        'banco'                  => trim($_POST['banco'] ?? ''),
-        'tipo_cuenta'            => trim($_POST['tipo_cuenta'] ?? ''),
-        'numero_cuenta'          => trim($_POST['numero_cuenta'] ?? ''),
-        'titular_cuenta'         => trim($_POST['titular_cuenta'] ?? ''),
-        'identificacion_titular' => trim($_POST['identificacion_titular'] ?? ''),
-        'metodo_pago_preferido'  => trim($_POST['metodo_pago_preferido'] ?? ''),
-        'nota_metodo_pago'       => trim($_POST['nota_metodo_pago'] ?? ''),
-
-        'frecuencia_liquidacion' => trim($_POST['frecuencia_liquidacion'] ?? ''),
-        'monto_minimo_retiro'    => trim($_POST['monto_minimo_retiro'] ?? ''),
-        'acepta_factura_electronica' => $_POST['acepta_factura_electronica'] ?? null,
-    ];
-
-    $errores = [];
-
-    if ($data['tipo_documento'] === '') $errores[] = 'Selecciona un tipo de documento de facturación.';
-    if ($data['numero_documento'] === '') $errores[] = 'Ingresa el número de documento de facturación.';
-    if ($data['razon_social'] === '') $errores[] = 'Ingresa el nombre o razón social para facturar.';
-    if ($data['direccion_facturacion'] === '' || $data['ciudad_facturacion'] === '' || $data['pais_facturacion'] === '') {
-        $errores[] = 'Completa la dirección, ciudad y país de facturación.';
-    }
-    if ($data['correo_facturacion'] === '') {
-        $errores[] = 'Ingresa un correo de facturación.';
-    } elseif (!filter_var($data['correo_facturacion'], FILTER_VALIDATE_EMAIL)) {
-        $errores[] = 'El correo de facturación no tiene un formato válido.';
-    }
-
-    $frecuenciasPermitidas = ['', 'semanal', 'quincenal', 'mensual'];
-    if (!in_array($data['frecuencia_liquidacion'], $frecuenciasPermitidas, true)) {
-        $errores[] = 'La frecuencia de liquidación no es válida.';
-    }
-
-    if ($data['monto_minimo_retiro'] !== '') {
-        if (!is_numeric($data['monto_minimo_retiro']) || (float) $data['monto_minimo_retiro'] < 0) {
-            $errores[] = 'El monto mínimo de retiro debe ser un número mayor o igual a 0.';
-        }
-    }
-
-    if ($data['banco'] !== '' || $data['numero_cuenta'] !== '' || $data['tipo_cuenta'] !== '') {
-        if ($data['banco'] === '' || $data['tipo_cuenta'] === '' || $data['numero_cuenta'] === '') {
-            $errores[] = 'Si vas a registrar una cuenta bancaria, completa banco, tipo de cuenta y número de cuenta.';
-        }
-    }
-
-    if (!empty($errores)) {
-        $mensaje = implode('<br>', $errores);
-        mostrarSweetAlert('error', 'Datos inválidos', $mensaje, BASE_URL . '/proveedor/configuracion#pagos');
-        exit();
-    }
-
-    $modelo = new ProveedorPagosFacturacion();
-    $ok = $modelo->guardarDesdeFormulario($usuarioId, $data);
-
-    if ($ok) {
-        mostrarSweetAlert('success', 'Pagos y facturación actualizados', 'Tu información de pagos y facturación se guardó correctamente.', BASE_URL . '/proveedor/configuracion#pagos');
-    } else {
-        mostrarSweetAlert('error', 'Error al guardar', 'Ocurrió un problema al guardar tu configuración de pagos. Inténtalo nuevamente.', BASE_URL . '/proveedor/configuracion#pagos');
-    }
-    exit;
-}
-
-
-/**
- * Lista todas las suscripciones de proveedores con datos del plan.
- * Usada por la vista suscripciones-activas.php
- */
-function listarSuscripciones()
-{
-    $obj = new Suscripcion();
-    return $obj->listar();
 }

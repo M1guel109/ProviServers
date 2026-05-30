@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
-require_once BASE_PATH . '/app/controllers/categoria-controller.php';
+require_once BASE_PATH . '/app/controllers/admin-controller.php';
 
 $datos = mostrarCategorias();
 ?>

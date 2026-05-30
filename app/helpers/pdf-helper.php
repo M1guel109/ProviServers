@@ -7,9 +7,16 @@ use Dompdf\Options;
 
 function generarPDF($html, $filename = "documento.pdf", $download = false)
 {
+    // Limpiar cualquier output previo (notices, warnings de DomPDF en PHP 8.x)
+    while (ob_get_level() > 0) {
+        ob_end_clean();
+    }
+
+    $prev = error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_NOTICE);
+
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
-    $options->set('isRemoteEnabled', true); // permite imágenes externas
+    $options->set('isRemoteEnabled', true);
 
     $dompdf = new Dompdf($options);
 
@@ -26,4 +33,6 @@ function generarPDF($html, $filename = "documento.pdf", $download = false)
     $dompdf->stream($filename, [
         "Attachment" => $download ? 1 : 0
     ]);
+
+    error_reporting($prev);
 }

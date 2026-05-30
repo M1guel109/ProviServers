@@ -1,61 +1,42 @@
-<?php
-
+﻿<?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
-// require_once BASE_PATH . '/app/controllers/proveedor-perfil-controller.php';
+require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
+require_once BASE_PATH . '/app/models/ProveedorNotificaciones.php';
+require_once BASE_PATH . '/app/models/ProveedorPagosFacturacion.php';
 
+$idUsuario      = (int)($_SESSION['user']['id'] ?? 0);
+$correoActual   = $_SESSION['user']['email'] ?? '';
 
-// $idUsuario      = $_SESSION['user']['id'] ?? null;
-// $perfil         = [];
-// $seguridad      = [];
-// $disponibilidad = [];
-// $notificaciones = [];
-// $pagosFacturacion = [];
+$perfil           = [];
+$seguridad        = [];
+$disponibilidad   = [];
+$notificaciones   = [];
+$pagosFacturacion = [];
 
-// if ($idUsuario) {
-//     $modeloPerfil    = new ProveedorPerfil();
-//     $modeloSeguridad = new ProveedorPerfil();
-//     $modeloDisp      = new ProveedorPerfil();
-//     $modeloNotif     = new ProveedorNotificaciones();
-//     $modeloPagos     = new ProveedorPagosFacturacion();
+if ($idUsuario > 0) {
+    try {
+        $modeloPerfil = new ProveedorPerfil();
 
-//     $perfilBD        = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
-//     $seguridadBD     = $modeloSeguridad->obtenerSeguridadPorUsuario($idUsuario);
-//     $dispBD          = $modeloDisp->obtenerDisponibilidadPorUsuario($idUsuario);
-//     $notifBD         = $modeloNotif->obtenerPorUsuario($idUsuario);
-//     $pagosBD         = $modeloPagos->obtenerPorUsuario($idUsuario);
-//     $modeloPoliticas = new ProveedorPerfil();
+        $perfilBD = $modeloPerfil->obtenerPerfilPorUsuario($idUsuario);
+        if ($perfilBD) $perfil = $perfilBD;
 
-//     // ... ya tienes los otros:
-//     $pagosBD         = $modeloPagos->obtenerPorUsuario($idUsuario);
-//     $politicasBD     = $modeloPoliticas->obtenerPoliticasPorUsuario($idUsuario);
+        $seguridadBD = $modeloPerfil->obtenerSeguridadPorUsuario($idUsuario);
+        if ($seguridadBD) $seguridad = $seguridadBD;
 
-//     if ($pagosBD) {
-//         $pagosFacturacion = $pagosBD;
-//     }
-//     if ($politicasBD) {
-//         $politicas        = $politicasBD;
-//     }
+        $dispBD = $modeloPerfil->obtenerDisponibilidadPorUsuario($idUsuario);
+        if ($dispBD) $disponibilidad = $dispBD;
 
+        $modeloNotif = new ProveedorNotificaciones();
+        $notifBD = $modeloNotif->obtenerPorUsuario($idUsuario);
+        if ($notifBD) $notificaciones = $notifBD;
 
-//     if ($perfilBD) {
-//         $perfil           = $perfilBD;
-//     }
-//     if ($seguridadBD) {
-//         $seguridad        = $seguridadBD;
-//     }
-//     if ($dispBD) {
-//         $disponibilidad   = $dispBD;
-//     }
-//     if ($notifBD) {
-//         $notificaciones   = $notifBD;
-//     }
-//     if ($pagosBD) {
-//         $pagosFacturacion = $pagosBD;
-//     }
-// }
-
-// $correoActual = $_SESSION['user']['email'] ?? '';
-
+        $modeloPagos = new ProveedorPagosFacturacion();
+        $pagosBD = $modeloPagos->obtenerPorUsuario($idUsuario);
+        if ($pagosBD) $pagosFacturacion = $pagosBD;
+    } catch (Exception $e) {
+        error_log('configuracion-proveedor.php: ' . $e->getMessage());
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -92,12 +73,23 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
         include_once __DIR__ . '/../../layouts/header-proveedor.php';
         ?>
 
-        <!-- Título principal -->
-        <section id="titulo-principal" class="mb-4">
-            <h1>Configuración del Proveedor</h1>
-            <p class="text-muted mb-0">
-                Administra tu perfil, seguridad, notificaciones y forma de trabajo en la plataforma.
-            </p>
+        <section id="titulo-principal" class="section-hero mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Configuración</h1>
+                    <p class="text-muted mb-0">Administra tu perfil, seguridad, notificaciones y forma de trabajo en la plataforma.</p>
+                </div>
+                <div class="col-md-4">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0 justify-content-md-end">
+                            <li class="breadcrumb-item">
+                                <a href="<?= BASE_URL ?>/proveedor/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Configuración</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </section>
 
         <!-- Contenedor principal de configuración -->
@@ -106,57 +98,26 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
             <ul class="nav nav-tabs" id="configTabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="perfil-tab" data-bs-toggle="tab"
-                        data-bs-target="#perfil" type="button" role="tab" aria-controls="perfil"
-                        aria-selected="true">
-                        <i class="bi bi-person-circle me-1"></i> Perfil profesional
+                        data-bs-target="#perfil" type="button" role="tab">
+                        <i class="bi bi-person-circle me-1"></i> Perfil
                     </button>
                 </li>
-
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="cuenta-tab" data-bs-toggle="tab"
-                        data-bs-target="#cuenta" type="button" role="tab" aria-controls="cuenta"
-                        aria-selected="false">
-                        <i class="bi bi-shield-lock me-1"></i> Cuenta y seguridad
-                    </button>
-                </li>
-
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="notificaciones-tab" data-bs-toggle="tab"
-                        data-bs-target="#notificaciones" type="button" role="tab"
-                        aria-controls="notificaciones" aria-selected="false">
-                        <i class="bi bi-bell me-1"></i> Notificaciones
-                    </button>
-                </li>
-
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="disponibilidad-tab" data-bs-toggle="tab"
-                        data-bs-target="#disponibilidad" type="button" role="tab"
-                        aria-controls="disponibilidad" aria-selected="false">
-                        <i class="bi bi-calendar-check me-1"></i> Disponibilidad y zona de servicio
+                        data-bs-target="#disponibilidad" type="button" role="tab">
+                        <i class="bi bi-calendar-check me-1"></i> Disponibilidad
                     </button>
                 </li>
-
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="pagos-tab" data-bs-toggle="tab"
-                        data-bs-target="#pagos" type="button" role="tab" aria-controls="pagos"
-                        aria-selected="false">
-                        <i class="bi bi-cash-stack me-1"></i> Pagos y facturación
+                        data-bs-target="#pagos" type="button" role="tab">
+                        <i class="bi bi-cash-stack me-1"></i> Pagos
                     </button>
                 </li>
-
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="politicas-tab" data-bs-toggle="tab"
-                        data-bs-target="#politicas" type="button" role="tab" aria-controls="politicas"
-                        aria-selected="false">
-                        <i class="bi bi-file-earmark-text me-1"></i> Políticas de servicio
-                    </button>
-                </li>
-
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="preferencias-tab" data-bs-toggle="tab"
-                        data-bs-target="#preferencias" type="button" role="tab"
-                        aria-controls="preferencias" aria-selected="false">
-                        <i class="bi bi-sliders me-1"></i> Preferencias del panel
+                    <button class="nav-link" id="cuenta-tab" data-bs-toggle="tab"
+                        data-bs-target="#cuenta" type="button" role="tab">
+                        <i class="bi bi-shield-lock me-1"></i> Cuenta
                     </button>
                 </li>
             </ul>
@@ -410,70 +371,20 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                 </div>
 
 
-                <!-- Cuenta y seguridad -->
-                <!-- Cuenta y seguridad -->
+                <!-- Cuenta -->
                 <div class="tab-pane fade" id="cuenta" role="tabpanel" aria-labelledby="cuenta-tab">
                     <div class="tarjeta p-4 tarjeta-config">
-                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
-                            <div>
-                                <h2 class="mb-1">Cuenta y seguridad</h2>
-                                <p class="text-muted mb-0">
-                                    Administra tu correo de acceso, contraseña y preferencias de seguridad de tu cuenta.
-                                </p>
-                            </div>
-                            <span class="badge bg-light text-dark" style="font-size: 0.8rem;">
-                                Última actualización:
-                                <?= isset($seguridad['updated_at']) ? htmlspecialchars($seguridad['updated_at']) : 'Sin registros aún' ?>
-                            </span>
-                        </div>
+                        <h2 class="mb-1">Cuenta y notificaciones</h2>
+                        <p class="text-muted mb-4">Cambia tu contraseña, configura alertas y gestiona el acceso a tu cuenta.</p>
 
                         <div class="row g-4">
-                            <!-- Columna izquierda: datos de acceso -->
+                            <!-- Columna izquierda: contraseña -->
                             <div class="col-lg-6">
-                                <!-- Actualizar correo -->
+                                <!-- Correo actual (solo lectura) -->
                                 <div class="tarjeta-config-inner mb-4">
                                     <h5 class="mb-2">Correo de acceso</h5>
-                                    <p class="text-muted" style="font-size: 0.9rem;">
-                                        Este es el correo con el que inicias sesión en Proviservers.
-                                        No se mostrará a los clientes.
-                                    </p>
-
-                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-correo" method="POST" class="mt-3">
-                                        <div class="mb-3">
-                                            <label class="form-label">Correo actual</label>
-                                            <input
-                                                type="email"
-                                                class="form-control"
-                                                value="<?= htmlspecialchars($correoActual) ?>"
-                                                readonly>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Nuevo correo <span class="text-danger">*</span></label>
-                                            <input
-                                                type="email"
-                                                name="nuevo_correo"
-                                                class="form-control"
-                                                placeholder="Ej: proveedor@miempresa.com"
-                                                required>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Confirmar nuevo correo <span class="text-danger">*</span></label>
-                                            <input
-                                                type="email"
-                                                name="confirmar_correo"
-                                                class="form-control"
-                                                placeholder="Vuelve a escribir el nuevo correo"
-                                                required>
-                                        </div>
-
-                                        <div class="d-flex justify-content-end">
-                                            <button type="submit" class="btn-modern btn-sm">
-                                                <i class="bi bi-envelope-check"></i> Actualizar correo
-                                            </button>
-                                        </div>
-                                    </form>
+                                    <p class="text-muted small mb-2">Este es el correo con el que inicias sesión. Contacta al administrador para cambiarlo.</p>
+                                    <input type="email" class="form-control" value="<?= htmlspecialchars($correoActual) ?>" readonly>
                                 </div>
 
                                 <!-- Cambiar contraseña -->
@@ -542,7 +453,7 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                                     $tiempoSesion      = isset($seguridad['tiempo_sesion']) ? (int) $seguridad['tiempo_sesion'] : 60;
                                     ?>
 
-                                    <form action="<?= BASE_URL ?>/proveedor/guardar-preferencias-seguridad" method="POST">
+                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-seguridad" method="POST">
                                         <div class="mb-3">
                                             <label class="form-label d-block">Alertas que quiero recibir</label>
 
@@ -648,223 +559,6 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 
 
-                <div class="tab-pane fade" id="notificaciones" role="tabpanel" aria-labelledby="notificaciones-tab">
-                    <div class="tarjeta p-4">
-                        <h2 class="mb-3">Notificaciones</h2>
-                        <p class="text-muted mb-4">
-                            Elige sobre qué quieres recibir avisos y por qué canal. Así te aseguramos que no pierdas
-                            solicitudes importantes ni actualizaciones de tus servicios.
-                        </p>
-
-                        <?php
-                        // Defaults si no hay registro aún
-                        $tieneNotif = !empty($notificaciones);
-
-                        $notiSolicitudesNuevas = $tieneNotif ? !empty($notificaciones['noti_solicitudes_nuevas']) : true;
-                        $notiCambiosEstado     = $tieneNotif ? !empty($notificaciones['noti_cambios_estado'])     : true;
-                        $notiResenas           = $tieneNotif ? !empty($notificaciones['noti_resenas'])            : true;
-                        $notiPagos             = $tieneNotif ? !empty($notificaciones['noti_pagos'])              : true;
-
-                        $canalEmail    = $tieneNotif ? !empty($notificaciones['canal_email'])    : true;
-                        $canalInterna  = $tieneNotif ? !empty($notificaciones['canal_interna'])  : true;
-                        $canalWhatsapp = $tieneNotif ? !empty($notificaciones['canal_whatsapp']) : false;
-
-                        $resumenDiario  = $tieneNotif ? !empty($notificaciones['resumen_diario'])  : false;
-                        $resumenSemanal = $tieneNotif ? !empty($notificaciones['resumen_semanal']) : false;
-                        ?>
-
-                        <form action="<?= BASE_URL ?>/proveedor/guardar-notificaciones" method="POST">
-                            <div class="row g-4">
-                                <!-- Columna izquierda: tipos de notificación -->
-                                <div class="col-lg-6">
-                                    <h5 class="mb-3">¿Sobre qué quieres recibir notificaciones?</h5>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="noti_solicitudes_nuevas"
-                                                name="noti_solicitudes_nuevas"
-                                                <?= $notiSolicitudesNuevas ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="noti_solicitudes_nuevas">
-                                                Nuevas solicitudes de servicio
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Cuando un cliente te envíe una nueva solicitud desde la plataforma.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="noti_cambios_estado"
-                                                name="noti_cambios_estado"
-                                                <?= $notiCambiosEstado ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="noti_cambios_estado">
-                                                Cambios en el estado de las solicitudes
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Cuando una solicitud pase a aceptada, en proceso, completada o cancelada.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="noti_resenas"
-                                                name="noti_resenas"
-                                                <?= $notiResenas ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="noti_resenas">
-                                                Nuevas reseñas o calificaciones
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Cuando un cliente deje una reseña sobre tu servicio.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="noti_pagos"
-                                                name="noti_pagos"
-                                                <?= $notiPagos ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="noti_pagos">
-                                                Pagos, liquidaciones y movimientos
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Avisos sobre pagos generados, liquidaciones y movimientos relevantes.
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Columna derecha: canales y resúmenes -->
-                                <div class="col-lg-6">
-                                    <h5 class="mb-3">¿Por dónde quieres recibirlos?</h5>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="canal_email"
-                                                name="canal_email"
-                                                <?= $canalEmail ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="canal_email">
-                                                Correo electrónico
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Te enviaremos notificaciones al correo asociado a tu cuenta.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="canal_interna"
-                                                name="canal_interna"
-                                                <?= $canalInterna ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="canal_interna">
-                                                Notificaciones internas del panel
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                Verás avisos dentro de tu panel de Proviservers.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="canal_whatsapp"
-                                                name="canal_whatsapp"
-                                                <?= $canalWhatsapp ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="canal_whatsapp">
-                                                WhatsApp (cuando esté disponible)
-                                            </label>
-                                            <small class="text-muted d-block">
-                                                En el futuro podrás recibir algunas notificaciones por WhatsApp.
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3">Resúmenes de actividad</h5>
-                                    <p class="text-muted" style="font-size: 0.9rem;">
-                                        Además de las notificaciones en tiempo real, puedes recibir un resumen con los
-                                        puntos más importantes.
-                                    </p>
-
-                                    <div class="mb-2">
-                                        <div class="form-check">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="resumen_diario"
-                                                name="resumen_diario"
-                                                <?= $resumenDiario ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="resumen_diario">
-                                                Resumen diario
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="mb-2">
-                                        <div class="form-check">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="resumen_semanal"
-                                                name="resumen_semanal"
-                                                <?= $resumenSemanal ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="resumen_semanal">
-                                                Resumen semanal
-                                            </label>
-                                        </div>
-                                        <small class="text-muted d-block">
-                                            Elige solo una de las dos opciones (diario o semanal). El sistema lo validará.
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <!-- Acciones -->
-                            <div class="d-flex justify-content-between flex-wrap gap-2">
-                                <div class="text-muted" style="font-size: 0.9rem;">
-                                    Puedes ajustar estas opciones en cualquier momento.
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="reset" class="btn-modern-outline">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
-                                    </button>
-                                    <button type="submit" class="btn-modern">
-                                        <i class="bi bi-save"></i> Guardar preferencias
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-
-                <!-- Disponibilidad y zona de servicio -->
-                <!-- Disponibilidad y zona de servicio -->
                 <div class="tab-pane fade" id="disponibilidad" role="tabpanel" aria-labelledby="disponibilidad-tab">
                     <div class="tarjeta p-4">
                         <h2 class="mb-3">Disponibilidad y zona de servicio</h2>
@@ -1353,254 +1047,14 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 
                 <!-- Políticas de servicio -->
-                <div class="tab-pane fade" id="politicas" role="tabpanel" aria-labelledby="politicas-tab">
-                    <div class="tarjeta p-4">
-                        <h2 class="mb-3">Políticas de servicio</h2>
-                        <p class="text-muted mb-4">
-                            Define cómo manejas cancelaciones, reprogramaciones, garantías y condiciones generales.
-                            Estas políticas se mostrarán al cliente antes de contratarte y nos ayudan a mantener todo
-                            dentro de la plataforma.
-                        </p>
-
-                        <?php
-                        $tienePoliticas = !empty($politicas);
-
-                        $tipoCancelacion        = $tienePoliticas ? ($politicas['tipo_cancelacion']        ?? 'moderada') : 'moderada';
-                        $descripcionCancelacion = $tienePoliticas ? ($politicas['descripcion_cancelacion'] ?? '') : '';
-
-                        $permiteReprogramarActual   = $tienePoliticas ? !empty($politicas['permite_reprogramar']) : true;
-                        $horasMinReprogramacionActual = $tienePoliticas ? ($politicas['horas_min_reprogramacion'] ?? '') : '';
-
-                        $cobraVisitaActual      = $tienePoliticas ? !empty($politicas['cobra_visita']) : false;
-                        $valorVisitaActual      = $tienePoliticas ? ($politicas['valor_visita'] ?? '') : '';
-
-                        $ofreceGarantiaActual   = $tienePoliticas ? !empty($politicas['ofrece_garantia']) : false;
-                        $diasGarantiaActual     = $tienePoliticas ? ($politicas['dias_garantia'] ?? '') : '';
-                        $detallesGarantiaActual = $tienePoliticas ? ($politicas['detalles_garantia'] ?? '') : '';
-
-                        // Por defecto, queremos que use la plataforma para el contacto
-                        if ($tienePoliticas) {
-                            $soloContactoPorPlataformaActual = !empty($politicas['solo_contacto_por_plataforma']);
-                        } else {
-                            $soloContactoPorPlataformaActual = true;
-                        }
-
-                        $tiempoRespuestaActual   = $tienePoliticas ? ($politicas['tiempo_respuesta_promedio'] ?? '') : '';
-                        $otrasCondicionesActual  = $tienePoliticas ? ($politicas['otras_condiciones'] ?? '') : '';
-                        ?>
-
-                        <form action="<?= BASE_URL ?>/proveedor/guardar-politicas" method="POST">
-                            <div class="row g-4">
-                                <!-- Columna izquierda: cancelaciones y reprogramación -->
-                                <div class="col-lg-6">
-                                    <h5 class="mb-3">Cancelaciones y reprogramación</h5>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Política de cancelación <span class="text-danger">*</span></label>
-                                        <select name="tipo_cancelacion" class="form-select">
-                                            <option value="flexible" <?= $tipoCancelacion === 'flexible' ? 'selected' : '' ?>>
-                                                Flexible (se puede cancelar/reprogramar con poco tiempo de anticipación)
-                                            </option>
-                                            <option value="moderada" <?= $tipoCancelacion === 'moderada' ? 'selected' : '' ?>>
-                                                Moderada (requiere algo de anticipación)
-                                            </option>
-                                            <option value="estricta" <?= $tipoCancelacion === 'estricta' ? 'selected' : '' ?>>
-                                                Estricta (cancelaciones con mucha anticipación o con cargo)
-                                            </option>
-                                        </select>
-                                        <small class="text-muted">
-                                            Esta etiqueta se mostrará al cliente para que entienda el tipo de política que manejas.
-                                        </small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Detalle de cancelaciones</label>
-                                        <textarea
-                                            name="descripcion_cancelacion"
-                                            class="form-control"
-                                            rows="3"
-                                            placeholder="Ej: Puedes cancelar hasta 24 horas antes sin costo. Menos de 24 horas se cobra el 50% del servicio."><?= htmlspecialchars($descripcionCancelacion) ?></textarea>
-                                        <small class="text-muted">
-                                            Explica con tus palabras qué pasa si el cliente cancela tarde o no se presenta.
-                                        </small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="permite_reprogramar"
-                                                name="permite_reprogramar"
-                                                <?= $permiteReprogramarActual ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="permite_reprogramar">
-                                                Permito reprogramar el servicio
-                                            </label>
-                                        </div>
-                                        <div class="row g-2 mt-2">
-                                            <div class="col-md-6">
-                                                <label class="form-label">Horas mínimas de anticipación</label>
-                                                <input
-                                                    type="number"
-                                                    name="horas_min_reprogramacion"
-                                                    class="form-control"
-                                                    min="0"
-                                                    placeholder="Ej: 24"
-                                                    value="<?= htmlspecialchars($horasMinReprogramacionActual) ?>">
-                                                <small class="text-muted">
-                                                    Cuántas horas antes se puede reprogramar sin problema.
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-4">Contacto y tiempos de respuesta</h5>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="solo_contacto_por_plataforma"
-                                                name="solo_contacto_por_plataforma"
-                                                <?= $soloContactoPorPlataformaActual ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="solo_contacto_por_plataforma">
-                                                Acepto que la comunicación con el cliente sea solo por la plataforma
-                                            </label>
-                                        </div>
-                                        <small class="text-muted d-block mt-1">
-                                            Esto ayuda a que todo quede registrado y evita que el cliente se vaya por fuera
-                                            del sistema.
-                                        </small>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label">Tiempo de respuesta promedio</label>
-                                        <input
-                                            type="text"
-                                            name="tiempo_respuesta_promedio"
-                                            class="form-control"
-                                            placeholder="Ej: Respondo normalmente en menos de 2 horas"
-                                            value="<?= htmlspecialchars($tiempoRespuestaActual) ?>">
-                                    </div>
-                                </div>
-
-                                <!-- Columna derecha: garantías, visita y otras condiciones -->
-                                <div class="col-lg-6">
-                                    <h5 class="mb-3">Visita y desplazamiento</h5>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="cobra_visita"
-                                                name="cobra_visita"
-                                                <?= $cobraVisitaActual ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="cobra_visita">
-                                                Cobro visita / diagnóstico aunque no se realice el servicio
-                                            </label>
-                                        </div>
-                                        <div class="row g-2 mt-2">
-                                            <div class="col-md-6">
-                                                <label class="form-label">Valor de la visita</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    name="valor_visita"
-                                                    class="form-control"
-                                                    placeholder="Ej: 30000"
-                                                    value="<?= htmlspecialchars($valorVisitaActual) ?>">
-                                            </div>
-                                        </div>
-                                        <small class="text-muted">
-                                            Si no aplicas cobro de visita, deja el valor vacío.
-                                        </small>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-4">Garantía del trabajo</h5>
-
-                                    <div class="mb-3">
-                                        <div class="form-check form-switch">
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                id="ofrece_garantia"
-                                                name="ofrece_garantia"
-                                                <?= $ofreceGarantiaActual ? 'checked' : '' ?>>
-                                            <label class="form-check-label" for="ofrece_garantia">
-                                                Ofrezco garantía sobre mi trabajo
-                                            </label>
-                                        </div>
-                                        <div class="row g-2 mt-2">
-                                            <div class="col-md-6">
-                                                <label class="form-label">Días de garantía</label>
-                                                <input
-                                                    type="number"
-                                                    name="dias_garantia"
-                                                    class="form-control"
-                                                    min="1"
-                                                    placeholder="Ej: 30"
-                                                    value="<?= htmlspecialchars($diasGarantiaActual) ?>">
-                                            </div>
-                                        </div>
-                                        <textarea
-                                            name="detalles_garantia"
-                                            class="form-control mt-2"
-                                            rows="3"
-                                            placeholder="Ej: La garantía aplica solo sobre la mano de obra, no sobre repuestos."><?= htmlspecialchars($detallesGarantiaActual) ?></textarea>
-                                    </div>
-
-                                    <h5 class="mb-3 mt-4">Otras condiciones</h5>
-                                    <div class="mb-3">
-                                        <textarea
-                                            name="otras_condiciones"
-                                            class="form-control"
-                                            rows="4"
-                                            placeholder="Ej: No realizo trabajos en altura sin las condiciones de seguridad adecuadas, se requiere que haya un adulto responsable en el lugar, etc."><?= htmlspecialchars($otrasCondicionesActual) ?></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <hr class="my-4">
-
-                            <!-- Acciones -->
-                            <div class="d-flex justify-content-between flex-wrap gap-2">
-                                <div class="text-muted" style="font-size: 0.9rem;">
-                                    Define políticas claras para evitar malentendidos con el cliente.
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="reset" class="btn-modern-outline">
-                                        <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
-                                    </button>
-                                    <button type="submit" class="btn-modern">
-                                        <i class="bi bi-save"></i> Guardar políticas
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-
-                <!-- Preferencias del panel -->
-                <div class="tab-pane fade" id="preferencias" role="tabpanel" aria-labelledby="preferencias-tab">
-                    <div class="tarjeta p-4">
-                        <h2 class="mb-3">Preferencias del panel</h2>
-                        <p class="text-muted mb-0">
-                            Aquí configurarás preferencias visuales y de uso del panel: página de inicio por defecto,
-                            idioma (en el futuro), formato de hora, etc.
-                        </p>
-                    </div>
-                </div>
 
             </div>
         </section>
     </main>
 
     <!-- Modal de confirmación para eliminar cuenta -->
-    <div class="modal fade" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade modal-cliente" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="modalEliminarCuentaLabel">

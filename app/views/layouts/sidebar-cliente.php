@@ -5,19 +5,22 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
 <aside class="sidebar" id="mainSidebar">
     <div class="logo">
         <a href="<?= BASE_URL ?>/cliente/dashboard">
-            <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png" 
+            <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png"
                  alt="<?= __('cliente_alt_logo') ?>" class="logo-completo">
-            <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png" 
+            <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png"
                  alt="<?= __('cliente_alt_logo') ?>" class="logo-favicon">
         </a>
+        <button class="close-menu-mobile" id="closeMenuMobile" aria-label="Cerrar menú">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <div class="menu-bar">
         <nav class="menu-principal">
             <ul>
-                <!-- Dashboard -->
+                <!-- Panel Principal -->
                 <li>
-                    <a href="<?= BASE_URL ?>/cliente/dashboard" class="active" data-title="<?= __('cliente_menu_panel') ?>">
+                    <a href="<?= BASE_URL ?>/cliente/dashboard" data-title="<?= __('cliente_menu_panel') ?>">
                         <i class="bi bi-grid-1x2-fill"></i>
                         <span class="nav-text"><?= __('cliente_menu_panel') ?></span>
                     </a>
@@ -28,7 +31,7 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                 <!-- Explorar servicios -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/explorar-servicios" data-title="<?= __('cliente_explorar_servicios') ?>">
-                        <i class="bi bi-search"></i>
+                        <i class="bi bi-compass"></i>
                         <span class="nav-text"><?= __('cliente_explorar_servicios') ?></span>
                     </a>
                 </li>
@@ -36,7 +39,7 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                 <!-- Mis solicitudes -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/mis-solicitudes" data-title="<?= __('cliente_mis_solicitudes') ?>">
-                        <i class="bi bi-envelope"></i>
+                        <i class="bi bi-send"></i>
                         <span class="nav-text"><?= __('cliente_mis_solicitudes') ?></span>
                     </a>
                 </li>
@@ -75,6 +78,16 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     </a>
                 </li>
 
+                <li class="menu-header"><?= __('cliente_header_configuracion') ?></li>
+
+                <!-- Mi Perfil -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/perfil" data-title="<?= __('cliente_mi_perfil') ?>">
+                        <i class="bi bi-person-circle"></i>
+                        <span class="nav-text"><?= __('cliente_mi_perfil') ?></span>
+                    </a>
+                </li>
+
                 <!-- Ayuda -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/ayuda" data-title="<?= __('cliente_ayuda') ?>">
@@ -82,29 +95,17 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                         <span class="nav-text"><?= __('cliente_ayuda') ?></span>
                     </a>
                 </li>
-
-                <li class="menu-header"><?= __('cliente_header_configuracion') ?></li>
-
-                <!-- Configuración / Perfil -->
-                <li>
-                    <a href="<?= BASE_URL ?>/cliente/perfil" data-title="<?= __('cliente_perfil') ?>">
-                        <i class="bi bi-person-circle"></i>
-                        <span class="nav-text"><?= __('cliente_perfil') ?></span>
-                    </a>
-                </li>
             </ul>
         </nav>
 
         <div class="menu-footer">
-            <a href="<?= BASE_URL ?>/cliente/perfil" data-title="<?= __('cliente_mi_perfil') ?>">
-                <i class="bi bi-person-circle"></i>
-                <span><?= __('cliente_mi_perfil') ?></span>
-            </a>
+            <!-- Cerrar sesión -->
             <a href="<?= BASE_URL ?>/cerrar-sesion" data-title="<?= __('cliente_salir') ?>">
                 <i class="bi bi-box-arrow-right"></i>
                 <span><?= __('cliente_salir') ?></span>
             </a>
-            
+
+            <!-- Dark mode toggle -->
             <div class="mode-row" id="modeToggle" data-title="<?= __('cliente_dark_mode') ?>">
                 <div class="sun-moon">
                     <i class="bi bi-moon-fill moon"></i>

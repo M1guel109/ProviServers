@@ -236,24 +236,30 @@ class Usuario
             if ($usuario['rol'] === 'proveedor' && !empty($usuario['proveedor_id'])) {
                 $pid = $usuario['proveedor_id'];
 
-                // A. Traer Categorías (Como un array simple de nombres)
-                // Esto devolverá: ['Plomería', 'Electricidad', ...]
-                $sqlCat = "SELECT c.nombre 
-                       FROM categorias c
-                       JOIN proveedor_categorias pc ON c.id = pc.categoria_id
-                       WHERE pc.proveedor_id = :pid";
-                $stmtCat = $this->conexion->prepare($sqlCat);
-                $stmtCat->execute([':pid' => $pid]);
-                $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+                try {
+                    $sqlCat = "SELECT c.nombre
+                           FROM categorias c
+                           JOIN proveedor_categorias pc ON c.id = pc.categoria_id
+                           WHERE pc.proveedor_id = :pid";
+                    $stmtCat = $this->conexion->prepare($sqlCat);
+                    $stmtCat->execute([':pid' => $pid]);
+                    $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+                } catch (PDOException $e) {
+                    error_log("Error en Usuario::mostrarId (categorías) -> " . $e->getMessage());
+                    $usuario['categorias'] = [];
+                }
 
-                // B. Traer Documentos (Array completo)
-                // Esto devolverá: [['id'=>1, 'tipo'=>'cedula', ...], ...]
-                $sqlDoc = "SELECT id, tipo_documento, archivo, estado, fecha_subida 
-                       FROM documentos_proveedor 
-                       WHERE proveedor_id = :pid";
-                $stmtDoc = $this->conexion->prepare($sqlDoc);
-                $stmtDoc->execute([':pid' => $pid]);
-                $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+                try {
+                    $sqlDoc = "SELECT id, tipo_documento, archivo, estado
+                           FROM documentos_proveedor
+                           WHERE proveedor_id = :pid";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
+                    $stmtDoc->execute([':pid' => $pid]);
+                    $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {
+                    error_log("Error en Usuario::mostrarId (documentos) -> " . $e->getMessage());
+                    $usuario['documentos'] = [];
+                }
             }
 
             return $usuario;
@@ -546,23 +552,33 @@ class Usuario
             if ($usuario['rol'] === 'proveedor' && !empty($usuario['proveedor_id'])) {
                 $pid = $usuario['proveedor_id'];
 
-                $sqlCat = "SELECT c.nombre 
-                       FROM categorias c
-                       JOIN proveedor_categorias pc ON c.id = pc.categoria_id
-                       WHERE pc.proveedor_id = :pid";
-                $stmtCat = $this->conexion->prepare($sqlCat);
-                $stmtCat->execute([':pid' => $pid]);
-                $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+                try {
+                    $sqlCat = "SELECT c.nombre
+                           FROM categorias c
+                           JOIN proveedor_categorias pc ON c.id = pc.categoria_id
+                           WHERE pc.proveedor_id = :pid";
+                    $stmtCat = $this->conexion->prepare($sqlCat);
+                    $stmtCat->execute([':pid' => $pid]);
+                    $usuario['categorias'] = $stmtCat->fetchAll(PDO::FETCH_COLUMN);
+                } catch (PDOException $e) {
+                    error_log("Error en Usuario::obtenerDetalleCompleto (categorías) -> " . $e->getMessage());
+                    $usuario['categorias'] = [];
+                }
 
-                $sqlDoc = "SELECT tipo_documento, archivo, estado 
-                       FROM documentos_proveedor 
-                       WHERE proveedor_id = :pid";
-                $stmtDoc = $this->conexion->prepare($sqlDoc);
-                $stmtDoc->execute([':pid' => $pid]);
-                $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+                try {
+                    $sqlDoc = "SELECT tipo_documento, archivo, estado
+                           FROM documentos_proveedor
+                           WHERE proveedor_id = :pid";
+                    $stmtDoc = $this->conexion->prepare($sqlDoc);
+                    $stmtDoc->execute([':pid' => $pid]);
+                    $usuario['documentos'] = $stmtDoc->fetchAll(PDO::FETCH_ASSOC);
+                } catch (PDOException $e) {
+                    error_log("Error en Usuario::obtenerDetalleCompleto (documentos) -> " . $e->getMessage());
+                    $usuario['documentos'] = [];
+                }
             }
 
-            // 3. ✅ NUEVO — Si es CLIENTE — historial y solicitudes
+            // 3. Si es CLIENTE — historial y solicitudes
             if ($usuario['rol'] === 'cliente' && !empty($usuario['cliente_id'])) {
                 $cid = $usuario['cliente_id'];
 

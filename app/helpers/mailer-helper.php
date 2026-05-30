@@ -15,8 +15,8 @@ function mailer_init()
     $mail->isSMTP();                                            //Send using SMTP
     $mail->Host       = 'smtp.gmail.com';                       //Set the SMTP server to send through
     $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'suppportproviservers@gmail.com';       //SMTP username
-    $mail->Password   = 'pycfcqpfdbbnxgsq';                               //SMTP password
+    $mail->Username   = SMTP_USER;
+    $mail->Password   = SMTP_PASS;
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
     $mail->Port       = 465;
     $mail->CharSet = "UTF-8";

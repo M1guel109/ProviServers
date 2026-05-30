@@ -371,47 +371,21 @@
         display: flex;
     }
 
-    .sidebar {
-        /* position: fixed; */
-        /* left: -280px; */
-        top: 0;
-        bottom: 0;
-        width: 280px;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1000;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar.mobile-open {
-        left: 0;
-    }
-
-    .contenido {
-        margin-left: 0 !important;
-        width: 100% !important;
-    }
-
-    /* Ajustes del header */
     .barra-superior {
-        position: sticky;
-        top: 0;
-        z-index: 99;
         background: white;
         margin: 0;
         border-radius: 0 0 12px 12px;
         padding: 12px 20px;
     }
 
-    /* Buscador se oculta en tablet/móvil */
-    .buscador.d-none.d-md-flex {
-        display: none !important;
-    }
 }
 
 /* Tablet Portrait (hasta 992px) */
 @media screen and (max-width: 992px) {
     .contenido {
-        padding: 20px 15px;
+        padding-right: 15px;
+        padding-bottom: 20px;
+        padding-left: 15px;
     }
 
     .barra-superior {
@@ -439,31 +413,10 @@
 /* Móvil (hasta 768px) */
 @media screen and (max-width: 768px) {
 
-    .sidebar {
-        position: fixed;
-        /* Asegura que flote sobre el contenido */
-        top: 0;
-        left: -100%;
-        /* Oculta por defecto */
-        height: 100vh;
-        /* OBLIGATORIO para el scroll */
-        width: 280px;
-        overflow-y: auto;
-        /* Habilita el scroll interno del menú */
-        -webkit-overflow-scrolling: touch;
-        /* Suaviza el scroll en iOS */
-        z-index: 9999;
-        background: var(--white-color);
-        transition: left 0.3s ease;
-    }
-
-    .sidebar.mobile-open {
-        left: 0;
-        /* Clase para mostrarlo */
-    }
-
     .contenido {
-        padding: 15px 12px;
+        padding-right: 12px;
+        padding-bottom: 15px;
+        padding-left: 12px;
     }
 
     #btn-toggle-menu {
@@ -483,44 +436,19 @@
         gap: 8px;
     }
 
-    /* Ocultar selector de idioma en móvil */
-    .nav-item.dropdown.d-none.d-sm-block {
-        display: none !important;
-    }
-
-    /* Ocultar plan gold en móvil */
-    .d-none.d-lg-flex {
-        display: none !important;
-    }
-
     .usuario img {
         width: 38px;
         height: 38px;
     }
 
-    .dropdown-menu {
-        position: fixed !important;
-        top: auto !important;
-        left: 10px !important;
-        right: 10px !important;
-        bottom: 10px !important;
-        width: auto !important;
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 16px !important;
-        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
-    }
-
-    .sidebar {
-        width: 85%;
-        max-width: 300px;
-    }
 }
 
 /* Móvil pequeño (hasta 480px) */
 @media screen and (max-width: 480px) {
     .contenido {
-        padding: 12px 10px;
+        padding-right: 10px;
+        padding-bottom: 12px;
+        padding-left: 10px;
     }
 
     #btn-toggle-menu {
@@ -553,14 +481,6 @@
         width: 90%;
     }
 
-    /* Dropdown a pantalla completa en móvil muy pequeño */
-    .dropdown-menu {
-        left: 5px !important;
-        right: 5px !important;
-        bottom: 5px !important;
-        padding: 10px 0 !important;
-    }
-
     .dropdown-header {
         padding: 12px !important;
     }
@@ -574,7 +494,9 @@
 /* Ajuste para pantallas muy pequeñas (hasta 360px) */
 @media screen and (max-width: 360px) {
     .contenido {
-        padding: 10px 8px;
+        padding-right: 8px;
+        padding-bottom: 10px;
+        padding-left: 8px;
     }
 
     #btn-toggle-menu {

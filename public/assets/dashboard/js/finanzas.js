@@ -3,8 +3,6 @@
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Finanzas cargadas');
-    
     // Inicializar gráficas
     initCharts();
     
@@ -15,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (aplicarFiltro) {
         aplicarFiltro.addEventListener('click', function() {
             const periodo = periodoSelect ? periodoSelect.value : 'mes';
-            console.log('Filtrar por período:', periodo);
             alert(`Filtrando datos financieros por: ${periodo}`);
         });
     }
@@ -213,7 +210,6 @@ function formatearMoneda(valor) {
 // Función para actualizar datos (cuando se implemente el backend)
 function actualizarFinanzas(periodo) {
     // Aquí iría un fetch al backend para obtener nuevos datos
-    console.log('Actualizando finanzas para período:', periodo);
     
     // Ejemplo de actualización:
     /*

@@ -184,120 +184,114 @@ class Publicacion
      */
     // app/models/Publicacion.php
 
-    public function listarPublicasActivas(?string $busqueda = null, ?int $categoriaId = null): array
-    {
+    public function listarPublicasActivas(
+        ?string $busqueda   = null,
+        ?int    $categoriaId = null,
+        ?string $ciudad      = null,
+        ?float  $precioMax   = null,
+        string  $orden       = 'recientes'
+    ): array {
         try {
             $sql = "
-                        SELECT 
-                            pub.id,
-                            pub.servicio_id,
-                            pub.titulo,
-                            pub.descripcion,
-                            pub.precio,
-                            pub.estado,
-                            pub.created_at,
+            SELECT
+                pub.id,
+                pub.servicio_id,
+                pub.titulo,
+                pub.descripcion,
+                pub.precio,
+                pub.estado,
+                pub.created_at,
 
-                            s.nombre       AS servicio_nombre,
-                            s.descripcion  AS servicio_descripcion,
-                            s.imagen       AS servicio_imagen,
+                s.nombre       AS servicio_nombre,
+                s.descripcion  AS servicio_descripcion,
+                s.imagen       AS servicio_imagen,
 
-                            c.nombre       AS categoria_nombre
-                        FROM publicaciones AS pub
-                        INNER JOIN servicios   AS s ON pub.servicio_id = s.id
-                        LEFT  JOIN categorias  AS c ON s.id_categoria = c.id
-                        WHERE pub.estado = 'aprobado' 
-                        AND s.disponibilidad = 1  -- <--- ESTA ES LA CLAVE
-                    ";
+                c.nombre       AS categoria_nombre,
+
+                CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                COALESCE(pp.foto, pr.foto)            AS proveedor_foto,
+                pp.ciudad                             AS proveedor_ciudad,
+                pp.zona                               AS proveedor_zona,
+                pp.latitud                            AS proveedor_lat,
+                pp.longitud                           AS proveedor_lng,
+
+                COALESCE(AVG(v.calificacion), 0) AS calificacion_promedio,
+                COUNT(v.id)                      AS total_resenas,
+
+                promo.porcentaje_descuento       AS promo_descuento,
+                promo.fecha_fin                  AS promo_hasta
+
+            FROM publicaciones AS pub
+            INNER JOIN servicios      AS s   ON pub.servicio_id  = s.id
+            LEFT  JOIN categorias     AS c   ON s.id_categoria   = c.id
+            INNER JOIN proveedores    AS pr  ON pub.proveedor_id = pr.id
+            LEFT  JOIN proveedor_perfil AS pp ON pp.id_usuario   = pr.usuario_id
+            LEFT  JOIN valoraciones   AS v   ON v.proveedor_id   = pr.id
+            LEFT  JOIN promociones promo
+                ON promo.publicacion_id = pub.id
+                AND promo.fecha_inicio <= CURDATE()
+                AND promo.fecha_fin    >= CURDATE()
+            WHERE pub.estado = 'aprobado'
+              AND s.disponibilidad = 1
+        ";
 
             $params = [];
 
-            // Búsqueda por texto (opcional)
             if (!empty($busqueda)) {
-                $sql .= " 
-                AND (
-                    pub.titulo      LIKE :busqueda
-                    OR s.nombre     LIKE :busqueda
+                $sql .= " AND (
+                    pub.titulo       LIKE :busqueda
+                    OR s.nombre      LIKE :busqueda
                     OR s.descripcion LIKE :busqueda
-                    OR c.nombre     LIKE :busqueda
-                )
-            ";
+                    OR c.nombre      LIKE :busqueda
+                    OR pp.ciudad     LIKE :busqueda
+                    OR pp.zona       LIKE :busqueda
+                )";
                 $params[':busqueda'] = '%' . $busqueda . '%';
             }
 
-            // Filtro por categoría (opcional)
             if (!empty($categoriaId)) {
                 $sql .= " AND s.id_categoria = :categoriaId";
-                $params[':categoriaId'] = (int) $categoriaId;
+                $params[':categoriaId'] = (int)$categoriaId;
             }
 
-            $sql .= " ORDER BY pub.created_at DESC";
+            if (!empty($ciudad)) {
+                $sql .= " AND (pp.ciudad LIKE :ciudad OR pp.zona LIKE :ciudad)";
+                $params[':ciudad'] = '%' . $ciudad . '%';
+            }
+
+            if ($precioMax !== null && $precioMax > 0) {
+                $sql .= " AND pub.precio <= :precioMax";
+                $params[':precioMax'] = $precioMax;
+            }
+
+            $ordenMap = [
+                'precio_asc'  => 'pub.precio ASC',
+                'precio_desc' => 'pub.precio DESC',
+                'valorados'   => 'calificacion_promedio DESC, total_resenas DESC',
+                'recientes'   => 'pub.created_at DESC',
+            ];
+            $orderBy = $ordenMap[$orden] ?? 'pub.created_at DESC';
+
+            $sql .= " GROUP BY pub.id ORDER BY $orderBy";
 
             $stmt = $this->conexion->prepare($sql);
 
             foreach ($params as $key => $value) {
-                if ($key === ':categoriaId') {
-                    $stmt->bindValue($key, $value, PDO::PARAM_INT);
-                } else {
-                    $stmt->bindValue($key, $value, PDO::PARAM_STR);
-                }
+                $stmt->bindValue(
+                    $key,
+                    $value,
+                    $key === ':categoriaId' ? PDO::PARAM_INT : PDO::PARAM_STR
+                );
             }
 
             $stmt->execute();
-            $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            return $filas ?: [];
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         } catch (PDOException $e) {
             error_log("Error en Publicacion::listarPublicasActivas -> " . $e->getMessage());
             return [];
         }
     }
-    public function obtenerPublicaActivaPorId(int $id): ?array
-    {
-        try {
-            $sql = "
-            SELECT 
-                pub.id,
-                pub.titulo,
-                pub.descripcion       AS publicacion_descripcion,
-                pub.precio,
-                pub.estado,
-                pub.created_at        AS publicacion_created_at,
 
-                s.id                  AS servicio_id,
-                s.nombre              AS servicio_nombre,
-                s.descripcion         AS servicio_descripcion,
-                s.imagen              AS servicio_imagen,
-                s.disponibilidad      AS servicio_disponible,
-
-                c.nombre              AS categoria_nombre,
-
-                p.id AS proveedor_id, 
-                p.usuario_id AS proveedor_usuario_id,
-                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor_nombre,
-                p.ubicacion AS proveedor_ubicacion,
-                p.foto AS proveedor_foto
-
-            FROM publicaciones AS pub
-            INNER JOIN servicios   AS s ON pub.servicio_id  = s.id
-            LEFT  JOIN categorias  AS c ON s.id_categoria   = c.id
-            INNER JOIN proveedores AS p ON pub.proveedor_id = p.id
-            WHERE pub.id = :id
-              AND pub.estado = 'aprobado'
-            LIMIT 1
-        ";
-
-            $stmt = $this->conexion->prepare($sql);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-
-            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            return $fila ?: null;
-        } catch (PDOException $e) {
-            error_log("Error en Publicacion::obtenerPublicaActivaPorId -> " . $e->getMessage());
-            return null;
-        }
-    }
 
     public function listarPublicacionesAprobadasParaSolicitudes(): array
     {
@@ -319,5 +313,59 @@ class Publicacion
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
+    public function obtenerDetallePublicacion(int $id): ?array
+    {
+        try {
+            $sql = "
+                SELECT 
+                    p.id AS publicacion_id,
+                    p.titulo AS publicacion_titulo,
+                    p.descripcion AS publicacion_descripcion,
+                    p.precio AS publicacion_precio,
+                    p.estado AS publicacion_estado,
+                    p.created_at AS publicacion_fecha,
+
+                    s.id AS servicio_id,
+                    s.nombre AS servicio_nombre,
+                    s.descripcion AS servicio_descripcion,
+                    s.imagen AS servicio_imagen,
+                    s.disponibilidad AS servicio_disponible,
+
+                    c.nombre AS categoria_nombre,
+
+                    pr.id AS proveedor_id,
+                    CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                    pr.ubicacion AS proveedor_ubicacion,
+                    pr.foto AS proveedor_foto,
+                    pr.usuario_id AS proveedor_usuario_id,
+
+                    promo.porcentaje_descuento AS promo_descuento,
+                    promo.fecha_fin            AS promo_hasta
+
+                FROM publicaciones p
+                INNER JOIN servicios s   ON p.servicio_id  = s.id
+                LEFT  JOIN categorias c  ON s.id_categoria = c.id
+                INNER JOIN proveedores pr ON p.proveedor_id = pr.id
+                LEFT  JOIN promociones promo
+                    ON promo.publicacion_id = p.id
+                    AND promo.fecha_inicio <= CURDATE()
+                    AND promo.fecha_fin    >= CURDATE()
+                WHERE p.id = :id
+                  AND p.estado = 'aprobado'
+                LIMIT 1
+            ";
+
+            $stmt = $this->conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $resultado ?: null;
+        } catch (PDOException $e) {
+            error_log("Error en Publicacion::obtenerDetallePublicacion -> " . $e->getMessage());
+            return null;
+        }
     }
 }

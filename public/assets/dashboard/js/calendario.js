@@ -233,8 +233,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const motivo = motivoTextarea ? motivoTextarea.value : '';
                 
                 // Aquí iría la lógica para guardar el bloqueo (AJAX)
-                console.log('Bloquear día:', fecha, motivo);
-                
                 // Agregar a la lista de bloqueados (simulado)
                 diasBloqueados.push(fecha);
                 
