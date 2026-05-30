@@ -54,15 +54,15 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
             $diasDash = (int)$planDash['dias_restantes'];
             $colorDash = $diasDash <= 2 ? 'danger' : 'warning';
         ?>
-        <div class="alert alert-<?= $colorDash ?> d-flex align-items-center gap-2 mb-4 rounded-3" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            <span>
-                <?= $diasDash === 0
-                    ? '<strong>Tu membresía venció.</strong> Renuévala para seguir publicando sin límites.'
-                    : "<strong>Tu plan vence en {$diasDash} " . ($diasDash === 1 ? 'día' : 'días') . ".</strong> Renuévalo para no perder tus beneficios." ?>
-                <a href="<?= BASE_URL ?>/proveedor/membresia" class="alert-link ms-1">Renovar ahora →</a>
-            </span>
-        </div>
+            <div class="alert alert-<?= $colorDash ?> d-flex align-items-center gap-2 mb-4 rounded-3" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span>
+                    <?= $diasDash === 0
+                        ? '<strong>Tu membresía venció.</strong> Renuévala para seguir publicando sin límites.'
+                        : "<strong>Tu plan vence en {$diasDash} " . ($diasDash === 1 ? 'día' : 'días') . ".</strong> Renuévalo para no perder tus beneficios." ?>
+                    <a href="<?= BASE_URL ?>/proveedor/membresia" class="alert-link ms-1">Renovar ahora →</a>
+                </span>
+            </div>
         <?php endif; ?>
 
         <!-- titulo con breadcrumb y explicación -->
@@ -166,12 +166,12 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
                                 ?? 'Servicio';
 
                             $estadoSrv = $srv['estado'] ?? 'pendiente';
-                            $estadoClass = match($estadoSrv) {
+                            $estadoClass = match ($estadoSrv) {
                                 'finalizado'            => 'estado-inactivo',
                                 'pendiente', 'confirmado' => 'estado-pendiente',
                                 default                 => 'estado-activo'
                             };
-                            $estadoLabel = match($estadoSrv) {
+                            $estadoLabel = match ($estadoSrv) {
                                 'finalizado'  => 'Finalizado',
                                 'pendiente'   => 'Pendiente',
                                 'confirmado'  => 'Confirmado',
@@ -179,14 +179,14 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
                                 default       => ucfirst($estadoSrv)
                             };
                         ?>
-                        <div class="servicio-item">
-                            <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
-                            <div class="servicio-info">
-                                <div class="servicio-nombre-item"><?= htmlspecialchars($tituloSrv) ?></div>
-                                <div class="servicio-categoria"><?= htmlspecialchars($srv['cliente_nombre'] ?? '') ?></div>
+                            <div class="servicio-item">
+                                <img src="<?= BASE_URL ?>/public/assets/dashboard/img/imagen-servicio.png" alt="Servicio">
+                                <div class="servicio-info">
+                                    <div class="servicio-nombre-item"><?= htmlspecialchars($tituloSrv) ?></div>
+                                    <div class="servicio-categoria"><?= htmlspecialchars($srv['cliente_nombre'] ?? '') ?></div>
+                                </div>
+                                <span class="servicio-estado <?= $estadoClass ?>"><?= $estadoLabel ?></span>
                             </div>
-                            <span class="servicio-estado <?= $estadoClass ?>"><?= $estadoLabel ?></span>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-muted small py-3">No tienes servicios contratados aún.</p>
@@ -202,22 +202,22 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
                         <?php foreach ($resenasRecientes as $r):
                             $n = (int)round((float)($r['calificacion'] ?? 0));
                         ?>
-                        <div class="reseña-item">
-                            <div class="reseña-header">
-                                <div class="reseña-cliente"><?= htmlspecialchars($r['cliente_nombre'] ?? 'Cliente') ?></div>
-                                <div class="reseña-calificacion">
-                                    <?php for ($i = 0; $i < 5; $i++): ?>
-                                        <i class="bi bi-star<?= $i < $n ? '-fill' : '' ?>"></i>
-                                    <?php endfor; ?>
+                            <div class="reseña-item">
+                                <div class="reseña-header">
+                                    <div class="reseña-cliente"><?= htmlspecialchars($r['cliente_nombre'] ?? 'Cliente') ?></div>
+                                    <div class="reseña-calificacion">
+                                        <?php for ($i = 0; $i < 5; $i++): ?>
+                                            <i class="bi bi-star<?= $i < $n ? '-fill' : '' ?>"></i>
+                                        <?php endfor; ?>
+                                    </div>
+                                </div>
+                                <?php if (!empty($r['comentario'])): ?>
+                                    <div class="reseña-comentario">"<?= htmlspecialchars($r['comentario']) ?>"</div>
+                                <?php endif; ?>
+                                <div class="reseña-fecha">
+                                    <?= $r['created_at'] ? date('d/m/Y', strtotime($r['created_at'])) : '' ?>
                                 </div>
                             </div>
-                            <?php if (!empty($r['comentario'])): ?>
-                                <div class="reseña-comentario">"<?= htmlspecialchars($r['comentario']) ?>"</div>
-                            <?php endif; ?>
-                            <div class="reseña-fecha">
-                                <?= $r['created_at'] ? date('d/m/Y', strtotime($r['created_at'])) : '' ?>
-                            </div>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-muted small py-3">Aún no tienes reseñas de clientes.</p>
@@ -231,21 +231,21 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
                 <div class="citas-proximas">
                     <?php if (!empty($proximasCitas)): ?>
                         <?php foreach ($proximasCitas as $cita): ?>
-                        <div class="cita-item">
-                            <div class="cita-fecha">
-                                <span class="cita-dia">
-                                    <?= $cita['fecha_ejecucion'] ? date('d', strtotime($cita['fecha_ejecucion'])) : '--' ?>
-                                </span>
-                                <span class="cita-mes">
-                                    <?= $cita['fecha_ejecucion'] ? date('M', strtotime($cita['fecha_ejecucion'])) : '' ?>
-                                </span>
+                            <div class="cita-item">
+                                <div class="cita-fecha">
+                                    <span class="cita-dia">
+                                        <?= $cita['fecha_ejecucion'] ? date('d', strtotime($cita['fecha_ejecucion'])) : '--' ?>
+                                    </span>
+                                    <span class="cita-mes">
+                                        <?= $cita['fecha_ejecucion'] ? date('M', strtotime($cita['fecha_ejecucion'])) : '' ?>
+                                    </span>
+                                </div>
+                                <div class="cita-info">
+                                    <div class="cita-servicio"><?= htmlspecialchars($cita['servicio_nombre'] ?? 'Servicio') ?></div>
+                                    <div class="cita-cliente"><?= htmlspecialchars($cita['cliente_nombre'] ?? '') ?></div>
+                                    <div class="cita-hora"><?= htmlspecialchars($cita['franja_horaria'] ?? '') ?></div>
+                                </div>
                             </div>
-                            <div class="cita-info">
-                                <div class="cita-servicio"><?= htmlspecialchars($cita['servicio_nombre'] ?? 'Servicio') ?></div>
-                                <div class="cita-cliente"><?= htmlspecialchars($cita['cliente_nombre'] ?? '') ?></div>
-                                <div class="cita-hora"><?= htmlspecialchars($cita['franja_horaria'] ?? '') ?></div>
-                            </div>
-                        </div>
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-muted small py-3">No hay citas próximas programadas.</p>
@@ -259,18 +259,19 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
         <!-- Enlaces / Información -->
     </footer>
 
-    <!-- apexcharts -->
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <!-- Bootstrap JS -->
+    <!-- Bootstrap JS primero (incluye Popper.js) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!-- tu javaScript -->
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-proveedor.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/app.js"></script>
+    <!-- main.js (sidebar, dark mode, tooltips) -->
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+
+    <!-- ApexCharts después de Bootstrap para no interferir con Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <!-- JS específico del dashboard -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-proveedor.js"></script>
 </body>
 
 </html>

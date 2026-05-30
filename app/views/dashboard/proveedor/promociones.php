@@ -40,7 +40,7 @@ try {
                 'valor'       => (int)$p['porcentaje_descuento'],
                 'usos'        => 0,
                 'limite_usos' => 0,
-                'fecha_inicio'=> $inicio,
+                'fecha_inicio' => $inicio,
                 'fecha_fin'   => $fin,
                 'estado'      => $fin < $hoy ? 'finalizada' : ($inicio > $hoy ? 'disponible' : 'activa'),
                 'servicios'   => [$p['servicio_titulo'] ?? 'Servicio'],
@@ -70,7 +70,7 @@ $misPublicaciones = $misPublicaciones ?? [];
 
 $tipos_promocion = [
     'descuento' => ['nombre' => 'Descuento', 'icono' => 'bi-percent', 'color' => 'primary'],
-    'paquete'   => ['nombre' => 'Paquete',   'icono' => 'bi-box-seam','color' => 'success'],
+    'paquete'   => ['nombre' => 'Paquete',   'icono' => 'bi-box-seam', 'color' => 'success'],
     'gratis'    => ['nombre' => 'Gratis',    'icono' => 'bi-gift',    'color' => 'warning'],
 ];
 
@@ -236,20 +236,20 @@ $tipos_promocion = [
             <h5 class="fw-bold mb-3">
                 <i class="bi bi-play-circle-fill text-success me-2"></i>Promociones activas
             </h5>
-            
+
             <div class="row g-4">
                 <?php foreach ($promociones_activas as $promo): ?>
                     <div class="col-md-6">
                         <div class="card-promocion activa">
                             <div class="promocion-badge activa">ACTIVA</div>
-                            
+
                             <div class="row g-0">
                                 <div class="col-md-4">
                                     <div class="promocion-imagen">
                                         <i class="bi bi-megaphone"></i>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-8">
                                     <div class="promocion-detalle">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
@@ -259,23 +259,23 @@ $tipos_promocion = [
                                                 <?= $tipos_promocion[$promo['tipo']]['nombre'] ?>
                                             </span>
                                         </div>
-                                        
+
                                         <p class="text-muted small mb-3"><?= $promo['descripcion'] ?></p>
-                                        
+
                                         <div class="promocion-meta mb-3">
                                             <div class="d-flex align-items-center gap-3 small">
-                                                <span><i class="bi bi-calendar3 me-1 text-primary"></i> 
+                                                <span><i class="bi bi-calendar3 me-1 text-primary"></i>
                                                     <?= date('d/m/Y', strtotime($promo['fecha_inicio'])) ?> - <?= date('d/m/Y', strtotime($promo['fecha_fin'])) ?>
                                                 </span>
-                                                <span><i class="bi bi-tag me-1 text-success"></i> 
-                                                    <?= $promo['valor'] ?>% 
+                                                <span><i class="bi bi-tag me-1 text-success"></i>
+                                                    <?= $promo['valor'] ?>%
                                                 </span>
                                             </div>
                                             <div class="mt-2">
                                                 <span class="badge bg-light text-dark me-1"><?= implode('</span><span class="badge bg-light text-dark me-1">', $promo['servicios']) ?></span>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="progress mb-2" style="height: 6px;">
                                             <div class="progress-bar bg-success" style="width: <?= ($promo['usos'] / $promo['limite_usos']) * 100 ?>%"></div>
                                         </div>
@@ -283,10 +283,10 @@ $tipos_promocion = [
                                             <span><?= $promo['usos'] ?> usos</span>
                                             <span>Límite: <?= $promo['limite_usos'] ?></span>
                                         </div>
-                                        
+
                                         <div class="d-flex gap-2">
                                             <form method="POST" action="<?= BASE_URL ?>/proveedor/promociones/eliminar"
-                                                  onsubmit="return confirm('¿Eliminar esta promoción?')">
+                                                onsubmit="return confirm('¿Eliminar esta promoción?')">
                                                 <input type="hidden" name="promo_id" value="<?= $promo['id'] ?>">
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">
                                                     <i class="bi bi-trash"></i> Eliminar
@@ -316,21 +316,21 @@ $tipos_promocion = [
             <h5 class="fw-bold mb-3">
                 <i class="bi bi-plus-circle-fill text-primary me-2"></i>Promociones disponibles para activar
             </h5>
-            
+
             <div class="row g-4">
                 <?php foreach ($promociones_disponibles as $promo): ?>
                     <div class="col-md-4">
                         <div class="card-promocion disponible">
                             <div class="promocion-badge disponible">DISPONIBLE</div>
-                            
+
                             <div class="promocion-header text-center">
                                 <i class="bi bi-gift promocion-icono-grande"></i>
                                 <h6 class="fw-bold mt-3"><?= $promo['titulo'] ?></h6>
                             </div>
-                            
+
                             <div class="promocion-body">
                                 <p class="small text-muted mb-3"><?= $promo['descripcion'] ?></p>
-                                
+
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="badge <?= $tipos_promocion[$promo['tipo']]['color'] ?>">
                                         <i class="bi <?= $tipos_promocion[$promo['tipo']]['icono'] ?> me-1"></i>
@@ -340,7 +340,7 @@ $tipos_promocion = [
                                         <i class="bi bi-calendar3"></i> <?= date('d/m', strtotime($promo['fecha_inicio'])) ?>
                                     </small>
                                 </div>
-                                
+
                                 <div class="d-flex gap-2">
                                     <button class="btn btn-sm btn-primary w-100">Activar promoción</button>
                                     <button class="btn btn-sm btn-outline-secondary">
@@ -359,7 +359,7 @@ $tipos_promocion = [
             <h5 class="fw-bold mb-3">
                 <i class="bi bi-clock-history text-secondary me-2"></i>Promociones finalizadas
             </h5>
-            
+
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead class="bg-light">
@@ -374,37 +374,37 @@ $tipos_promocion = [
                     </thead>
                     <tbody>
                         <?php foreach ($promociones_finalizadas as $promo): ?>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold"><?= $promo['titulo'] ?></span>
-                                <br>
-                                <small class="text-muted"><?= $promo['descripcion'] ?></small>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    <i class="bi <?= $tipos_promocion[$promo['tipo']]['icono'] ?> me-1"></i>
-                                    <?= $tipos_promocion[$promo['tipo']]['nombre'] ?>
-                                </span>
-                            </td>
-                            <td>
-                                <small><?= date('d/m/Y', strtotime($promo['fecha_inicio'])) ?><br>
-                                <?= date('d/m/Y', strtotime($promo['fecha_fin'])) ?></small>
-                            </td>
-                            <td><?= $promo['usos'] ?>/<?= $promo['limite_usos'] ?></td>
-                            <td>
-                                <div class="d-flex align-items-center">
-                                    <div class="progress flex-grow-1 me-2" style="height: 6px;">
-                                        <div class="progress-bar bg-success" style="width: 90%"></div>
+                            <tr>
+                                <td>
+                                    <span class="fw-semibold"><?= $promo['titulo'] ?></span>
+                                    <br>
+                                    <small class="text-muted"><?= $promo['descripcion'] ?></small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">
+                                        <i class="bi <?= $tipos_promocion[$promo['tipo']]['icono'] ?> me-1"></i>
+                                        <?= $tipos_promocion[$promo['tipo']]['nombre'] ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <small><?= date('d/m/Y', strtotime($promo['fecha_inicio'])) ?><br>
+                                        <?= date('d/m/Y', strtotime($promo['fecha_fin'])) ?></small>
+                                </td>
+                                <td><?= $promo['usos'] ?>/<?= $promo['limite_usos'] ?></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                            <div class="progress-bar bg-success" style="width: 90%"></div>
+                                        </div>
+                                        <small>90%</small>
                                     </div>
-                                    <small>90%</small>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-arrow-repeat"></i> Reactivar
-                                </button>
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-arrow-repeat"></i> Reactivar
+                                    </button>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -424,55 +424,55 @@ $tipos_promocion = [
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <form method="POST" action="<?= BASE_URL ?>/proveedor/promociones/crear">
-                <div class="modal-body p-4">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Publicación <span class="text-danger">*</span></label>
-                            <select name="publicacion_id" class="form-select" required>
-                                <option value="">Selecciona un servicio publicado...</option>
-                                <?php foreach ($misPublicaciones as $pub): ?>
-                                    <option value="<?= $pub['id'] ?>">
-                                        <?= htmlspecialchars($pub['titulo']) ?>
-                                        <?= $pub['precio'] > 0 ? ' — $'.number_format((float)$pub['precio'],0,',','.') : '' ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                            <?php if (empty($misPublicaciones)): ?>
-                                <small class="text-warning">
-                                    <i class="bi bi-exclamation-triangle me-1"></i>
-                                    No tienes publicaciones aprobadas. Debes publicar un servicio primero.
-                                </small>
-                            <?php endif; ?>
-                        </div>
+                    <div class="modal-body p-4">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Publicación <span class="text-danger">*</span></label>
+                                <select name="publicacion_id" class="form-select" required>
+                                    <option value="">Selecciona un servicio publicado...</option>
+                                    <?php foreach ($misPublicaciones as $pub): ?>
+                                        <option value="<?= $pub['id'] ?>">
+                                            <?= htmlspecialchars($pub['titulo']) ?>
+                                            <?= $pub['precio'] > 0 ? ' — $' . number_format((float)$pub['precio'], 0, ',', '.') : '' ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <?php if (empty($misPublicaciones)): ?>
+                                    <small class="text-warning">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                        No tienes publicaciones aprobadas. Debes publicar un servicio primero.
+                                    </small>
+                                <?php endif; ?>
+                            </div>
 
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">Descuento (%) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <input type="number" name="porcentaje_descuento" class="form-control"
-                                    min="1" max="100" placeholder="Ej: 20" required>
-                                <span class="input-group-text">%</span>
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">Descuento (%) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" name="porcentaje_descuento" class="form-control"
+                                        min="1" max="100" placeholder="Ej: 20" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+                                <input type="date" name="fecha_inicio" class="form-control"
+                                    min="<?= date('Y-m-d') ?>" required>
+                            </div>
+
+                            <div class="col-6">
+                                <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
+                                <input type="date" name="fecha_fin" class="form-control"
+                                    min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
                             </div>
                         </div>
-
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
-                            <input type="date" name="fecha_inicio" class="form-control"
-                                min="<?= date('Y-m-d') ?>" required>
-                        </div>
-
-                        <div class="col-6">
-                            <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
-                            <input type="date" name="fecha_fin" class="form-control"
-                                min="<?= date('Y-m-d', strtotime('+1 day')) ?>" required>
-                        </div>
                     </div>
-                </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" <?= empty($misPublicaciones) ? 'disabled' : '' ?>>
-                        <i class="bi bi-save me-2"></i>Crear promoción
-                    </button>
-                </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" <?= empty($misPublicaciones) ? 'disabled' : '' ?>>
+                            <i class="bi bi-save me-2"></i>Crear promoción
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -505,7 +505,7 @@ $tipos_promocion = [
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-4">
                         <h6 class="fw-bold mb-3">Rendimiento por tipo de promoción</h6>
                         <div class="mb-3">
@@ -536,7 +536,7 @@ $tipos_promocion = [
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="mt-4">
                         <h6 class="fw-bold mb-3">Ingresos generados por promociones</h6>
                         <canvas id="chartPromociones" style="width:100%; max-height:200px;"></canvas>
@@ -566,7 +566,7 @@ $tipos_promocion = [
                                 <label class="form-label fw-bold">Título de la promoción</label>
                                 <input type="text" class="form-control" value="Descuento del 20% en primera contratación" required>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Tipo de promoción</label>
                                 <select class="form-select" required>
@@ -575,12 +575,12 @@ $tipos_promocion = [
                                     <option value="gratis">Primera visita gratis</option>
                                 </select>
                             </div>
-                            
+
                             <div class="col-md-12">
                                 <label class="form-label fw-bold">Descripción</label>
                                 <textarea class="form-control" rows="3">Ofrece un 20% de descuento a nuevos clientes que contraten tu servicio por primera vez.</textarea>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Valor</label>
                                 <div class="input-group">
@@ -588,22 +588,22 @@ $tipos_promocion = [
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Fecha inicio</label>
                                 <input type="date" class="form-control" value="2025-03-01" required>
                             </div>
-                            
+
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Fecha fin</label>
                                 <input type="date" class="form-control" value="2025-04-30" required>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Límite de usos</label>
                                 <input type="number" class="form-control" value="50" required>
                             </div>
-                            
+
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Estado</label>
                                 <select class="form-select">
@@ -630,15 +630,14 @@ $tipos_promocion = [
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/promociones.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
-
     <script>
         const BASE_URL = "<?= BASE_URL ?>";
     </script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+
+    <!-- Chart.js y lógica de promociones -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/promociones.js"></script>
 </body>
 
 </html>

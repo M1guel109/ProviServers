@@ -652,6 +652,7 @@ body.toggle-sidebar .has-submenu:hover .submenu::after {
     flex: 1;
     margin-left: var(--sidebar-width);
     padding: 25px;
+    padding-top: 88px;   /* espacio para el header fijo (15px top + ~52px altura + 21px gap) */
     transition: margin-left var(--transition-slow);
     width: calc(100% - var(--sidebar-width));
 }
@@ -672,11 +673,20 @@ body.toggle-sidebar .contenido {
     padding: 10px 30px;
     border-radius: 12px;
     box-shadow: var(--shadow-sm);
-    margin-bottom: 30px;
     border: 1px solid var(--border-color);
-    position: sticky;
+    /* ── Fixed header ── */
+    position: fixed;
     top: 15px;
-    z-index: 99;
+    left: calc(var(--sidebar-width) + 25px);
+    right: 25px;
+    z-index: 1030;
+}
+
+/* Sidebar colapsado — solo desktop */
+@media (min-width: 1025px) {
+    body.toggle-sidebar .barra-superior {
+        left: calc(var(--sidebar-collapsed-width) + 25px);
+    }
 }
 
 /* ── Breadcrumb global ── */
@@ -1122,7 +1132,7 @@ body.toggle-sidebar .contenido {
     width: 0 !important;
 }
 
-/* clip no crea scroll-container, así position:sticky del header funciona */
+/* clip evita scroll horizontal sin crear scroll-container */
 .contenido {
     overflow-x: clip !important;
 }
@@ -1268,6 +1278,14 @@ body.toggle-sidebar .contenido {
         margin-left: 0;
         width: 100%;
         padding: 15px;
+        padding-top: 75px;   /* espacio para el header fijo en móvil (10px top + 52px altura + 13px gap) */
+    }
+
+    /* ── Header fijo en móvil: ancho completo ── */
+    .barra-superior {
+        left: 10px;
+        right: 10px;
+        top: 10px;
     }
 
     /* ── SIDEBAR MÓVIL — slide desde la izquierda ── */
@@ -1436,7 +1454,7 @@ body.toggle-sidebar .contenido {
         display: none;
     }
 
-    /* ── Header móvil: una sola línea compacta, sticky ── */
+    /* ── Header móvil: una sola línea compacta, fijo ── */
     .barra-superior {
         padding: 6px 12px;
         min-height: 52px;
@@ -1561,18 +1579,12 @@ body.toggle-sidebar .menu-principal a.active::before {
     .barra-superior {
         padding: 8px 15px;
         border-radius: 8px;
-        margin-bottom: 15px;
-    }
-
-    .acciones-barra {
-        gap: 8px;
     }
 }
 
 @media screen and (max-width: 576px) {
     .barra-superior {
         padding: 8px 10px;
-        gap: 6px;
     }
 
     .contenido {

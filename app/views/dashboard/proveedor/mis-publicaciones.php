@@ -65,13 +65,6 @@ if ($usuarioId) {
                     </nav>
                 </div>
             </div>
-
-            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-                <ol id="breadcrumb" class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="<?= BASE_URL ?>/proveedor/dashboard">Inicio</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Mis publicaciones</li>
-                </ol>
-            </nav>
         </section>
 
 

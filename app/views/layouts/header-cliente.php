@@ -50,7 +50,10 @@ $cantidadNotif     = count($misNotificaciones);
 
         <!-- Notificaciones -->
         <div class="dropdown">
-            <button type="button" class="hdr-btn-icon position-relative" data-bs-toggle="dropdown" aria-label="Notificaciones">
+            <button type="button" class="hdr-btn-icon position-relative"
+                    data-bs-toggle="dropdown"
+                    data-bs-strategy="fixed"
+                    aria-label="Notificaciones">
                 <i class="bi bi-bell"></i>
                 <?php if ($cantidadNotif > 0): ?>
                     <span class="hdr-badge"><?= $cantidadNotif ?></span>
@@ -99,7 +102,9 @@ $cantidadNotif     = count($misNotificaciones);
 
         <!-- Usuario -->
         <div class="dropdown">
-            <button type="button" class="hdr-btn-user" data-bs-toggle="dropdown">
+            <button type="button" class="hdr-btn-user"
+                    data-bs-toggle="dropdown"
+                    data-bs-strategy="fixed">
                 <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($fotoPerfil) ?>"
                      alt="Perfil" class="rounded-circle border shadow-sm"
                      width="34" height="34"

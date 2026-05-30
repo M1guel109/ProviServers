@@ -231,7 +231,7 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- JS propio -->
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
 </body>
 

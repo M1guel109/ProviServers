@@ -441,19 +441,6 @@
         height: 38px;
     }
 
-    .dropdown-menu {
-        position: fixed !important;
-        top: auto !important;
-        left: 10px !important;
-        right: 10px !important;
-        bottom: 10px !important;
-        width: auto !important;
-        max-height: 90vh;
-        overflow-y: auto;
-        border-radius: 16px !important;
-        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2) !important;
-    }
-
 }
 
 /* Móvil pequeño (hasta 480px) */
@@ -490,14 +477,6 @@
 
     .sidebar {
         width: 90%;
-    }
-
-    /* Dropdown a pantalla completa en móvil muy pequeño */
-    .dropdown-menu {
-        left: 5px !important;
-        right: 5px !important;
-        bottom: 5px !important;
-        padding: 10px 0 !important;
     }
 
     .dropdown-header {
