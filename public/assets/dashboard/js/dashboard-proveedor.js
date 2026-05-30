@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (periodoSelect) {
             periodoSelect.addEventListener('change', function () {
                 // Aquí podrías actualizar la gráfica según el período seleccionado
-                console.log('Período cambiado a:', this.value);
             });
         }
     }

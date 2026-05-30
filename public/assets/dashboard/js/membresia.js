@@ -3,8 +3,6 @@
    ====================================================== */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Membresía cargada');
-    
     // Manejar selección de plan en modal
     const botonesSeleccionar = document.querySelectorAll('.btn-seleccionar-plan, .btn-cambiar-plan');
     botonesSeleccionar.forEach(btn => {

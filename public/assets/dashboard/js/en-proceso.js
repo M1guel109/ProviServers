@@ -24,8 +24,6 @@ function sweetProyecto(icon, title, text, callback = null, options = {}) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('Script de Seguimiento (En Proceso) cargado.');
-
     const formSeguimientoModal = document.getElementById('formSeguimientoModal');
     const selectEstado = document.getElementById('seg-estado-modal');
 
@@ -102,13 +100,6 @@ function toggleCamposSeguimiento() {
  * abrirSeguimiento(id, nombreServicio, estadoActual, nombreCliente)
  */
 window.abrirSeguimiento = function (idContrato, nombreServicio, estadoActual, nombreCliente) {
-    console.log('abrirSeguimiento llamado', {
-        idContrato,
-        nombreServicio,
-        estadoActual,
-        nombreCliente
-    });
-
     if (!idContrato || Number(idContrato) === 0) {
         sweetProyecto('error', 'Error', 'No se encontró el ID del contrato.');
         return;
