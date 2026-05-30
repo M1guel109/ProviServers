@@ -371,11 +371,7 @@
         display: flex;
     }
 
-    /* Header sticky en tablet para mejor UX */
     .barra-superior {
-        position: sticky;
-        top: 0;
-        z-index: 99;
         background: white;
         margin: 0;
         border-radius: 0 0 12px 12px;
@@ -387,7 +383,9 @@
 /* Tablet Portrait (hasta 992px) */
 @media screen and (max-width: 992px) {
     .contenido {
-        padding: 20px 15px;
+        padding-right: 15px;
+        padding-bottom: 20px;
+        padding-left: 15px;
     }
 
     .barra-superior {
@@ -416,7 +414,9 @@
 @media screen and (max-width: 768px) {
 
     .contenido {
-        padding: 15px 12px;
+        padding-right: 12px;
+        padding-bottom: 15px;
+        padding-left: 12px;
     }
 
     #btn-toggle-menu {
@@ -446,7 +446,9 @@
 /* Móvil pequeño (hasta 480px) */
 @media screen and (max-width: 480px) {
     .contenido {
-        padding: 12px 10px;
+        padding-right: 10px;
+        padding-bottom: 12px;
+        padding-left: 10px;
     }
 
     #btn-toggle-menu {
@@ -492,7 +494,9 @@
 /* Ajuste para pantallas muy pequeñas (hasta 360px) */
 @media screen and (max-width: 360px) {
     .contenido {
-        padding: 10px 8px;
+        padding-right: 8px;
+        padding-bottom: 10px;
+        padding-left: 8px;
     }
 
     #btn-toggle-menu {

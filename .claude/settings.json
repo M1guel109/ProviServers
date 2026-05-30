@@ -61,7 +61,8 @@
       "Bash(Select-String cliente *)",
       "Bash(Get-ChildItem -Path \"c:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\core\" -Recurse -Include \"*.php\")",
       "Bash(Select-Object -First 20)",
-      "Read(//c/xampp/htdocs/ProviServers/app/views/dashboard/proveedor/**)"
+      "Read(//c/xampp/htdocs/ProviServers/app/views/dashboard/proveedor/**)",
+      "Bash(Get-ChildItem \"C:\\\\xampp\\\\htdocs\\\\ProviServers\\\\app\\\\views\\\\dashboard\" -Directory)"
     ]
   }
 }

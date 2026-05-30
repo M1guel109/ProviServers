@@ -41,8 +41,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Inicializar gráfica en modal de estadísticas
-    initChartPromociones();
+    // Inicializar gráfica solo cuando el modal se abre (no sobre canvas oculto)
+    let chartInicializado = false;
+    const modalEstadisticas = document.getElementById('modalEstadisticas');
+    if (modalEstadisticas) {
+        modalEstadisticas.addEventListener('shown.bs.modal', function() {
+            if (!chartInicializado) {
+                initChartPromociones();
+                chartInicializado = true;
+            }
+        });
+    }
 });
 
 function guardarPromocion() {
