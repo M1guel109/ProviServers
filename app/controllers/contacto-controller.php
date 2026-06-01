@@ -1,7 +1,7 @@
 ﻿<?php
 // Importamos el modelo y el helper de alertas
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once BASE_PATH . '/app/models/Contacto.php'; 
+require_once BASE_PATH . '/app/models/contacto.php';
 
 function procesarContacto() {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
