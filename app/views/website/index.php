@@ -50,8 +50,8 @@
         <section id="hero" class="hero d-flex align-items-start position-relative">
             <div class="hero-carousel">
                 <img src="<?= BASE_URL ?>/public/assets/website/img/fondo-landing.png" class="hero-img active" alt="Imagen 1">
-                <img src="<?= BASE_URL ?>/public/assets/website/img/fondo-landing2.jpg" class="hero-img" alt="Imagen 2">
-                <img src="<?= BASE_URL ?>/public/assets/website/img/fondo-landing3.jpg" class="hero-img" alt="Imagen 3">
+                <img src="<?= BASE_URL ?>/public/assets/website/img/fondo-landing-2.jpg" class="hero-img" alt="Imagen 2">
+                <img src="<?= BASE_URL ?>/public/assets/website/img/fondo-landing-3.jpg" class="hero-img" alt="Imagen 3">
             </div>
             <div class="container">
                 <div class="row justify-content-end">
