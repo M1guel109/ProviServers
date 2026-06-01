@@ -1,7 +1,7 @@
 <?php
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
-error_reporting(E_ALL); // errores se registran en error_log, no se muestran al usuario
+error_reporting(E_ALL);
 
 // ======================================================
 // ROUTER PRINCIPAL — ProviServers
@@ -9,11 +9,16 @@ error_reporting(E_ALL); // errores se registran en error_log, no se muestran al 
 
 require_once __DIR__ . '/config/config.php';
 
+// Logging de errores PHP en archivo (nunca expuesto al usuario)
+ini_set('log_errors', 1);
+ini_set('error_log', BASE_PATH . '/php_errors.log');
+
 // Obtener la URL actual
 $requestUri = $_SERVER['REQUEST_URI'];
 
-// Quitar el prefijo de la carpeta del proyecto
-$request = str_replace('/ProviServers', '', $requestUri);
+// Normalizar la ruta: quitar subfolder si existe (local: /ProviServers, prod: vacío)
+$basePath = parse_url(BASE_URL, PHP_URL_PATH) ?: '';
+$request  = $basePath !== '' ? str_replace($basePath, '', $requestUri) : $requestUri;
 
 // Quitar parámetros tipo ?id=123
 $request = strtok($request, '?');
