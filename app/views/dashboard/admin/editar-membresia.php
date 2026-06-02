@@ -1,7 +1,7 @@
 ﻿<?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
 // ✅ CORREGIDO: kebab-case, sin mayúscula
-require_once BASE_PATH . '/app/models/Membresia.php';
+require_once BASE_PATH . '/app/models/membresia.php';
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     header('Location: ' . BASE_URL . '/admin/consultar-membresias');
