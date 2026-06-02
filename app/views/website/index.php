@@ -61,7 +61,7 @@
                         </h1>
                         <div class="d-flex flex-column flex-sm-row gap-3 justify-content-end">
                             <a href="<?= BASE_URL ?>/registro" class="btn-primary-proviservers">REGISTRARME</a>
-                            <a href="#" class="btn-secondary-proviservers">VER SERVICIOS</a>
+                            <a href="#servicios" class="btn-secondary-proviservers">VER SERVICIOS</a>
                         </div>
                     </div>
                 </div>
@@ -156,141 +156,153 @@
                 <div class="divider"></div>
 
                 <!-- NUEVO: Grid con todas las tarjetas -->
-                <div class="team-cards-grid">
-                    <!-- Tarjeta 1 - Karen -->
-                    <div class="card">
-                        <div class="card-image">
-                            <img src="<?= BASE_URL ?>/public/assets/website/img/team1.png" alt="Karen Heredia">
-                        </div>
-                        <div class="card-content">
-                            <div class="card-info">
-                                <h3 class="card-name">Karen Heredia</h3>
-                                <div class="stars">
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </div>
-                                <p class="card-description">
-                                    Es un desarrollador integral que domina tanto el front-end como el back-end, conectando lo visual con lo funcional para ofrecer soluciones completas, eficientes y escalables en cada proyecto.
-                                </p>
+                <div class="team-carousel-wrapper">
+                    <div class="team-cards-grid" id="teamCarouselGrid">
+                        <!-- Tarjeta 1 - Karen -->
+                        <div class="card">
+                            <div class="card-image">
+                                <img src="<?= BASE_URL ?>/public/assets/website/img/team1.png" alt="Karen Heredia">
                             </div>
-                            <div class="social-icons">
-                                <a href="https://github.com/KarenHeredia1621" target="_blank" class="social-link" aria-label="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                                    </svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/karen-heredia-07bb04368/" target="_blank" class="social-link" aria-label="LinkedIn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                    </svg>
-                                </a>
+                            <div class="card-content">
+                                <div class="card-info">
+                                    <h3 class="card-name">Karen Heredia</h3>
+                                    <div class="stars">
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                    </div>
+                                    <p class="card-description">
+                                        Es un desarrollador integral que domina tanto el front-end como el back-end, conectando lo visual con lo funcional para ofrecer soluciones completas, eficientes y escalables en cada proyecto.
+                                    </p>
+                                </div>
+                                <div class="social-icons">
+                                    <a href="https://github.com/KarenHeredia1621" target="_blank" class="social-link" aria-label="GitHub">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        </svg>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/karen-heredia-07bb04368/" target="_blank" class="social-link" aria-label="LinkedIn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 2 - Schneider (con borde) -->
+                        <div class="card ">
+                            <div class="card-image">
+                                <img src="<?= BASE_URL ?>/public/assets/website/img/team2.png" alt="Schneider Manrrique">
+                            </div>
+                            <div class="card-content">
+                                <div class="card-info">
+                                    <h3 class="card-name">Schneider Manrrique</h3>
+                                    <div class="stars">
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                    </div>
+                                    <p class="card-description">
+                                        Es un profesional que construye la lógica, estructura y seguridad del sistema, asegurando que los datos fluyan correctamente entre la interfaz y el servidor, con alto rendimiento y fiabilidad.
+                                    </p>
+                                </div>
+                                <div class="social-icons">
+                                    <a href="https://github.com/SchDEv-spn" target="_blank" class="social-link" aria-label="GitHub">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        </svg>
+                                    </a>
+                                    <a href="https://co.linkedin.com/in/schneider-manrique-osorio" target="_blank" class="social-link" aria-label="LinkedIn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 3 - Miguel -->
+                        <div class="card">
+                            <div class="card-image">
+                                <img src="<?= BASE_URL ?>/public/assets/website/img/team5.png" alt="Miguel Lozano">
+                            </div>
+                            <div class="card-content">
+                                <div class="card-info">
+                                    <h3 class="card-name">Miguel Lozano</h3>
+                                    <div class="stars">
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                    </div>
+                                    <p class="card-description">
+                                        Es un miembro experto que transforma las ideas en experiencias visuales, desarrollando interfaces interactivas y accesibles que garantizan una navegación fluida y atractiva para el usuario.
+                                    </p>
+                                </div>
+                                <div class="social-icons">
+                                    <a href="https://github.com/M1guel109" target="_blank" class="social-link" aria-label="GitHub">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        </svg>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/miguel-lozano-716522358?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-link" aria-label="LinkedIn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tarjeta 4 - Juanita -->
+                        <div class="card">
+                            <div class="card-image">
+                                <img src="<?= BASE_URL ?>/public/assets/website/img/team4.png" alt="Juanita Jimenez">
+                            </div>
+                            <div class="card-content">
+                                <div class="card-info">
+                                    <h3 class="card-name">Juanita Jimenez</h3>
+                                    <div class="stars">
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                        <span class="star">★</span>
+                                    </div>
+                                    <p class="card-description">
+                                        Es un miembro experto que transforma las ideas en experiencias visuales, desarrollando interfaces interactivas y accesibles que garantizan una navegación fluida y atractiva para el usuario.
+                                    </p>
+                                </div>
+                                <div class="social-icons">
+                                    <a href="https://github.com/JuanitaJimenez09" target="_blank" class="social-link" aria-label="GitHub">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                                        </svg>
+                                    </a>
+                                    <a href="https://www.linkedin.com/in/juanita-tolosa-32a21a349?trk=contact-info" target="_blank" class="social-link" aria-label="LinkedIn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                        </svg>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Tarjeta 2 - Schneider (con borde) -->
-                    <div class="card ">
-                        <div class="card-image">
-                            <img src="<?= BASE_URL ?>/public/assets/website/img/team2.png" alt="Schneider Manrrique">
+                    <div class="team-carousel-controls">
+                        <button class="team-carousel-btn" id="teamPrev" aria-label="Anterior"><i class="bi bi-chevron-left"></i></button>
+                        <div class="team-carousel-dots">
+                            <span class="team-dot active"></span>
+                            <span class="team-dot"></span>
+                            <span class="team-dot"></span>
+                            <span class="team-dot"></span>
                         </div>
-                        <div class="card-content">
-                            <div class="card-info">
-                                <h3 class="card-name">Schneider Manrrique</h3>
-                                <div class="stars">
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </div>
-                                <p class="card-description">
-                                    Es un profesional que construye la lógica, estructura y seguridad del sistema, asegurando que los datos fluyan correctamente entre la interfaz y el servidor, con alto rendimiento y fiabilidad.
-                                </p>
-                            </div>
-                            <div class="social-icons">
-                                <a href="https://github.com/SchDEv-spn" target="_blank" class="social-link" aria-label="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                                    </svg>
-                                </a>
-                                <a href="https://co.linkedin.com/in/schneider-manrique-osorio" target="_blank" class="social-link" aria-label="LinkedIn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta 3 - Miguel -->
-                    <div class="card">
-                        <div class="card-image">
-                            <img src="<?= BASE_URL ?>/public/assets/website/img/team5.png" alt="Miguel Lozano">
-                        </div>
-                        <div class="card-content">
-                            <div class="card-info">
-                                <h3 class="card-name">Miguel Lozano</h3>
-                                <div class="stars">
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </div>
-                                <p class="card-description">
-                                    Es un miembro experto que transforma las ideas en experiencias visuales, desarrollando interfaces interactivas y accesibles que garantizan una navegación fluida y atractiva para el usuario.
-                                </p>
-                            </div>
-                            <div class="social-icons">
-                                <a href="https://github.com/M1guel109" target="_blank" class="social-link" aria-label="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                                    </svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/miguel-lozano-716522358?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="social-link" aria-label="LinkedIn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tarjeta 4 - Juanita -->
-                    <div class="card">
-                        <div class="card-image">
-                            <img src="<?= BASE_URL ?>/public/assets/website/img/team4.png" alt="Juanita Jimenez">
-                        </div>
-                        <div class="card-content">
-                            <div class="card-info">
-                                <h3 class="card-name">Juanita Jimenez</h3>
-                                <div class="stars">
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </div>
-                                <p class="card-description">
-                                    Es un miembro experto que transforma las ideas en experiencias visuales, desarrollando interfaces interactivas y accesibles que garantizan una navegación fluida y atractiva para el usuario.
-                                </p>
-                            </div>
-                            <div class="social-icons">
-                                <a href="https://github.com/JuanitaJimenez09" target="_blank" class="social-link" aria-label="GitHub">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61 -.546-1.385-1.333-1.754-1.333-1.754-1.089-.744.084-.729.084-.729 1.205.084 1.84 1.236 1.84 1.236 1.07 1.835 2.809 1.305 3.495.998 .108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.469-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23a11.52 11.52 0 0 1 3.003-.404 c1.018.005 2.042.138 3.003.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.873.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.628-5.475 5.922.43.372.823 1.102.823 2.222 0 1.606-.015 2.896-.015 3.286 0 .317.218.687.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-                                    </svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/juanita-tolosa-32a21a349?trk=contact-info" target="_blank" class="social-link" aria-label="LinkedIn">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
+                        <button class="team-carousel-btn" id="teamNext" aria-label="Siguiente"><i class="bi bi-chevron-right"></i></button>
                     </div>
                 </div>
             </div>
@@ -447,11 +459,6 @@
                             Nuestros clientes no solo contratan un servicio, viven una experiencia.
                             Lea sus testimonios y vea cómo hemos hecho la diferencia en sus hogares y en su día a día.
                         </p>
-
-                        <div class="testimonial-buttons">
-                            <button class="arrow-btn prev"><i class="fas fa-arrow-left"></i></button>
-                            <button class="arrow-btn next"><i class="fas fa-arrow-right"></i></button>
-                        </div>
                     </div>
 
                     <div class="testimonial-carousel">
@@ -523,7 +530,7 @@
                         <div class="testimonial-card">
                             <div class="testimonial-content">
                                 <div class="testimonial-avatar">
-                                    <img src="<?= BASE_URL ?>/<?= BASE_URL ?>/public/assets/website/img/comentarios.png" alt="Cliente María Fernanda López" />
+                                    <img src="<?= BASE_URL ?>/public/assets/website/img/comentarios.png" alt="Cliente María Fernanda López" />
                                 </div>
                                 <div class="testimonial-info">
                                     <h3>María Fernanda López</h3>
@@ -539,6 +546,11 @@
                                 <div class="testimonial-icon"><i class="fas fa-quote-right"></i></div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="testimonial-buttons">
+                        <button class="arrow-btn prev"><i class="fas fa-arrow-left"></i></button>
+                        <button class="arrow-btn next"><i class="fas fa-arrow-right"></i></button>
                     </div>
                 </div>
             </div>
@@ -593,7 +605,9 @@
                         <input type="text" name="nombre" placeholder="Nombre" required />
                         <input type="email" name="email" placeholder="Correo electrónico" required />
                         <textarea name="mensaje" rows="5" placeholder="Mensaje" required></textarea>
-                        <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                        <div class="btn-submit-wrapper">
+                            <button type="submit" class="btn-submit">Enviar Mensaje</button>
+                        </div>
                     </form>
 
                 </div>
