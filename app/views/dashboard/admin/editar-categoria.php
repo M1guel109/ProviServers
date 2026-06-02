@@ -1,6 +1,6 @@
 ﻿<?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
-require_once BASE_PATH . '/app/models/Categoria.php';
+require_once BASE_PATH . '/app/models/categoria.php';
 
 // Validar ID
 if (!isset($_GET['id']) || empty($_GET['id'])) {

@@ -172,11 +172,76 @@ document.addEventListener("DOMContentLoaded", function () {
       showTestimonial(currentTestimonial);
     });
 
-    // Autoplay opcional (cada 5 segundos)
+    // Autoplay (cada 5 segundos)
     setInterval(() => {
       currentTestimonial = (currentTestimonial + 1) % testimonialCards.length;
       showTestimonial(currentTestimonial);
     }, 5000);
+  }
+
+  // ===== TEAM CAROUSEL (solo mobile) =====
+  const teamGrid = document.getElementById('teamCarouselGrid');
+  const teamPrevBtn = document.getElementById('teamPrev');
+  const teamNextBtn = document.getElementById('teamNext');
+  const teamDots = document.querySelectorAll('.team-dot');
+
+  if (teamGrid && teamPrevBtn && teamNextBtn) {
+    const teamCards = teamGrid.querySelectorAll('.card');
+    let teamIndex = 0;
+    let teamPaused = false;
+    let teamTimer = null;
+
+    function goToTeamSlide(index) {
+      teamIndex = (index + teamCards.length) % teamCards.length;
+      teamGrid.style.transform = `translateX(-${teamIndex * 100}%)`;
+      teamDots.forEach((d, i) => d.classList.toggle('active', i === teamIndex));
+    }
+
+    function startTeamAutoPlay() {
+      teamTimer = setInterval(() => {
+        if (!teamPaused) goToTeamSlide(teamIndex + 1);
+      }, 4000);
+    }
+
+    function resetTimer() {
+      clearInterval(teamTimer);
+      startTeamAutoPlay();
+    }
+
+    teamPrevBtn.addEventListener('click', () => { goToTeamSlide(teamIndex - 1); resetTimer(); });
+    teamNextBtn.addEventListener('click', () => { goToTeamSlide(teamIndex + 1); resetTimer(); });
+    teamDots.forEach((dot, i) => dot.addEventListener('click', () => { goToTeamSlide(i); resetTimer(); }));
+
+    // Swipe touch
+    let touchStartX = 0;
+    teamGrid.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      teamPaused = true;
+    }, { passive: true });
+    teamGrid.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) {
+        diff > 0 ? goToTeamSlide(teamIndex + 1) : goToTeamSlide(teamIndex - 1);
+        resetTimer();
+      }
+      teamPaused = false;
+    }, { passive: true });
+
+    // Solo iniciar en mobile
+    function initTeamCarousel() {
+      if (window.innerWidth <= 767) {
+        startTeamAutoPlay();
+      } else {
+        clearInterval(teamTimer);
+        teamGrid.style.transform = '';
+      }
+    }
+
+    initTeamCarousel();
+    window.addEventListener('resize', () => {
+      clearInterval(teamTimer);
+      initTeamCarousel();
+    });
   }
 });
 
