@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    1. CONFIGURACIÓN BÁSICA Y FUENTES
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
@@ -1805,3 +1805,4 @@ body.toggle-sidebar .menu-principal a.active::before {
         border-radius: 8px !important;
     }
 }
+

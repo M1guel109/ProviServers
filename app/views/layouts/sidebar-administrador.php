@@ -1,5 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/models/Contacto.php';
+$_contactoNoLeidos = (new Contacto())->contarNoLeidos();
 ?>
 
 <aside class="sidebar" id="mainSidebar">
@@ -75,6 +77,16 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                         <li><a href="<?= BASE_URL ?>/admin/consultar-membresias?accion=listar_membresias" class="submenu-link"><?= __('admin_sub_planes') ?></a></li>
                         <li><a href="<?= BASE_URL ?>/admin/consultar-suscripciones" class="submenu-link"><?= __('admin_sub_suscripciones') ?></a></li>
                     </ul>
+                </li>
+
+                <li>
+                    <a href="<?= BASE_URL ?>/admin/mensajes-contacto" data-title="Mensajes de Contacto">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span class="nav-text">Mensajes de Contacto</span>
+                        <?php if ($_contactoNoLeidos > 0): ?>
+                            <span class="badge bg-danger ms-auto"><?= $_contactoNoLeidos ?></span>
+                        <?php endif; ?>
+                    </a>
                 </li>
 
                 <li class="menu-header"><?= __('admin_header_admin') ?></li>
