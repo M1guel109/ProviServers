@@ -111,6 +111,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/finanzas.php';
         break;
 
+    case '/admin/mensajes-contacto':
+        require BASE_PATH . '/app/views/dashboard/admin/mensajes-contacto.php';
+        break;
+
     case '/admin/facturacion':
         require BASE_PATH . '/app/views/dashboard/admin/facturacion.php';
         break;

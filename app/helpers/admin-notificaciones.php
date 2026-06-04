@@ -92,6 +92,25 @@ function obtenerNotificacionesAdmin() {
         ];
     }
 
+    // =======================================================
+    // 6. MENSAJES DE CONTACTO NO LEÍDOS -> Tipo: 'info'
+    // =======================================================
+    try {
+        $sqlContacto = "SELECT COUNT(*) as total, MAX(fecha_envio) as ultima_hora
+                        FROM mensajes_contacto WHERE leido = 0";
+        $stmtC = $db->query($sqlContacto);
+        $resC  = $stmtC->fetch(PDO::FETCH_ASSOC);
+
+        if ($resC && $resC['total'] > 0) {
+            $notificaciones[] = [
+                'tipo'    => 'info',
+                'titulo'  => 'Mensajes de Contacto',
+                'mensaje' => "Tienes {$resC['total']} mensaje" . ($resC['total'] > 1 ? 's' : '') . " sin leer del formulario de contacto.",
+                'hora'    => calcularTiempo($resC['ultima_hora']),
+            ];
+        }
+    } catch (PDOException $e) {}
+
     return $notificaciones;
 }
 
