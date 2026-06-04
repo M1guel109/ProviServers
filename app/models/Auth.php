@@ -109,12 +109,21 @@ class Auth
 
             // 4. LÓGICA EXTRA PARA PROVEEDORES
             if ($data['rol'] === 'proveedor') {
-                // A. Asignación de membresía inicial
+                // A. Asignación de membresía inicial — buscar ID real o usar el primero disponible
+                $membresiaId = $data['id_membresia_defecto'] ?? 4;
+                try {
+                    $stmtMem = $this->conexion->prepare("SELECT id FROM membresias WHERE id = :id LIMIT 1");
+                    $stmtMem->execute([':id' => $membresiaId]);
+                    if (!$stmtMem->fetchColumn()) {
+                        $membresiaId = $this->conexion->query("SELECT id FROM membresias ORDER BY id ASC LIMIT 1")->fetchColumn() ?: 1;
+                    }
+                } catch (PDOException $e) { /* continuar con el ID por defecto */ }
+
                 $sqlMembresia = "INSERT INTO proveedor_membresia (proveedor_id, membresia_id, estado)
                                 VALUES (:pid, :mid, 'inactiva')";
                 $this->conexion->prepare($sqlMembresia)->execute([
                     ':pid' => $detalle_id,
-                    ':mid' => $data['id_membresia_defecto'] ?? 4
+                    ':mid' => $membresiaId,
                 ]);
 
                 // B. Guardar documentos
@@ -176,7 +185,7 @@ class Auth
         } catch (PDOException $e) {
             if ($this->conexion->inTransaction()) $this->conexion->rollBack();
             if ($e->getCode() === '23000') return 'duplicado';
-            error_log("Error en Auth::registrarUsuario -> " . $e->getMessage());
+            error_log("Auth::registrarUsuario [SQLSTATE {$e->getCode()}] -> " . $e->getMessage());
             return false;
         }
     }
@@ -246,15 +255,23 @@ class Auth
 
     private function obtenerEstadoId($nombreEstado)
     {
+        // IDs por defecto según convención del proyecto
+        $fallback = ['activo' => 2, 'pendiente' => 1];
+
         try {
             $sql = "SELECT id FROM usuario_estados WHERE nombre = :nombre LIMIT 1";
             $stmt = $this->conexion->prepare($sql);
             $stmt->execute([':nombre' => $nombreEstado]);
             $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-            return $resultado ? $resultado['id'] : null;
+
+            if ($resultado) return (int)$resultado['id'];
+
+            // Tabla existe pero no tiene el registro → usar fallback
+            return $fallback[$nombreEstado] ?? 1;
         } catch (PDOException $e) {
-            error_log("Error en Auth::obtenerEstadoId -> " . $e->getMessage());
-            return null;
+            error_log("Auth::obtenerEstadoId -> " . $e->getMessage());
+            // Tabla no existe en este entorno → usar fallback
+            return $fallback[$nombreEstado] ?? 1;
         }
     }
 
