@@ -1,8 +1,8 @@
-﻿<?php
+﻿﻿﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/Auth.php';
-require_once __DIR__ . '/../models/membresia.php';
+require_once __DIR__ . '/../models/Membresia.php';
 
 // ===================================================================
 // ROUTER INTERNO — Dispatch por método HTTP y acción
@@ -92,7 +92,7 @@ function iniciarSesion()
     }
 
     if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) session_start();
     }
     session_regenerate_id(true);
 
@@ -262,7 +262,7 @@ function recuperarPassword()
 function cerrarSesion()
 {
     if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+        if (session_status() === PHP_SESSION_NONE) session_start();
     }
 
     $_SESSION = [];

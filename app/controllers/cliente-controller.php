@@ -1,10 +1,10 @@
-﻿<?php
+﻿﻿﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/Publicacion.php';
 require_once __DIR__ . '/../models/ServicioContratado.php';
 require_once __DIR__ . '/../models/Valoracion.php';
-require_once __DIR__ . '/../models/solicitud.php';
+require_once __DIR__ . '/../models/Solicitud.php';
 require_once __DIR__ . '/../models/Necesidad.php';
 require_once __DIR__ . '/../models/Cotizacion.php';
 
@@ -13,7 +13,7 @@ require_once __DIR__ . '/../models/Cotizacion.php';
 // ===================================================================
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 }
 
 if (!isset($_SESSION['user']['id']) || ($_SESSION['user']['rol'] ?? '') !== 'cliente') {

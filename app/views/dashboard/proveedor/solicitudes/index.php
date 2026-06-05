@@ -1,8 +1,8 @@
-﻿<?php
+﻿﻿<?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 // Modelos
-require_once BASE_PATH . '/app/models/solicitud.php';
+require_once BASE_PATH . '/app/models/Solicitud.php';
 require_once BASE_PATH . '/app/models/ServicioContratado.php';
 
 $usuarioId = (int)($_SESSION['user']['id'] ?? 0);
