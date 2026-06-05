@@ -1,8 +1,8 @@
 ﻿<?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
-require_once BASE_PATH . '/app/models/ProveedorPerfil.php';
-require_once BASE_PATH . '/app/models/ProveedorNotificaciones.php';
-require_once BASE_PATH . '/app/models/ProveedorPagosFacturacion.php';
+require_once BASE_PATH . '/app/models/proveedor-perfil.php';
+require_once BASE_PATH . '/app/models/proveedor-notificaciones.php';
+require_once BASE_PATH . '/app/models/proveedor-pagos-facturacion.php';
 
 $idUsuario      = (int)($_SESSION['user']['id'] ?? 0);
 $correoActual   = $_SESSION['user']['email'] ?? '';

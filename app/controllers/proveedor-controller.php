@@ -5,17 +5,17 @@
 // =======================================================================
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
-require_once __DIR__ . '/../models/Servicio.php';
-require_once __DIR__ . '/../models/Publicacion.php';
-require_once __DIR__ . '/../models/Categoria.php';
-require_once __DIR__ . '/../models/Solicitud.php';
-require_once __DIR__ . '/../models/Necesidad.php';
-require_once __DIR__ . '/../models/Cotizacion.php';
-require_once __DIR__ . '/../models/ServicioContratado.php';
-require_once __DIR__ . '/../models/Valoracion.php';
-require_once __DIR__ . '/../models/ProveedorPerfil.php';
-require_once __DIR__ . '/../models/ProveedorNotificaciones.php';
-require_once __DIR__ . '/../models/ProveedorPagosFacturacion.php';
+require_once __DIR__ . '/../models/servicio.php';
+require_once __DIR__ . '/../models/publicacion.php';
+require_once __DIR__ . '/../models/categoria.php';
+require_once __DIR__ . '/../models/solicitud.php';
+require_once __DIR__ . '/../models/necesidad.php';
+require_once __DIR__ . '/../models/cotizacion.php';
+require_once __DIR__ . '/../models/servicio-contratado.php';
+require_once __DIR__ . '/../models/valoracion.php';
+require_once __DIR__ . '/../models/proveedor-perfil.php';
+require_once __DIR__ . '/../models/proveedor-notificaciones.php';
+require_once __DIR__ . '/../models/proveedor-pagos-facturacion.php';
 
 // =======================================================================
 // GUARD DE SESIÓN Y ROL

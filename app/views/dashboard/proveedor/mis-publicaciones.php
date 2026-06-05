@@ -3,7 +3,7 @@
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 // Modelo de publicaciones
-require_once BASE_PATH . '/app/models/Publicacion.php';
+require_once BASE_PATH . '/app/models/publicacion.php';
 
 $usuarioId = $_SESSION['user']['id'] ?? null;
 $publicaciones = [];

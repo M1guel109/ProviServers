@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
-require_once BASE_PATH . '/app/models/Contacto.php';
+require_once BASE_PATH . '/app/models/contacto.php';
 $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
 ?>
 
@@ -8,9 +8,9 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
     <div class="logo">
         <a href="<?= BASE_URL ?>/admin/dashboard">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/logo-principal.png"
-                 alt="<?= __('admin_alt_logo') ?>" class="logo-completo">
+                alt="<?= __('admin_alt_logo') ?>" class="logo-completo">
             <img src="<?= BASE_URL ?>/public/assets/img/logos/favicon.png"
-                 alt="<?= __('admin_alt_logo') ?>" class="logo-favicon">
+                alt="<?= __('admin_alt_logo') ?>" class="logo-favicon">
         </a>
         <button class="close-menu-mobile" id="closeMenuMobile" aria-label="Cerrar menú">
             <i class="bi bi-x-lg"></i>
@@ -129,7 +129,7 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
                 <i class="bi bi-box-arrow-right"></i>
                 <span><?= __('admin_footer_salir') ?></span>
             </a>
-            
+
             <div class="mode-row" id="modeToggle" data-title="Cambiar tema">
                 <div class="sun-moon">
                     <i class="bi bi-moon-fill moon"></i>

@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
-require_once BASE_PATH . '/app/models/Categoria.php';
+require_once BASE_PATH . '/app/models/categoria.php';
 
 // Aseguramos que las variables existan para evitar errores de notice
 $busqueda    = $busqueda    ?? '';
