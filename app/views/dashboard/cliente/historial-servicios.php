@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
-require_once BASE_PATH . '/app/models/ServicioContratado.php';
+require_once BASE_PATH . '/app/models/servicio-contratado.php';
 require_once BASE_PATH . '/config/database.php';
 
 $uid      = (int)($_SESSION['user']['id'] ?? 0);

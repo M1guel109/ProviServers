@@ -2,7 +2,7 @@
 // (Opcional) Solo clientes logueados
 // require_once BASE_PATH . '/app/helpers/session-cliente.php';
 
-require_once BASE_PATH . '/app/models/Publicacion.php';
+require_once BASE_PATH . '/app/models/publicacion.php';
 
 // Soporta ambos: ?id_publicacion= y ?id=
 $publicacionId = (int)($_GET['id_publicacion'] ?? ($_GET['id'] ?? 0));

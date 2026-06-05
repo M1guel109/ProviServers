@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../helpers/mailer-helper.php';
-require_once BASE_PATH . '/app/models/Contacto.php';
+require_once BASE_PATH . '/app/models/contacto.php';
 
 function procesarContacto(): void {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') return;

@@ -110,7 +110,7 @@ class Auth
             // 4. LÓGICA EXTRA PARA PROVEEDORES
             if ($data['rol'] === 'proveedor') {
                 // A. Asignación de membresía inicial — buscar ID real o usar el primero disponible
-                $membresiaId = $data['id_membresia_defecto'] ?? 4;
+                $membresiaId = $data['id_membresia_defecto'] ?? 1;
                 try {
                     $stmtMem = $this->conexion->prepare("SELECT id FROM membresias WHERE id = :id LIMIT 1");
                     $stmtMem->execute([':id' => $membresiaId]);

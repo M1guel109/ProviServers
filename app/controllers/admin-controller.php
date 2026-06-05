@@ -2,11 +2,11 @@
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../helpers/notificaciones-helper.php';
-require_once __DIR__ . '/../models/Admin.php';
-require_once __DIR__ . '/../models/Categoria.php';
-require_once __DIR__ . '/../models/Membresia.php';
-require_once __DIR__ . '/../models/Suscripcion.php';
-require_once __DIR__ . '/../models/Moderacion.php';
+require_once __DIR__ . '/../models/admin.php';
+require_once __DIR__ . '/../models/categoria.php';
+require_once __DIR__ . '/../models/membresia.php';
+require_once __DIR__ . '/../models/suscripcion.php';
+require_once __DIR__ . '/../models/moderacion.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
