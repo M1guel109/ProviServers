@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/ProveedorPerfil.php';
@@ -10,7 +10,7 @@ require_once __DIR__ . '/../models/ProveedorPagosFacturacion.php';
 // ===================================================================
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 }
 
 if (!isset($_SESSION['user']['id']) || ($_SESSION['user']['rol'] ?? '') !== 'proveedor') {

@@ -1,7 +1,7 @@
 <?php
 // Iniciar sesión si no está iniciada (para leer $_SESSION['lang'])
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 }
 
 // Configuración por defecto

@@ -1,8 +1,8 @@
-﻿<?php
+﻿﻿<?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
 
 // Cargamos categorías reales ANTES del DOCTYPE
-require_once BASE_PATH . '/app/models/admin.php';
+require_once BASE_PATH . '/app/models/Admin.php';
 $objUsuario    = new Usuario();
 $categorias_bd = $objUsuario->obtenerTodasCategorias();
 ?>

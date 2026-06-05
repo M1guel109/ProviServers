@@ -197,7 +197,7 @@ try {
 
     <!-- Estilos Globales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-proveedor.css">
 
     <!-- CSS Específico -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/facturacion.css">
