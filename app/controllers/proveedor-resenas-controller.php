@@ -1,6 +1,6 @@
 ﻿<?php
 require_once __DIR__ . '/../helpers/session-proveedor.php';
-require_once __DIR__ . '/../models/Valoracion.php';
+require_once __DIR__ . '/../models/valoracion.php';
 
 function mostrarResenasProveedor()
 {

@@ -1,6 +1,6 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
-require_once BASE_PATH . '/app/models/Contacto.php';
+require_once BASE_PATH . '/app/models/contacto.php';
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
 
 $modelo   = new Contacto();
