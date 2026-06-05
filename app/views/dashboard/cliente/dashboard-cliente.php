@@ -1,6 +1,6 @@
-﻿<?php
+﻿﻿<?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
-require_once BASE_PATH . '/app/models/categoria.php';
+require_once BASE_PATH . '/app/models/Categoria.php';
 require_once BASE_PATH . '/app/models/ServicioContratado.php';
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
 

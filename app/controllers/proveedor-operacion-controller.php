@@ -1,15 +1,15 @@
-﻿<?php
+﻿﻿﻿<?php
 // Importamos las dependencias necesarias
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/Necesidad.php';
 require_once __DIR__ . '/../models/Cotizacion.php';
-require_once __DIR__ . '/../models/solicitud.php';
+require_once __DIR__ . '/../models/Solicitud.php';
 require_once __DIR__ . '/../models/ServicioContratado.php';
 require_once __DIR__ . '/../models/Publicacion.php';
 
 // 1. VALIDACIÓN GLOBAL DE SESIÓN Y ROL
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 }
 
 // Este controlador maneja acciones tanto de Cliente (Crear Solicitud) como de Proveedor.

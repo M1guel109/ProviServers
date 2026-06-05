@@ -1,19 +1,19 @@
-﻿<?php
+﻿﻿﻿﻿﻿﻿﻿<?php
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../helpers/notificaciones-helper.php';
-require_once __DIR__ . '/../models/admin.php';
-require_once __DIR__ . '/../models/categoria.php';
-require_once __DIR__ . '/../models/membresia.php';
-require_once __DIR__ . '/../models/suscripcion.php';
-require_once __DIR__ . '/../models/moderacion.php';
+require_once __DIR__ . '/../models/Admin.php';
+require_once __DIR__ . '/../models/Categoria.php';
+require_once __DIR__ . '/../models/Membresia.php';
+require_once __DIR__ . '/../models/Suscripcion.php';
+require_once __DIR__ . '/../models/Moderacion.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
 // ===================================================================
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
 }
 
 if (!isset($_SESSION['user']['id']) || ($_SESSION['user']['rol'] ?? '') !== 'admin') {

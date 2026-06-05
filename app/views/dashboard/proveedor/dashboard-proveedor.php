@@ -1,7 +1,7 @@
 <?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 require_once BASE_PATH . '/app/models/ServicioContratado.php';
-require_once BASE_PATH . '/app/models/solicitud.php';
+require_once BASE_PATH . '/app/models/Solicitud.php';
 require_once BASE_PATH . '/app/helpers/plan-helper.php';
 
 $uid = (int)($_SESSION['user']['id'] ?? 0);
@@ -32,7 +32,7 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
     <!-- css de estilos globales o generales -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <!-- CSS específico para dashboard de proveedores -->
-    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-Proveedor.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-proveedor.css">
 </head>
 
 <body>
