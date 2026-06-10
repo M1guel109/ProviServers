@@ -119,13 +119,12 @@ class Valoracion
 
         $stTop = $this->db->query("
             SELECT
-                CONCAT(u.nombres, ' ', u.apellidos) AS proveedor,
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
                 ROUND(AVG(v.calificacion), 2)        AS promedio,
                 COUNT(v.id)                          AS total
             FROM valoraciones v
             INNER JOIN proveedores p ON v.proveedor_id = p.id
-            INNER JOIN usuarios u    ON p.usuario_id   = u.id
-            GROUP BY p.id, u.nombres, u.apellidos
+            GROUP BY p.id, p.nombres, p.apellidos
             ORDER BY promedio DESC, total DESC
             LIMIT 10
         ");
@@ -136,16 +135,14 @@ class Valoracion
                 v.calificacion,
                 v.comentario,
                 v.created_at,
-                CONCAT(uc.nombres, ' ', uc.apellidos) AS cliente,
-                CONCAT(up.nombres, ' ', up.apellidos) AS proveedor,
-                sv.nombre                             AS servicio
+                CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                sv.nombre                           AS servicio
             FROM valoraciones v
-            INNER JOIN clientes c            ON v.cliente_id             = c.id
-            INNER JOIN usuarios uc           ON c.usuario_id             = uc.id
-            INNER JOIN proveedores p         ON v.proveedor_id           = p.id
-            INNER JOIN usuarios up           ON p.usuario_id             = up.id
-            INNER JOIN servicios_contratados sc ON v.servicio_contratado_id = sc.id
-            INNER JOIN servicios sv          ON sc.servicio_id           = sv.id
+            INNER JOIN clientes c                ON v.cliente_id             = c.id
+            INNER JOIN proveedores p             ON v.proveedor_id           = p.id
+            INNER JOIN servicios_contratados sc  ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv              ON sc.servicio_id           = sv.id
             ORDER BY v.created_at DESC
             LIMIT 50
         ");
