@@ -237,5 +237,7 @@ $bajas     = $dist[1] + $dist[2];
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    
 </body>
 </html>

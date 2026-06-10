@@ -859,6 +859,9 @@ function reportesPdfController()
         case 'calificaciones':
             reporteCalificacionesPDF();
             break;
+        case 'ingresos':
+            reporteIngresosPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -924,4 +927,18 @@ function reporteCalificacionesPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_calificaciones.pdf', false);
+}
+
+function reporteIngresosPDF()
+{
+    require_once BASE_PATH . '/app/models/finanza.php';
+
+    $modelo  = new Finanza();
+    $reporte = $modelo->obtenerReporteIngresos();
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/ingresos-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_ingresos_servicios.pdf', false);
 }

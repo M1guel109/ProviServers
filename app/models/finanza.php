@@ -146,5 +146,96 @@ class Finanza
             return [];
         }
     }
+
+    public function obtenerReporteIngresos(): array
+    {
+        $tasa = 0.10;
+
+        $stGlobal = $this->conexion->query("
+            SELECT
+                COUNT(*)                                             AS total_transacciones,
+                COALESCE(SUM(monto), 0)                             AS bruto,
+                COUNT(CASE WHEN liberado = 1 THEN 1 END)            AS liberados,
+                COALESCE(SUM(CASE WHEN liberado = 1 THEN monto END), 0) AS bruto_liberado
+            FROM pagos_servicios
+            WHERE mp_status = 'approved'
+        ");
+        $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [
+            'total_transacciones' => 0, 'bruto' => 0, 'liberados' => 0, 'bruto_liberado' => 0,
+        ];
+        $global['comision']          = round($global['bruto']          * $tasa, 2);
+        $global['neto']              = round($global['bruto']          - $global['comision'], 2);
+        $global['comision_liberado'] = round($global['bruto_liberado'] * $tasa, 2);
+        $global['neto_liberado']     = round($global['bruto_liberado'] - $global['comision_liberado'], 2);
+
+        $stMes = $this->conexion->query("
+            SELECT
+                DATE_FORMAT(created_at, '%Y-%m')  AS periodo,
+                COUNT(*)                           AS transacciones,
+                COALESCE(SUM(monto), 0)            AS bruto
+            FROM pagos_servicios
+            WHERE mp_status = 'approved'
+            GROUP BY periodo
+            ORDER BY periodo DESC
+            LIMIT 12
+        ");
+        $porMes = $stMes->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($porMes as &$mes) {
+            $mes['comision'] = round($mes['bruto'] * $tasa, 2);
+            $mes['neto']     = round($mes['bruto'] - $mes['comision'], 2);
+        }
+        unset($mes);
+
+        $stProv = $this->conexion->query("
+            SELECT
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                COUNT(ps.id)                         AS transacciones,
+                COALESCE(SUM(ps.monto), 0)           AS bruto
+            FROM pagos_servicios ps
+            INNER JOIN proveedores p ON ps.proveedor_id = p.id
+            WHERE ps.mp_status = 'approved'
+            GROUP BY p.id, p.nombres, p.apellidos
+            ORDER BY bruto DESC
+            LIMIT 10
+        ");
+        $porProveedor = $stProv->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($porProveedor as &$prov) {
+            $prov['comision'] = round($prov['bruto'] * $tasa, 2);
+            $prov['neto']     = round($prov['bruto'] - $prov['comision'], 2);
+        }
+        unset($prov);
+
+        $stRecientes = $this->conexion->query("
+            SELECT
+                ps.created_at,
+                ps.monto                             AS bruto,
+                ps.mp_status,
+                ps.liberado,
+                CONCAT(p.nombres, ' ', p.apellidos)  AS proveedor,
+                CONCAT(c.nombres, ' ', c.apellidos)  AS cliente,
+                sv.nombre                            AS servicio
+            FROM pagos_servicios ps
+            INNER JOIN proveedores p  ON ps.proveedor_id          = p.id
+            INNER JOIN clientes c     ON ps.cliente_id            = c.id
+            INNER JOIN servicios_contratados sc ON ps.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv   ON sc.servicio_id           = sv.id
+            ORDER BY ps.created_at DESC
+            LIMIT 50
+        ");
+        $recientes = $stRecientes->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($recientes as &$rec) {
+            $rec['comision'] = round($rec['bruto'] * $tasa, 2);
+            $rec['neto']     = round($rec['bruto'] - $rec['comision'], 2);
+        }
+        unset($rec);
+
+        return [
+            'global'        => $global,
+            'porMes'        => $porMes,
+            'porProveedor'  => $porProveedor,
+            'recientes'     => $recientes,
+            'tasa_comision' => (int)($tasa * 100),
+        ];
+    }
 }
 ?>
