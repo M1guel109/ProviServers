@@ -856,6 +856,9 @@ function reportesPdfController()
         case 'membresias':
             reporteMembresiasPDF();
             break;
+        case 'calificaciones':
+            reporteCalificacionesPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -907,4 +910,18 @@ function reporteMembresiasPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_membresias.pdf', false);
+}
+
+function reporteCalificacionesPDF()
+{
+    require_once BASE_PATH . '/app/models/valoracion.php';
+
+    $modelo  = new Valoracion();
+    $reporte = $modelo->obtenerReporteCalificaciones();
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/calificaciones-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_calificaciones.pdf', false);
 }
