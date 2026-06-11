@@ -563,4 +563,112 @@ class ServicioContratado
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
+
+    public function obtenerReportePorFecha(
+        ?string $desde     = null,
+        ?string $hasta     = null,
+        ?string $estado    = null,
+        string  $agrupacion = 'mes'
+    ): array {
+        try {
+            $params = [];
+            $where  = "WHERE 1=1";
+
+            if (!empty($desde)) {
+                $where .= " AND DATE(sc.created_at) >= :desde";
+                $params[':desde'] = $desde;
+            }
+            if (!empty($hasta)) {
+                $where .= " AND DATE(sc.created_at) <= :hasta";
+                $params[':hasta'] = $hasta;
+            }
+            if (!empty($estado)) {
+                $where .= " AND sc.estado = :estado";
+                $params[':estado'] = $estado;
+            }
+
+            // Resumen global
+            $sqlGlobal = "
+                SELECT
+                    COUNT(*)                                           AS total,
+                    SUM(sc.estado = 'finalizado')                      AS finalizados,
+                    SUM(sc.estado = 'en_proceso')                      AS en_proceso,
+                    SUM(sc.estado = 'pendiente')                       AS pendientes,
+                    SUM(sc.estado = 'confirmado')                      AS confirmados,
+                    SUM(sc.estado IN ('cancelado','cancelado_cliente','cancelado_proveedor')) AS cancelados
+                FROM servicios_contratados sc
+                $where
+            ";
+            $stGlobal = $this->db->prepare($sqlGlobal);
+            foreach ($params as $k => $v) {
+                $stGlobal->bindValue($k, $v);
+            }
+            $stGlobal->execute();
+            $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // Agrupación por período
+            $formatMap = [
+                'dia'     => '%Y-%m-%d',
+                'semana'  => '%Y (semana %u)',
+                'mes'     => '%Y-%m',
+            ];
+            $formato = $formatMap[$agrupacion] ?? '%Y-%m';
+
+            $sqlPeriodo = "
+                SELECT
+                    DATE_FORMAT(sc.created_at, '$formato') AS periodo,
+                    COUNT(*)                               AS total,
+                    SUM(sc.estado = 'finalizado')          AS finalizados,
+                    SUM(sc.estado IN ('cancelado','cancelado_cliente','cancelado_proveedor')) AS cancelados
+                FROM servicios_contratados sc
+                $where
+                GROUP BY periodo
+                ORDER BY MIN(sc.created_at) DESC
+                LIMIT 24
+            ";
+            $stPeriodo = $this->db->prepare($sqlPeriodo);
+            foreach ($params as $k => $v) {
+                $stPeriodo->bindValue($k, $v);
+            }
+            $stPeriodo->execute();
+            $porPeriodo = $stPeriodo->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            // Detalle
+            $sqlDetalle = "
+                SELECT
+                    sc.id          AS contrato_id,
+                    sc.estado,
+                    sc.fecha_solicitud,
+                    sc.fecha_ejecucion,
+                    sc.created_at,
+                    sv.nombre                                       AS servicio_nombre,
+                    c.nombre                                        AS categoria_nombre,
+                    CONCAT(cl.nombres, ' ', cl.apellidos)           AS cliente_nombre,
+                    CONCAT(pr.nombres, ' ', pr.apellidos)           AS proveedor_nombre
+                FROM servicios_contratados sc
+                INNER JOIN servicios   sv  ON sc.servicio_id  = sv.id
+                LEFT  JOIN categorias  c   ON sv.id_categoria = c.id
+                INNER JOIN clientes    cl  ON sc.cliente_id   = cl.id
+                INNER JOIN proveedores pr  ON sc.proveedor_id = pr.id
+                $where
+                ORDER BY sc.created_at DESC
+                LIMIT 200
+            ";
+            $stDetalle = $this->db->prepare($sqlDetalle);
+            foreach ($params as $k => $v) {
+                $stDetalle->bindValue($k, $v);
+            }
+            $stDetalle->execute();
+            $detalle = $stDetalle->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            return [
+                'global'    => $global,
+                'porPeriodo' => $porPeriodo,
+                'detalle'   => $detalle,
+            ];
+        } catch (PDOException $e) {
+            error_log("Error en ServicioContratado::obtenerReportePorFecha -> " . $e->getMessage());
+            return ['global' => [], 'porPeriodo' => [], 'detalle' => []];
+        }
+    }
 }

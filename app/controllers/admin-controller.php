@@ -865,6 +865,9 @@ function reportesPdfController()
         case 'serviciosOfrecidos':
             reporteServiciosOfrecidosPDF();
             break;
+        case 'serviciosFecha':
+            reporteServiciosFechaPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -987,4 +990,29 @@ function reporteServiciosOfrecidosPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_servicios_ofrecidos.pdf', false);
+}
+
+function reporteServiciosFechaPDF()
+{
+    require_once BASE_PATH . '/app/models/servicio-contratado.php';
+
+    $desde      = $_GET['desde']      ?? null;
+    $hasta      = $_GET['hasta']      ?? null;
+    $estado     = isset($_GET['estado']) && $_GET['estado'] !== '' ? $_GET['estado'] : null;
+    $agrupacion = $_GET['agrupacion'] ?? 'mes';
+
+    $modelo  = new ServicioContratado();
+    $reporte = $modelo->obtenerReportePorFecha($desde, $hasta, $estado, $agrupacion);
+
+    $filtros = array_filter([
+        'desde'  => $desde,
+        'hasta'  => $hasta,
+        'estado' => $estado ? ucfirst(str_replace('_', ' ', $estado)) : null,
+    ]);
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/servicios-fecha-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_servicios_por_fecha.pdf', false);
 }
