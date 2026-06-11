@@ -240,6 +240,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/reportes-ingresos.php';
         break;
 
+    case '/admin/reportes-servicios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-servicios.php';
+        break;
+
     case '/admin/reporte':
         require_once BASE_PATH . '/app/controllers/admin-controller.php';
         reportesPdfController();

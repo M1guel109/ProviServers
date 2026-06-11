@@ -315,6 +315,138 @@ class Publicacion
         return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
     }
 
+    public function obtenerReporteServiciosOfrecidos(
+        ?int    $categoriaId  = null,
+        ?string $estado       = null,
+        ?int    $proveedorId  = null,
+        ?string $desde        = null,
+        ?string $hasta        = null
+    ): array {
+        try {
+            $params = [];
+
+            $where = "WHERE pub.tipo_publicacion = 'proveedor'";
+
+            if (!empty($categoriaId)) {
+                $where .= " AND s.id_categoria = :categoriaId";
+                $params[':categoriaId'] = $categoriaId;
+            }
+            if (!empty($estado)) {
+                $where .= " AND pub.estado = :estado";
+                $params[':estado'] = $estado;
+            }
+            if (!empty($proveedorId)) {
+                $where .= " AND pub.proveedor_id = :proveedorId";
+                $params[':proveedorId'] = $proveedorId;
+            }
+            if (!empty($desde)) {
+                $where .= " AND DATE(pub.created_at) >= :desde";
+                $params[':desde'] = $desde;
+            }
+            if (!empty($hasta)) {
+                $where .= " AND DATE(pub.created_at) <= :hasta";
+                $params[':hasta'] = $hasta;
+            }
+
+            // Resumen global con los filtros aplicados
+            $sqlGlobal = "
+                SELECT
+                    COUNT(*)                                        AS total,
+                    SUM(pub.estado = 'aprobado')                   AS aprobados,
+                    SUM(pub.estado = 'pendiente')                  AS pendientes,
+                    SUM(pub.estado = 'rechazado')                  AS rechazados,
+                    COALESCE(SUM(sol_count.total_sol), 0)          AS total_solicitudes,
+                    COALESCE(SUM(sc_count.total_contratos), 0)     AS total_contratos
+                FROM publicaciones pub
+                INNER JOIN servicios s ON pub.servicio_id = s.id
+                LEFT JOIN (
+                    SELECT publicacion_id, COUNT(*) AS total_sol
+                    FROM solicitudes
+                    GROUP BY publicacion_id
+                ) sol_count ON sol_count.publicacion_id = pub.id
+                LEFT JOIN (
+                    SELECT sol.publicacion_id, COUNT(sc.id) AS total_contratos
+                    FROM servicios_contratados sc
+                    INNER JOIN solicitudes sol ON sc.solicitud_id = sol.id
+                    GROUP BY sol.publicacion_id
+                ) sc_count ON sc_count.publicacion_id = pub.id
+                $where
+            ";
+
+            $stGlobal = $this->conexion->prepare($sqlGlobal);
+            foreach ($params as $k => $v) {
+                $stGlobal->bindValue($k, $v, in_array($k, [':categoriaId', ':proveedorId']) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stGlobal->execute();
+            $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // Detalle de publicaciones
+            $sqlDetalle = "
+                SELECT
+                    pub.id                                          AS publicacion_id,
+                    pub.titulo,
+                    pub.precio,
+                    pub.estado,
+                    pub.created_at,
+                    s.nombre                                        AS servicio_nombre,
+                    c.nombre                                        AS categoria_nombre,
+                    CONCAT(pr.nombres, ' ', pr.apellidos)           AS proveedor_nombre,
+                    COALESCE(sol_count.total_sol, 0)                AS solicitudes,
+                    COALESCE(sc_count.total_contratos, 0)           AS contratos
+                FROM publicaciones pub
+                INNER JOIN servicios   s   ON pub.servicio_id  = s.id
+                LEFT  JOIN categorias  c   ON s.id_categoria   = c.id
+                INNER JOIN proveedores pr  ON pub.proveedor_id = pr.id
+                LEFT JOIN (
+                    SELECT publicacion_id, COUNT(*) AS total_sol
+                    FROM solicitudes
+                    GROUP BY publicacion_id
+                ) sol_count ON sol_count.publicacion_id = pub.id
+                LEFT JOIN (
+                    SELECT sol.publicacion_id, COUNT(sc.id) AS total_contratos
+                    FROM servicios_contratados sc
+                    INNER JOIN solicitudes sol ON sc.solicitud_id = sol.id
+                    GROUP BY sol.publicacion_id
+                ) sc_count ON sc_count.publicacion_id = pub.id
+                $where
+                ORDER BY pub.created_at DESC
+                LIMIT 200
+            ";
+
+            $stDetalle = $this->conexion->prepare($sqlDetalle);
+            foreach ($params as $k => $v) {
+                $stDetalle->bindValue($k, $v, in_array($k, [':categoriaId', ':proveedorId']) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stDetalle->execute();
+            $publicaciones = $stDetalle->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            // Por categoría (sin filtro de categoría para mostrar distribución)
+            $sqlCat = "
+                SELECT
+                    COALESCE(c.nombre, 'Sin categoría') AS categoria,
+                    COUNT(pub.id)                       AS total
+                FROM publicaciones pub
+                INNER JOIN servicios  s ON pub.servicio_id = s.id
+                LEFT  JOIN categorias c ON s.id_categoria  = c.id
+                WHERE pub.tipo_publicacion = 'proveedor'
+                GROUP BY c.id, c.nombre
+                ORDER BY total DESC
+                LIMIT 10
+            ";
+            $stCat = $this->conexion->query($sqlCat);
+            $porCategoria = $stCat->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+            return [
+                'global'       => $global,
+                'publicaciones' => $publicaciones,
+                'porCategoria' => $porCategoria,
+            ];
+        } catch (PDOException $e) {
+            error_log("Error en Publicacion::obtenerReporteServiciosOfrecidos -> " . $e->getMessage());
+            return ['global' => [], 'publicaciones' => [], 'porCategoria' => []];
+        }
+    }
+
     public function obtenerDetallePublicacion(int $id): ?array
     {
         try {
