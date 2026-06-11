@@ -862,6 +862,9 @@ function reportesPdfController()
         case 'ingresos':
             reporteIngresosPDF();
             break;
+        case 'serviciosOfrecidos':
+            reporteServiciosOfrecidosPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -941,4 +944,47 @@ function reporteIngresosPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_ingresos_servicios.pdf', false);
+}
+
+function reporteServiciosOfrecidosPDF()
+{
+    require_once BASE_PATH . '/app/models/publicacion.php';
+    require_once BASE_PATH . '/app/models/categoria.php';
+    require_once BASE_PATH . '/config/database.php';
+
+    $categoriaId = isset($_GET['categoria_id']) && $_GET['categoria_id'] !== '' ? (int)$_GET['categoria_id'] : null;
+    $estado      = isset($_GET['estado'])       && $_GET['estado']       !== '' ? $_GET['estado']       : null;
+    $proveedorId = isset($_GET['proveedor_id']) && $_GET['proveedor_id'] !== '' ? (int)$_GET['proveedor_id'] : null;
+    $desde       = $_GET['desde'] ?? null;
+    $hasta       = $_GET['hasta'] ?? null;
+
+    $modelo  = new Publicacion();
+    $reporte = $modelo->obtenerReporteServiciosOfrecidos($categoriaId, $estado, $proveedorId, $desde, $hasta);
+
+    // Etiquetas legibles para los filtros del PDF
+    $filtros = [];
+    if ($estado)     $filtros['estado']    = ucfirst($estado);
+    if ($desde)      $filtros['desde']     = $desde;
+    if ($hasta)      $filtros['hasta']     = $hasta;
+
+    if ($categoriaId) {
+        $catModelo  = new Categoria();
+        $cat        = $catModelo->mostrarId($categoriaId);
+        if ($cat)   $filtros['categoria'] = $cat['nombre'];
+    }
+    if ($proveedorId) {
+        $db   = new Conexion();
+        $pdo  = $db->getConexion();
+        $stmt = $pdo->prepare("SELECT CONCAT(nombres, ' ', apellidos) AS nombre FROM proveedores WHERE id = :id LIMIT 1");
+        $stmt->bindParam(':id', $proveedorId, PDO::PARAM_INT);
+        $stmt->execute();
+        $prov = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($prov) $filtros['proveedor'] = $prov['nombre'];
+    }
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/servicios-ofrecidos-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_servicios_ofrecidos.pdf', false);
 }
