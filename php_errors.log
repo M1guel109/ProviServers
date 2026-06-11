@@ -54,3 +54,13 @@ Stack trace:
 #1 C:\xampp\htdocs\ProviServers\index.php(241): reportesPdfController()
 #2 {main}
   thrown in C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php on line 923
+[10-Jun-2026 20:44:01 Europe/Berlin] PHP Warning:  require(C:\xampp\htdocs\ProviServers/app/views/dashboard/admin/facturacion.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ProviServers\index.php on line 119
+[10-Jun-2026 20:44:01 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\xampp\htdocs\ProviServers/app/views/dashboard/admin/facturacion.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ProviServers\index.php:119
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\ProviServers\index.php on line 119
+[10-Jun-2026 20:50:47 Europe/Berlin] PHP Warning:  require(C:\xampp\htdocs\ProviServers/app/views/dashboard/admin/facturacion.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\ProviServers\index.php on line 119
+[10-Jun-2026 20:50:47 Europe/Berlin] PHP Fatal error:  Uncaught Error: Failed opening required 'C:\xampp\htdocs\ProviServers/app/views/dashboard/admin/facturacion.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\ProviServers\index.php:119
+Stack trace:
+#0 {main}
+  thrown in C:\xampp\htdocs\ProviServers\index.php on line 119

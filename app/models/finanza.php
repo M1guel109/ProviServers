@@ -146,5 +146,73 @@ class Finanza
             return [];
         }
     }
+
+    public function obtenerReporteIngresos(): array
+    {
+        $stGlobal = $this->conexion->query("
+            SELECT
+                COUNT(*)                                                              AS total_pagos,
+                COALESCE(SUM(CASE WHEN estado_pago = 'pagado'    THEN monto END), 0) AS confirmado,
+                COALESCE(SUM(CASE WHEN estado_pago = 'pendiente' THEN monto END), 0) AS pendiente,
+                COUNT(CASE WHEN estado_pago = 'pagado'    THEN 1 END)                AS pagos_confirmados,
+                COUNT(CASE WHEN estado_pago = 'pendiente' THEN 1 END)                AS pagos_pendientes
+            FROM pagos
+        ");
+        $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [
+            'total_pagos' => 0, 'confirmado' => 0, 'pendiente' => 0,
+            'pagos_confirmados' => 0, 'pagos_pendientes' => 0,
+        ];
+
+        $stMes = $this->conexion->query("
+            SELECT
+                DATE_FORMAT(fecha_pago, '%Y-%m') AS periodo,
+                COUNT(*)                          AS pagos,
+                COALESCE(SUM(monto), 0)           AS total
+            FROM pagos
+            WHERE estado_pago = 'pagado'
+            GROUP BY periodo
+            ORDER BY periodo DESC
+            LIMIT 12
+        ");
+        $porMes = $stMes->fetchAll(PDO::FETCH_ASSOC);
+
+        $stPlan = $this->conexion->query("
+            SELECT
+                m.tipo                  AS plan,
+                COUNT(p.id)             AS ventas,
+                COALESCE(SUM(p.monto), 0) AS total
+            FROM pagos p
+            INNER JOIN proveedor_membresia pm ON p.proveedor_membresia_id = pm.id
+            INNER JOIN membresias m           ON pm.membresia_id          = m.id
+            WHERE p.estado_pago = 'pagado'
+            GROUP BY m.id, m.tipo
+            ORDER BY total DESC
+        ");
+        $porPlan = $stPlan->fetchAll(PDO::FETCH_ASSOC);
+
+        $stRecientes = $this->conexion->query("
+            SELECT
+                p.fecha_pago,
+                p.monto,
+                p.estado_pago,
+                p.metodo_pago,
+                CONCAT(prov.nombres, ' ', prov.apellidos) AS proveedor,
+                m.tipo                                    AS plan
+            FROM pagos p
+            INNER JOIN proveedores prov        ON p.proveedor_id          = prov.id
+            INNER JOIN proveedor_membresia pm  ON p.proveedor_membresia_id = pm.id
+            INNER JOIN membresias m            ON pm.membresia_id          = m.id
+            ORDER BY p.created_at DESC
+            LIMIT 50
+        ");
+        $recientes = $stRecientes->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'global'    => $global,
+            'porMes'    => $porMes,
+            'porPlan'   => $porPlan,
+            'recientes' => $recientes,
+        ];
+    }
 }
 ?>
