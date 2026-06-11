@@ -232,6 +232,26 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/reportes-usuarios.php';
         break;
 
+    case '/admin/reportes-calificaciones':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-calificaciones.php';
+        break;
+
+    case '/admin/reportes-ingresos':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-ingresos.php';
+        break;
+
+    case '/admin/reportes-servicios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-servicios.php';
+        break;
+
+    case '/admin/reportes-servicios-fecha':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-servicios-fecha.php';
+        break;
+
+    case '/admin/reportes-proveedores':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-proveedores.php';
+        break;
+
     case '/admin/reporte':
         require_once BASE_PATH . '/app/controllers/admin-controller.php';
         reportesPdfController();

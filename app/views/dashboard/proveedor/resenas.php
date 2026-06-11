@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Asegúrate de que BASE_PATH esté definido en tu config
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 // Las variables $resenas, $promedio, $totalResenas, $porcentajes llegan del controlador
@@ -9,6 +9,7 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Reseñas y Calificaciones</title>
 

@@ -102,6 +102,59 @@ class Valoracion
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerReporteCalificaciones(): array
+    {
+        $stGlobal = $this->db->query("
+            SELECT
+                COUNT(*)                        AS total,
+                ROUND(AVG(calificacion), 2)     AS promedio,
+                SUM(calificacion = 5)           AS cinco,
+                SUM(calificacion = 4)           AS cuatro,
+                SUM(calificacion = 3)           AS tres,
+                SUM(calificacion = 2)           AS dos,
+                SUM(calificacion = 1)           AS uno
+            FROM valoraciones
+        ");
+        $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stTop = $this->db->query("
+            SELECT
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                ROUND(AVG(v.calificacion), 2)        AS promedio,
+                COUNT(v.id)                          AS total
+            FROM valoraciones v
+            INNER JOIN proveedores p ON v.proveedor_id = p.id
+            GROUP BY p.id, p.nombres, p.apellidos
+            ORDER BY promedio DESC, total DESC
+            LIMIT 10
+        ");
+        $topProveedores = $stTop->fetchAll(PDO::FETCH_ASSOC);
+
+        $stRecientes = $this->db->query("
+            SELECT
+                v.calificacion,
+                v.comentario,
+                v.created_at,
+                CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                sv.nombre                           AS servicio
+            FROM valoraciones v
+            INNER JOIN clientes c                ON v.cliente_id             = c.id
+            INNER JOIN proveedores p             ON v.proveedor_id           = p.id
+            INNER JOIN servicios_contratados sc  ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv              ON sc.servicio_id           = sv.id
+            ORDER BY v.created_at DESC
+            LIMIT 50
+        ");
+        $recientes = $stRecientes->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'global'         => $global,
+            'topProveedores' => $topProveedores,
+            'recientes'      => $recientes,
+        ];
+    }
+
     public function responderResena(int $valoracionId, int $proveedorUsuarioId, string $respuesta): bool
     {
         // 1. Obtenemos el ID del proveedor basado en el usuario logueado
