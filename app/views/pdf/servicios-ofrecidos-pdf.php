@@ -60,8 +60,6 @@
         .badge-aprobado  { background: #d4edda; color: #155724; padding: 2px 6px; border-radius: 10px; font-size: 9px; }
         .badge-pendiente { background: #fff3cd; color: #856404; padding: 2px 6px; border-radius: 10px; font-size: 9px; }
         .badge-rechazado { background: #f8d7da; color: #721c24; padding: 2px 6px; border-radius: 10px; font-size: 9px; }
-        .bar-bg   { background: #e9ecef; border-radius: 4px; height: 12px; width: 100%; }
-        .bar-fill { background: #0066ff; border-radius: 4px; height: 12px; }
         .cat-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
         .cat-table td { padding: 4px 6px; font-size: 10px; }
         .cat-name { width: 120px; font-weight: bold; }
@@ -146,7 +144,14 @@
                 <?php $ancho = max(round(($cat['total'] / $maxCat) * 100), 1); ?>
                 <tr>
                     <td class="cat-name"><?= htmlspecialchars($cat['categoria']) ?></td>
-                    <td class="cat-bar"><div class="bar-bg"><div class="bar-fill" style="width:<?= $ancho ?>%;"></div></div></td>
+                    <td class="cat-bar">
+                        <table style="width:100%; height:12px; border-collapse:collapse; font-size:1px; line-height:12px;">
+                            <tr>
+                                <td style="width:<?= $ancho ?>%; background-color:#0066ff; height:12px;"></td>
+                                <td style="background-color:#e9ecef; height:12px;"></td>
+                            </tr>
+                        </table>
+                    </td>
                     <td class="cat-count"><?= (int)$cat['total'] ?></td>
                 </tr>
             <?php endforeach; ?>

@@ -64,3 +64,78 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\xampp\htdocs\ProviServers\index.php on line 119
+[11-Jun-2026 23:50:18 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 00:18:25 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 00:32:38 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
