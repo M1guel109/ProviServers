@@ -463,4 +463,129 @@ class ProveedorPerfil
             return 'error';
         }
     }
+
+    // ======================================================================
+    // REPORTE DE PROVEEDORES (admin)
+    // ======================================================================
+
+    public function obtenerReporteProveedores($nivelConfianza = null, $verificado = null, $calMin = null, $calMax = null)
+    {
+        try {
+            $where  = [];
+            $params = [];
+
+            if ($nivelConfianza !== null) {
+                $where[]  = 'p.nivel_confianza = :nivel';
+                $params[':nivel'] = $nivelConfianza;
+            }
+            if ($verificado !== null) {
+                $where[]  = 'p.verificado = :verificado';
+                $params[':verificado'] = $verificado;
+            }
+            if ($calMin !== null) {
+                $where[]  = 'p.calificacion_promedio >= :calMin';
+                $params[':calMin'] = $calMin;
+            }
+            if ($calMax !== null) {
+                $where[]  = 'p.calificacion_promedio <= :calMax';
+                $params[':calMax'] = $calMax;
+            }
+
+            $whereSQL = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+            // 1. Global
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    COUNT(*)                             AS total,
+                    SUM(p.verificado = 1)                AS verificados,
+                    SUM(p.verificado = 0)                AS no_verificados,
+                    ROUND(AVG(p.calificacion_promedio), 2) AS prom_calificacion,
+                    SUM(p.nivel_confianza = 'nuevo')     AS nuevos,
+                    SUM(p.nivel_confianza = 'validado')  AS validados,
+                    SUM(p.nivel_confianza = 'confiable') AS confiables,
+                    SUM(p.nivel_confianza = 'experto')   AS expertos
+                FROM proveedores p $whereSQL
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $global = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // 2. Por nivel de confianza
+            $stmt = $this->conexion->prepare("
+                SELECT p.nivel_confianza AS nivel, COUNT(*) AS total
+                FROM proveedores p $whereSQL
+                GROUP BY p.nivel_confianza
+                ORDER BY FIELD(p.nivel_confianza, 'experto', 'confiable', 'validado', 'nuevo')
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porNivel = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Por rango de calificación
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    CASE
+                        WHEN p.calificacion_promedio < 1 THEN '0 - 1'
+                        WHEN p.calificacion_promedio < 2 THEN '1 - 2'
+                        WHEN p.calificacion_promedio < 3 THEN '2 - 3'
+                        WHEN p.calificacion_promedio < 4 THEN '3 - 4'
+                        ELSE '4 - 5'
+                    END AS rango,
+                    COUNT(*) AS total
+                FROM proveedores p $whereSQL
+                GROUP BY rango
+                ORDER BY rango
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porCalificacion = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Por categoría (proveedores con publicaciones aprobadas)
+            $catWhere = $where ? ('WHERE ' . implode(' AND ', array_map(fn($c) => str_replace('p.', 'pr.', $c), $where))) : '';
+            $stmt = $this->conexion->prepare("
+                SELECT cat.nombre AS categoria, COUNT(DISTINCT pr.id) AS proveedores
+                FROM categorias cat
+                JOIN servicios sv  ON sv.id_categoria  = cat.id
+                JOIN publicaciones pub ON pub.servicio_id = sv.id AND pub.estado = 'aprobado'
+                JOIN proveedores pr ON pr.id = pub.proveedor_id
+                $catWhere
+                GROUP BY cat.id
+                ORDER BY proveedores DESC
+                LIMIT 10
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porCategoria = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 5. Detalle
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    p.id,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS nombre,
+                    p.ubicacion,
+                    p.calificacion_promedio,
+                    p.verificado,
+                    p.nivel_confianza,
+                    p.publicaciones_aprobadas_count,
+                    COUNT(DISTINCT c.id)  AS total_calificaciones,
+                    COUNT(DISTINCT sc.id) AS total_contratos
+                FROM proveedores p
+                LEFT JOIN calificaciones c  ON c.proveedor_id  = p.id
+                LEFT JOIN servicios_contratados sc ON sc.proveedor_id = p.id
+                $whereSQL
+                GROUP BY p.id
+                ORDER BY p.calificacion_promedio DESC, p.nombres ASC
+                LIMIT 200
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $detalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return compact('global', 'porNivel', 'porCalificacion', 'porCategoria', 'detalle');
+
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorPerfil::obtenerReporteProveedores -> ' . $e->getMessage());
+            return ['global' => [], 'porNivel' => [], 'porCalificacion' => [], 'porCategoria' => [], 'detalle' => []];
+        }
+    }
 }

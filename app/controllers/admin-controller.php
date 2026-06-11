@@ -868,6 +868,9 @@ function reportesPdfController()
         case 'serviciosFecha':
             reporteServiciosFechaPDF();
             break;
+        case 'proveedores':
+            reporteProveedoresPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -990,6 +993,32 @@ function reporteServiciosOfrecidosPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_servicios_ofrecidos.pdf', false);
+}
+
+function reporteProveedoresPDF()
+{
+    require_once BASE_PATH . '/app/models/proveedor-perfil.php';
+
+    $nivelConfianza = isset($_GET['nivel_confianza']) && $_GET['nivel_confianza'] !== '' ? $_GET['nivel_confianza'] : null;
+    $verificado     = isset($_GET['verificado'])     && $_GET['verificado']     !== '' ? (int)$_GET['verificado'] : null;
+    $calMin         = isset($_GET['cal_min'])        && $_GET['cal_min']        !== '' ? (float)$_GET['cal_min'] : null;
+    $calMax         = isset($_GET['cal_max'])        && $_GET['cal_max']        !== '' ? (float)$_GET['cal_max'] : null;
+
+    $modelo  = new ProveedorPerfil();
+    $reporte = $modelo->obtenerReporteProveedores($nivelConfianza, $verificado, $calMin, $calMax);
+
+    $filtros = [
+        'nivel_confianza' => $nivelConfianza,
+        'verificado'      => $verificado,
+        'cal_min'         => $calMin,
+        'cal_max'         => $calMax,
+    ];
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/proveedores-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_proveedores.pdf', false);
 }
 
 function reporteServiciosFechaPDF()

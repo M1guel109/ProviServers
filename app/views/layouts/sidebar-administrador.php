@@ -119,6 +119,7 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
                         <li><a href="<?= BASE_URL ?>/admin/reportes-ingresos" class="submenu-link">Ingresos</a></li>
                         <li><a href="<?= BASE_URL ?>/admin/reportes-servicios" class="submenu-link">Servicios ofrecidos</a></li>
                         <li><a href="<?= BASE_URL ?>/admin/reportes-servicios-fecha" class="submenu-link">Servicios por fecha</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-proveedores" class="submenu-link">Proveedores</a></li>
                     </ul>
                 </li>
             </ul>
