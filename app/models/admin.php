@@ -754,4 +754,102 @@ class Usuario
             ];
         }
     }
+
+    public function obtenerReporteUsuarios($desde = null, $hasta = null, $rol = null, $estadoId = null)
+    {
+        try {
+            $where  = [];
+            $params = [];
+
+            if ($desde) {
+                $where[]          = 'u.created_at >= :desde';
+                $params[':desde'] = $desde . ' 00:00:00';
+            }
+            if ($hasta) {
+                $where[]          = 'u.created_at <= :hasta';
+                $params[':hasta'] = $hasta . ' 23:59:59';
+            }
+            if ($rol) {
+                $where[]       = 'u.rol = :rol';
+                $params[':rol'] = $rol;
+            }
+            if ($estadoId !== null) {
+                $where[]            = 'u.estado_id = :estado_id';
+                $params[':estado_id'] = $estadoId;
+            }
+
+            $whereSQL = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+            // 1. Global
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    COUNT(*)                                              AS total,
+                    SUM(u.rol = 'cliente')                               AS clientes,
+                    SUM(u.rol = 'proveedor')                             AS proveedores,
+                    SUM(u.rol = 'admin')                                 AS admins,
+                    SUM(ue.nombre = 'activo')                            AS activos,
+                    SUM(ue.nombre = 'pendiente')                         AS pendientes,
+                    SUM(ue.nombre = 'suspendido')                        AS suspendidos,
+                    SUM(ue.nombre IN ('inactivo','bloqueado'))            AS inactivos
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $global = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // 2. Crecimiento mensual (últimos 12 meses o rango filtrado)
+            $crecWhere = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    DATE_FORMAT(u.created_at, '%Y-%m')           AS periodo,
+                    DATE_FORMAT(MIN(u.created_at), '%b %Y')      AS label,
+                    COUNT(*)                                      AS total,
+                    SUM(u.rol = 'cliente')                        AS clientes,
+                    SUM(u.rol = 'proveedor')                      AS proveedores
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $crecWhere
+                GROUP BY periodo
+                ORDER BY periodo ASC
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $crecimiento = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Por estado
+            $stmt = $this->conexion->prepare("
+                SELECT ue.nombre AS estado, COUNT(*) AS total
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+                GROUP BY ue.id
+                ORDER BY total DESC
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Detalle
+            $stmt = $this->conexion->prepare("
+                SELECT u.id, u.email, u.rol, u.created_at,
+                       ue.nombre AS estado
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+                ORDER BY u.created_at DESC
+                LIMIT 200
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $detalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return compact('global', 'crecimiento', 'porEstado', 'detalle');
+
+        } catch (PDOException $e) {
+            error_log('Error en Usuario::obtenerReporteUsuarios -> ' . $e->getMessage());
+            return ['global' => [], 'crecimiento' => [], 'porEstado' => [], 'detalle' => []];
+        }
+    }
 }
