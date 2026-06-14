@@ -628,6 +628,11 @@ function crearPromocion(): void
         exit;
     }
 
+    if ($fechaInicio < date('Y-m-d')) {
+        mostrarSweetAlert('error', 'Fecha inválida', 'La fecha de inicio no puede ser en el pasado.', BASE_URL . '/proveedor/promociones');
+        exit;
+    }
+
     if ($fechaFin <= $fechaInicio) {
         mostrarSweetAlert('error', 'Fechas inválidas', 'La fecha de fin debe ser posterior a la de inicio.', BASE_URL . '/proveedor/promociones');
         exit;
