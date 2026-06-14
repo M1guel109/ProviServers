@@ -42,6 +42,10 @@ switch ($method) {
             registrarMembresia();
         } elseif ($accion === 'actualizar_membresia') {
             actualizarMembresia();
+        } elseif ($accion === 'liberar_pago') {
+            liberarPago();
+        } elseif ($accion === 'reembolsar_pago') {
+            reembolsarPago();
         } elseif ($accion === 'cambiar_estado_documento') {
             procesarEstadoDocumento();
         } elseif ($accion === 'actualizar') {
@@ -1053,4 +1057,64 @@ function reporteServiciosFechaPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_servicios_por_fecha.pdf', false);
+}
+
+// ===================================================================
+// GESTIÓN DE PAGOS (#188 / #189)
+// ===================================================================
+
+function liberarPago(): void
+{
+    $pagoId = (int)($_POST['pago_id'] ?? 0);
+    if ($pagoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Pago no válido.', BASE_URL . '/admin/pagos');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        $st  = $pdo->prepare("
+            UPDATE pagos_servicios
+            SET liberado = 1, fecha_liberacion = NOW()
+            WHERE id = :id AND mp_status = 'approved' AND liberado = 0
+        ");
+        $st->execute([':id' => $pagoId]);
+        if ($st->rowCount() > 0) {
+            mostrarSweetAlert('success', 'Pago liberado', 'Los fondos fueron liberados al proveedor.', BASE_URL . '/admin/pagos');
+        } else {
+            mostrarSweetAlert('error', 'Sin cambios', 'El pago no existe o ya fue liberado.', BASE_URL . '/admin/pagos');
+        }
+    } catch (PDOException $e) {
+        error_log('liberarPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo liberar el pago.', BASE_URL . '/admin/pagos');
+    }
+    exit;
+}
+
+function reembolsarPago(): void
+{
+    $pagoId = (int)($_POST['pago_id'] ?? 0);
+    if ($pagoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Pago no válido.', BASE_URL . '/admin/pagos');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        $st  = $pdo->prepare("
+            UPDATE pagos_servicios
+            SET mp_status = 'refunded'
+            WHERE id = :id AND mp_status IN ('charged_back','in_process')
+        ");
+        $st->execute([':id' => $pagoId]);
+        if ($st->rowCount() > 0) {
+            mostrarSweetAlert('success', 'Reembolso aplicado', 'El pago fue marcado como reembolsado.', BASE_URL . '/admin/pagos');
+        } else {
+            mostrarSweetAlert('error', 'Sin cambios', 'El pago no está en estado de disputa o ya fue procesado.', BASE_URL . '/admin/pagos');
+        }
+    } catch (PDOException $e) {
+        error_log('reembolsarPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo aplicar el reembolso.', BASE_URL . '/admin/pagos');
+    }
+    exit;
 }

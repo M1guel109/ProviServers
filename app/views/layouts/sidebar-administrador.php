@@ -102,6 +102,7 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
                     <ul class="submenu">
                         <li><a href="<?= BASE_URL ?>/admin/finanzas" class="submenu-link"><?= __('admin_sub_balance') ?></a></li>
                         <li><a href="<?= BASE_URL ?>/admin/facturacion" class="submenu-link"><?= __('admin_sub_facturacion') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/pagos" class="submenu-link">Gestión de pagos</a></li>
                     </ul>
                 </li>
 
