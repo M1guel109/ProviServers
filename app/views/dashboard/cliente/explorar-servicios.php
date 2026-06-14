@@ -8,6 +8,7 @@ $catActual   = $catActual   ?? '';
 $ciudad      = $ciudad      ?? '';
 $precioMax   = $precioMax   ?? null;
 $orden       = $orden       ?? 'recientes';
+$soloOfertas = $soloOfertas ?? false;
 $publicaciones = $publicaciones ?? [];
 $objCategoria = new Categoria();
 $categorias = $objCategoria->mostrar() ?: [];
@@ -110,11 +111,24 @@ $categorias = $objCategoria->mostrar() ?: [];
                     </div>
                 </div>
 
-                <!-- Fila 2: filtros de categoría (mantienen los otros filtros activos) -->
+                <!-- Fila 2: filtros de categoría + En oferta -->
                 <div class="d-flex flex-wrap gap-2">
-                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios<?= $orden !== 'recientes' ? '?orden='.$orden : '' ?>"
-                        class="btn btn-outline-primary <?= $catActual === '' ? 'active' : '' ?>">
+                    <?php
+                        $qsBase = http_build_query(array_filter([
+                            'q'          => $busqueda,
+                            'ciudad'     => $ciudad,
+                            'precio_max' => $precioMax ? (int)$precioMax : '',
+                            'orden'      => $orden !== 'recientes' ? $orden : '',
+                        ]));
+                        $qsOfertas = $qsBase ? $qsBase . '&ofertas=1' : 'ofertas=1';
+                    ?>
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios<?= $qsBase ? '?'.$qsBase : '' ?>"
+                        class="btn btn-outline-primary <?= $catActual === '' && !$soloOfertas ? 'active' : '' ?>">
                         <i class="bi bi-grid-3x3-gap-fill"></i> Todas
+                    </a>
+                    <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsOfertas ?>"
+                        class="btn <?= $soloOfertas ? 'btn-danger' : 'btn-outline-danger' ?>">
+                        <i class="bi bi-tag-fill"></i> En oferta
                     </a>
                     <?php foreach ($categorias as $cat):
                         $catId = $cat['id'] ?? 0;
@@ -140,6 +154,7 @@ $categorias = $objCategoria->mostrar() ?: [];
                             'ciudad'    => $ciudad,
                             'precio_max'=> $precioMax ? (int)$precioMax : '',
                             'orden'     => $orden !== 'recientes' ? $orden : '',
+                            'ofertas'   => $soloOfertas ? '1' : '',
                         ]));
                     ?>
                         <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsCat ?>"
@@ -152,10 +167,11 @@ $categorias = $objCategoria->mostrar() ?: [];
                 <!-- Badge de filtros activos -->
                 <?php
                 $filtrosActivos = array_filter([
-                    $busqueda  ? "Búsqueda: \"$busqueda\"" : null,
-                    $ciudad    ? "Ciudad: \"$ciudad\""      : null,
-                    $precioMax ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
-                    $catActual ? 'Categoría seleccionada'   : null,
+                    $busqueda    ? "Búsqueda: \"$busqueda\""                              : null,
+                    $ciudad      ? "Ciudad: \"$ciudad\""                                   : null,
+                    $precioMax   ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
+                    $catActual   ? 'Categoría seleccionada'                               : null,
+                    $soloOfertas ? 'Solo ofertas activas'                                 : null,
                 ]);
                 if ($filtrosActivos): ?>
                 <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
