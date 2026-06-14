@@ -85,6 +85,7 @@ function mostrarCatalogoPublico()
     $precioMax   = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
     $orden       = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
                    ? $_GET['orden'] : 'recientes';
+    $soloOfertas = isset($_GET['ofertas']) && $_GET['ofertas'] === '1';
 
     $catActual = $categoriaId ?? '';
 
@@ -94,7 +95,8 @@ function mostrarCatalogoPublico()
         $categoriaId,
         $ciudad ?: null,
         $precioMax,
-        $orden
+        $orden,
+        $soloOfertas
     );
 
     require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
