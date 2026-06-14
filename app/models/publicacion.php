@@ -159,10 +159,19 @@ class Publicacion
                 s.disponibilidad        AS servicio_disponible,
                 s.precio                AS servicio_precio,
 
-                c.nombre                AS categoria_nombre
+                c.nombre                AS categoria_nombre,
+
+                promo.porcentaje_descuento AS promo_descuento,
+                promo.fecha_fin            AS promo_hasta,
+                ROUND(pub.precio * (1 - COALESCE(promo.porcentaje_descuento, 0) / 100)) AS precio_con_descuento
+
             FROM publicaciones AS pub
             INNER JOIN servicios  AS s ON pub.servicio_id = s.id
             LEFT  JOIN categorias AS c ON s.id_categoria  = c.id
+            LEFT  JOIN promociones promo
+                ON promo.publicacion_id = pub.id
+                AND promo.fecha_inicio <= CURDATE()
+                AND promo.fecha_fin    >= CURDATE()
             WHERE pub.proveedor_id = :proveedor_id
             ORDER BY pub.fecha_publicacion DESC, pub.id DESC
         ";
@@ -220,7 +229,8 @@ class Publicacion
                 COUNT(v.id)                      AS total_resenas,
 
                 promo.porcentaje_descuento       AS promo_descuento,
-                promo.fecha_fin                  AS promo_hasta
+                promo.fecha_fin                  AS promo_hasta,
+                ROUND(pub.precio * (1 - COALESCE(promo.porcentaje_descuento, 0) / 100)) AS precio_con_descuento
 
             FROM publicaciones AS pub
             INNER JOIN servicios      AS s   ON pub.servicio_id  = s.id
@@ -476,7 +486,8 @@ class Publicacion
                     pr.usuario_id AS proveedor_usuario_id,
 
                     promo.porcentaje_descuento AS promo_descuento,
-                    promo.fecha_fin            AS promo_hasta
+                    promo.fecha_fin            AS promo_hasta,
+                    ROUND(p.precio * (1 - COALESCE(promo.porcentaje_descuento, 0) / 100)) AS precio_con_descuento
 
                 FROM publicaciones p
                 INNER JOIN servicios s   ON p.servicio_id  = s.id
