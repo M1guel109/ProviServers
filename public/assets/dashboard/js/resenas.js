@@ -1,5 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
-    
+
+    const filtroCal  = document.getElementById('filtro-calificacion');
+    const buscarInput = document.getElementById('buscar-resena');
+
+    function filtrarResenas() {
+        const calSeleccionada = filtroCal ? filtroCal.value : '';
+        const textoBusqueda   = buscarInput ? buscarInput.value.trim().toLowerCase() : '';
+
+        document.querySelectorAll('.tarjeta-resena').forEach(function(tarjeta) {
+            const cal     = tarjeta.dataset.calificacion || '';
+            const nombre  = tarjeta.dataset.nombre       || '';
+            const coment  = tarjeta.dataset.comentario   || '';
+
+            const pasaCal    = calSeleccionada === '' || cal === calSeleccionada;
+            const pasaBuscar = textoBusqueda  === '' || nombre.includes(textoBusqueda) || coment.includes(textoBusqueda);
+
+            tarjeta.style.display = pasaCal && pasaBuscar ? '' : 'none';
+        });
+    }
+
+    if (filtroCal)   filtroCal.addEventListener('change', filtrarResenas);
+    if (buscarInput) buscarInput.addEventListener('input',  filtrarResenas);
+
     // Referencia al modal de respuesta
     const modalResponder = document.getElementById('modalResponder');
     
