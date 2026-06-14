@@ -139,3 +139,7 @@ Stack trace:
 #20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
 #21 {main}
   thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 02:42:37 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 220
+[14-Jun-2026 07:05:33 Europe/Berlin] estadisticas.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pub_sol.precio' in 'field list'
+[14-Jun-2026 07:05:35 Europe/Berlin] calendario.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.nombre' in 'field list'
+[14-Jun-2026 07:05:45 Europe/Berlin] estadisticas.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pub_sol.precio' in 'field list'

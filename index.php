@@ -236,6 +236,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/reportes-calificaciones.php';
         break;
 
+    case '/admin/calificaciones-proveedor':
+        require BASE_PATH . '/app/views/dashboard/admin/calificaciones-proveedor.php';
+        break;
+
     case '/admin/reportes-ingresos':
         require BASE_PATH . '/app/views/dashboard/admin/reportes-ingresos.php';
         break;
@@ -372,6 +376,10 @@ switch ($request) {
     case '/proveedor/actualizar-estado':
     case '/proveedor/oportunidades':
     case '/proveedor/oportunidades/enviar-cotizacion':
+    case '/proveedor/calificaciones-cliente':
+        require BASE_PATH . '/app/views/dashboard/proveedor/calificaciones-cliente.php';
+        break;
+
     case '/proveedor/resenas':
     case '/proveedor/resenas/responder':
     case '/proveedor/guardar-perfil-profesional':

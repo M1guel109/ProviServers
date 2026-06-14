@@ -105,6 +105,9 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                     <option value="">Todas las calificaciones</option>
                     <option value="5">5 estrellas</option>
                     <option value="4">4 estrellas</option>
+                    <option value="3">3 estrellas</option>
+                    <option value="2">2 estrellas</option>
+                    <option value="1">1 estrella</option>
                 </select>
                 <div class="buscador-resenas">
                     <i class="bi bi-search"></i>
@@ -126,7 +129,10 @@ require_once BASE_PATH . '/app/helpers/session-proveedor.php';
                 <?php else: ?>
 
                     <?php foreach ($resenas as $r): ?>
-                        <div class="tarjeta tarjeta-resena">
+                        <div class="tarjeta tarjeta-resena"
+                             data-calificacion="<?= (int)$r['calificacion'] ?>"
+                             data-nombre="<?= htmlspecialchars(mb_strtolower($r['cliente_nombre'])) ?>"
+                             data-comentario="<?= htmlspecialchars(mb_strtolower($r['comentario'] ?? '')) ?>">
                             <div class="resena-header">
                                 <div class="cliente-info">
                                     <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= !empty($r['cliente_foto']) ? $r['cliente_foto'] : 'default_user.png' ?>"
