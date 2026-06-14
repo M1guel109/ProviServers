@@ -261,6 +261,15 @@ switch ($request) {
         reportesPdfController();
         break;
 
+    case '/admin/pagos':
+        require BASE_PATH . '/app/views/dashboard/admin/pagos.php';
+        break;
+
+    case '/admin/pagos/liberar':
+    case '/admin/pagos/reembolsar':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        break;
+
     // ADMINISTRADOR — Moderación
 
     case '/admin/consultar-servicios':
