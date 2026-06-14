@@ -62,11 +62,20 @@ try {
         ");
         $stPubs->execute([':pid' => $proveedorId]);
         $misPublicaciones = $stPubs->fetchAll(PDO::FETCH_ASSOC);
+
+        // IDs de publicaciones que ya tienen promoción activa o futura
+        $stConPromo = $pdo->prepare("
+            SELECT DISTINCT publicacion_id FROM promociones
+            WHERE proveedor_id = :pid AND fecha_fin >= CURDATE()
+        ");
+        $stConPromo->execute([':pid' => $proveedorId]);
+        $pubsConPromo = $stConPromo->fetchAll(PDO::FETCH_COLUMN);
     }
 } catch (PDOException $e) {
     error_log('promociones.php: ' . $e->getMessage());
 }
 $misPublicaciones = $misPublicaciones ?? [];
+$pubsConPromo     = $pubsConPromo     ?? [];
 
 $tipos_promocion = [
     'descuento' => ['nombre' => 'Descuento', 'icono' => 'bi-percent', 'color' => 'primary'],
@@ -429,12 +438,16 @@ $tipos_promocion = [
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Publicación <span class="text-danger">*</span></label>
-                                <select name="publicacion_id" class="form-select" required>
+                                <select name="publicacion_id" id="select-publicacion-promo" class="form-select" required>
                                     <option value="">Selecciona un servicio publicado...</option>
                                     <?php foreach ($misPublicaciones as $pub): ?>
-                                        <option value="<?= $pub['id'] ?>">
+                                        <?php $tienePromo = in_array($pub['id'], $pubsConPromo); ?>
+                                        <option value="<?= $pub['id'] ?>"
+                                                data-precio="<?= (float)$pub['precio'] ?>"
+                                                <?= $tienePromo ? 'disabled' : '' ?>>
                                             <?= htmlspecialchars($pub['titulo']) ?>
                                             <?= $pub['precio'] > 0 ? ' — $' . number_format((float)$pub['precio'], 0, ',', '.') : '' ?>
+                                            <?= $tienePromo ? ' (Promo activa)' : '' ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </select>
@@ -449,9 +462,15 @@ $tipos_promocion = [
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Descuento (%) <span class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="number" name="porcentaje_descuento" class="form-control"
+                                    <input type="number" id="input-descuento-promo" name="porcentaje_descuento" class="form-control"
                                         min="1" max="100" placeholder="Ej: 20" required>
                                     <span class="input-group-text">%</span>
+                                </div>
+                                <div id="preview-precio" class="d-none mt-2 px-3 py-2 bg-light rounded small">
+                                    <i class="bi bi-tag-fill text-danger me-1"></i>
+                                    <span class="text-muted text-decoration-line-through me-1" id="preview-precio-base"></span>
+                                    <strong class="text-danger" id="preview-precio-final"></strong>
+                                    <span class="text-muted ms-1">— ahorra <strong id="preview-ahorro"></strong></span>
                                 </div>
                             </div>
 

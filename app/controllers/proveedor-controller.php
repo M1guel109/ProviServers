@@ -659,6 +659,17 @@ function crearPromocion(): void
             exit;
         }
 
+        // Verificar que no haya ya una promoción activa o futura para esta publicación
+        $stDup = $pdo->prepare("
+            SELECT COUNT(*) FROM promociones
+            WHERE publicacion_id = :pub AND fecha_fin >= CURDATE()
+        ");
+        $stDup->execute([':pub' => $publicacionId]);
+        if ((int)$stDup->fetchColumn() > 0) {
+            mostrarSweetAlert('error', 'Ya tiene promoción', 'Esta publicación ya tiene una promoción activa o programada. Elimínala primero para crear una nueva.', BASE_URL . '/proveedor/promociones');
+            exit;
+        }
+
         // Crear tabla si no existe
         $pdo->exec("CREATE TABLE IF NOT EXISTS promociones (
             id                   INT AUTO_INCREMENT PRIMARY KEY,
