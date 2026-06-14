@@ -879,13 +879,22 @@ function reportesPdfController()
 
 function reporteUsuariosPDF()
 {
-    $usuarios = mostrarUsuarios();
+    require_once BASE_PATH . '/app/models/admin.php';
 
-    $foto_default_base64 = '';
-    $ruta_default = BASE_PATH . '/public/uploads/usuarios/default_user.png';
-    if (file_exists($ruta_default)) {
-        $foto_default_base64 = 'data:image/png;base64,' . base64_encode(file_get_contents($ruta_default));
-    }
+    $desde    = $_GET['desde']    ?? null;
+    $hasta    = $_GET['hasta']    ?? null;
+    $rol      = isset($_GET['rol'])       && $_GET['rol']       !== '' ? $_GET['rol']       : null;
+    $estadoId = isset($_GET['estado_id']) && $_GET['estado_id'] !== '' ? (int)$_GET['estado_id'] : null;
+
+    $modelo  = new Usuario();
+    $reporte = $modelo->obtenerReporteUsuarios($desde, $hasta, $rol, $estadoId);
+
+    $filtros = array_filter([
+        'desde'    => $desde,
+        'hasta'    => $hasta,
+        'rol'      => $rol      ? ucfirst($rol) : null,
+        'estado'   => $estadoId !== null ? $estadoId : null,
+    ]);
 
     ob_start();
     require BASE_PATH . '/app/views/pdf/usuarios-pdf.php';
