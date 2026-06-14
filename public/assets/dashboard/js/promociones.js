@@ -39,6 +39,22 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Sincronizar min de fecha_fin cuando fecha_inicio cambia (#192)
+    const inputFechaInicio = document.querySelector('#modalCrearPromocion [name="fecha_inicio"]');
+    const inputFechaFin    = document.querySelector('#modalCrearPromocion [name="fecha_fin"]');
+    if (inputFechaInicio && inputFechaFin) {
+        inputFechaInicio.addEventListener('change', function () {
+            if (!this.value) return;
+            const d = new Date(this.value + 'T00:00:00');
+            d.setDate(d.getDate() + 1);
+            const minFin = d.toISOString().split('T')[0];
+            inputFechaFin.setAttribute('min', minFin);
+            if (inputFechaFin.value && inputFechaFin.value <= this.value) {
+                inputFechaFin.value = '';
+            }
+        });
+    }
+
     // Inicializar gráfica solo cuando el modal se abre (no sobre canvas oculto)
     let chartInicializado = false;
     const modalEstadisticas = document.getElementById('modalEstadisticas');

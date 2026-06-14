@@ -278,7 +278,7 @@ $tipos_promocion = [
                                         </div>
 
                                         <div class="progress mb-2" style="height: 6px;">
-                                            <div class="progress-bar bg-success" style="width: <?= ($promo['usos'] / $promo['limite_usos']) * 100 ?>%"></div>
+                                            <div class="progress-bar bg-success" style="width: <?= $promo['limite_usos'] > 0 ? round(($promo['usos'] / $promo['limite_usos']) * 100) : 0 ?>%"></div>
                                         </div>
                                         <div class="d-flex justify-content-between small text-muted mb-3">
                                             <span><?= $promo['usos'] ?> usos</span>
