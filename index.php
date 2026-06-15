@@ -519,6 +519,24 @@ switch ($request) {
         require BASE_PATH . '/app/controllers/perfil-controller.php';
         break;
 
+    // CLIENTE — Métodos de pago
+
+    case '/cliente/metodos-pago':
+        require BASE_PATH . '/app/views/dashboard/cliente/metodos-pago.php';
+        break;
+
+    case '/cliente/metodos-pago/agregar-tarjeta':
+        require BASE_PATH . '/app/views/dashboard/cliente/agregar-tarjeta.php';
+        break;
+
+    case '/cliente/metodos-pago/guardar':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/metodos-pago');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
     // CLIENTE — Mensajes
 
     case '/cliente/mensajes':

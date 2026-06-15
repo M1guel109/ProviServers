@@ -60,6 +60,14 @@ switch ($method) {
             crearNecesidad();
         } elseif ($accion === 'aceptar_cotizacion') {
             aceptarCotizacion();
+        } elseif ($accion === 'agregar_metodo_pago') {
+            agregarMetodoPago();
+        } elseif ($accion === 'predeterminado_metodo_pago') {
+            marcarPredeterminado();
+        } elseif ($accion === 'eliminar_metodo_pago') {
+            eliminarMetodoPago();
+        } elseif ($accion === 'tokenizar_tarjeta') {
+            guardarTarjetaTokenizada();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -491,4 +499,293 @@ function aceptarCotizacion()
         mostrarSweetAlert('error', 'Error', 'No se pudo procesar la contratación. Intenta nuevamente.');
     }
     exit();
+}
+
+// ===================================================================
+// MÉTODOS DE PAGO (#183 / #184)
+// ===================================================================
+
+function agregarMetodoPago(): void
+{
+    $uid    = (int)$_SESSION['user']['id'];
+    $tipo   = trim($_POST['tipo']             ?? '');
+    $alias  = trim($_POST['alias']            ?? '');
+    $digitos = preg_replace('/\D/', '', $_POST['ultimos_digitos'] ?? '');
+    $digitos = mb_substr($digitos, -4);
+
+    $tiposValidos = ['tarjeta_credito', 'tarjeta_debito', 'pse', 'efectivo', 'mercadopago'];
+    if (!in_array($tipo, $tiposValidos) || $alias === '') {
+        mostrarSweetAlert('error', 'Datos inválidos', 'Completa todos los campos requeridos.', BASE_URL . '/cliente/metodos-pago');
+        exit;
+    }
+
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        $pdo->exec("CREATE TABLE IF NOT EXISTS metodos_pago (
+            id              INT AUTO_INCREMENT PRIMARY KEY,
+            usuario_id      INT          NOT NULL,
+            tipo            VARCHAR(30)  NOT NULL,
+            alias           VARCHAR(100) NOT NULL,
+            ultimos_digitos VARCHAR(4)   NULL,
+            predeterminado  TINYINT(1)   NOT NULL DEFAULT 0,
+            created_at      DATETIME     DEFAULT NOW()
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $count = (int)$pdo->prepare("SELECT COUNT(*) FROM metodos_pago WHERE usuario_id = :uid")
+            ->execute([':uid' => $uid]) ? 0 : 0;
+        $st = $pdo->prepare("SELECT COUNT(*) FROM metodos_pago WHERE usuario_id = :uid");
+        $st->execute([':uid' => $uid]);
+        $esPrimero = (int)$st->fetchColumn() === 0;
+
+        $pdo->prepare("
+            INSERT INTO metodos_pago (usuario_id, tipo, alias, ultimos_digitos, predeterminado, created_at)
+            VALUES (:uid, :tipo, :alias, :dig, :pred, NOW())
+        ")->execute([
+            ':uid'  => $uid,
+            ':tipo' => $tipo,
+            ':alias'=> $alias,
+            ':dig'  => $digitos ?: null,
+            ':pred' => $esPrimero ? 1 : 0,
+        ]);
+
+        mostrarSweetAlert('success', 'Método agregado', 'Tu método de pago fue guardado correctamente.', BASE_URL . '/cliente/metodos-pago');
+    } catch (PDOException $e) {
+        error_log('agregarMetodoPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo guardar el método de pago.', BASE_URL . '/cliente/metodos-pago');
+    }
+    exit;
+}
+
+function marcarPredeterminado(): void
+{
+    $uid    = (int)$_SESSION['user']['id'];
+    $metodoId = (int)($_POST['metodo_id'] ?? 0);
+    if ($metodoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Método no válido.', BASE_URL . '/cliente/metodos-pago');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        $pdo->prepare("UPDATE metodos_pago SET predeterminado = 0 WHERE usuario_id = :uid")->execute([':uid' => $uid]);
+        $pdo->prepare("UPDATE metodos_pago SET predeterminado = 1 WHERE id = :id AND usuario_id = :uid")->execute([':id' => $metodoId, ':uid' => $uid]);
+        mostrarSweetAlert('success', 'Actualizado', 'Método predeterminado actualizado.', BASE_URL . '/cliente/metodos-pago');
+    } catch (PDOException $e) {
+        error_log('marcarPredeterminado: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo actualizar.', BASE_URL . '/cliente/metodos-pago');
+    }
+    exit;
+}
+
+function eliminarMetodoPago(): void
+{
+    $uid      = (int)$_SESSION['user']['id'];
+    $metodoId = (int)($_POST['metodo_id'] ?? 0);
+    if ($metodoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Método no válido.', BASE_URL . '/cliente/metodos-pago');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        // Obtener datos antes de eliminar para limpiar vault de MP si aplica
+        $stGet = $pdo->prepare("SELECT mp_customer_id, mp_card_id FROM metodos_pago WHERE id = :id AND usuario_id = :uid LIMIT 1");
+        $stGet->execute([':id' => $metodoId, ':uid' => $uid]);
+        $metodo = $stGet->fetch(PDO::FETCH_ASSOC);
+
+        $st = $pdo->prepare("DELETE FROM metodos_pago WHERE id = :id AND usuario_id = :uid");
+        $st->execute([':id' => $metodoId, ':uid' => $uid]);
+        if ($st->rowCount() > 0) {
+            // Si tenía tarjeta tokenizada en MP, eliminarla del vault
+            if ($metodo && $metodo['mp_customer_id'] && $metodo['mp_card_id']) {
+                mpDeleteCard($metodo['mp_customer_id'], $metodo['mp_card_id']);
+            }
+            // Si era el predeterminado, asignar el siguiente disponible
+            $pdo->prepare("
+                UPDATE metodos_pago SET predeterminado = 1
+                WHERE usuario_id = :uid ORDER BY created_at ASC LIMIT 1
+            ")->execute([':uid' => $uid]);
+            mostrarSweetAlert('success', 'Eliminado', 'El método de pago fue eliminado.', BASE_URL . '/cliente/metodos-pago');
+        } else {
+            mostrarSweetAlert('error', 'No encontrado', 'No se encontró el método de pago.', BASE_URL . '/cliente/metodos-pago');
+        }
+    } catch (PDOException $e) {
+        error_log('eliminarMetodoPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo eliminar.', BASE_URL . '/cliente/metodos-pago');
+    }
+    exit;
+}
+
+// ===================================================================
+// TOKENIZACIÓN DE TARJETAS — MercadoPago Cards API (#182 / #181)
+// ===================================================================
+
+function ensureMetodosPagoColumns(PDO $pdo): void
+{
+    $cols = [
+        "ADD COLUMN mp_customer_id VARCHAR(60) NULL",
+        "ADD COLUMN mp_card_id     VARCHAR(60) NULL",
+        "ADD COLUMN marca          VARCHAR(30) NULL",
+        "ADD COLUMN expiry_month   VARCHAR(2)  NULL",
+        "ADD COLUMN expiry_year    VARCHAR(4)  NULL",
+    ];
+    foreach ($cols as $col) {
+        try { $pdo->exec("ALTER TABLE metodos_pago $col"); } catch (PDOException $e) {}
+    }
+}
+
+function guardarTarjetaTokenizada(): void
+{
+    $uid   = (int)$_SESSION['user']['id'];
+    $token = trim($_POST['card_token']        ?? '');
+    $pmId  = trim($_POST['payment_method_id'] ?? '');
+
+    if (!$token) {
+        mostrarSweetAlert('error', 'Token inválido', 'No se recibió la tokenización de la tarjeta.', BASE_URL . '/cliente/metodos-pago/agregar-tarjeta');
+        exit;
+    }
+
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        ensureMetodosPagoColumns($pdo);
+
+        $stU = $pdo->prepare("SELECT email FROM usuarios WHERE id = :uid LIMIT 1");
+        $stU->execute([':uid' => $uid]);
+        $email = $stU->fetchColumn();
+
+        if (!$email) {
+            mostrarSweetAlert('error', 'Error', 'Usuario no encontrado.', BASE_URL . '/cliente/metodos-pago');
+            exit;
+        }
+
+        $customerId = mpGetOrCreateCustomer($email);
+        if (!$customerId) {
+            mostrarSweetAlert('error', 'Error MP', 'No se pudo registrar el cliente en MercadoPago.', BASE_URL . '/cliente/metodos-pago/agregar-tarjeta');
+            exit;
+        }
+
+        $card = mpSaveCard($customerId, $token);
+        if (!$card) {
+            mostrarSweetAlert('error', 'Tarjeta rechazada', 'No se pudo guardar la tarjeta. Verifica los datos e intenta de nuevo.', BASE_URL . '/cliente/metodos-pago/agregar-tarjeta');
+            exit;
+        }
+
+        $cardId  = $card['id'];
+        $last4   = $card['last_four_digits']         ?? '';
+        $marca   = strtolower($card['payment_method']['id'] ?? $pmId);
+        $expMes  = str_pad((string)($card['expiration_month'] ?? ''), 2, '0', STR_PAD_LEFT);
+        $expAno  = (string)($card['expiration_year'] ?? '');
+        $alias   = ucfirst($marca) . ' ••••' . $last4;
+
+        // Evitar duplicados del mismo card_id
+        $stChk = $pdo->prepare("SELECT id FROM metodos_pago WHERE mp_card_id = :cid AND usuario_id = :uid LIMIT 1");
+        $stChk->execute([':cid' => $cardId, ':uid' => $uid]);
+        if ($stChk->fetchColumn()) {
+            mostrarSweetAlert('info', 'Ya registrada', 'Esta tarjeta ya está en tu cuenta.', BASE_URL . '/cliente/metodos-pago');
+            exit;
+        }
+
+        $stCnt = $pdo->prepare("SELECT COUNT(*) FROM metodos_pago WHERE usuario_id = :uid");
+        $stCnt->execute([':uid' => $uid]);
+        $esPrimero = (int)$stCnt->fetchColumn() === 0;
+
+        $pdo->prepare("
+            INSERT INTO metodos_pago
+                (usuario_id, tipo, alias, ultimos_digitos, predeterminado,
+                 mp_customer_id, mp_card_id, marca, expiry_month, expiry_year, created_at)
+            VALUES
+                (:uid, 'tarjeta_credito', :alias, :dig, :pred,
+                 :cust, :card, :marca, :expm, :expy, NOW())
+        ")->execute([
+            ':uid'   => $uid,
+            ':alias' => $alias,
+            ':dig'   => $last4,
+            ':pred'  => $esPrimero ? 1 : 0,
+            ':cust'  => $customerId,
+            ':card'  => $cardId,
+            ':marca' => $marca,
+            ':expm'  => $expMes,
+            ':expy'  => $expAno,
+        ]);
+
+        mostrarSweetAlert('success', 'Tarjeta guardada', 'Tu tarjeta fue registrada correctamente.', BASE_URL . '/cliente/metodos-pago');
+    } catch (PDOException $e) {
+        error_log('guardarTarjetaTokenizada: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo guardar la tarjeta.', BASE_URL . '/cliente/metodos-pago/agregar-tarjeta');
+    }
+    exit;
+}
+
+function mpGetOrCreateCustomer(string $email): ?string
+{
+    $ch = curl_init('https://api.mercadopago.com/v1/customers/search?email=' . urlencode($email));
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . MP_ACCESS_TOKEN],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $data = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+
+    if (!empty($data['results'][0]['id'])) {
+        return $data['results'][0]['id'];
+    }
+
+    $ch = curl_init('https://api.mercadopago.com/v1/customers');
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode(['email' => $email]),
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . MP_ACCESS_TOKEN,
+        ],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $data = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+
+    return $data['id'] ?? null;
+}
+
+function mpSaveCard(string $customerId, string $token): ?array
+{
+    $ch = curl_init("https://api.mercadopago.com/v1/customers/{$customerId}/cards");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode(['token' => $token]),
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . MP_ACCESS_TOKEN,
+        ],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    $response = curl_exec($ch);
+    $code     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    $data = json_decode($response, true);
+    if ($code === 201 && isset($data['id'])) {
+        return $data;
+    }
+    error_log("mpSaveCard [HTTP $code]: " . substr($response, 0, 300));
+    return null;
+}
+
+function mpDeleteCard(string $customerId, string $cardId): void
+{
+    $ch = curl_init("https://api.mercadopago.com/v1/customers/{$customerId}/cards/{$cardId}");
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CUSTOMREQUEST  => 'DELETE',
+        CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . MP_ACCESS_TOKEN],
+        CURLOPT_SSL_VERIFYPEER => false,
+    ]);
+    curl_exec($ch);
+    curl_close($ch);
 }

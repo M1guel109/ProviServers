@@ -88,6 +88,15 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     </a>
                 </li>
 
+                <!-- Métodos de pago -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/metodos-pago" data-title="Métodos de pago"
+                       class="<?= ($currentPage ?? '') === 'metodos-pago' ? 'active' : '' ?>">
+                        <i class="bi bi-credit-card"></i>
+                        <span class="nav-text">Métodos de pago</span>
+                    </a>
+                </li>
+
                 <!-- Ayuda -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/ayuda" data-title="<?= __('cliente_ayuda') ?>">
