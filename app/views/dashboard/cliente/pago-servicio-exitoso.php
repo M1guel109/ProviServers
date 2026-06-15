@@ -39,6 +39,16 @@ include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
                 </span>
             </div>
             <h2 class="fw-bold text-success mb-2">¡Pago realizado!</h2>
+            <?php if (!empty($montoDisplay) && $montoDisplay > 0): ?>
+                <div class="mb-3">
+                    <span class="fs-3 fw-bold text-success">
+                        $<?= number_format($montoDisplay, 0, ',', '.') ?>
+                    </span>
+                    <?php if ($mpRefDisplay): ?>
+                        <div class="text-muted small mt-1">Ref. #<?= htmlspecialchars((string)$mpRefDisplay) ?></div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             <p class="text-muted mb-4">
                 Tu pago fue procesado correctamente. El proveedor ha sido notificado y ya puede continuar con el servicio.
             </p>

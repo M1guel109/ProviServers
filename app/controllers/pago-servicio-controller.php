@@ -230,12 +230,31 @@ function webhookPagoServicio(): void
 // =====================================================
 function pagoServicioExitoso(): void
 {
-    $paymentId = (int)($_GET['payment_id'] ?? 0);
+    $paymentId    = (int)($_GET['payment_id'] ?? 0);
+    $montoDisplay = null;
+    $mpRefDisplay = null;
 
     if ($paymentId > 0) {
         $pago = consultarPagoServicioMP($paymentId);
         if ($pago && $pago['status'] === 'approved') {
             registrarPagoServicio($pago);
+            $montoDisplay = (float)($pago['transaction_amount'] ?? 0);
+            $mpRefDisplay = $paymentId;
+        }
+        // Fallback: buscar en DB si la API de MP no respondió (entorno local)
+        if (!$montoDisplay) {
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("SELECT monto, mp_payment_id FROM pagos_servicios WHERE mp_payment_id = :mpid LIMIT 1");
+                $st->execute([':mpid' => $paymentId]);
+                if ($row = $st->fetch(PDO::FETCH_ASSOC)) {
+                    $montoDisplay = (float)$row['monto'];
+                    $mpRefDisplay = $row['mp_payment_id'];
+                }
+            } catch (PDOException $e) {
+                error_log('pagoServicioExitoso fallback: ' . $e->getMessage());
+            }
         }
     }
 
@@ -312,6 +331,27 @@ function registrarPagoServicio(array $pago): void
                 SET estado = 'en_proceso', modified_at = NOW()
                 WHERE id = :id AND estado = 'confirmado'
             ")->execute([':id' => $contratoId]);
+
+            // Notificar al proveedor vía mensajes internos (#186)
+            $stProv = $pdo->prepare("
+                SELECT pr.usuario_id, u.id AS admin_id
+                FROM proveedores pr,
+                     (SELECT id FROM usuarios WHERE rol = 'admin' LIMIT 1) u
+                WHERE pr.id = :prov_id
+                LIMIT 1
+            ");
+            $stProv->execute([':prov_id' => $sc['proveedor_id']]);
+            $notif = $stProv->fetch(PDO::FETCH_ASSOC);
+            if ($notif) {
+                $pdo->prepare("
+                    INSERT INTO mensajes (emisor_id, receptor_id, contenido, leido, fecha_hora, created_at)
+                    VALUES (:emisor, :receptor, :msg, 0, NOW(), NOW())
+                ")->execute([
+                    ':emisor'   => $notif['admin_id'],
+                    ':receptor' => $notif['usuario_id'],
+                    ':msg'      => "💳 Recibimos el pago del cliente por \$" . number_format($monto, 0, ',', '.') . ". Los fondos quedan retenidos en la plataforma hasta que completes el servicio.",
+                ]);
+            }
         }
 
     } catch (PDOException $e) {
