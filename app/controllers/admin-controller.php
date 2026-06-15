@@ -1073,17 +1073,59 @@ function liberarPago(): void
     try {
         $db  = new Conexion();
         $pdo = $db->getConexion();
-        $st  = $pdo->prepare("
-            UPDATE pagos_servicios
-            SET liberado = 1, fecha_liberacion = NOW()
-            WHERE id = :id AND mp_status = 'approved' AND liberado = 0
+
+        // Obtener datos del pago antes de liberar
+        $stPago = $pdo->prepare("
+            SELECT ps.monto, ps.proveedor_id, pr.usuario_id AS prov_usuario_id
+            FROM pagos_servicios ps
+            INNER JOIN proveedores pr ON ps.proveedor_id = pr.id
+            WHERE ps.id = :id AND ps.mp_status = 'approved' AND ps.liberado = 0
+            LIMIT 1
         ");
-        $st->execute([':id' => $pagoId]);
-        if ($st->rowCount() > 0) {
-            mostrarSweetAlert('success', 'Pago liberado', 'Los fondos fueron liberados al proveedor.', BASE_URL . '/admin/pagos');
-        } else {
+        $stPago->execute([':id' => $pagoId]);
+        $pago = $stPago->fetch(PDO::FETCH_ASSOC);
+
+        if (!$pago) {
             mostrarSweetAlert('error', 'Sin cambios', 'El pago no existe o ya fue liberado.', BASE_URL . '/admin/pagos');
+            exit;
         }
+
+        // Liberar el pago
+        $pdo->prepare("
+            UPDATE pagos_servicios SET liberado = 1, fecha_liberacion = NOW() WHERE id = :id
+        ")->execute([':id' => $pagoId]);
+
+        // Registrar liquidación (#187) — sin comisión
+        $pdo->exec("CREATE TABLE IF NOT EXISTS liquidaciones (
+            id                 INT AUTO_INCREMENT PRIMARY KEY,
+            pagos_servicios_id INT           NOT NULL,
+            proveedor_id       INT           NOT NULL,
+            monto              DECIMAL(12,2) NOT NULL,
+            created_at         DATETIME      DEFAULT NOW()
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $pdo->prepare("
+            INSERT INTO liquidaciones (pagos_servicios_id, proveedor_id, monto, created_at)
+            VALUES (:pago_id, :prov_id, :monto, NOW())
+        ")->execute([
+            ':pago_id' => $pagoId,
+            ':prov_id' => $pago['proveedor_id'],
+            ':monto'   => $pago['monto'],
+        ]);
+
+        // Notificar al proveedor (#187)
+        $adminId = (int)$_SESSION['user']['id'];
+        $monto   = number_format((float)$pago['monto'], 0, ',', '.');
+        $pdo->prepare("
+            INSERT INTO mensajes (emisor_id, receptor_id, contenido, leido, fecha_hora, created_at)
+            VALUES (:emisor, :receptor, :msg, 0, NOW(), NOW())
+        ")->execute([
+            ':emisor'   => $adminId,
+            ':receptor' => $pago['prov_usuario_id'],
+            ':msg'      => "✅ Tu pago de \$$monto ha sido liberado. Ya puedes ver el ingreso en tu historial de pagos.",
+        ]);
+
+        mostrarSweetAlert('success', 'Pago liberado', 'Los fondos fueron liberados al proveedor.', BASE_URL . '/admin/pagos');
     } catch (PDOException $e) {
         error_log('liberarPago: ' . $e->getMessage());
         mostrarSweetAlert('error', 'Error', 'No se pudo liberar el pago.', BASE_URL . '/admin/pagos');
