@@ -60,6 +60,15 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     </a>
                 </li>
 
+                <!-- Historial de pagos -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/historial-pagos" data-title="Historial de pagos"
+                       class="<?= ($currentPage ?? '') === 'historial-pagos' ? 'active' : '' ?>">
+                        <i class="bi bi-receipt"></i>
+                        <span class="nav-text">Historial de pagos</span>
+                    </a>
+                </li>
+
                 <!-- Favoritos -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/favoritos" data-title="<?= __('cliente_favoritos') ?>">

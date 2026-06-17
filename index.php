@@ -310,6 +310,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/finanzas.php';
         break;
 
+    case '/proveedor/historial-pagos':
+        require BASE_PATH . '/app/views/dashboard/proveedor/historial-pagos.php';
+        break;
+
     case '/proveedor/facturacion':
         require BASE_PATH . '/app/views/dashboard/proveedor/facturacion.php';
         break;
@@ -523,6 +527,10 @@ switch ($request) {
 
     case '/cliente/metodos-pago':
         require BASE_PATH . '/app/views/dashboard/cliente/metodos-pago.php';
+        break;
+
+    case '/cliente/historial-pagos':
+        require BASE_PATH . '/app/views/dashboard/cliente/historial-pagos.php';
         break;
 
     case '/cliente/metodos-pago/agregar-tarjeta':
