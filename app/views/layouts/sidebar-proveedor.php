@@ -107,6 +107,14 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                 </li>
 
                 <li>
+                    <a href="<?= BASE_URL ?>/proveedor/historial-pagos" data-title="Historial de pagos"
+                       class="<?= ($currentPage ?? '') === 'historial-pagos' ? 'active' : '' ?>">
+                        <i class="bi bi-receipt"></i>
+                        <span class="nav-text">Historial de pagos</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="<?= BASE_URL ?>/proveedor/facturacion"
                        data-title="<?= __('proveedor_facturacion') ?>">
                         <i class="bi bi-receipt"></i>
