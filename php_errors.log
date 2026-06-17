@@ -177,3 +177,4 @@ Stack trace:
   thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php on line 20
 [15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php on line 75
 [15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\helpers\session-cliente.php on line 7
+[17-Jun-2026 06:35:50 Europe/Berlin] Error en Publicacion::listarPublicasActivas -> SQLSTATE[HY000]: General error: 2006 MySQL server has gone away

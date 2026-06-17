@@ -194,12 +194,13 @@ class Publicacion
     // app/models/Publicacion.php
 
     public function listarPublicasActivas(
-        ?string $busqueda    = null,
-        ?int    $categoriaId = null,
-        ?string $ciudad      = null,
-        ?float  $precioMax   = null,
-        string  $orden       = 'recientes',
-        bool    $soloOfertas = false
+        ?string $busqueda       = null,
+        ?int    $categoriaId    = null,
+        ?string $ciudad         = null,
+        ?float  $precioMax      = null,
+        string  $orden          = 'recientes',
+        bool    $soloOfertas    = false,
+        ?float  $calificacionMin = null
     ): array {
         try {
             $sql = "
@@ -283,7 +284,15 @@ class Publicacion
             ];
             $orderBy = $ordenMap[$orden] ?? 'pub.created_at DESC';
 
-            $havingStr = $soloOfertas ? ' HAVING promo_descuento IS NOT NULL' : '';
+            $havingConds = [];
+            if ($soloOfertas) {
+                $havingConds[] = 'promo_descuento IS NOT NULL';
+            }
+            if ($calificacionMin !== null && $calificacionMin > 0) {
+                $havingConds[] = 'calificacion_promedio >= :calMin';
+                $params[':calMin'] = $calificacionMin;
+            }
+            $havingStr = $havingConds ? ' HAVING ' . implode(' AND ', $havingConds) : '';
             $sql .= " GROUP BY pub.id$havingStr ORDER BY $orderBy";
 
             $stmt = $this->conexion->prepare($sql);

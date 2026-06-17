@@ -3,13 +3,14 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
 require_once BASE_PATH . '/app/models/categoria.php';
 
 // Aseguramos que las variables existan para evitar errores de notice
-$busqueda    = $busqueda    ?? '';
-$catActual   = $catActual   ?? '';
-$ciudad      = $ciudad      ?? '';
-$precioMax   = $precioMax   ?? null;
-$orden       = $orden       ?? 'recientes';
-$soloOfertas = $soloOfertas ?? false;
-$publicaciones = $publicaciones ?? [];
+$busqueda        = $busqueda        ?? '';
+$catActual       = $catActual       ?? '';
+$ciudad          = $ciudad          ?? '';
+$precioMax       = $precioMax       ?? null;
+$orden           = $orden           ?? 'recientes';
+$soloOfertas     = $soloOfertas     ?? false;
+$calificacionMin = $calificacionMin ?? null;
+$publicaciones   = $publicaciones   ?? [];
 $objCategoria = new Categoria();
 $categorias = $objCategoria->mostrar() ?: [];
 
@@ -97,6 +98,17 @@ $categorias = $objCategoria->mostrar() ?: [];
                         </div>
                     </div>
                     <div class="col-md-2">
+                        <select name="estrellas" class="form-select bg-light" onchange="this.form.submit()"
+                                title="Calificación mínima">
+                            <option value=""  <?= $calificacionMin === null ? 'selected' : '' ?>>⭐ Todas las estrellas</option>
+                            <option value="1" <?= $calificacionMin == 1 ? 'selected' : '' ?>>⭐ 1+ estrellas</option>
+                            <option value="2" <?= $calificacionMin == 2 ? 'selected' : '' ?>>⭐⭐ 2+ estrellas</option>
+                            <option value="3" <?= $calificacionMin == 3 ? 'selected' : '' ?>>⭐⭐⭐ 3+ estrellas</option>
+                            <option value="4" <?= $calificacionMin == 4 ? 'selected' : '' ?>>⭐⭐⭐⭐ 4+ estrellas</option>
+                            <option value="5" <?= $calificacionMin == 5 ? 'selected' : '' ?>>⭐⭐⭐⭐⭐ Solo 5 estrellas</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 col-6">
                         <select name="orden" class="form-select bg-light">
                             <option value="recientes"   <?= $orden === 'recientes'   ? 'selected' : '' ?>>Más recientes</option>
                             <option value="precio_asc"  <?= $orden === 'precio_asc'  ? 'selected' : '' ?>>Precio: menor</option>
@@ -119,6 +131,7 @@ $categorias = $objCategoria->mostrar() ?: [];
                             'ciudad'     => $ciudad,
                             'precio_max' => $precioMax ? (int)$precioMax : '',
                             'orden'      => $orden !== 'recientes' ? $orden : '',
+                            'estrellas'  => $calificacionMin ? (int)$calificacionMin : '',
                         ]));
                         $qsOfertas = $qsBase ? $qsBase . '&ofertas=1' : 'ofertas=1';
                     ?>
@@ -155,6 +168,7 @@ $categorias = $objCategoria->mostrar() ?: [];
                             'precio_max'=> $precioMax ? (int)$precioMax : '',
                             'orden'     => $orden !== 'recientes' ? $orden : '',
                             'ofertas'   => $soloOfertas ? '1' : '',
+                            'estrellas' => $calificacionMin ? (int)$calificacionMin : '',
                         ]));
                     ?>
                         <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsCat ?>"
@@ -167,11 +181,12 @@ $categorias = $objCategoria->mostrar() ?: [];
                 <!-- Badge de filtros activos -->
                 <?php
                 $filtrosActivos = array_filter([
-                    $busqueda    ? "Búsqueda: \"$busqueda\""                              : null,
-                    $ciudad      ? "Ciudad: \"$ciudad\""                                   : null,
-                    $precioMax   ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
-                    $catActual   ? 'Categoría seleccionada'                               : null,
-                    $soloOfertas ? 'Solo ofertas activas'                                 : null,
+                    $busqueda        ? "Búsqueda: \"$busqueda\""                                   : null,
+                    $ciudad          ? "Ciudad: \"$ciudad\""                                        : null,
+                    $precioMax       ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
+                    $catActual       ? 'Categoría seleccionada'                                    : null,
+                    $soloOfertas     ? 'Solo ofertas activas'                                      : null,
+                    $calificacionMin ? str_repeat('⭐', (int)$calificacionMin) . '+ estrellas'     : null,
                 ]);
                 if ($filtrosActivos): ?>
                 <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
