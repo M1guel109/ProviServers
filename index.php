@@ -533,6 +533,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/historial-pagos.php';
         break;
 
+    case '/cliente/checkout':
+        require BASE_PATH . '/app/views/dashboard/cliente/checkout.php';
+        break;
+
     case '/cliente/metodos-pago/agregar-tarjeta':
         require BASE_PATH . '/app/views/dashboard/cliente/agregar-tarjeta.php';
         break;
