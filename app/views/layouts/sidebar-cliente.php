@@ -1,5 +1,9 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
+$_notifCount = isset($_SESSION['user']['id'])
+    ? Notificacion::contarNoLeidas((int)$_SESSION['user']['id'])
+    : 0;
 ?>
 
 <aside class="sidebar" id="mainSidebar">
@@ -84,6 +88,20 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     <a href="<?= BASE_URL ?>/cliente/mensajes" data-title="<?= __('cliente_mensajes') ?>">
                         <i class="bi bi-chat-dots"></i>
                         <span class="nav-text"><?= __('cliente_mensajes') ?></span>
+                    </a>
+                </li>
+
+                <!-- Notificaciones -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/notificaciones" data-title="Notificaciones"
+                       class="<?= ($currentPage ?? '') === 'notificaciones' ? 'active' : '' ?>">
+                        <i class="bi bi-bell<?= $_notifCount > 0 ? '-fill text-warning' : '' ?>"></i>
+                        <span class="nav-text d-flex align-items-center justify-content-between">
+                            Notificaciones
+                            <?php if ($_notifCount > 0): ?>
+                                <span class="badge bg-danger rounded-pill"><?= $_notifCount > 99 ? '99+' : $_notifCount ?></span>
+                            <?php endif; ?>
+                        </span>
                     </a>
                 </li>
 

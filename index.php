@@ -339,6 +339,8 @@ switch ($request) {
         break;
 
     case '/proveedor/notificaciones':
+    case '/proveedor/notificaciones/marcar-leida':
+    case '/proveedor/notificaciones/marcar-todas':
         require BASE_PATH . '/app/views/dashboard/proveedor/notificaciones.php';
         break;
 
@@ -438,6 +440,8 @@ switch ($request) {
         break;
 
     case '/cliente/notificaciones':
+    case '/cliente/notificaciones/marcar-leida':
+    case '/cliente/notificaciones/marcar-todas':
         require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
         break;
 
