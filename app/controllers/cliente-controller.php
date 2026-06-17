@@ -87,13 +87,15 @@ switch ($method) {
 
 function mostrarCatalogoPublico()
 {
-    $busqueda    = trim($_GET['q']      ?? '');
-    $categoriaId = isset($_GET['cat']) && $_GET['cat'] !== '' ? (int)$_GET['cat'] : null;
-    $ciudad      = trim($_GET['ciudad'] ?? '');
-    $precioMax   = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
-    $orden       = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
-                   ? $_GET['orden'] : 'recientes';
-    $soloOfertas = isset($_GET['ofertas']) && $_GET['ofertas'] === '1';
+    $busqueda       = trim($_GET['q']      ?? '');
+    $categoriaId    = isset($_GET['cat']) && $_GET['cat'] !== '' ? (int)$_GET['cat'] : null;
+    $ciudad         = trim($_GET['ciudad'] ?? '');
+    $precioMax      = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
+    $orden          = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
+                      ? $_GET['orden'] : 'recientes';
+    $soloOfertas    = isset($_GET['ofertas']) && $_GET['ofertas'] === '1';
+    $calificacionMin = isset($_GET['estrellas']) && $_GET['estrellas'] !== ''
+                      ? max(0, min(5, (float)$_GET['estrellas'])) : null;
 
     $catActual = $categoriaId ?? '';
 
@@ -104,7 +106,8 @@ function mostrarCatalogoPublico()
         $ciudad ?: null,
         $precioMax,
         $orden,
-        $soloOfertas
+        $soloOfertas,
+        $calificacionMin
     );
 
     require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
