@@ -440,75 +440,107 @@ if ($idUsuario > 0) {
 
                             <!-- Columna derecha: preferencias de seguridad -->
                             <div class="col-lg-6">
-                                <div class="tarjeta-config-inner mb-4">
-                                    <h5 class="mb-2">Alertas y notificaciones</h5>
-                                    <p class="text-muted" style="font-size: 0.9rem;">
-                                        Elige sobre qué eventos quieres recibir alertas como proveedor.
+                                <div class="tarjeta-config-inner mb-4" id="notificaciones">
+                                    <h5 class="mb-1">Preferencias de notificaciones</h5>
+                                    <p class="text-muted mb-3" style="font-size:0.9rem;">
+                                        Elige qué eventos generan notificaciones en la plataforma y por qué canales recibirlas.
                                     </p>
 
-                                    <?php
-                                    $alertaSolicitudes = !empty($seguridad['alerta_solicitudes']);
-                                    $alertaResenas     = !empty($seguridad['alerta_resenas']);
-                                    $alertaPagos       = !empty($seguridad['alerta_pagos']);
-                                    $canalSeleccionado = $seguridad['canal_notificaciones'] ?? 'ambos';
-                                    $tiempoSesion      = isset($seguridad['tiempo_sesion']) ? (int) $seguridad['tiempo_sesion'] : 60;
-                                    ?>
+                                    <form action="<?= BASE_URL ?>/proveedor/guardar-notificaciones" method="POST">
 
-                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-seguridad" method="POST">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block">Alertas que quiero recibir</label>
+                                        <p class="fw-semibold small mb-2">Eventos que quiero recibir</p>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_solicitudes"
-                                                    name="alerta_solicitudes" value="1" <?= $alertaSolicitudes ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_solicitudes">
-                                                    Nuevas solicitudes y cambios de estado de servicios
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_solicitudes_nuevas"
+                                                   name="noti_solicitudes_nuevas" value="1"
+                                                   <?= !empty($notificaciones['noti_solicitudes_nuevas']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_solicitudes_nuevas">
+                                                <i class="bi bi-send text-primary me-1"></i> Nuevas solicitudes de clientes
+                                            </label>
+                                        </div>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_resenas"
-                                                    name="alerta_resenas" value="1" <?= $alertaResenas ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_resenas">
-                                                    Nuevas reseñas y calificaciones de clientes
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_cambios_estado"
+                                                   name="noti_cambios_estado" value="1"
+                                                   <?= !empty($notificaciones['noti_cambios_estado']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_cambios_estado">
+                                                <i class="bi bi-arrow-repeat text-warning me-1"></i> Cambios de estado en servicios
+                                            </label>
+                                        </div>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_pagos"
-                                                    name="alerta_pagos" value="1" <?= $alertaPagos ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_pagos">
-                                                    Pagos, abonos y temas de facturación
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_resenas"
+                                                   name="noti_resenas" value="1"
+                                                   <?= !empty($notificaciones['noti_resenas']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_resenas">
+                                                <i class="bi bi-star text-warning me-1"></i> Calificaciones y reseñas de clientes
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="noti_pagos"
+                                                   name="noti_pagos" value="1"
+                                                   <?= !empty($notificaciones['noti_pagos']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_pagos">
+                                                <i class="bi bi-credit-card text-success me-1"></i> Pagos y liberaciones de fondos
+                                            </label>
                                         </div>
 
                                         <hr>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Canal principal de notificaciones</label>
-                                            <select name="canal_notificaciones" class="form-select">
-                                                <option value="ambos" <?= $canalSeleccionado === 'ambos' ? 'selected' : '' ?>>Correo y plataforma</option>
-                                                <option value="correo" <?= $canalSeleccionado === 'correo' ? 'selected' : '' ?>>Solo correo</option>
-                                                <option value="plataforma" <?= $canalSeleccionado === 'plataforma' ? 'selected' : '' ?>>Solo dentro de la plataforma</option>
-                                            </select>
+                                        <p class="fw-semibold small mb-2">Canales de entrega</p>
+
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="canal_interna"
+                                                   name="canal_interna" value="1"
+                                                   <?= !empty($notificaciones['canal_interna']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_interna">
+                                                <i class="bi bi-bell me-1"></i> Notificaciones dentro de la plataforma
+                                            </label>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Tiempo de cierre de sesión por inactividad</label>
-                                            <select name="tiempo_sesion" class="form-select">
-                                                <option value="30" <?= $tiempoSesion === 30 ? 'selected' : '' ?>>30 minutos</option>
-                                                <option value="60" <?= $tiempoSesion === 60 ? 'selected' : '' ?>>1 hora</option>
-                                                <option value="120" <?= $tiempoSesion === 120 ? 'selected' : '' ?>>2 horas</option>
-                                            </select>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="canal_email"
+                                                   name="canal_email" value="1"
+                                                   <?= !empty($notificaciones['canal_email']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_email">
+                                                <i class="bi bi-envelope me-1"></i> Correo electrónico
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="canal_whatsapp"
+                                                   name="canal_whatsapp" value="1"
+                                                   <?= !empty($notificaciones['canal_whatsapp']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_whatsapp">
+                                                <i class="bi bi-whatsapp text-success me-1"></i> WhatsApp
+                                                <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">Próximamente</span>
+                                            </label>
                                         </div>
 
                                         <hr>
 
-                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                            <small class="text-muted">
-                                                Puedes ajustar estas preferencias en cualquier momento.
-                                            </small>
+                                        <p class="fw-semibold small mb-2">Resúmenes periódicos</p>
+
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="resumen_diario"
+                                                   name="resumen_diario" value="1"
+                                                   <?= !empty($notificaciones['resumen_diario']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_diario">
+                                                Resumen diario de actividad
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="resumen_semanal"
+                                                   name="resumen_semanal" value="1"
+                                                   <?= !empty($notificaciones['resumen_semanal']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_semanal">
+                                                Resumen semanal de actividad
+                                            </label>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end">
                                             <button type="submit" class="btn-modern btn-sm">
                                                 <i class="bi bi-save"></i> Guardar preferencias
                                             </button>
