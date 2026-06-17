@@ -7,6 +7,7 @@
 require_once BASE_PATH . '/config/mercadopago.php';
 require_once BASE_PATH . '/config/database.php';
 require_once BASE_PATH . '/app/helpers/alert-helper.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
@@ -351,6 +352,13 @@ function registrarPagoServicio(array $pago): void
                     ':receptor' => $notif['usuario_id'],
                     ':msg'      => "💳 Recibimos el pago del cliente por \$" . number_format($monto, 0, ',', '.') . ". Los fondos quedan retenidos en la plataforma hasta que completes el servicio.",
                 ]);
+                Notificacion::crear(
+                    (int)$notif['usuario_id'],
+                    Notificacion::TIPO_PAGO,
+                    'Pago recibido por tu servicio',
+                    'El cliente realizó el pago de $' . number_format($monto, 0, ',', '.') . '. Los fondos quedan retenidos hasta que completes el trabajo.',
+                    BASE_URL . '/proveedor/servicios-contratados'
+                );
             }
         }
 

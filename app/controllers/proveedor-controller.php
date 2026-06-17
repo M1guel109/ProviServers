@@ -16,6 +16,7 @@ require_once __DIR__ . '/../models/valoracion.php';
 require_once __DIR__ . '/../models/proveedor-perfil.php';
 require_once __DIR__ . '/../models/proveedor-notificaciones.php';
 require_once __DIR__ . '/../models/proveedor-pagos-facturacion.php';
+require_once __DIR__ . '/../models/Notificacion.php';
 
 // =======================================================================
 // GUARD DE SESIÓN Y ROL
@@ -555,16 +556,58 @@ function actualizarEstadoServicio()
         exit();
     }
 
+    // Notificar al cliente del cambio de estado
+    try {
+        $dbN  = new Conexion();
+        $pdoN = $dbN->getConexion();
+        $stN  = $pdoN->prepare("
+            SELECT cl.usuario_id
+            FROM servicios_contratados sc
+            INNER JOIN clientes cl ON sc.cliente_id = cl.id
+            WHERE sc.id = :id LIMIT 1
+        ");
+        $stN->execute([':id' => $contratoId]);
+        $clUid = $stN->fetchColumn();
+        if ($clUid) {
+            $mensajeEstado = match ($nuevoEstado) {
+                'confirmado'          => 'El proveedor confirmó tu servicio. Realiza el pago para continuar.',
+                'en_proceso'          => 'Tu servicio ha comenzado. El proveedor está trabajando en ello.',
+                'finalizado'          => 'Tu servicio fue completado. ¡Ya puedes calificarlo!',
+                'cancelado_proveedor' => 'El proveedor canceló el servicio.',
+                default               => 'El estado de tu servicio fue actualizado a: ' . $nuevoEstado . '.',
+            };
+            Notificacion::crear(
+                (int)$clUid,
+                Notificacion::TIPO_ESTADO,
+                'Actualización de tu servicio',
+                $mensajeEstado,
+                BASE_URL . '/cliente/servicios-contratados'
+            );
+        }
+    } catch (PDOException $e) {
+        error_log('actualizarEstadoServicio::notif: ' . $e->getMessage());
+    }
+
     // Al finalizar: marcar el pago como liberado (escrow → proveedor)
     if ($nuevoEstado === 'finalizado') {
         try {
             $db  = new Conexion();
             $pdo = $db->getConexion();
-            $pdo->prepare("
+            $st  = $pdo->prepare("
                 UPDATE pagos_servicios
                 SET liberado = 1, fecha_liberacion = NOW()
                 WHERE servicio_contratado_id = :id AND liberado = 0
-            ")->execute([':id' => $contratoId]);
+            ");
+            $st->execute([':id' => $contratoId]);
+            if ($st->rowCount() > 0) {
+                Notificacion::crear(
+                    $usuarioId,
+                    Notificacion::TIPO_LIBERACION,
+                    'Pago liberado a tu cuenta',
+                    'Los fondos del servicio han sido liberados a tu cuenta. ¡Bien hecho!',
+                    BASE_URL . '/proveedor/historial-pagos'
+                );
+            }
         } catch (PDOException $e) {
             error_log('actualizarEstadoServicio::liberarPago: ' . $e->getMessage());
         }

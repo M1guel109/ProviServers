@@ -7,6 +7,7 @@ require_once __DIR__ . '/../models/valoracion.php';
 require_once __DIR__ . '/../models/solicitud.php';
 require_once __DIR__ . '/../models/necesidad.php';
 require_once __DIR__ . '/../models/cotizacion.php';
+require_once __DIR__ . '/../models/Notificacion.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
@@ -206,6 +207,29 @@ function calificarServicio()
     $ok     = $modelo->crearPorClienteUsuario($contratoId, $usuarioId, $calificacion, $comentario);
 
     if ($ok) {
+        try {
+            $db  = new Conexion();
+            $pdo = $db->getConexion();
+            $st  = $pdo->prepare("
+                SELECT pr.usuario_id
+                FROM servicios_contratados sc
+                INNER JOIN proveedores pr ON sc.proveedor_id = pr.id
+                WHERE sc.id = :id LIMIT 1
+            ");
+            $st->execute([':id' => $contratoId]);
+            $provUid = $st->fetchColumn();
+            if ($provUid) {
+                Notificacion::crear(
+                    (int)$provUid,
+                    Notificacion::TIPO_CALIFICACION,
+                    'Nueva calificación recibida',
+                    'Un cliente calificó tu servicio con ' . $calificacion . ' estrella(s).',
+                    BASE_URL . '/proveedor/mis-servicios'
+                );
+            }
+        } catch (PDOException $e) {
+            error_log('calificarServicio::notif: ' . $e->getMessage());
+        }
         mostrarSweetAlert('success', '¡Gracias!', 'Tu calificación fue registrada exitosamente.', BASE_URL . '/cliente/servicios-contratados');
     } else {
         mostrarSweetAlert('error', 'Error al calificar', 'No se pudo calificar. Verifica que el servicio esté finalizado y no lo hayas calificado antes.', BASE_URL . '/cliente/servicios-contratados');
@@ -343,6 +367,24 @@ function guardarSolicitud()
     ]);
 
     if ($resultado === true) {
+        try {
+            $db  = new Conexion();
+            $pdo = $db->getConexion();
+            $st  = $pdo->prepare("SELECT usuario_id FROM proveedores WHERE id = :id LIMIT 1");
+            $st->execute([':id' => $proveedorId]);
+            $provUid = $st->fetchColumn();
+            if ($provUid) {
+                Notificacion::crear(
+                    (int)$provUid,
+                    Notificacion::TIPO_SOLICITUD,
+                    'Nueva solicitud de servicio',
+                    'Recibiste una nueva solicitud para "' . $titulo . '".',
+                    BASE_URL . '/proveedor/solicitudes'
+                );
+            }
+        } catch (PDOException $e) {
+            error_log('guardarSolicitud::notif: ' . $e->getMessage());
+        }
         mostrarSweetAlert('success', 'Solicitud enviada', 'El proveedor recibirá tu solicitud.', BASE_URL . '/cliente/explorar-servicios');
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo enviar la solicitud. Intenta nuevamente.');
@@ -497,6 +539,29 @@ function aceptarCotizacion()
     $ok     = $modelo->aceptarCotizacionParaClienteUsuario($usuarioId, $cotizacionId);
 
     if ($ok) {
+        try {
+            $db  = new Conexion();
+            $pdo = $db->getConexion();
+            $st  = $pdo->prepare("
+                SELECT pr.usuario_id, c.titulo
+                FROM cotizaciones c
+                INNER JOIN proveedores pr ON c.proveedor_id = pr.id
+                WHERE c.id = :id LIMIT 1
+            ");
+            $st->execute([':id' => $cotizacionId]);
+            $row = $st->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                Notificacion::crear(
+                    (int)$row['usuario_id'],
+                    Notificacion::TIPO_COTIZACION,
+                    'Cotización aceptada',
+                    '¡Tu cotización para "' . $row['titulo'] . '" fue aceptada! Ya tienes un nuevo servicio contratado.',
+                    BASE_URL . '/proveedor/servicios-contratados'
+                );
+            }
+        } catch (PDOException $e) {
+            error_log('aceptarCotizacion::notif: ' . $e->getMessage());
+        }
         mostrarSweetAlert('success', '¡Trato cerrado!', 'Has contratado el servicio correctamente.', BASE_URL . '/cliente/servicios-contratados');
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo procesar la contratación. Intenta nuevamente.');
