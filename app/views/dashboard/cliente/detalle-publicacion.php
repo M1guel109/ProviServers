@@ -2,6 +2,8 @@
 // Aquí asumimos que $publicacion viene desde el controlador
 // y que ya se validó que no es null.
 
+require_once BASE_PATH . '/app/models/valoracion.php';
+
 $titulo          = $publicacion['titulo'] ?? $publicacion['servicio_nombre'] ?? 'Servicio';
 $servicioNombre  = $publicacion['servicio_nombre'] ?? '';
 $servicioDesc    = $publicacion['servicio_descripcion'] ?? ($publicacion['publicacion_descripcion'] ?? '');
@@ -19,6 +21,23 @@ $proveedorUbicacion = $publicacion['proveedor_ubicacion'] ?? 'Ubicación no espe
 $proveedorFoto      = $publicacion['proveedor_foto'] ?? 'default_user.png';
 
 $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
+
+// Reseñas del proveedor
+$proveedorUsuarioId = (int)($publicacion['proveedor_usuario_id'] ?? 0);
+$resenasProveedor   = [];
+$promedioCalif      = 0.0;
+$totalResenas       = 0;
+if ($proveedorUsuarioId > 0) {
+    try {
+        $resenasProveedor = (new Valoracion())->obtenerResenasPorProveedor($proveedorUsuarioId);
+        $totalResenas     = count($resenasProveedor);
+        if ($totalResenas > 0) {
+            $promedioCalif = array_sum(array_column($resenasProveedor, 'calificacion')) / $totalResenas;
+        }
+    } catch (Exception $e) {
+        error_log('detalle-publicacion reseñas: ' . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -140,6 +159,57 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                             </ul>
                         </div>
                     </div>
+
+                    <!-- Reseñas del proveedor -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                <i class="bi bi-chat-square-text me-1"></i>
+                                Reseñas del proveedor
+                            </h5>
+                            <?php if ($totalResenas > 0): ?>
+                                <p class="text-muted small mb-3">
+                                    <?= number_format($promedioCalif, 1) ?> de 5 &middot; <?= $totalResenas ?> reseña<?= $totalResenas !== 1 ? 's' : '' ?>
+                                </p>
+                                <?php foreach ($resenasProveedor as $r): ?>
+                                    <div class="border rounded p-3 mb-3">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($r['cliente_foto'] ?: 'default_user.png') ?>"
+                                                 alt="avatar" class="rounded-circle"
+                                                 style="width:36px;height:36px;object-fit:cover;">
+                                            <div>
+                                                <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($r['cliente_nombre']) ?></div>
+                                                <div style="font-size:.75rem;color:#aaa;">
+                                                    <?= date('d M Y', strtotime($r['fecha'])) ?>
+                                                    &middot; <?= htmlspecialchars($r['servicio_nombre']) ?>
+                                                </div>
+                                            </div>
+                                            <div class="ms-auto" style="font-size:.85rem;">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="bi bi-star<?= $i <= (int)$r['calificacion'] ? '-fill text-warning' : ' text-secondary opacity-50' ?>"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                        </div>
+                                        <?php if (!empty($r['comentario'])): ?>
+                                            <p class="mb-2 small text-muted fst-italic">"<?= htmlspecialchars($r['comentario']) ?>"</p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($r['respuesta_proveedor'])): ?>
+                                            <div class="p-2 rounded bg-light border-start border-3 border-primary mt-2">
+                                                <small class="fw-bold text-primary d-block mb-1">
+                                                    <i class="bi bi-person-check me-1"></i>Respuesta del proveedor
+                                                </small>
+                                                <small class="text-muted"><?= htmlspecialchars($r['respuesta_proveedor']) ?></small>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted small mt-2 mb-0">
+                                    <i class="bi bi-star me-1"></i>Este proveedor aún no tiene reseñas.
+                                </p>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Columna derecha: proveedor + acción -->
@@ -167,10 +237,17 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 </div>
                             </div>
 
-                            <p class="mb-1" style="font-size: 0.9rem;">
+                            <p class="mb-0" style="font-size: 0.9rem;">
                                 <strong>Calificación:</strong>
-                                <span class="text-warning">★ ★ ★ ★ ☆</span>
-                                <span class="text-muted">(próximamente)</span>
+                                <?php if ($totalResenas > 0): ?>
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="bi bi-star<?= $i <= round($promedioCalif) ? '-fill text-warning' : ' text-secondary opacity-50' ?>"></i>
+                                    <?php endfor; ?>
+                                    <span class="ms-1 fw-semibold"><?= number_format($promedioCalif, 1) ?></span>
+                                    <span class="text-muted small">(<?= $totalResenas ?> reseña<?= $totalResenas !== 1 ? 's' : '' ?>)</span>
+                                <?php else: ?>
+                                    <span class="text-muted small">Sin reseñas aún</span>
+                                <?php endif; ?>
                             </p>
                         </div>
                     </div>
