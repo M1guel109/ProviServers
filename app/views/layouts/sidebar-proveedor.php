@@ -119,6 +119,14 @@ $_notifCount = isset($_SESSION['user']['id'])
                 </li>
 
                 <li>
+                    <a href="<?= BASE_URL ?>/proveedor/completadas" data-title="Historial de contrataciones"
+                       class="<?= ($currentPage ?? '') === 'completadas' ? 'active' : '' ?>">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="nav-text">Historial de contrataciones</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="<?= BASE_URL ?>/proveedor/facturacion"
                        data-title="<?= __('proveedor_facturacion') ?>">
                         <i class="bi bi-receipt"></i>
