@@ -383,6 +383,47 @@ public function aceptarCotizacionParaClienteUsuario(int $usuarioClienteId, int $
         return false;
     }
 }
+public function obtenerDetalleParaClienteUsuario(int $usuarioClienteId, int $cotizacionId): ?array
+{
+    $clienteId = $this->obtenerClienteIdPorUsuario($usuarioClienteId);
+    if (!$clienteId) return null;
+
+    try {
+        $st = $this->db->prepare("
+            SELECT
+                c.id,
+                c.titulo,
+                c.mensaje,
+                c.precio,
+                c.tiempo_estimado,
+                c.estado,
+                c.created_at,
+                n.titulo          AS necesidad_titulo,
+                n.descripcion     AS necesidad_descripcion,
+                CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                pr.foto           AS proveedor_foto,
+                sv.nombre         AS servicio_nombre
+            FROM cotizaciones c
+            INNER JOIN necesidades n   ON c.necesidad_id   = n.id
+            INNER JOIN clientes cl     ON n.cliente_id     = cl.id
+            INNER JOIN proveedores pr  ON c.proveedor_id   = pr.id
+            LEFT JOIN publicaciones pub ON c.publicacion_id = pub.id
+            LEFT JOIN servicios sv     ON pub.servicio_id   = sv.id
+            WHERE c.id = :cid
+              AND cl.usuario_id = :uid
+              AND c.estado = 'pendiente'
+              AND n.estado = 'abierta'
+            LIMIT 1
+        ");
+        $st->execute([':cid' => $cotizacionId, ':uid' => $usuarioClienteId]);
+        $row = $st->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    } catch (PDOException $e) {
+        error_log('Cotizacion::obtenerDetalleParaClienteUsuario -> ' . $e->getMessage());
+        return null;
+    }
+}
+
 public function obtenerPublicacionesAprobadasPorProveedorUsuario(int $usuarioProveedorId): array
 {
     $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioProveedorId);

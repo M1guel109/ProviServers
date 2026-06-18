@@ -48,6 +48,15 @@ $_notifCount = isset($_SESSION['user']['id'])
                     </a>
                 </li>
 
+                <!-- Mis necesidades -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/necesidades" data-title="Mis necesidades"
+                       class="<?= ($currentPage ?? '') === 'necesidades' ? 'active' : '' ?>">
+                        <i class="bi bi-lightbulb"></i>
+                        <span class="nav-text">Mis necesidades</span>
+                    </a>
+                </li>
+
                 <!-- Servicios contratados -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/servicios-contratados" data-title="<?= __('cliente_servicios_contratados') ?>">
