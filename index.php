@@ -391,6 +391,9 @@ switch ($request) {
     case '/proveedor/actualizar-estado':
     case '/proveedor/oportunidades':
     case '/proveedor/oportunidades/enviar-cotizacion':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
     case '/proveedor/calificaciones-cliente':
         require BASE_PATH . '/app/views/dashboard/proveedor/calificaciones-cliente.php';
         break;

@@ -330,12 +330,14 @@ class Solicitud
     /* ======================================================
        RECHAZAR SOLICITUD (Proveedor)
        ====================================================== */
-    public function rechazar(int $solicitudId, int $proveedorUsuarioId): bool
+    public function rechazar(int $solicitudId, int $proveedorUsuarioId, ?string $motivo = null): bool
     {
         try {
             $sql = "UPDATE solicitudes s
                     INNER JOIN proveedores p ON s.proveedor_id = p.id
-                    SET s.estado = 'rechazada'
+                    SET s.estado          = 'rechazada',
+                        s.motivo_rechazo  = :motivo,
+                        s.fecha_rechazo   = NOW()
                     WHERE s.id = :id
                       AND p.usuario_id = :usuario
                       AND s.estado = 'pendiente'";
@@ -343,7 +345,8 @@ class Solicitud
             $stmt = $this->conexion->prepare($sql);
             return $stmt->execute([
                 ':id'      => $solicitudId,
-                ':usuario' => $proveedorUsuarioId
+                ':usuario' => $proveedorUsuarioId,
+                ':motivo'  => $motivo ?: null,
             ]);
         } catch (PDOException $e) {
             error_log("Solicitud::rechazar -> " . $e->getMessage());

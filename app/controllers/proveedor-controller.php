@@ -74,7 +74,9 @@ switch ($method) {
     case 'POST':
         $accion = $_POST['accion'] ?? '';
 
-        if (str_contains($uri, '/proveedor/resenas/responder')) {
+        if ($accion === 'rechazar_solicitud') {
+            rechazarSolicitud($_POST['id'] ?? null);
+        } elseif (str_contains($uri, '/proveedor/resenas/responder')) {
             guardarRespuestaProveedor();
         } elseif (str_contains($uri, '/proveedor/promociones/crear')) {
             crearPromocion();
@@ -790,7 +792,30 @@ function aceptarSolicitud($id)
         $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas-solicitudes');
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT cl.usuario_id, s.titulo
+                    FROM solicitudes s
+                    INNER JOIN clientes cl ON s.cliente_id = cl.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => (int)$id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud aceptada',
+                        'Tu solicitud "' . $row['titulo'] . '" fue aceptada. El proveedor está listo para iniciar.',
+                        BASE_URL . '/cliente/servicios-contratados'
+                    );
+                }
+            } catch (Throwable $e) {
+                error_log('aceptarSolicitud::notif: ' . $e->getMessage());
+            }
+            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como confirmado.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.', BASE_URL . '/proveedor/nuevas-solicitudes');
         }
@@ -809,12 +834,40 @@ function rechazarSolicitud($id)
     }
 
     $proveedorUsuarioId = (int)$_SESSION['user']['id'];
+    $motivo             = trim($_POST['motivo'] ?? '');
     $modelo             = new Solicitud();
 
     try {
-        $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
+        $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId, $motivo ?: null);
 
         if ($resultado) {
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT cl.usuario_id, s.titulo
+                    FROM solicitudes s
+                    INNER JOIN clientes cl ON s.cliente_id = cl.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => (int)$id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    $msg = 'Tu solicitud "' . $row['titulo'] . '" fue rechazada por el proveedor.';
+                    if ($motivo) {
+                        $msg .= ' Motivo: ' . $motivo;
+                    }
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud rechazada',
+                        $msg,
+                        BASE_URL . '/cliente/mis-solicitudes'
+                    );
+                }
+            } catch (Throwable $e) {
+                error_log('rechazarSolicitud::notif: ' . $e->getMessage());
+            }
             mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo rechazar la solicitud.', BASE_URL . '/proveedor/nuevas-solicitudes');

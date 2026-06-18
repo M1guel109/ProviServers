@@ -147,16 +147,17 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
                                 <?php if ($solicitudId > 0) : ?>
                                     <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=aceptar_solicitud&id=<?= $solicitudId ?>&tab=nuevas"
                                         class="btn btn-sm btn-outline-success flex-fill"
-                                        title="Aceptar">
+                                        title="Aceptar"
+                                        onclick="return confirm('¿Confirmas aceptar esta solicitud?')">
                                         <i class="bi bi-check-lg"></i> Aceptar
                                     </a>
 
-                                    <a href="<?= BASE_URL ?>/proveedor/solicitudes?accion=rechazar_solicitud&id=<?= $solicitudId ?>&tab=nuevas"
-                                        class="btn btn-sm btn-outline-danger flex-fill"
+                                    <button type="button"
+                                        class="btn btn-sm btn-outline-danger flex-fill btn-abrir-rechazo"
                                         title="Rechazar"
-                                        onclick="return confirm('¿Rechazar esta solicitud?')">
+                                        data-id="<?= $solicitudId ?>">
                                         <i class="bi bi-x-lg"></i> Rechazar
-                                    </a>
+                                    </button>
                                 <?php else : ?>
                                     <button class="btn btn-sm btn-outline-secondary flex-fill" type="button" disabled>
                                         Sin ID
@@ -175,3 +176,39 @@ $totalHoy = count(array_filter($solicitudes, function ($s) {
         </div>
     <?php endif; ?>
 </section>
+
+<!-- Modal rechazo con motivo -->
+<div class="modal fade" id="modalRechazar" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" action="<?= BASE_URL ?>/proveedor/solicitudes" class="modal-content">
+            <input type="hidden" name="accion" value="rechazar_solicitud">
+            <input type="hidden" name="id" id="rechazo_id">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-x-circle text-danger me-2"></i>Rechazar solicitud</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small mb-3">Puedes indicar el motivo del rechazo para que el cliente lo sepa (opcional).</p>
+                <label for="rechazo_motivo" class="form-label fw-semibold">Motivo del rechazo</label>
+                <textarea name="motivo" id="rechazo_motivo" class="form-control" rows="3"
+                          maxlength="500" placeholder="Ej: No tengo disponibilidad en esa fecha..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-x-lg me-1"></i>Confirmar rechazo
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.btn-abrir-rechazo').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.getElementById('rechazo_id').value = this.dataset.id;
+        document.getElementById('rechazo_motivo').value = '';
+        new bootstrap.Modal(document.getElementById('modalRechazar')).show();
+    });
+});
+</script>
