@@ -139,13 +139,10 @@
                     </div>
 
                     <?php if (($detalle['estado'] ?? '') === 'abierta' && ($c['estado'] ?? '') === 'pendiente'): ?>
-                      <form class="mt-2" method="POST" action="<?= rtrim(BASE_URL, '/') ?>/cliente/necesidades/aceptar-cotizacion">
-                        <input type="hidden" name="accion" value="aceptar_cotizacion">
-                        <input type="hidden" name="cotizacion_id" value="<?= (int)$c['id'] ?>">
-                        <button type="submit" class="btn btn-sm btn-success w-100">
-                          Aceptar cotización
-                        </button>
-                      </form>
+                      <a href="<?= BASE_URL ?>/cliente/necesidades/confirmar-cotizacion?id=<?= (int)$c['id'] ?>"
+                         class="btn btn-sm btn-success w-100 mt-2">
+                        <i class="bi bi-check-circle me-1"></i> Aceptar cotización
+                      </a>
                     <?php endif; ?>
                   </div>
                 <?php endforeach; ?>
