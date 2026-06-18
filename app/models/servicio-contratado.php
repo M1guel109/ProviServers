@@ -208,6 +208,19 @@ class ServicioContratado
     /**
      * Actualizar estado del contrato (para proveedor, o luego cliente)
      */
+    public function obtenerEstado(int $contratoId): ?string
+    {
+        try {
+            $st = $this->db->prepare("SELECT estado FROM servicios_contratados WHERE id = :id LIMIT 1");
+            $st->execute([':id' => $contratoId]);
+            $val = $st->fetchColumn();
+            return $val !== false ? (string)$val : null;
+        } catch (PDOException $e) {
+            error_log('ServicioContratado::obtenerEstado -> ' . $e->getMessage());
+            return null;
+        }
+    }
+
     public function actualizarEstado(int $contratoId, string $nuevoEstado): bool
     {
         $estadosPermitidos = [
