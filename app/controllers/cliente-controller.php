@@ -8,6 +8,7 @@ require_once __DIR__ . '/../models/solicitud.php';
 require_once __DIR__ . '/../models/necesidad.php';
 require_once __DIR__ . '/../models/cotizacion.php';
 require_once __DIR__ . '/../models/Notificacion.php';
+require_once __DIR__ . '/../models/SeguimientoContrato.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
@@ -32,7 +33,9 @@ $uri    = $_SERVER['REQUEST_URI'];
 switch ($method) {
 
     case 'GET':
-        if (str_contains($uri, 'contrato-pdf')) {
+        if (str_contains($uri, '/cliente/contrato/seguimiento')) {
+            seguimientoContratoJSON('cliente');
+        } elseif (str_contains($uri, 'contrato-pdf')) {
             generarComprobantePDFCliente();
         } elseif (str_contains($uri, 'explorar')) {
             mostrarCatalogoPublico();
@@ -51,7 +54,9 @@ switch ($method) {
     case 'POST':
         $accion = $_POST['accion'] ?? '';
 
-        if ($accion === 'calificar_servicio') {
+        if (str_contains($uri, '/cliente/contrato/comentario')) {
+            agregarComentarioContrato('cliente');
+        } elseif ($accion === 'calificar_servicio') {
             calificarServicio();
         } elseif ($accion === 'cancelar_servicio') {
             cancelarServicio();
@@ -856,4 +861,76 @@ function mpDeleteCard(string $customerId, string $cardId): void
     ]);
     curl_exec($ch);
     curl_close($ch);
+}
+
+// =======================================================================
+// SEGUIMIENTO DE CONTRATO
+// =======================================================================
+
+function seguimientoContratoJSON(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_GET['id'] ?? 0);
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'ID de contrato inválido.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $historial = SeguimientoContrato::listarPorContrato($contratoId);
+    echo json_encode(['ok' => true, 'data' => $historial]);
+    exit();
+}
+
+function agregarComentarioContrato(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_POST['contrato_id'] ?? 0);
+    $comentario = trim($_POST['comentario']   ?? '');
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0 || $comentario === '') {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'Datos incompletos.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $archivoPath = null;
+    if (!empty($_FILES['archivo']['tmp_name'])) {
+        $archivoPath = SeguimientoContrato::subirArchivo($_FILES['archivo']);
+        if ($archivoPath === null) {
+            http_response_code(422);
+            echo json_encode(['ok' => false, 'message' => 'Archivo no válido (máx 5 MB, formatos: pdf, jpg, png, doc, docx, txt).']);
+            exit();
+        }
+    }
+
+    $ok = SeguimientoContrato::registrar(
+        contratoId:     $contratoId,
+        usuarioId:      $usuarioId,
+        rol:            $rol,
+        comentario:     $comentario,
+        archivoAdjunto: $archivoPath
+    );
+
+    echo json_encode(['ok' => $ok, 'message' => $ok ? 'Comentario registrado.' : 'Error al guardar.']);
+    exit();
 }
