@@ -194,13 +194,16 @@ class Publicacion
     // app/models/Publicacion.php
 
     public function listarPublicasActivas(
-        ?string $busqueda       = null,
-        ?int    $categoriaId    = null,
-        ?string $ciudad         = null,
-        ?float  $precioMax      = null,
-        string  $orden          = 'recientes',
-        bool    $soloOfertas    = false,
-        ?float  $calificacionMin = null
+        ?string $busqueda        = null,
+        ?int    $categoriaId     = null,
+        ?string $ciudad          = null,
+        ?float  $precioMax       = null,
+        string  $orden           = 'recientes',
+        bool    $soloOfertas     = false,
+        ?float  $calificacionMin = null,
+        ?float  $lat             = null,
+        ?float  $lng             = null,
+        ?int    $radioKm         = null
     ): array {
         try {
             $sql = "
@@ -274,6 +277,19 @@ class Publicacion
             if ($precioMax !== null && $precioMax > 0) {
                 $sql .= " AND pub.precio <= :precioMax";
                 $params[':precioMax'] = $precioMax;
+            }
+
+            if ($lat !== null && $lng !== null && $radioKm !== null && $radioKm > 0) {
+                $sql .= " AND pp.latitud IS NOT NULL AND pp.longitud IS NOT NULL
+                          AND (6371 * 2 * ASIN(SQRT(
+                              POWER(SIN(RADIANS(pp.latitud  - :lat) / 2), 2)
+                              + COS(RADIANS(:lat2)) * COS(RADIANS(pp.latitud))
+                              * POWER(SIN(RADIANS(pp.longitud - :lng) / 2), 2)
+                          ))) <= :radioKm";
+                $params[':lat']    = $lat;
+                $params[':lat2']   = $lat;
+                $params[':lng']    = $lng;
+                $params[':radioKm'] = $radioKm;
             }
 
             $ordenMap = [

@@ -10,7 +10,11 @@ $precioMax       = $precioMax       ?? null;
 $orden           = $orden           ?? 'recientes';
 $soloOfertas     = $soloOfertas     ?? false;
 $calificacionMin = $calificacionMin ?? null;
+$lat             = $lat             ?? null;
+$lng             = $lng             ?? null;
+$radioKm         = $radioKm         ?? 10;
 $publicaciones   = $publicaciones   ?? [];
+$filtroPorCoordenadas = $lat !== null && $lng !== null;
 $objCategoria = new Categoria();
 $categorias = $objCategoria->mostrar() ?: [];
 
@@ -66,7 +70,11 @@ $categorias = $objCategoria->mostrar() ?: [];
         </section>
 
         <section class="filtros-container mb-4">
-            <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios">
+            <form method="GET" action="<?= BASE_URL ?>/cliente/explorar-servicios" id="form-filtros">
+                <!-- Inputs ocultos para filtro por coordenadas -->
+                <input type="hidden" name="lat"   id="input-lat"   value="<?= $lat !== null ? htmlspecialchars((string)$lat) : '' ?>">
+                <input type="hidden" name="lng"   id="input-lng"   value="<?= $lng !== null ? htmlspecialchars((string)$lng) : '' ?>">
+
                 <!-- Fila 1: búsqueda + ciudad + precio + orden -->
                 <div class="row g-2 mb-3">
                     <div class="col-md-4">
@@ -123,6 +131,37 @@ $categorias = $objCategoria->mostrar() ?: [];
                     </div>
                 </div>
 
+                <!-- Fila 1b: Cerca de mí + radio (solo cuando hay coords activas) -->
+                <div class="row g-2 mb-2 align-items-center">
+                    <div class="col-auto">
+                        <button type="button" id="btn-cerca-mi" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-crosshair me-1"></i>Cerca de mí
+                        </button>
+                        <?php if ($filtroPorCoordenadas): ?>
+                        <button type="button" class="btn btn-outline-danger btn-sm ms-1" id="btn-quitar-coords"
+                                title="Quitar filtro de ubicación">
+                            <i class="bi bi-x-circle me-1"></i>Quitar ubicación
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                    <div class="col-auto" id="contenedor-radio" <?= $filtroPorCoordenadas ? '' : 'style="display:none"' ?>>
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light"><i class="bi bi-arrows-angle-expand"></i></span>
+                            <select name="radio" class="form-select form-select-sm bg-light" style="min-width:120px">
+                                <option value="5"  <?= $radioKm == 5  ? 'selected' : '' ?>>5 km</option>
+                                <option value="10" <?= $radioKm == 10 ? 'selected' : '' ?>>10 km</option>
+                                <option value="25" <?= $radioKm == 25 ? 'selected' : '' ?>>25 km</option>
+                                <option value="50" <?= $radioKm == 50 ? 'selected' : '' ?>>50 km</option>
+                            </select>
+                        </div>
+                    </div>
+                    <?php if ($filtroPorCoordenadas): ?>
+                    <div class="col-auto">
+                        <small class="text-success"><i class="bi bi-geo-fill me-1"></i>Filtrando por tu ubicación (<?= $radioKm ?> km)</small>
+                    </div>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Fila 2: filtros de categoría + En oferta -->
                 <div class="d-flex flex-wrap gap-2">
                     <?php
@@ -132,6 +171,9 @@ $categorias = $objCategoria->mostrar() ?: [];
                             'precio_max' => $precioMax ? (int)$precioMax : '',
                             'orden'      => $orden !== 'recientes' ? $orden : '',
                             'estrellas'  => $calificacionMin ? (int)$calificacionMin : '',
+                            'lat'        => $lat !== null ? (string)$lat : '',
+                            'lng'        => $lng !== null ? (string)$lng : '',
+                            'radio'      => $filtroPorCoordenadas ? (string)$radioKm : '',
                         ]));
                         $qsOfertas = $qsBase ? $qsBase . '&ofertas=1' : 'ofertas=1';
                     ?>
@@ -169,6 +211,9 @@ $categorias = $objCategoria->mostrar() ?: [];
                             'orden'     => $orden !== 'recientes' ? $orden : '',
                             'ofertas'   => $soloOfertas ? '1' : '',
                             'estrellas' => $calificacionMin ? (int)$calificacionMin : '',
+                            'lat'       => $lat !== null ? (string)$lat : '',
+                            'lng'       => $lng !== null ? (string)$lng : '',
+                            'radio'     => $filtroPorCoordenadas ? (string)$radioKm : '',
                         ]));
                     ?>
                         <a href="<?= BASE_URL ?>/cliente/explorar-servicios?<?= $qsCat ?>"
@@ -181,12 +226,13 @@ $categorias = $objCategoria->mostrar() ?: [];
                 <!-- Badge de filtros activos -->
                 <?php
                 $filtrosActivos = array_filter([
-                    $busqueda        ? "Búsqueda: \"$busqueda\""                                   : null,
-                    $ciudad          ? "Ciudad: \"$ciudad\""                                        : null,
-                    $precioMax       ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
-                    $catActual       ? 'Categoría seleccionada'                                    : null,
-                    $soloOfertas     ? 'Solo ofertas activas'                                      : null,
-                    $calificacionMin ? str_repeat('⭐', (int)$calificacionMin) . '+ estrellas'     : null,
+                    $busqueda              ? "Búsqueda: \"$busqueda\""                                   : null,
+                    $ciudad                ? "Ciudad: \"$ciudad\""                                        : null,
+                    $precioMax             ? 'Precio máx: $'.number_format((int)$precioMax, 0, ',', '.') : null,
+                    $catActual             ? 'Categoría seleccionada'                                    : null,
+                    $soloOfertas           ? 'Solo ofertas activas'                                      : null,
+                    $calificacionMin       ? str_repeat('⭐', (int)$calificacionMin) . '+ estrellas'     : null,
+                    $filtroPorCoordenadas  ? "Cerca de mí ({$radioKm} km)"                              : null,
                 ]);
                 if ($filtrosActivos): ?>
                 <div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
@@ -570,6 +616,42 @@ $categorias = $objCategoria->mostrar() ?: [];
                 }).addTo(mapaLeaflet).bindPopup('<b>Tu ubicación</b>').openPopup();
             }, () => {});
         }
+    }
+
+    // Botón "Cerca de mí"
+    document.getElementById('btn-cerca-mi').addEventListener('click', function () {
+        if (!navigator.geolocation) {
+            alert('Tu navegador no soporta geolocalización.');
+            return;
+        }
+        const btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Obteniendo ubicación...';
+
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                document.getElementById('input-lat').value = pos.coords.latitude;
+                document.getElementById('input-lng').value = pos.coords.longitude;
+                document.getElementById('contenedor-radio').style.display = '';
+                document.getElementById('form-filtros').submit();
+            },
+            function () {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-crosshair me-1"></i>Cerca de mí';
+                alert('No se pudo obtener tu ubicación. Verifica los permisos del navegador.');
+            },
+            { timeout: 10000 }
+        );
+    });
+
+    // Botón "Quitar ubicación"
+    const btnQuitarCoords = document.getElementById('btn-quitar-coords');
+    if (btnQuitarCoords) {
+        btnQuitarCoords.addEventListener('click', function () {
+            document.getElementById('input-lat').value = '';
+            document.getElementById('input-lng').value = '';
+            document.getElementById('form-filtros').submit();
+        });
     }
     </script>
 
