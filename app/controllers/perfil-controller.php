@@ -34,6 +34,8 @@ switch ($method) {
             cambiarEmail();
         } elseif (str_contains($uri, 'cambiar-clave')) {
             cambiarContrasena();
+        } elseif (str_contains($uri, 'eliminar-cuenta')) {
+            eliminarCuenta();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -176,6 +178,42 @@ function cambiarEmail()
             break;
         default:
             mostrarSweetAlert('error', 'Error inesperado', 'No se pudo actualizar el correo. Intenta nuevamente.', $redirect);
+    }
+    exit();
+}
+
+function eliminarCuenta()
+{
+    $id  = (int)$_SESSION['user']['id'];
+    $rol = $_SESSION['user']['rol'] ?? '';
+
+    if ($rol !== 'cliente') {
+        mostrarSweetAlert('error', 'Acción no permitida', 'Solo clientes pueden usar esta función.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    $clave = $_POST['clave_confirmar_baja'] ?? '';
+
+    if (empty($clave)) {
+        mostrarSweetAlert('error', 'Contraseña requerida', 'Debes confirmar tu contraseña para eliminar la cuenta.', BASE_URL . '/cliente/perfil');
+        exit();
+    }
+
+    $resultado = (new Perfil())->eliminarCuentaCliente($id, $clave);
+
+    switch ($resultado) {
+        case 'eliminado':
+        case 'desactivado':
+            $_SESSION = [];
+            session_unset();
+            session_destroy();
+            mostrarSweetAlert('success', 'Cuenta eliminada', 'Tu cuenta ha sido eliminada correctamente. ¡Hasta pronto!', BASE_URL . '/login');
+            break;
+        case 'clave_incorrecta':
+            mostrarSweetAlert('error', 'Contraseña incorrecta', 'La contraseña ingresada no es correcta.', BASE_URL . '/cliente/perfil');
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'No se pudo procesar tu solicitud. Intenta nuevamente.', BASE_URL . '/cliente/perfil');
     }
     exit();
 }

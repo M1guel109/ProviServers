@@ -113,6 +113,60 @@ class Perfil
         }
     }
 
+    public function eliminarCuentaCliente(int $id, string $clave): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+
+            // 1. Verificar contraseña
+            $stmt = $this->conexion->prepare("SELECT clave FROM usuarios WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) { $this->conexion->rollBack(); return 'error'; }
+            if (!password_verify($clave, $usuario['clave'])) { $this->conexion->rollBack(); return 'clave_incorrecta'; }
+
+            // 2. Verificar contratos activos
+            $stmtCid = $this->conexion->prepare(
+                "SELECT id FROM clientes WHERE usuario_id = :uid LIMIT 1"
+            );
+            $stmtCid->execute([':uid' => $id]);
+            $clienteId = $stmtCid->fetchColumn();
+
+            $tieneActivos = false;
+            if ($clienteId) {
+                $stmtAct = $this->conexion->prepare(
+                    "SELECT COUNT(*) FROM servicios_contratados
+                     WHERE cliente_id = :cid
+                       AND estado IN ('pendiente','confirmado','en_proceso')"
+                );
+                $stmtAct->execute([':cid' => $clienteId]);
+                $tieneActivos = (int)$stmtAct->fetchColumn() > 0;
+            }
+
+            if ($tieneActivos) {
+                // Soft delete — desactiva sin borrar historial
+                $this->conexion->prepare("UPDATE usuarios SET estado_id = 4 WHERE id = :id")
+                    ->execute([':id' => $id]);
+                $this->conexion->commit();
+                return 'desactivado';
+            }
+
+            // 3. Hard delete — sin contratos activos
+            $this->conexion->prepare("DELETE FROM clientes WHERE usuario_id = :id")
+                ->execute([':id' => $id]);
+            $this->conexion->prepare("DELETE FROM usuarios WHERE id = :id")
+                ->execute([':id' => $id]);
+
+            $this->conexion->commit();
+            return 'eliminado';
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            error_log('Perfil::eliminarCuentaCliente -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
+
     public function cambiarContrasena($id, $claveActual, $nuevaClave)
     {
         try {
