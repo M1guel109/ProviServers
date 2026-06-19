@@ -409,21 +409,11 @@ $categorias = $objCategoria->mostrar() ?: [];
                                             <span class="fw-bold text-primary fs-5">$<?= number_format($precio, 0, ',', '.') ?></span>
                                         <?php endif; ?>
                                     </div>
-                                    <!-- TARJETA — pasar TODOS los datos completos al botón -->
                                     <div class="d-grid gap-2">
-                                        <button class="btn btn-outline-primary btn-ver-detalle"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#modalDetalleServicio"
-                                            data-id="<?= (int)$pub['id'] ?>"
-                                            data-titulo="<?= htmlspecialchars($titulo) ?>"
-                                            data-descripcion="<?= htmlspecialchars($descripcion) ?>"
-                                            data-precio="<?= number_format($precio, 0, ',', '.') ?>"
-                                            data-precio-raw="<?= $precio ?>"
-                                            data-proveedor="<?= htmlspecialchars($proveedorNombre) ?>"
-                                            data-categoria="<?= htmlspecialchars($categoriaNombre) ?>"
-                                            data-imagen="<?= $rutaImagen ?>">
+                                        <a href="<?= BASE_URL ?>/cliente/publicacion?id=<?= (int)$pub['id'] ?>"
+                                           class="btn btn-outline-primary">
                                             <i class="bi bi-eye"></i> Ver Detalles
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
                             </div>

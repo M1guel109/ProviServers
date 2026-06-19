@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/publicacion.php';
+require_once __DIR__ . '/../models/proveedor-perfil.php';
 require_once __DIR__ . '/../models/servicio-contratado.php';
 require_once __DIR__ . '/../models/valoracion.php';
 require_once __DIR__ . '/../models/solicitud.php';
@@ -144,6 +145,11 @@ function mostrarDetallePublicacion()
         mostrarSweetAlert('error', 'No encontrada', 'La publicación no existe o ya no está disponible.', BASE_URL . '/cliente/explorar-servicios');
         exit();
     }
+
+    $proveedorUsuarioId = (int)($publicacion['proveedor_usuario_id'] ?? 0);
+    $perfilPublico = $proveedorUsuarioId > 0
+        ? (new ProveedorPerfil())->obtenerPerfilPublicoProveedor($proveedorUsuarioId)
+        : ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
 
     require BASE_PATH . '/app/views/dashboard/cliente/detalle-publicacion.php';
     exit();

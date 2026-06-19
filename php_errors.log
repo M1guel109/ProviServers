@@ -179,3 +179,22 @@ Stack trace:
 [15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\helpers\session-cliente.php on line 7
 [17-Jun-2026 06:35:50 Europe/Berlin] Error en Publicacion::listarPublicasActivas -> SQLSTATE[HY000]: General error: 2006 MySQL server has gone away
 [19-Jun-2026 06:20:05 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 297
+[19-Jun-2026 07:26:08 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:11 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:40 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:50 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:52:24 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 07:52:30 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 07:52:38 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16

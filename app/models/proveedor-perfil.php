@@ -465,6 +465,54 @@ class ProveedorPerfil
     }
 
     // ======================================================================
+    // PERFIL PÚBLICO — datos visibles para clientes en el detalle de servicio
+    // ======================================================================
+
+    public function obtenerPerfilPublicoProveedor(int $usuarioId): array
+    {
+        try {
+            $stmtPerfil = $this->conexion->prepare(
+                "SELECT nombre_comercial, tipo_proveedor, eslogan, descripcion,
+                        anios_experiencia, idiomas, ciudad, zona,
+                        telefono_contacto, whatsapp, correo_alternativo, foto
+                 FROM proveedor_perfil WHERE id_usuario = :uid LIMIT 1"
+            );
+            $stmtPerfil->execute([':uid' => $usuarioId]);
+            $perfil = $stmtPerfil->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtPoliticas = $this->conexion->prepare(
+                "SELECT ps.tipo_cancelacion, ps.descripcion_cancelacion,
+                        ps.permite_reprogramar, ps.horas_min_reprogramacion,
+                        ps.cobra_visita, ps.valor_visita,
+                        ps.ofrece_garantia, ps.dias_garantia, ps.detalles_garantia,
+                        ps.tiempo_respuesta_promedio, ps.otras_condiciones
+                 FROM proveedores_politicas_servicio ps
+                 INNER JOIN proveedores p ON ps.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtPoliticas->execute([':uid' => $usuarioId]);
+            $politicas = $stmtPoliticas->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtDisp = $this->conexion->prepare(
+                "SELECT d.dias_semana, d.hora_inicio, d.hora_fin,
+                        d.atiende_fines_semana, d.atiende_festivos,
+                        d.atencion_urgencias, d.detalle_urgencias,
+                        d.tipo_zona, d.radio_km
+                 FROM proveedores_disponibilidad d
+                 INNER JOIN proveedores p ON d.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtDisp->execute([':uid' => $usuarioId]);
+            $disponibilidad = $stmtDisp->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            return compact('perfil', 'politicas', 'disponibilidad');
+        } catch (PDOException $e) {
+            error_log('ProveedorPerfil::obtenerPerfilPublicoProveedor -> ' . $e->getMessage());
+            return ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
+        }
+    }
+
+    // ======================================================================
     // REPORTE DE PROVEEDORES (admin)
     // ======================================================================
 
