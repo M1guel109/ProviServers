@@ -198,3 +198,6 @@ Stack trace:
 #0 C:\xampp\htdocs\ProviServers\index.php(476): require()
 #1 {main}
   thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 19:40:07 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))
+[19-Jun-2026 19:41:53 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))
+[19-Jun-2026 19:42:52 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))
