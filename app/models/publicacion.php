@@ -330,6 +330,83 @@ class Publicacion
     }
 
 
+    public function obtenerParaMapa(
+        ?string $ciudad      = null,
+        ?float  $lat         = null,
+        ?float  $lng         = null,
+        ?int    $radioKm     = null,
+        ?int    $categoriaId = null
+    ): array {
+        try {
+            $sql = "
+                SELECT
+                    pub.id,
+                    pub.titulo,
+                    pub.precio,
+                    s.nombre                              AS servicio_nombre,
+                    c.nombre                              AS categoria_nombre,
+                    CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre,
+                    pp.ciudad                             AS proveedor_ciudad,
+                    pp.zona                               AS proveedor_zona,
+                    pp.latitud                            AS lat,
+                    pp.longitud                           AS lng,
+                    COALESCE(AVG(v.calificacion), 0)      AS calificacion_promedio,
+                    COUNT(v.id)                           AS total_resenas,
+                    promo.porcentaje_descuento            AS promo_descuento
+                FROM publicaciones pub
+                INNER JOIN servicios       s   ON pub.servicio_id  = s.id
+                LEFT  JOIN categorias      c   ON s.id_categoria   = c.id
+                INNER JOIN proveedores     pr  ON pub.proveedor_id = pr.id
+                LEFT  JOIN proveedor_perfil pp ON pp.id_usuario    = pr.usuario_id
+                LEFT  JOIN valoraciones    v   ON v.proveedor_id   = pr.id
+                LEFT  JOIN promociones promo
+                    ON promo.publicacion_id = pub.id
+                    AND promo.fecha_inicio <= CURDATE()
+                    AND promo.fecha_fin    >= CURDATE()
+                WHERE pub.estado        = 'aprobado'
+                  AND s.disponibilidad  = 1
+                  AND pp.latitud        IS NOT NULL
+                  AND pp.longitud       IS NOT NULL
+            ";
+
+            $params = [];
+
+            if (!empty($ciudad)) {
+                $sql .= " AND (pp.ciudad LIKE :ciudad OR pp.zona LIKE :ciudad)";
+                $params[':ciudad'] = '%' . $ciudad . '%';
+            }
+
+            if ($lat !== null && $lng !== null && $radioKm !== null && $radioKm > 0) {
+                $sql .= " AND (6371 * 2 * ASIN(SQRT(
+                    POWER(SIN(RADIANS(pp.latitud  - :lat) / 2), 2)
+                    + COS(RADIANS(:lat2)) * COS(RADIANS(pp.latitud))
+                    * POWER(SIN(RADIANS(pp.longitud - :lng) / 2), 2)
+                ))) <= :radioKm";
+                $params[':lat']    = $lat;
+                $params[':lat2']   = $lat;
+                $params[':lng']    = $lng;
+                $params[':radioKm'] = $radioKm;
+            }
+
+            if (!empty($categoriaId)) {
+                $sql .= " AND s.id_categoria = :catId";
+                $params[':catId'] = (int)$categoriaId;
+            }
+
+            $sql .= " GROUP BY pub.id ORDER BY pub.created_at DESC";
+
+            $stmt = $this->conexion->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v, $k === ':catId' ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            error_log('Publicacion::obtenerParaMapa -> ' . $e->getMessage());
+            return [];
+        }
+    }
+
     public function listarPublicacionesAprobadasParaSolicitudes(): array
     {
         $sql = "

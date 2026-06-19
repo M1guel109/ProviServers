@@ -178,3 +178,4 @@ Stack trace:
 [15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php on line 75
 [15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\helpers\session-cliente.php on line 7
 [17-Jun-2026 06:35:50 Europe/Berlin] Error en Publicacion::listarPublicasActivas -> SQLSTATE[HY000]: General error: 2006 MySQL server has gone away
+[19-Jun-2026 06:20:05 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 297

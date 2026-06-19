@@ -464,6 +464,7 @@ switch ($request) {
     case '/cliente/servicios-contratados':
     case '/cliente/mis-solicitudes':
     case '/cliente/necesidades':
+    case '/cliente/mapa/datos':
         require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
