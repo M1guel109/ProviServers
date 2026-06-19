@@ -230,6 +230,37 @@ $usuario = $usuario ?? [];
                         </button>
                       </div>
                     </form>
+
+                    <hr class="mt-4">
+
+                    <!-- Zona peligrosa -->
+                    <div class="mt-3">
+                      <button type="button" class="btn btn-sm btn-outline-danger"
+                              onclick="document.getElementById('zona-eliminar-cuenta').style.display =
+                                       document.getElementById('zona-eliminar-cuenta').style.display === 'none' ? 'block' : 'none'">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar mi cuenta
+                      </button>
+                    </div>
+
+                    <div id="zona-eliminar-cuenta" style="display:none;" class="mt-3">
+                      <div class="alert alert-danger p-2 mb-3" style="font-size:0.88rem;">
+                        <strong>Advertencia:</strong> Esta acción es irreversible. Si no tienes contratos activos,
+                        tu cuenta y todos tus datos serán eliminados permanentemente.
+                      </div>
+                      <form action="<?= BASE_URL ?>/cliente/perfil/eliminar-cuenta" method="POST"
+                            onsubmit="return confirm('¿Estás seguro? Esta acción no se puede deshacer.')">
+                        <div class="mb-3">
+                          <label class="form-label">Confirma tu contraseña <span class="text-danger">*</span></label>
+                          <input type="password" name="clave_confirmar_baja" class="form-control" required
+                                 placeholder="Tu contraseña actual">
+                        </div>
+                        <div class="text-center">
+                          <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash3 me-1"></i> Eliminar mi cuenta definitivamente
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div><!-- End tab-content -->
               </div>
