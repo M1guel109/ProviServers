@@ -107,6 +107,8 @@ switch ($method) {
             guardarPagos();
         } elseif (str_contains($uri, '/proveedor/guardar-politicas') || $accion === 'actualizar_politicas') {
             guardarPoliticas();
+        } elseif (str_contains($uri, '/proveedor/eliminar-cuenta')) {
+            eliminarCuentaProveedor();
         } elseif ($accion === 'actualizar') {
             actualizarServicio();
         } else {
@@ -1166,6 +1168,26 @@ function cerrarSesiones()
     }
 
     mostrarSweetAlert('success', 'Sesión cerrada', 'Tu sesión se cerró correctamente.', BASE_URL . '/login');
+    exit();
+}
+
+function eliminarCuentaProveedor()
+{
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $resultado = (new ProveedorPerfil())->eliminarCuenta($idUsuario);
+
+    switch ($resultado) {
+        case 'eliminado':
+        case 'desactivado':
+            $_SESSION = [];
+            session_unset();
+            session_destroy();
+            mostrarSweetAlert('success', 'Cuenta eliminada', 'Tu cuenta ha sido eliminada. ¡Hasta pronto!', BASE_URL . '/login');
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'No se pudo procesar tu solicitud. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion');
+    }
     exit();
 }
 

@@ -465,6 +465,55 @@ class ProveedorPerfil
     }
 
     // ======================================================================
+    // ELIMINACIÓN DE CUENTA — proveedor
+    // ======================================================================
+
+    public function eliminarCuenta(int $usuarioId): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+
+            $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
+            if (!$proveedorId) { $this->conexion->rollBack(); return 'error'; }
+
+            // 1. Verificar contratos activos
+            $stmtAct = $this->conexion->prepare(
+                "SELECT COUNT(*) FROM servicios_contratados
+                 WHERE proveedor_id = :pid
+                   AND estado IN ('pendiente','confirmado','en_proceso')"
+            );
+            $stmtAct->execute([':pid' => $proveedorId]);
+            $tieneActivos = (int)$stmtAct->fetchColumn() > 0;
+
+            if ($tieneActivos) {
+                $this->conexion->prepare("UPDATE usuarios SET estado_id = 4 WHERE id = :uid")
+                    ->execute([':uid' => $usuarioId]);
+                $this->conexion->commit();
+                return 'desactivado';
+            }
+
+            // 2. Hard delete — limpiar dependencias
+            $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM proveedor_perfil WHERE id_usuario = :uid")
+                ->execute([':uid' => $usuarioId]);
+            $this->conexion->prepare("DELETE FROM proveedores WHERE id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM usuarios WHERE id = :uid")
+                ->execute([':uid' => $usuarioId]);
+
+            $this->conexion->commit();
+            return 'eliminado';
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            error_log('ProveedorPerfil::eliminarCuenta -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
+
+    // ======================================================================
     // PERFIL PÚBLICO — datos visibles para clientes en el detalle de servicio
     // ======================================================================
 
