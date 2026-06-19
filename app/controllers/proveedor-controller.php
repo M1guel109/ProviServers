@@ -1243,7 +1243,7 @@ function guardarPoliticas()
     $ofreceGarantia         = isset($_POST['ofrece_garantia'])        ? 1 : 0;
     $diasGarantia           = trim($_POST['dias_garantia']           ?? '');
     $detallesGarantia       = trim($_POST['detalles_garantia']       ?? '');
-    $soloContactoPlataforma = isset($_POST['solo_contacto_por_plataforma']) ? 1 : 0;
+    $soloContactoPlataforma = 1; // Regla de plataforma: siempre obligatorio
     $tiempoRespuesta        = trim($_POST['tiempo_respuesta_promedio'] ?? '');
     $otrasCondiciones       = trim($_POST['otras_condiciones']        ?? '');
 
