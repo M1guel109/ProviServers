@@ -12,6 +12,7 @@ $seguridad        = [];
 $disponibilidad   = [];
 $notificaciones   = [];
 $pagosFacturacion = [];
+$politicas        = [];
 
 if ($idUsuario > 0) {
     try {
@@ -25,6 +26,9 @@ if ($idUsuario > 0) {
 
         $dispBD = $modeloPerfil->obtenerDisponibilidadPorUsuario($idUsuario);
         if ($dispBD) $disponibilidad = $dispBD;
+
+        $politicasBD = $modeloPerfil->obtenerPoliticasPorUsuario($idUsuario);
+        if ($politicasBD) $politicas = $politicasBD;
 
         $modeloNotif = new ProveedorNotificaciones();
         $notifBD = $modeloNotif->obtenerPorUsuario($idUsuario);
@@ -113,6 +117,12 @@ if ($idUsuario > 0) {
                     <button class="nav-link" id="pagos-tab" data-bs-toggle="tab"
                         data-bs-target="#pagos" type="button" role="tab">
                         <i class="bi bi-cash-stack me-1"></i> Pagos
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="politicas-tab" data-bs-toggle="tab"
+                        data-bs-target="#politicas" type="button" role="tab">
+                        <i class="bi bi-file-earmark-text me-1"></i> Políticas
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -1080,6 +1090,140 @@ if ($idUsuario > 0) {
 
 
                 <!-- Políticas de servicio -->
+                <div class="tab-pane fade" id="politicas" role="tabpanel" aria-labelledby="politicas-tab">
+                    <div class="card border-0 shadow-sm p-4">
+                        <h4 class="mb-1">Políticas de servicio</h4>
+                        <p class="text-muted mb-4">Define tus condiciones de cancelación, garantías y normas de trabajo.</p>
+
+                        <?php
+                        $tipoCancelacionActual       = $politicas['tipo_cancelacion']            ?? 'moderada';
+                        $descCancelacionActual       = $politicas['descripcion_cancelacion']     ?? '';
+                        $permiteReprogramarActual    = !empty($politicas['permite_reprogramar']);
+                        $horasReprogramarActual      = $politicas['horas_min_reprogramacion']    ?? '';
+                        $cobraVisitaActual           = !empty($politicas['cobra_visita']);
+                        $valorVisitaActual           = $politicas['valor_visita']                ?? '';
+                        $ofreceGarantiaActual        = !empty($politicas['ofrece_garantia']);
+                        $diasGarantiaActual          = $politicas['dias_garantia']               ?? '';
+                        $detallesGarantiaActual      = $politicas['detalles_garantia']           ?? '';
+                        $soloPlataformaActual        = !empty($politicas['solo_contacto_por_plataforma']);
+                        $tiempoRespuestaActual       = $politicas['tiempo_respuesta_promedio']   ?? '';
+                        $otrasCondicionesActual      = $politicas['otras_condiciones']           ?? '';
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-politicas" method="POST">
+                            <div class="row g-4">
+
+                                <!-- Columna izquierda: Cancelación y reprogramación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Cancelación y reprogramación</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Política de cancelación <span class="text-danger">*</span></label>
+                                        <select name="tipo_cancelacion" class="form-select">
+                                            <option value="flexible"  <?= $tipoCancelacionActual === 'flexible'  ? 'selected' : '' ?>>Flexible — El cliente puede cancelar sin costo</option>
+                                            <option value="moderada"  <?= $tipoCancelacionActual === 'moderada'  ? 'selected' : '' ?>>Moderada — Cancelación con aviso previo</option>
+                                            <option value="estricta"  <?= $tipoCancelacionActual === 'estricta'  ? 'selected' : '' ?>>Estricta — No se permiten cancelaciones</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción de tu política de cancelación</label>
+                                        <textarea name="descripcion_cancelacion" class="form-control" rows="3"
+                                            placeholder="Describe tus condiciones de cancelación..."><?= htmlspecialchars($descCancelacionActual) ?></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="permite_reprogramar"
+                                                name="permite_reprogramar" <?= $permiteReprogramarActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="permite_reprogramar">Permito reprogramar citas</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="campo-horas-reprogramar" <?= $permiteReprogramarActual ? '' : 'style="display:none"' ?>>
+                                        <label class="form-label">Horas mínimas de aviso para reprogramar</label>
+                                        <input type="number" name="horas_min_reprogramacion" class="form-control"
+                                            min="0" placeholder="Ej: 24"
+                                            value="<?= htmlspecialchars((string)$horasReprogramarActual) ?>">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="cobra_visita"
+                                                name="cobra_visita" <?= $cobraVisitaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="cobra_visita">Cobro visita de diagnóstico</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="campo-valor-visita" <?= $cobraVisitaActual ? '' : 'style="display:none"' ?>>
+                                        <label class="form-label">Valor de la visita ($)</label>
+                                        <input type="number" name="valor_visita" class="form-control"
+                                            min="0" step="1000" placeholder="Ej: 30000"
+                                            value="<?= htmlspecialchars((string)$valorVisitaActual) ?>">
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: Garantía y condiciones generales -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Garantía y condiciones generales</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="ofrece_garantia"
+                                                name="ofrece_garantia" <?= $ofreceGarantiaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="ofrece_garantia">Ofrezco garantía por el trabajo</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="campos-garantia" <?= $ofreceGarantiaActual ? '' : 'style="display:none"' ?>>
+                                        <div class="mb-3">
+                                            <label class="form-label">Días de garantía</label>
+                                            <input type="number" name="dias_garantia" class="form-control"
+                                                min="1" placeholder="Ej: 30"
+                                                value="<?= htmlspecialchars((string)$diasGarantiaActual) ?>">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Detalles de la garantía</label>
+                                            <textarea name="detalles_garantia" class="form-control" rows="2"
+                                                placeholder="¿Qué cubre la garantía?"><?= htmlspecialchars($detallesGarantiaActual) ?></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info d-flex gap-2 align-items-start mb-3">
+                                        <i class="bi bi-shield-check fs-5 mt-1"></i>
+                                        <div>
+                                            <strong>Contacto exclusivo por la plataforma</strong><br>
+                                            <small>Toda comunicación y contratación debe realizarse a través de ProviServers. No está permitido acordar servicios por WhatsApp, llamadas u otros canales externos.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Tiempo de respuesta promedio</label>
+                                        <input type="text" name="tiempo_respuesta_promedio" class="form-control"
+                                            maxlength="50" placeholder="Ej: Menos de 2 horas"
+                                            value="<?= htmlspecialchars($tiempoRespuestaActual) ?>">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Otras condiciones</label>
+                                        <textarea name="otras_condiciones" class="form-control" rows="3"
+                                            placeholder="Cualquier condición adicional que el cliente deba saber..."><?= htmlspecialchars($otrasCondicionesActual) ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-floppy me-1"></i> Guardar políticas
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
             </div>
         </section>
@@ -1122,6 +1266,18 @@ if ($idUsuario > 0) {
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-proveedor.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/configuracion-proveedor.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script>
+    // Toggles condicionales del tab Políticas
+    document.getElementById('permite_reprogramar').addEventListener('change', function () {
+        document.getElementById('campo-horas-reprogramar').style.display = this.checked ? '' : 'none';
+    });
+    document.getElementById('cobra_visita').addEventListener('change', function () {
+        document.getElementById('campo-valor-visita').style.display = this.checked ? '' : 'none';
+    });
+    document.getElementById('ofrece_garantia').addEventListener('change', function () {
+        document.getElementById('campos-garantia').style.display = this.checked ? '' : 'none';
+    });
+    </script>
 </body>
 
 </html>

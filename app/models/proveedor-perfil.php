@@ -465,6 +465,103 @@ class ProveedorPerfil
     }
 
     // ======================================================================
+    // ELIMINACIÓN DE CUENTA — proveedor
+    // ======================================================================
+
+    public function eliminarCuenta(int $usuarioId): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+
+            $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
+            if (!$proveedorId) { $this->conexion->rollBack(); return 'error'; }
+
+            // 1. Verificar contratos activos
+            $stmtAct = $this->conexion->prepare(
+                "SELECT COUNT(*) FROM servicios_contratados
+                 WHERE proveedor_id = :pid
+                   AND estado IN ('pendiente','confirmado','en_proceso')"
+            );
+            $stmtAct->execute([':pid' => $proveedorId]);
+            $tieneActivos = (int)$stmtAct->fetchColumn() > 0;
+
+            if ($tieneActivos) {
+                $this->conexion->prepare("UPDATE usuarios SET estado_id = 4 WHERE id = :uid")
+                    ->execute([':uid' => $usuarioId]);
+                $this->conexion->commit();
+                return 'desactivado';
+            }
+
+            // 2. Hard delete — limpiar dependencias
+            $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM proveedor_perfil WHERE id_usuario = :uid")
+                ->execute([':uid' => $usuarioId]);
+            $this->conexion->prepare("DELETE FROM proveedores WHERE id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM usuarios WHERE id = :uid")
+                ->execute([':uid' => $usuarioId]);
+
+            $this->conexion->commit();
+            return 'eliminado';
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            error_log('ProveedorPerfil::eliminarCuenta -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
+
+    // ======================================================================
+    // PERFIL PÚBLICO — datos visibles para clientes en el detalle de servicio
+    // ======================================================================
+
+    public function obtenerPerfilPublicoProveedor(int $usuarioId): array
+    {
+        try {
+            $stmtPerfil = $this->conexion->prepare(
+                "SELECT nombre_comercial, tipo_proveedor, eslogan, descripcion,
+                        anios_experiencia, idiomas, ciudad, zona,
+                        telefono_contacto, whatsapp, correo_alternativo, foto
+                 FROM proveedor_perfil WHERE id_usuario = :uid LIMIT 1"
+            );
+            $stmtPerfil->execute([':uid' => $usuarioId]);
+            $perfil = $stmtPerfil->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtPoliticas = $this->conexion->prepare(
+                "SELECT ps.tipo_cancelacion, ps.descripcion_cancelacion,
+                        ps.permite_reprogramar, ps.horas_min_reprogramacion,
+                        ps.cobra_visita, ps.valor_visita,
+                        ps.ofrece_garantia, ps.dias_garantia, ps.detalles_garantia,
+                        ps.tiempo_respuesta_promedio, ps.otras_condiciones
+                 FROM proveedores_politicas_servicio ps
+                 INNER JOIN proveedores p ON ps.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtPoliticas->execute([':uid' => $usuarioId]);
+            $politicas = $stmtPoliticas->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtDisp = $this->conexion->prepare(
+                "SELECT d.dias_semana, d.hora_inicio, d.hora_fin,
+                        d.atiende_fines_semana, d.atiende_festivos,
+                        d.atencion_urgencias, d.detalle_urgencias,
+                        d.tipo_zona, d.radio_km
+                 FROM proveedores_disponibilidad d
+                 INNER JOIN proveedores p ON d.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtDisp->execute([':uid' => $usuarioId]);
+            $disponibilidad = $stmtDisp->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            return compact('perfil', 'politicas', 'disponibilidad');
+        } catch (PDOException $e) {
+            error_log('ProveedorPerfil::obtenerPerfilPublicoProveedor -> ' . $e->getMessage());
+            return ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
+        }
+    }
+
+    // ======================================================================
     // REPORTE DE PROVEEDORES (admin)
     // ======================================================================
 

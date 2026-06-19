@@ -1,4 +1,7 @@
-﻿<?php $usuario = $usuario ?? []; ?>
+﻿<?php
+require_once BASE_PATH . '/app/helpers/session-cliente.php';
+$usuario = $usuario ?? [];
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -73,7 +76,10 @@
                 <h2><?= htmlspecialchars($usuario['nombres'] ?? '') ?></h2>
                 <h3 class="text-muted"><?= htmlspecialchars($usuario['correo'] ?? '') ?></h3>
 
-                <button class="btn btn-outline-primary btn-sm mt-2">Cambiar foto</button>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2"
+                        onclick="document.getElementById('inputFotoPerfil').click()">
+                    <i class="bi bi-camera me-1"></i>Cambiar foto
+                </button>
               </div>
             </div>
           </div>
@@ -92,7 +98,7 @@
                     <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-edit" role="tab">Editar Perfil</button>
                   </li>
                   <li class="nav-item">
-                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" role="tab">Cambiar Contraseña</button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profile-change-password" role="tab">Cuenta y Seguridad</button>
                   </li>
                 </ul>
 
@@ -148,9 +154,15 @@
                           <input type="text" name="ubicacion" class="form-control"
                                  value="<?= htmlspecialchars($usuario['ubicacion'] ?? $usuario['direccion'] ?? '') ?>">
                         </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Correo electrónico</label>
+                          <input type="text" class="form-control bg-light" readonly
+                                 value="<?= htmlspecialchars($usuario['correo'] ?? '') ?>">
+                          <small class="text-muted">Para cambiar el correo ve a la pestaña <strong>Cuenta y Seguridad</strong>.</small>
+                        </div>
                         <div class="col-12">
                           <label class="form-label">Foto de perfil</label>
-                          <input type="file" name="foto" class="form-control" accept="image/*">
+                          <input type="file" name="foto" id="inputFotoPerfil" class="form-control" accept="image/*">
                           <small class="text-muted">JPG, PNG o WEBP — máx 2MB. Deja vacío para mantener la actual.</small>
                         </div>
                       </div>
@@ -163,9 +175,42 @@
                     </form>
                   </div>
 
-                  <!-- Cambiar Contraseña -->
+                  <!-- Cuenta y Seguridad -->
                   <div class="tab-pane fade pt-3" id="profile-change-password">
-                    <h5 class="card-title">Cambiar Contraseña</h5>
+
+                    <!-- Cambiar correo -->
+                    <h5 class="card-title">Cambiar correo electrónico</h5>
+                    <form action="<?= BASE_URL ?>/cliente/perfil/cambiar-email" method="POST" class="mb-4">
+                      <div class="mb-3">
+                        <label class="form-label">Correo actual</label>
+                        <input type="text" class="form-control bg-light" readonly
+                               value="<?= htmlspecialchars($usuario['correo'] ?? '') ?>">
+                      </div>
+                      <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                          <label class="form-label">Nuevo correo <span class="text-danger">*</span></label>
+                          <input type="email" name="email_nuevo" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">Confirmar nuevo correo <span class="text-danger">*</span></label>
+                          <input type="email" name="email_confirma" class="form-control" required>
+                        </div>
+                      </div>
+                      <div class="mb-3">
+                        <label class="form-label">Contraseña actual (para confirmar) <span class="text-danger">*</span></label>
+                        <input type="password" name="clave_actual" class="form-control" required>
+                      </div>
+                      <div class="text-center">
+                        <button type="submit" class="btn btn-primary">
+                          <i class="bi bi-envelope-check me-1"></i> Actualizar correo
+                        </button>
+                      </div>
+                    </form>
+
+                    <hr>
+
+                    <!-- Cambiar contraseña -->
+                    <h5 class="card-title mt-3">Cambiar contraseña</h5>
                     <form id="formCambioClave" action="<?= BASE_URL ?>/cliente/perfil/cambiar-clave" method="POST">
                       <div class="mb-3">
                         <label class="form-label" for="currentPassword">Contraseña actual</label>
@@ -180,9 +225,42 @@
                         <input name="clave_confirmar" id="renewPassword" type="password" class="form-control" required>
                       </div>
                       <div class="text-center">
-                        <button type="submit" name="cambiar_clave" class="btn btn-primary">Cambiar Contraseña</button>
+                        <button type="submit" class="btn btn-outline-primary">
+                          <i class="bi bi-key me-1"></i> Cambiar contraseña
+                        </button>
                       </div>
                     </form>
+
+                    <hr class="mt-4">
+
+                    <!-- Zona peligrosa -->
+                    <div class="mt-3">
+                      <button type="button" class="btn btn-sm btn-outline-danger"
+                              onclick="document.getElementById('zona-eliminar-cuenta').style.display =
+                                       document.getElementById('zona-eliminar-cuenta').style.display === 'none' ? 'block' : 'none'">
+                        <i class="bi bi-trash3 me-1"></i> Eliminar mi cuenta
+                      </button>
+                    </div>
+
+                    <div id="zona-eliminar-cuenta" style="display:none;" class="mt-3">
+                      <div class="alert alert-danger p-2 mb-3" style="font-size:0.88rem;">
+                        <strong>Advertencia:</strong> Esta acción es irreversible. Si no tienes contratos activos,
+                        tu cuenta y todos tus datos serán eliminados permanentemente.
+                      </div>
+                      <form action="<?= BASE_URL ?>/cliente/perfil/eliminar-cuenta" method="POST"
+                            onsubmit="return confirm('¿Estás seguro? Esta acción no se puede deshacer.')">
+                        <div class="mb-3">
+                          <label class="form-label">Confirma tu contraseña <span class="text-danger">*</span></label>
+                          <input type="password" name="clave_confirmar_baja" class="form-control" required
+                                 placeholder="Tu contraseña actual">
+                        </div>
+                        <div class="text-center">
+                          <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash3 me-1"></i> Eliminar mi cuenta definitivamente
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div><!-- End tab-content -->
               </div>
@@ -197,6 +275,17 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
+
+  <script>
+    document.getElementById('inputFotoPerfil').addEventListener('change', function () {
+      if (!this.files || !this.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        document.querySelector('.profile-card img').src = e.target.result;
+      };
+      reader.readAsDataURL(this.files[0]);
+    });
+  </script>
 </body>
 
 </html>

@@ -415,6 +415,7 @@ switch ($request) {
     case '/proveedor/guardar-notificaciones':
     case '/proveedor/guardar-pagos':
     case '/proveedor/guardar-politicas':
+    case '/proveedor/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
@@ -543,6 +544,8 @@ switch ($request) {
         break;
 
     case '/cliente/perfil/cambiar-clave':
+    case '/cliente/perfil/cambiar-email':
+    case '/cliente/perfil/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
         break;
 
