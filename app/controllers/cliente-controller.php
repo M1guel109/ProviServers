@@ -35,6 +35,8 @@ switch ($method) {
     case 'GET':
         if (str_contains($uri, '/cliente/contrato/seguimiento')) {
             seguimientoContratoJSON('cliente');
+        } elseif (str_contains($uri, '/cliente/mapa/datos')) {
+            datosMapaJSON();
         } elseif (str_contains($uri, 'contrato-pdf')) {
             generarComprobantePDFCliente();
         } elseif (str_contains($uri, 'explorar')) {
@@ -938,5 +940,50 @@ function agregarComentarioContrato(string $rol): void
     );
 
     echo json_encode(['ok' => $ok, 'message' => $ok ? 'Comentario registrado.' : 'Error al guardar.']);
+    exit();
+}
+
+// ===================================================================
+// MAPA INTERACTIVO — Endpoint JSON (#160)
+// ===================================================================
+
+function datosMapaJSON(): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $ciudad  = trim($_GET['ciudad'] ?? '');
+    $lat     = isset($_GET['lat'])   && is_numeric($_GET['lat'])   ? (float)$_GET['lat']   : null;
+    $lng     = isset($_GET['lng'])   && is_numeric($_GET['lng'])   ? (float)$_GET['lng']   : null;
+    $radioKm = isset($_GET['radio']) && is_numeric($_GET['radio']) ? (int)$_GET['radio']   : 10;
+    $catId   = isset($_GET['cat'])   && is_numeric($_GET['cat'])   ? (int)$_GET['cat']     : null;
+
+    $modelo     = new Publicacion();
+    $resultados = $modelo->obtenerParaMapa(
+        $ciudad ?: null,
+        $lat,
+        $lng,
+        ($lat !== null && $lng !== null) ? $radioKm : null,
+        $catId
+    );
+
+    $base = BASE_URL;
+    $marcadores = array_map(fn($p) => [
+        'id'          => (int)$p['id'],
+        'titulo'      => $p['titulo'],
+        'precio'      => (float)$p['precio'],
+        'servicio'    => $p['servicio_nombre'],
+        'categoria'   => $p['categoria_nombre'] ?? '',
+        'proveedor'   => $p['proveedor_nombre'],
+        'ciudad'      => trim(($p['proveedor_ciudad'] ?? '') . ($p['proveedor_zona'] ? ' — ' . $p['proveedor_zona'] : '')),
+        'lat'         => (float)$p['lat'],
+        'lng'         => (float)$p['lng'],
+        'calificacion'=> round((float)$p['calificacion_promedio'], 1),
+        'resenas'     => (int)$p['total_resenas'],
+        'descuento'   => (int)($p['promo_descuento'] ?? 0),
+        'url'         => $base . '/cliente/publicacion?id=' . $p['id'],
+    ], $resultados);
+
+    echo json_encode(['ok' => true, 'total' => count($marcadores), 'marcadores' => $marcadores]);
     exit();
 }
