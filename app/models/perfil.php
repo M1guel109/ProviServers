@@ -61,20 +61,13 @@ class Perfil
             $this->conexion->beginTransaction();
             $tabla = $this->getTablaDetalle($rol);
 
-            // 1. Actualizar Usuario (Email y Clave si existe)
-            $sqlUser = "UPDATE usuarios SET email = :email";
-            $paramsUser = [':email' => $data['email'], ':id' => $id];
-            if (!empty($data['clave'])) {
-                $sqlUser .= ", clave = :clave";
-                $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
-            }
-            $sqlUser .= " WHERE id = :id";
-            $this->conexion->prepare($sqlUser)->execute($paramsUser);
-
-            // 2. Actualizar Tabla de Detalle
-            $sqlDetalle = "UPDATE $tabla SET 
-                            nombres = :nom, apellidos = :ape, 
-                            telefono = :tel, ubicacion = :ubi, foto = :foto 
+            // Solo actualiza datos del detalle — email se cambia en flujo separado con contraseña
+            $sqlDetalle = "UPDATE $tabla SET
+                            nombres   = :nom,
+                            apellidos = :ape,
+                            telefono  = :tel,
+                            ubicacion = :ubi,
+                            foto      = :foto
                            WHERE usuario_id = :id";
             $this->conexion->prepare($sqlDetalle)->execute([
                 ':nom'  => $data['nombres'],
@@ -82,14 +75,41 @@ class Perfil
                 ':tel'  => $data['telefono'],
                 ':ubi'  => $data['ubicacion'],
                 ':foto' => $data['foto'],
-                ':id'   => $id
+                ':id'   => $id,
             ]);
 
             $this->conexion->commit();
             return true;
         } catch (Exception $e) {
             $this->conexion->rollBack();
+            error_log('Perfil::actualizarPerfil -> ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function cambiarEmail(int $id, string $claveActual, string $emailNuevo): string
+    {
+        try {
+            $stmt = $this->conexion->prepare("SELECT clave FROM usuarios WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) return 'error';
+            if (!password_verify($claveActual, $usuario['clave'])) return 'clave_incorrecta';
+
+            $stmtCheck = $this->conexion->prepare(
+                "SELECT id FROM usuarios WHERE email = :email AND id <> :id LIMIT 1"
+            );
+            $stmtCheck->execute([':email' => $emailNuevo, ':id' => $id]);
+            if ($stmtCheck->fetch()) return 'email_duplicado';
+
+            $this->conexion->prepare("UPDATE usuarios SET email = :email WHERE id = :id")
+                ->execute([':email' => $emailNuevo, ':id' => $id]);
+
+            return 'ok';
+        } catch (Exception $e) {
+            error_log('Perfil::cambiarEmail -> ' . $e->getMessage());
+            return 'error';
         }
     }
 

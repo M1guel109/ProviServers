@@ -543,6 +543,7 @@ switch ($request) {
         break;
 
     case '/cliente/perfil/cambiar-clave':
+    case '/cliente/perfil/cambiar-email':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
         break;
 
