@@ -455,25 +455,28 @@ class Usuario
                 $pid = $stmtPid->fetchColumn();
 
                 if ($pid) {
-                    // Si tienes tabla de servicios, descomenta esto:
-                    /*
-                    $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE proveedor_id = :pid"); 
+                    $stmtCheck = $this->conexion->prepare(
+                        "SELECT COUNT(*) FROM servicios_contratados
+                         WHERE proveedor_id = :pid
+                           AND estado IN ('pendiente','confirmado','en_proceso')"
+                    );
                     $stmtCheck->execute([':pid' => $pid]);
                     if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
-                    */
                 }
             } elseif ($rol === 'cliente') {
                 $stmtCid = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = :id");
                 $stmtCid->execute([':id' => $id]);
                 $cid = $stmtCid->fetchColumn();
 
-                /*
                 if ($cid) {
-                   $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE cliente_id = :cid");
-                   $stmtCheck->execute([':cid' => $cid]);
-                   if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                    $stmtCheck = $this->conexion->prepare(
+                        "SELECT COUNT(*) FROM servicios_contratados
+                         WHERE cliente_id = :cid
+                           AND estado IN ('pendiente','confirmado','en_proceso')"
+                    );
+                    $stmtCheck->execute([':cid' => $cid]);
+                    if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
                 }
-                */
             }
 
             // =========================================================
@@ -493,13 +496,16 @@ class Usuario
 
                 // --- LIMPIEZA DE DEPENDENCIAS (Solo Proveedores) ---
                 if ($rol === 'proveedor' && $pid) {
-                    // Categorías (Asegúrate de usar el nombre de columna correcto que te funcionó)
-                    $delCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
-                    $delCat->execute([':pid' => $pid]);
-
-                    // Documentos (Asegúrate de usar el nombre de columna correcto)
-                    $delDoc = $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid");
-                    $delDoc->execute([':pid' => $pid]);
+                    foreach ([
+                        "DELETE FROM proveedor_categorias          WHERE proveedor_id = :pid",
+                        "DELETE FROM documentos_proveedor          WHERE proveedor_id = :pid",
+                        "DELETE FROM proveedores_disponibilidad    WHERE proveedor_id = :pid",
+                        "DELETE FROM proveedores_politicas_servicio WHERE proveedor_id = :pid",
+                    ] as $sql) {
+                        $this->conexion->prepare($sql)->execute([':pid' => $pid]);
+                    }
+                    $this->conexion->prepare("DELETE FROM proveedor_perfil WHERE id_usuario = :id")
+                        ->execute([':id' => $id]);
                 }
 
                 // 3. Borrar Perfil
