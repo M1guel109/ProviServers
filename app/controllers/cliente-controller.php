@@ -10,6 +10,7 @@ require_once __DIR__ . '/../models/necesidad.php';
 require_once __DIR__ . '/../models/cotizacion.php';
 require_once __DIR__ . '/../models/Notificacion.php';
 require_once __DIR__ . '/../models/SeguimientoContrato.php';
+require_once __DIR__ . '/../models/cliente-notificaciones.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
@@ -77,6 +78,8 @@ switch ($method) {
             eliminarMetodoPago();
         } elseif ($accion === 'tokenizar_tarjeta') {
             guardarTarjetaTokenizada();
+        } elseif (str_contains($uri, '/cliente/guardar-notificaciones')) {
+            guardarNotificacionesCliente();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -949,47 +952,30 @@ function agregarComentarioContrato(string $rol): void
     exit();
 }
 
-// ===================================================================
-// MAPA INTERACTIVO — Endpoint JSON (#160)
-// ===================================================================
+// =======================================================================
+// PREFERENCIAS DE NOTIFICACIONES
+// =======================================================================
 
-function datosMapaJSON(): void
+function guardarNotificacionesCliente(): void
 {
-    ob_clean();
-    header('Content-Type: application/json; charset=utf-8');
+    $idUsuario = (int)$_SESSION['user']['id'];
+    $data = [
+        'noti_cambios_estado'    => isset($_POST['noti_cambios_estado'])    ? 1 : 0,
+        'noti_nueva_cotizacion'  => isset($_POST['noti_nueva_cotizacion'])  ? 1 : 0,
+        'noti_recordatorio_pago' => isset($_POST['noti_recordatorio_pago']) ? 1 : 0,
+        'noti_resenas'           => isset($_POST['noti_resenas'])           ? 1 : 0,
+        'canal_email'            => isset($_POST['canal_email'])            ? 1 : 0,
+        'canal_interna'          => isset($_POST['canal_interna'])          ? 1 : 0,
+        'resumen_diario'         => isset($_POST['resumen_diario'])         ? 1 : 0,
+        'resumen_semanal'        => isset($_POST['resumen_semanal'])        ? 1 : 0,
+    ];
 
-    $ciudad  = trim($_GET['ciudad'] ?? '');
-    $lat     = isset($_GET['lat'])   && is_numeric($_GET['lat'])   ? (float)$_GET['lat']   : null;
-    $lng     = isset($_GET['lng'])   && is_numeric($_GET['lng'])   ? (float)$_GET['lng']   : null;
-    $radioKm = isset($_GET['radio']) && is_numeric($_GET['radio']) ? (int)$_GET['radio']   : 10;
-    $catId   = isset($_GET['cat'])   && is_numeric($_GET['cat'])   ? (int)$_GET['cat']     : null;
+    $ok = (new ClienteNotificaciones())->guardarDesdeFormulario($idUsuario, $data);
 
-    $modelo     = new Publicacion();
-    $resultados = $modelo->obtenerParaMapa(
-        $ciudad ?: null,
-        $lat,
-        $lng,
-        ($lat !== null && $lng !== null) ? $radioKm : null,
-        $catId
-    );
-
-    $base = BASE_URL;
-    $marcadores = array_map(fn($p) => [
-        'id'          => (int)$p['id'],
-        'titulo'      => $p['titulo'],
-        'precio'      => (float)$p['precio'],
-        'servicio'    => $p['servicio_nombre'],
-        'categoria'   => $p['categoria_nombre'] ?? '',
-        'proveedor'   => $p['proveedor_nombre'],
-        'ciudad'      => trim(($p['proveedor_ciudad'] ?? '') . ($p['proveedor_zona'] ? ' — ' . $p['proveedor_zona'] : '')),
-        'lat'         => (float)$p['lat'],
-        'lng'         => (float)$p['lng'],
-        'calificacion'=> round((float)$p['calificacion_promedio'], 1),
-        'resenas'     => (int)$p['total_resenas'],
-        'descuento'   => (int)($p['promo_descuento'] ?? 0),
-        'url'         => $base . '/cliente/publicacion?id=' . $p['id'],
-    ], $resultados);
-
-    echo json_encode(['ok' => true, 'total' => count($marcadores), 'marcadores' => $marcadores]);
+    if ($ok) {
+        mostrarSweetAlert('success', 'Preferencias guardadas', 'Tus preferencias de notificación se actualizaron correctamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
+    }
     exit();
 }
