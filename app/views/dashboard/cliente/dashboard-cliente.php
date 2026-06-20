@@ -68,7 +68,25 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
             </div>
         </section>
 
-        <!-- TARJETAS DE ESTADÍSTICAS (estilo consistente) -->
+        <!-- BARRA DE CONTROL DEL DASHBOARD -->
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <div id="hidden-widgets-container" class="d-none">
+                <span class="small text-muted me-2">Widgets ocultos:</span>
+                <div id="hidden-widgets-panel" class="d-inline"></div>
+            </div>
+            <button id="btn-restaurar-dashboard" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar configuración
+            </button>
+        </div>
+
+        <div id="dashboard-grid">
+
+        <!-- WIDGET: ESTADÍSTICAS -->
+        <div class="widget-card mb-4" data-widget-id="estadisticas" data-label="Estadísticas">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="estadisticas" title="Ocultar">✕</button>
+            </div>
         <section class="row g-4 mb-5">
             <div class="col-md-3 col-sm-6">
                 <div class="tarjeta-estadistica">
@@ -114,7 +132,14 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
             </div>
         </section>
 
-        <!-- ACCIONES RÁPIDAS -->
+        </section></div><!-- /widget estadisticas -->
+
+        <!-- WIDGET: ACCIONES RÁPIDAS -->
+        <div class="widget-card mb-4" data-widget-id="acciones-rapidas" data-label="Acciones rápidas">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="acciones-rapidas" title="Ocultar">✕</button>
+            </div>
         <section class="mb-5">
             <h5 class="fw-bold mb-4"><?= __('cliente_que_necesitas') ?></h5>
             <div class="d-flex gap-3 flex-wrap">
@@ -130,7 +155,14 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
             </div>
         </section>
 
-        <!-- SERVICIOS EN CURSO -->
+        </section></div><!-- /widget acciones-rapidas -->
+
+        <!-- WIDGET: SERVICIOS EN CURSO -->
+        <div class="widget-card mb-4" data-widget-id="servicios-curso" data-label="Servicios en curso">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="servicios-curso" title="Ocultar">✕</button>
+            </div>
         <section class="mb-5">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="fw-bold mb-0"><?= __('cliente_servicios_curso') ?></h5>
@@ -206,7 +238,14 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
             </div>
         </section>
 
-        <!-- CATEGORÍAS POPULARES -->
+        </section></div><!-- /widget servicios-curso -->
+
+        <!-- WIDGET: CATEGORÍAS POPULARES -->
+        <div class="widget-card mb-4" data-widget-id="categorias" data-label="Categorías populares">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="categorias" title="Ocultar">✕</button>
+            </div>
         <section class="mb-5">
             <h5 class="fw-bold mb-4"><?= __('cliente_categorias_populares') ?></h5>
             <div class="row g-4">
@@ -236,6 +275,10 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
                 <?php endforeach; ?>
             </div>
         </section>
+
+        </section></div><!-- /widget categorias -->
+
+        </div><!-- /#dashboard-grid -->
 
     </main>
 
@@ -420,6 +463,8 @@ $califPromedio = !empty($ratings) ? round(array_sum($ratings) / count($ratings),
     </script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-personalizable.js"></script>
 </body>
 
 </html>
