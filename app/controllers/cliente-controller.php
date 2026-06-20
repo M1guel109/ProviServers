@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../helpers/alert-helper.php';
 require_once __DIR__ . '/../models/publicacion.php';
+require_once __DIR__ . '/../models/proveedor-perfil.php';
 require_once __DIR__ . '/../models/servicio-contratado.php';
 require_once __DIR__ . '/../models/valoracion.php';
 require_once __DIR__ . '/../models/solicitud.php';
@@ -34,7 +35,11 @@ $uri    = $_SERVER['REQUEST_URI'];
 switch ($method) {
 
     case 'GET':
-        if (str_contains($uri, 'contrato-pdf')) {
+        if (str_contains($uri, '/cliente/contrato/seguimiento')) {
+            seguimientoContratoJSON('cliente');
+        } elseif (str_contains($uri, '/cliente/mapa/datos')) {
+            datosMapaJSON();
+        } elseif (str_contains($uri, 'contrato-pdf')) {
             generarComprobantePDFCliente();
         } elseif (str_contains($uri, 'explorar')) {
             mostrarCatalogoPublico();
@@ -53,7 +58,9 @@ switch ($method) {
     case 'POST':
         $accion = $_POST['accion'] ?? '';
 
-        if ($accion === 'calificar_servicio') {
+        if (str_contains($uri, '/cliente/contrato/comentario')) {
+            agregarComentarioContrato('cliente');
+        } elseif ($accion === 'calificar_servicio') {
             calificarServicio();
         } elseif ($accion === 'cancelar_servicio') {
             cancelarServicio();
@@ -92,15 +99,18 @@ switch ($method) {
 
 function mostrarCatalogoPublico()
 {
-    $busqueda       = trim($_GET['q']      ?? '');
-    $categoriaId    = isset($_GET['cat']) && $_GET['cat'] !== '' ? (int)$_GET['cat'] : null;
-    $ciudad         = trim($_GET['ciudad'] ?? '');
-    $precioMax      = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
-    $orden          = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
-                      ? $_GET['orden'] : 'recientes';
-    $soloOfertas    = isset($_GET['ofertas']) && $_GET['ofertas'] === '1';
+    $busqueda        = trim($_GET['q']      ?? '');
+    $categoriaId     = isset($_GET['cat']) && $_GET['cat'] !== '' ? (int)$_GET['cat'] : null;
+    $ciudad          = trim($_GET['ciudad'] ?? '');
+    $precioMax       = isset($_GET['precio_max']) && $_GET['precio_max'] !== '' ? (float)$_GET['precio_max'] : null;
+    $orden           = in_array($_GET['orden'] ?? '', ['precio_asc','precio_desc','valorados','recientes'], true)
+                       ? $_GET['orden'] : 'recientes';
+    $soloOfertas     = isset($_GET['ofertas']) && $_GET['ofertas'] === '1';
     $calificacionMin = isset($_GET['estrellas']) && $_GET['estrellas'] !== ''
-                      ? max(0, min(5, (float)$_GET['estrellas'])) : null;
+                       ? max(0, min(5, (float)$_GET['estrellas'])) : null;
+    $lat             = isset($_GET['lat'])   && is_numeric($_GET['lat'])   ? (float)$_GET['lat']   : null;
+    $lng             = isset($_GET['lng'])   && is_numeric($_GET['lng'])   ? (float)$_GET['lng']   : null;
+    $radioKm         = isset($_GET['radio']) && is_numeric($_GET['radio']) ? (int)$_GET['radio']   : 10;
 
     $catActual = $categoriaId ?? '';
 
@@ -112,7 +122,10 @@ function mostrarCatalogoPublico()
         $precioMax,
         $orden,
         $soloOfertas,
-        $calificacionMin
+        $calificacionMin,
+        $lat,
+        $lng,
+        ($lat !== null && $lng !== null) ? $radioKm : null
     );
 
     require BASE_PATH . '/app/views/dashboard/cliente/explorar-servicios.php';
@@ -135,6 +148,11 @@ function mostrarDetallePublicacion()
         mostrarSweetAlert('error', 'No encontrada', 'La publicación no existe o ya no está disponible.', BASE_URL . '/cliente/explorar-servicios');
         exit();
     }
+
+    $proveedorUsuarioId = (int)($publicacion['proveedor_usuario_id'] ?? 0);
+    $perfilPublico = $proveedorUsuarioId > 0
+        ? (new ProveedorPerfil())->obtenerPerfilPublicoProveedor($proveedorUsuarioId)
+        : ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
 
     require BASE_PATH . '/app/views/dashboard/cliente/detalle-publicacion.php';
     exit();

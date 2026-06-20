@@ -1,43 +1,102 @@
-﻿<?php
+<?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
-require_once BASE_PATH . '/app/models/servicio-contratado.php';
 require_once BASE_PATH . '/config/database.php';
 
-$uid      = (int)($_SESSION['user']['id'] ?? 0);
-$scModel  = new ServicioContratado();
-$contratos = $scModel->listarPorClienteUsuario($uid);
-$historial = array_values(array_filter($contratos, fn($c) => $c['estado'] === 'finalizado'));
+$uid = (int)($_SESSION['user']['id'] ?? 0);
 
-// Estadísticas rápidas
-$totalGastado   = 0.0;
-$totalServicios = count($historial);
+// ── Filtros GET ───────────────────────────────────────────────────────
+$filtroEstado   = trim($_GET['estado']    ?? '');
+$filtroDesde    = trim($_GET['desde']     ?? '');
+$filtroHasta    = trim($_GET['hasta']     ?? '');
+$filtroProveedor = trim($_GET['proveedor'] ?? '');
 
-// Obtener datos de pagos reales desde pagos_servicios
-$pagosMap = [];
+$contratos = [];
+$kpis = ['total' => 0, 'completados' => 0, 'cancelados' => 0, 'monto_total' => 0.0];
+
 try {
-    $db2 = new Conexion();
-    $pdo2 = $db2->getConexion();
+    $db  = new Conexion();
+    $pdo = $db->getConexion();
 
-    $stCl = $pdo2->prepare("SELECT id FROM clientes WHERE usuario_id = :uid LIMIT 1");
+    $stCl = $pdo->prepare("SELECT id FROM clientes WHERE usuario_id = :uid LIMIT 1");
     $stCl->execute([':uid' => $uid]);
     $clienteId = (int)($stCl->fetchColumn() ?: 0);
 
     if ($clienteId > 0) {
-        $stPag = $pdo2->prepare("
-            SELECT servicio_contratado_id, monto, liberado, fecha_liberacion, created_at AS fecha_pago
-            FROM pagos_servicios WHERE cliente_id = :cid
-        ");
-        $stPag->execute([':cid' => $clienteId]);
-        foreach ($stPag->fetchAll(PDO::FETCH_ASSOC) as $p) {
-            $pagosMap[(int)$p['servicio_contratado_id']] = $p;
-            $totalGastado += (float)$p['monto'];
-        }
-    }
-} catch (PDOException $e) { /* pagos_servicios puede no existir aún */ }
+        $where  = "WHERE sc.cliente_id = :cid";
+        $params = [':cid' => $clienteId];
 
-$ultimaFecha = !empty($historial)
-    ? ($historial[0]['fecha_ejecucion'] ?? $historial[0]['fecha_solicitud'] ?? null)
-    : null;
+        if ($filtroEstado !== '') {
+            $where .= " AND sc.estado = :estado";
+            $params[':estado'] = $filtroEstado;
+        }
+        if ($filtroDesde !== '') {
+            $where .= " AND DATE(sc.created_at) >= :desde";
+            $params[':desde'] = $filtroDesde;
+        }
+        if ($filtroHasta !== '') {
+            $where .= " AND DATE(sc.created_at) <= :hasta";
+            $params[':hasta'] = $filtroHasta;
+        }
+        if ($filtroProveedor !== '') {
+            $where .= " AND CONCAT(pr.nombres, ' ', pr.apellidos) LIKE :prov";
+            $params[':prov'] = '%' . $filtroProveedor . '%';
+        }
+
+        $st = $pdo->prepare("
+            SELECT
+                sc.id                                                           AS contrato_id,
+                sc.estado,
+                sc.created_at,
+                sc.fecha_ejecucion,
+                COALESCE(cot.titulo, sol.titulo, sv.nombre, 'Servicio')         AS titulo,
+                CONCAT(pr.nombres, ' ', pr.apellidos)                           AS proveedor_nombre,
+                COALESCE(cot.precio, pub_sol.precio, sv.precio, 0)              AS precio_base,
+                ps.monto                                                        AS monto_pagado,
+                ps.mp_status                                                    AS pago_estado,
+                ps.liberado
+            FROM servicios_contratados sc
+            INNER JOIN proveedores pr       ON sc.proveedor_id      = pr.id
+            LEFT JOIN cotizaciones cot      ON sc.cotizacion_id     = cot.id
+            LEFT JOIN solicitudes sol       ON sc.solicitud_id      = sol.id
+            LEFT JOIN publicaciones pub_sol ON sol.publicacion_id   = pub_sol.id
+            LEFT JOIN servicios sv          ON sc.servicio_id       = sv.id
+            LEFT JOIN pagos_servicios ps    ON ps.servicio_contratado_id = sc.id
+            $where
+            ORDER BY sc.created_at DESC
+        ");
+        $st->execute($params);
+        $contratos = $st->fetchAll(PDO::FETCH_ASSOC);
+
+        // KPIs (sin filtros de estado para mostrar totales reales)
+        $stKpi = $pdo->prepare("
+            SELECT
+                COUNT(*)                                                          AS total,
+                SUM(sc.estado = 'finalizado')                                     AS completados,
+                SUM(sc.estado IN ('cancelado','cancelado_cliente','cancelado_proveedor')) AS cancelados,
+                COALESCE(SUM(ps.monto), 0)                                        AS monto_total
+            FROM servicios_contratados sc
+            LEFT JOIN pagos_servicios ps ON ps.servicio_contratado_id = sc.id
+            WHERE sc.cliente_id = :cid
+        ");
+        $stKpi->execute([':cid' => $clienteId]);
+        $kpis = $stKpi->fetch(PDO::FETCH_ASSOC);
+    }
+} catch (PDOException $e) {
+    error_log('historial-servicios cliente: ' . $e->getMessage());
+}
+
+function badgeContrato(string $estado): string {
+    return match($estado) {
+        'pendiente'           => '<span class="badge bg-secondary">Pendiente</span>',
+        'confirmado'          => '<span class="badge bg-info text-dark">Confirmado</span>',
+        'en_proceso'          => '<span class="badge bg-primary">En proceso</span>',
+        'finalizado'          => '<span class="badge bg-success">Completado</span>',
+        'cancelado',
+        'cancelado_cliente',
+        'cancelado_proveedor' => '<span class="badge bg-danger">Cancelado</span>',
+        default               => '<span class="badge bg-light text-dark">' . htmlspecialchars($estado) . '</span>',
+    };
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,175 +104,186 @@ $ultimaFecha = !empty($historial)
     <meta charset="UTF-8">
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proviservers | Historial de Pagos</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>ProviServers | Historial de contrataciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
 </head>
 <body>
-    <?php
-    $currentPage = 'historial';
-    include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
-    ?>
-    <main class="contenido">
-        <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
+<?php
+$currentPage = 'historial';
+include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
+?>
+<main class="contenido">
+    <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
-        <section id="historial-servicios" class="p-3 p-md-4">
-
-            <!-- Encabezado -->
-            <div class="section-hero mb-4">
+    <section id="titulo-principal" class="section-hero mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">Historial de contrataciones</h1>
+                <p class="text-muted mb-0">Todos tus servicios contratados, en cualquier estado.</p>
+            </div>
+            <div class="col-md-4">
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
+                    <ol class="breadcrumb mb-0 justify-content-md-end">
                         <li class="breadcrumb-item">
                             <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
                         </li>
-                        <li class="breadcrumb-item active" aria-current="page">Historial</li>
+                        <li class="breadcrumb-item active">Historial</li>
                     </ol>
                 </nav>
-                <h1>Historial de Pagos</h1>
-                <p class="text-muted">Registro completo de todos tus servicios contratados y pagados.</p>
             </div>
+        </div>
+    </section>
 
-            <!-- Estadísticas -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <div class="fs-1 fw-bold text-primary"><?= $totalServicios ?></div>
-                        <div class="small text-muted">Servicios completados</div>
-                    </div>
-                </div>
-                <div class="col-6 col-md-4">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <div class="fs-4 fw-bold text-success">
-                            $<?= number_format($totalGastado, 0, ',', '.') ?>
-                        </div>
-                        <div class="small text-muted">Total pagado</div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div class="card border-0 shadow-sm text-center p-3">
-                        <div class="fw-bold text-secondary" style="font-size:1.1rem;">
-                            <?= $ultimaFecha ? date('d M Y', strtotime($ultimaFecha)) : '—' ?>
-                        </div>
-                        <div class="small text-muted">Último servicio</div>
-                    </div>
+    <div class="container-fluid px-4 pb-5">
+
+        <!-- KPIs -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-primary"><?= (int)$kpis['total'] ?></div>
+                    <div class="small text-muted">Total contratos</div>
                 </div>
             </div>
-
-            <!-- Tabla de historial -->
-            <?php if (!empty($historial)): ?>
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center py-3">
-                    <span class="fw-bold">Mis servicios</span>
-                    <span class="badge bg-secondary"><?= $totalServicios ?> registros</span>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-success"><?= (int)$kpis['completados'] ?></div>
+                    <div class="small text-muted">Completados</div>
                 </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-2 fw-bold text-danger"><?= (int)$kpis['cancelados'] ?></div>
+                    <div class="small text-muted">Cancelados</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 shadow-sm text-center p-3">
+                    <div class="fs-4 fw-bold text-success">$<?= number_format((float)$kpis['monto_total'], 0, ',', '.') ?></div>
+                    <div class="small text-muted">Total pagado</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form method="GET" action="<?= BASE_URL ?>/cliente/historial" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Estado</label>
+                        <select name="estado" class="form-select form-select-sm">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente"   <?= $filtroEstado === 'pendiente'   ? 'selected' : '' ?>>Pendiente</option>
+                            <option value="confirmado"  <?= $filtroEstado === 'confirmado'  ? 'selected' : '' ?>>Confirmado</option>
+                            <option value="en_proceso"  <?= $filtroEstado === 'en_proceso'  ? 'selected' : '' ?>>En proceso</option>
+                            <option value="finalizado"  <?= $filtroEstado === 'finalizado'  ? 'selected' : '' ?>>Completado</option>
+                            <option value="cancelado"   <?= $filtroEstado === 'cancelado'   ? 'selected' : '' ?>>Cancelado</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">Desde</label>
+                        <input type="date" name="desde" class="form-control form-control-sm" value="<?= htmlspecialchars($filtroDesde) ?>">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small fw-semibold">Hasta</label>
+                        <input type="date" name="hasta" class="form-control form-control-sm" value="<?= htmlspecialchars($filtroHasta) ?>">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Proveedor</label>
+                        <input type="text" name="proveedor" class="form-control form-control-sm"
+                               placeholder="Nombre del proveedor"
+                               value="<?= htmlspecialchars($filtroProveedor) ?>">
+                    </div>
+                    <div class="col-md-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-funnel"></i> Filtrar
+                        </button>
+                        <a href="<?= BASE_URL ?>/cliente/historial" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-x"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <?php if (empty($contratos)): ?>
+                    <div class="text-center py-5 text-muted">
+                        <i class="bi bi-clipboard-x fs-1"></i>
+                        <p class="mt-3">No se encontraron contrataciones con los filtros seleccionados.</p>
+                    </div>
+                <?php else: ?>
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+                    <table id="tabla-historial" class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
+                                <th>#</th>
                                 <th>Servicio</th>
                                 <th>Proveedor</th>
                                 <th>Fecha</th>
+                                <th class="text-center">Estado</th>
                                 <th class="text-end">Monto</th>
                                 <th class="text-center">Pago</th>
-                                <th class="text-center">Calificación</th>
-                                <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                        <?php foreach ($historial as $sc):
-                            $contratoId = (int)($sc['contrato_id'] ?? 0);
-                            $titulo = $sc['servicio_nombre'] ?? $sc['solicitud_titulo'] ?? $sc['cotizacion_titulo'] ?? 'Servicio';
-                            $proveedor = $sc['proveedor_nombre'] ?? '—';
-                            $monto = (float)($sc['monto'] ?? 0);
-
-                            $fechaRaw = $sc['fecha_ejecucion'] ?? $sc['solicitud_fecha_preferida'] ?? $sc['fecha_solicitud'] ?? null;
-                            $fechaTexto = $fechaRaw ? date('d M Y', strtotime($fechaRaw)) : '—';
-
-                            $pago = $pagosMap[$contratoId] ?? null;
-                            $montoPagado = $pago ? (float)$pago['monto'] : null;
-                            $fechaPago   = $pago ? date('d M Y', strtotime($pago['fecha_pago'])) : null;
-                            $liberado    = $pago ? (bool)$pago['liberado'] : false;
-
-                            $calif   = (int)($sc['mi_calificacion'] ?? 0);
-                            $yaValoró = (int)($sc['tiene_valoracion'] ?? 0) === 1;
-                        ?>
-                        <tr>
-                            <td>
-                                <span class="fw-semibold"><?= htmlspecialchars($titulo) ?></span>
-                            </td>
-                            <td class="text-muted small"><?= htmlspecialchars($proveedor) ?></td>
-                            <td class="text-muted small"><?= $fechaTexto ?></td>
-                            <td class="text-end fw-semibold">
-                                <?php if ($montoPagado !== null): ?>
-                                    <span class="text-success">$<?= number_format($montoPagado, 0, ',', '.') ?></span>
-                                <?php elseif ($monto > 0): ?>
-                                    <span class="text-muted">$<?= number_format($monto, 0, ',', '.') ?></span>
-                                <?php else: ?>
-                                    <span class="text-muted">—</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <?php if ($pago): ?>
-                                    <span class="badge bg-success">
-                                        <i class="bi bi-check-circle me-1"></i>Pagado
-                                    </span>
-                                    <?php if ($fechaPago): ?>
-                                        <div class="text-muted" style="font-size:0.7rem;"><?= $fechaPago ?></div>
+                        <?php foreach ($contratos as $c): ?>
+                            <tr>
+                                <td class="text-muted small"><?= str_pad($c['contrato_id'], 5, '0', STR_PAD_LEFT) ?></td>
+                                <td class="fw-semibold"><?= htmlspecialchars($c['titulo']) ?></td>
+                                <td class="text-muted small"><?= htmlspecialchars($c['proveedor_nombre']) ?></td>
+                                <td class="text-muted small">
+                                    <?= $c['created_at'] ? date('d/m/Y', strtotime($c['created_at'])) : '—' ?>
+                                </td>
+                                <td class="text-center"><?= badgeContrato($c['estado']) ?></td>
+                                <td class="text-end fw-semibold">
+                                    <?php $monto = $c['monto_pagado'] ?? $c['precio_base']; ?>
+                                    <?= $monto > 0 ? '$' . number_format((float)$monto, 0, ',', '.') : '<span class="text-muted">—</span>' ?>
+                                </td>
+                                <td class="text-center">
+                                    <?php if ($c['monto_pagado']): ?>
+                                        <span class="badge bg-success">Pagado</span>
+                                    <?php elseif ($c['estado'] === 'finalizado'): ?>
+                                        <span class="badge bg-warning text-dark">Sin pago</span>
+                                    <?php else: ?>
+                                        <span class="text-muted small">—</span>
                                     <?php endif; ?>
-                                <?php else: ?>
-                                    <span class="badge bg-secondary">Sin registro</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <?php if ($yaValoró && $calif > 0): ?>
-                                    <span class="text-warning">
-                                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                                            <i class="bi bi-star<?= $i <= $calif ? '-fill' : '' ?>" style="font-size:.8rem;"></i>
-                                        <?php endfor; ?>
-                                    </span>
-                                <?php else: ?>
-                                    <span class="text-muted small">Sin calificar</span>
-                                <?php endif; ?>
-                            </td>
-                            <td class="text-center">
-                                <div class="d-flex gap-1 justify-content-center">
-                                    <?php if ($contratoId > 0): ?>
-                                    <a href="<?= BASE_URL ?>/cliente/contrato-pdf?id=<?= $contratoId ?>"
-                                       class="btn btn-outline-secondary btn-sm" target="_blank"
-                                       title="Descargar comprobante">
-                                        <i class="bi bi-file-pdf"></i>
-                                    </a>
-                                    <?php endif; ?>
-                                    <a href="<?= BASE_URL ?>/cliente/explorar"
-                                       class="btn btn-outline-primary btn-sm"
-                                       title="Contratar de nuevo">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                            </tr>
                         <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
+                <?php endif; ?>
             </div>
-            <?php else: ?>
-            <div class="text-center py-5">
-                <i class="bi bi-clock-history text-muted" style="font-size:3.5rem;"></i>
-                <h5 class="mt-3 text-muted">Aún no tienes servicios completados</h5>
-                <p class="text-muted small">Cuando finalices un servicio aparecerá aquí con su comprobante.</p>
-                <a href="<?= BASE_URL ?>/cliente/explorar" class="btn btn-primary mt-2">
-                    <i class="bi bi-search me-1"></i> Explorar servicios
-                </a>
-            </div>
-            <?php endif; ?>
+        </div>
 
-        </section>
-    </main>
+    </div>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script>const BASE_URL = "<?= BASE_URL ?>";</script>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+<script>
+$(document).ready(function () {
+    $('#tabla-historial').DataTable({
+        order: [[3, 'desc']],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+        },
+        columnDefs: [{ orderable: false, targets: [6] }]
+    });
+});
+</script>
 </body>
 </html>

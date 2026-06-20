@@ -391,6 +391,16 @@ switch ($request) {
     case '/proveedor/actualizar-estado':
     case '/proveedor/oportunidades':
     case '/proveedor/oportunidades/enviar-cotizacion':
+    case '/proveedor/contrato/seguimiento':
+    case '/proveedor/contrato/comentario':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
+    case '/cliente/contrato/seguimiento':
+    case '/cliente/contrato/comentario':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
     case '/proveedor/calificaciones-cliente':
         require BASE_PATH . '/app/views/dashboard/proveedor/calificaciones-cliente.php';
         break;
@@ -405,6 +415,7 @@ switch ($request) {
     case '/proveedor/guardar-notificaciones':
     case '/proveedor/guardar-pagos':
     case '/proveedor/guardar-politicas':
+    case '/proveedor/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
@@ -458,6 +469,7 @@ switch ($request) {
     case '/cliente/servicios-contratados':
     case '/cliente/mis-solicitudes':
     case '/cliente/necesidades':
+    case '/cliente/mapa/datos':
         require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
@@ -491,6 +503,14 @@ switch ($request) {
             exit;
         }
         require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
+    case '/cliente/necesidades/confirmar-cotizacion':
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('Location: ' . BASE_URL . '/cliente/necesidades');
+            exit;
+        }
+        require BASE_PATH . '/app/views/dashboard/cliente/confirmar-cotizacion.php';
         break;
 
     case '/cliente/necesidades/aceptar-cotizacion':
@@ -528,6 +548,8 @@ switch ($request) {
         break;
 
     case '/cliente/perfil/cambiar-clave':
+    case '/cliente/perfil/cambiar-email':
+    case '/cliente/perfil/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
         break;
 

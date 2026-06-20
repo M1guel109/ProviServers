@@ -17,6 +17,7 @@ require_once __DIR__ . '/../models/proveedor-perfil.php';
 require_once __DIR__ . '/../models/proveedor-notificaciones.php';
 require_once __DIR__ . '/../models/proveedor-pagos-facturacion.php';
 require_once __DIR__ . '/../models/Notificacion.php';
+require_once __DIR__ . '/../models/SeguimientoContrato.php';
 
 // =======================================================================
 // GUARD DE SESIÓN Y ROL
@@ -44,7 +45,9 @@ switch ($method) {
         $accion = $_GET['accion'] ?? '';
         $id     = $_GET['id']     ?? null;
 
-        if (str_contains($uri, '/proveedor/contrato-pdf')) {
+        if (str_contains($uri, '/proveedor/contrato/seguimiento')) {
+            seguimientoContratoJSON('proveedor');
+        } elseif (str_contains($uri, '/proveedor/contrato-pdf')) {
             generarComprobantePDFProveedor();
         } elseif (str_contains($uri, '/proveedor/oportunidades')) {
             mostrarOportunidades();
@@ -74,7 +77,11 @@ switch ($method) {
     case 'POST':
         $accion = $_POST['accion'] ?? '';
 
-        if (str_contains($uri, '/proveedor/resenas/responder')) {
+        if ($accion === 'rechazar_solicitud') {
+            rechazarSolicitud($_POST['id'] ?? null);
+        } elseif (str_contains($uri, '/proveedor/contrato/comentario')) {
+            agregarComentarioContrato('proveedor');
+        } elseif (str_contains($uri, '/proveedor/resenas/responder')) {
             guardarRespuestaProveedor();
         } elseif (str_contains($uri, '/proveedor/promociones/crear')) {
             crearPromocion();
@@ -100,6 +107,8 @@ switch ($method) {
             guardarPagos();
         } elseif (str_contains($uri, '/proveedor/guardar-politicas') || $accion === 'actualizar_politicas') {
             guardarPoliticas();
+        } elseif (str_contains($uri, '/proveedor/eliminar-cuenta')) {
+            eliminarCuentaProveedor();
         } elseif ($accion === 'actualizar') {
             actualizarServicio();
         } else {
@@ -482,6 +491,7 @@ function mostrarEnProceso()
 
 function actualizarEstadoServicio()
 {
+    ob_clean();
     header('Content-Type: application/json; charset=utf-8');
 
     $contratoId  = (int)($_POST['contrato_id'] ?? 0);
@@ -550,11 +560,30 @@ function actualizarEstadoServicio()
         }
     }
 
+    $estadoAnterior = $modelo->obtenerEstado($contratoId) ?? null;
+
     if (!$modelo->actualizarEstado($contratoId, $nuevoEstado)) {
         http_response_code(422);
         echo json_encode(['success' => false, 'message' => 'No se pudo actualizar el estado del servicio.']);
         exit();
     }
+
+    // Registrar en seguimiento
+    $descripcionSeg = match ($nuevoEstado) {
+        'confirmado'          => 'Servicio confirmado por el proveedor.',
+        'en_proceso'          => 'El proveedor inició el servicio.',
+        'finalizado'          => 'El proveedor marcó el servicio como finalizado.',
+        'cancelado_proveedor' => 'El proveedor canceló el servicio.',
+        default               => 'Estado actualizado a: ' . $nuevoEstado . '.',
+    };
+    SeguimientoContrato::registrar(
+        contratoId:    $contratoId,
+        usuarioId:     $usuarioId,
+        rol:           'proveedor',
+        estadoNuevo:   $nuevoEstado,
+        estadoAnterior: $estadoAnterior,
+        descripcion:   $descripcionSeg
+    );
 
     // Notificar al cliente del cambio de estado
     try {
@@ -790,7 +819,40 @@ function aceptarSolicitud($id)
         $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
-            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas-solicitudes');
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT cl.usuario_id, s.titulo, sc.id AS contrato_id
+                    FROM solicitudes s
+                    INNER JOIN clientes cl ON s.cliente_id = cl.id
+                    LEFT JOIN servicios_contratados sc ON sc.solicitud_id = s.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => (int)$id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud aceptada',
+                        'Tu solicitud "' . $row['titulo'] . '" fue aceptada. El proveedor está listo para iniciar.',
+                        BASE_URL . '/cliente/servicios-contratados'
+                    );
+                    if ($row['contrato_id']) {
+                        SeguimientoContrato::registrar(
+                            contratoId:   (int)$row['contrato_id'],
+                            usuarioId:    $proveedorUsuarioId,
+                            rol:          'proveedor',
+                            estadoNuevo:  'confirmado',
+                            descripcion:  'Solicitud aceptada por el proveedor.'
+                        );
+                    }
+                }
+            } catch (Throwable $e) {
+                error_log('aceptarSolicitud::notif: ' . $e->getMessage());
+            }
+            mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como confirmado.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.', BASE_URL . '/proveedor/nuevas-solicitudes');
         }
@@ -809,12 +871,40 @@ function rechazarSolicitud($id)
     }
 
     $proveedorUsuarioId = (int)$_SESSION['user']['id'];
+    $motivo             = trim($_POST['motivo'] ?? '');
     $modelo             = new Solicitud();
 
     try {
-        $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
+        $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId, $motivo ?: null);
 
         if ($resultado) {
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT cl.usuario_id, s.titulo
+                    FROM solicitudes s
+                    INNER JOIN clientes cl ON s.cliente_id = cl.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => (int)$id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row) {
+                    $msg = 'Tu solicitud "' . $row['titulo'] . '" fue rechazada por el proveedor.';
+                    if ($motivo) {
+                        $msg .= ' Motivo: ' . $motivo;
+                    }
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud rechazada',
+                        $msg,
+                        BASE_URL . '/cliente/mis-solicitudes'
+                    );
+                }
+            } catch (Throwable $e) {
+                error_log('rechazarSolicitud::notif: ' . $e->getMessage());
+            }
             mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo rechazar la solicitud.', BASE_URL . '/proveedor/nuevas-solicitudes');
@@ -1082,6 +1172,26 @@ function cerrarSesiones()
     exit();
 }
 
+function eliminarCuentaProveedor()
+{
+    $idUsuario = (int)$_SESSION['user']['id'];
+
+    $resultado = (new ProveedorPerfil())->eliminarCuenta($idUsuario);
+
+    switch ($resultado) {
+        case 'eliminado':
+        case 'desactivado':
+            $_SESSION = [];
+            session_unset();
+            session_destroy();
+            mostrarSweetAlert('success', 'Cuenta eliminada', 'Tu cuenta ha sido eliminada. ¡Hasta pronto!', BASE_URL . '/login');
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'No se pudo procesar tu solicitud. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion');
+    }
+    exit();
+}
+
 function guardarDisponibilidad()
 {
     $idUsuario          = (int)$_SESSION['user']['id'];
@@ -1156,7 +1266,7 @@ function guardarPoliticas()
     $ofreceGarantia         = isset($_POST['ofrece_garantia'])        ? 1 : 0;
     $diasGarantia           = trim($_POST['dias_garantia']           ?? '');
     $detallesGarantia       = trim($_POST['detalles_garantia']       ?? '');
-    $soloContactoPlataforma = isset($_POST['solo_contacto_por_plataforma']) ? 1 : 0;
+    $soloContactoPlataforma = 1; // Regla de plataforma: siempre obligatorio
     $tiempoRespuesta        = trim($_POST['tiempo_respuesta_promedio'] ?? '');
     $otrasCondiciones       = trim($_POST['otras_condiciones']        ?? '');
 
@@ -1417,5 +1527,77 @@ function generarComprobantePDFProveedor()
 
     $filename = 'comprobante-contrato-' . str_pad($contratoId, 6, '0', STR_PAD_LEFT) . '.pdf';
     generarPDF($html, $filename, false);
+    exit();
+}
+
+// =======================================================================
+// SEGUIMIENTO DE CONTRATO
+// =======================================================================
+
+function seguimientoContratoJSON(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_GET['id'] ?? 0);
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'ID de contrato inválido.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $historial = SeguimientoContrato::listarPorContrato($contratoId);
+    echo json_encode(['ok' => true, 'data' => $historial]);
+    exit();
+}
+
+function agregarComentarioContrato(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_POST['contrato_id'] ?? 0);
+    $comentario = trim($_POST['comentario']   ?? '');
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0 || $comentario === '') {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'Datos incompletos.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $archivoPath = null;
+    if (!empty($_FILES['archivo']['tmp_name'])) {
+        $archivoPath = SeguimientoContrato::subirArchivo($_FILES['archivo']);
+        if ($archivoPath === null) {
+            http_response_code(422);
+            echo json_encode(['ok' => false, 'message' => 'Archivo no válido (máx 5 MB, formatos: pdf, jpg, png, doc, docx, txt).']);
+            exit();
+        }
+    }
+
+    $ok = SeguimientoContrato::registrar(
+        contratoId:     $contratoId,
+        usuarioId:      $usuarioId,
+        rol:            $rol,
+        comentario:     $comentario,
+        archivoAdjunto: $archivoPath
+    );
+
+    echo json_encode(['ok' => $ok, 'message' => $ok ? 'Comentario registrado.' : 'Error al guardar.']);
     exit();
 }

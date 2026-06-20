@@ -30,8 +30,12 @@ switch ($method) {
 
         if ($accion === 'actualizar-perfil') {
             actualizarPerfil();
+        } elseif (str_contains($uri, 'cambiar-email')) {
+            cambiarEmail();
         } elseif (str_contains($uri, 'cambiar-clave')) {
             cambiarContrasena();
+        } elseif (str_contains($uri, 'eliminar-cuenta')) {
+            eliminarCuenta();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -77,43 +81,139 @@ function actualizarPerfil()
     $id  = (int)$_SESSION['user']['id'];
     $rol = $_SESSION['user']['rol'] ?? '';
 
-    $data = [
-        'nombres'   => trim($_POST['nombres']   ?? ''),
-        'apellidos' => trim($_POST['apellidos'] ?? ''),
-        'email'     => trim($_POST['email']     ?? ''),
-        'telefono'  => trim($_POST['telefono']  ?? ''),
-        'ubicacion' => trim($_POST['ubicacion'] ?? ''),
-        'foto'      => $_POST['foto_actual']    ?? 'default_user.png',
-    ];
+    $nombres   = trim($_POST['nombres']   ?? '');
+    $apellidos = trim($_POST['apellidos'] ?? '');
+    $telefono  = trim($_POST['telefono']  ?? '');
+    $ubicacion = trim($_POST['ubicacion'] ?? '');
+
+    if (empty($nombres)) {
+        mostrarSweetAlert('error', 'Campo requerido', 'El nombre es obligatorio.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    $fotoFinal = $_POST['foto_actual'] ?? 'default_user.png';
 
     if (!empty($_FILES['foto']['tmp_name']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
 
         if (!in_array($ext, ['png', 'jpg', 'jpeg', 'webp'], true)) {
-            mostrarSweetAlert('error', 'Formato no válido', 'La foto debe ser JPG, PNG o WEBP.');
+            mostrarSweetAlert('error', 'Formato no válido', 'La foto debe ser JPG, PNG o WEBP. Máx 2MB.');
+            exit();
+        }
+
+        if ($_FILES['foto']['size'] > 2 * 1024 * 1024) {
+            mostrarSweetAlert('error', 'Imagen muy grande', 'La foto no debe superar 2MB.');
             exit();
         }
 
         $ruta_perfiles = BASE_PATH . '/public/uploads/usuarios/';
-        if (!is_dir($ruta_perfiles)) mkdir($ruta_perfiles, 0777, true);
+        $nombre_final  = 'perfil_' . $id . '_' . uniqid() . '.' . $ext;
 
-        $nombre_final = 'perfil_' . uniqid() . '.' . $ext;
         if (move_uploaded_file($_FILES['foto']['tmp_name'], $ruta_perfiles . $nombre_final)) {
             $fotoAnterior = $_POST['foto_actual'] ?? '';
             if ($fotoAnterior !== 'default_user.png' && file_exists($ruta_perfiles . $fotoAnterior)) {
                 @unlink($ruta_perfiles . $fotoAnterior);
             }
-            $data['foto'] = $nombre_final;
+            $fotoFinal = $nombre_final;
         }
     }
+
+    $data = [
+        'nombres'   => $nombres,
+        'apellidos' => $apellidos,
+        'telefono'  => $telefono,
+        'ubicacion' => $ubicacion,
+        'foto'      => $fotoFinal,
+    ];
 
     $redirect = resolverRedirectPerfil($rol);
     $modelo   = new Perfil();
 
     if ($modelo->actualizarPerfil($id, $rol, $data)) {
+        $_SESSION['user']['foto'] = $fotoFinal;
         mostrarSweetAlert('success', '¡Actualizado!', 'Tu perfil se ha actualizado correctamente.', $redirect);
     } else {
         mostrarSweetAlert('error', 'Error', 'No se pudo guardar en la base de datos.');
+    }
+    exit();
+}
+
+function cambiarEmail()
+{
+    $id  = (int)$_SESSION['user']['id'];
+    $rol = $_SESSION['user']['rol'] ?? '';
+
+    $emailNuevo    = trim($_POST['email_nuevo']    ?? '');
+    $emailConfirma = trim($_POST['email_confirma'] ?? '');
+    $claveActual   = $_POST['clave_actual']        ?? '';
+
+    if (empty($emailNuevo) || empty($claveActual)) {
+        mostrarSweetAlert('error', 'Campos requeridos', 'Ingresa el nuevo correo y tu contraseña actual.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    if (!filter_var($emailNuevo, FILTER_VALIDATE_EMAIL)) {
+        mostrarSweetAlert('error', 'Correo inválido', 'El formato del correo no es válido.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    if ($emailNuevo !== $emailConfirma) {
+        mostrarSweetAlert('error', 'Correos no coinciden', 'El nuevo correo y su confirmación deben ser iguales.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    $resultado = (new Perfil())->cambiarEmail($id, $claveActual, $emailNuevo);
+
+    $redirect = resolverRedirectPerfil($rol);
+    switch ($resultado) {
+        case 'ok':
+            $_SESSION['user']['email'] = $emailNuevo;
+            mostrarSweetAlert('success', 'Correo actualizado', 'Tu correo se cambió correctamente.', $redirect);
+            break;
+        case 'clave_incorrecta':
+            mostrarSweetAlert('error', 'Contraseña incorrecta', 'La contraseña actual ingresada no es correcta.', $redirect);
+            break;
+        case 'email_duplicado':
+            mostrarSweetAlert('error', 'Correo en uso', 'Ese correo ya está registrado en otra cuenta.', $redirect);
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'No se pudo actualizar el correo. Intenta nuevamente.', $redirect);
+    }
+    exit();
+}
+
+function eliminarCuenta()
+{
+    $id  = (int)$_SESSION['user']['id'];
+    $rol = $_SESSION['user']['rol'] ?? '';
+
+    if ($rol !== 'cliente') {
+        mostrarSweetAlert('error', 'Acción no permitida', 'Solo clientes pueden usar esta función.', resolverRedirectPerfil($rol));
+        exit();
+    }
+
+    $clave = $_POST['clave_confirmar_baja'] ?? '';
+
+    if (empty($clave)) {
+        mostrarSweetAlert('error', 'Contraseña requerida', 'Debes confirmar tu contraseña para eliminar la cuenta.', BASE_URL . '/cliente/perfil');
+        exit();
+    }
+
+    $resultado = (new Perfil())->eliminarCuentaCliente($id, $clave);
+
+    switch ($resultado) {
+        case 'eliminado':
+        case 'desactivado':
+            $_SESSION = [];
+            session_unset();
+            session_destroy();
+            mostrarSweetAlert('success', 'Cuenta eliminada', 'Tu cuenta ha sido eliminada correctamente. ¡Hasta pronto!', BASE_URL . '/login');
+            break;
+        case 'clave_incorrecta':
+            mostrarSweetAlert('error', 'Contraseña incorrecta', 'La contraseña ingresada no es correcta.', BASE_URL . '/cliente/perfil');
+            break;
+        default:
+            mostrarSweetAlert('error', 'Error inesperado', 'No se pudo procesar tu solicitud. Intenta nuevamente.', BASE_URL . '/cliente/perfil');
     }
     exit();
 }
