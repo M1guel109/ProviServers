@@ -156,12 +156,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // 6. MARCAR ENLACE ACTIVO SEGÚN LA URL ACTUAL
   // =====================================================================
   function setActiveLink() {
-    const currentUrl = window.location.href;
+    const currentPath = window.location.pathname;
 
     document.querySelectorAll(".sidebar a").forEach((link) => {
       link.classList.remove("active");
       const href = link.getAttribute("href");
-      if (href && href !== "#" && currentUrl.includes(href)) {
+      if (!href || href === "#") return;
+      let hrefPath;
+      try {
+        hrefPath = new URL(href, window.location.origin).pathname;
+      } catch (e) {
+        hrefPath = href.split("?")[0];
+      }
+      if (hrefPath && currentPath === hrefPath) {
         link.classList.add("active");
 
         // Si está dentro de un submenú, abrir el padre

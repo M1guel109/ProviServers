@@ -42,6 +42,10 @@ switch ($method) {
             registrarMembresia();
         } elseif ($accion === 'actualizar_membresia') {
             actualizarMembresia();
+        } elseif ($accion === 'liberar_pago') {
+            liberarPago();
+        } elseif ($accion === 'reembolsar_pago') {
+            reembolsarPago();
         } elseif ($accion === 'cambiar_estado_documento') {
             procesarEstadoDocumento();
         } elseif ($accion === 'actualizar') {
@@ -862,6 +866,15 @@ function reportesPdfController()
         case 'ingresos':
             reporteIngresosPDF();
             break;
+        case 'serviciosOfrecidos':
+            reporteServiciosOfrecidosPDF();
+            break;
+        case 'serviciosFecha':
+            reporteServiciosFechaPDF();
+            break;
+        case 'proveedores':
+            reporteProveedoresPDF();
+            break;
         default:
             mostrarSweetAlert('error', 'Reporte inválido', 'El tipo de reporte solicitado no existe.');
             exit();
@@ -870,13 +883,22 @@ function reportesPdfController()
 
 function reporteUsuariosPDF()
 {
-    $usuarios = mostrarUsuarios();
+    require_once BASE_PATH . '/app/models/admin.php';
 
-    $foto_default_base64 = '';
-    $ruta_default = BASE_PATH . '/public/uploads/usuarios/default_user.png';
-    if (file_exists($ruta_default)) {
-        $foto_default_base64 = 'data:image/png;base64,' . base64_encode(file_get_contents($ruta_default));
-    }
+    $desde    = $_GET['desde']    ?? null;
+    $hasta    = $_GET['hasta']    ?? null;
+    $rol      = isset($_GET['rol'])       && $_GET['rol']       !== '' ? $_GET['rol']       : null;
+    $estadoId = isset($_GET['estado_id']) && $_GET['estado_id'] !== '' ? (int)$_GET['estado_id'] : null;
+
+    $modelo  = new Usuario();
+    $reporte = $modelo->obtenerReporteUsuarios($desde, $hasta, $rol, $estadoId);
+
+    $filtros = array_filter([
+        'desde'    => $desde,
+        'hasta'    => $hasta,
+        'rol'      => $rol      ? ucfirst($rol) : null,
+        'estado'   => $estadoId !== null ? $estadoId : null,
+    ]);
 
     ob_start();
     require BASE_PATH . '/app/views/pdf/usuarios-pdf.php';
@@ -941,4 +963,200 @@ function reporteIngresosPDF()
     $html = ob_get_clean();
 
     generarPDF($html, 'reporte_ingresos_servicios.pdf', false);
+}
+
+function reporteServiciosOfrecidosPDF()
+{
+    require_once BASE_PATH . '/app/models/publicacion.php';
+    require_once BASE_PATH . '/app/models/categoria.php';
+    require_once BASE_PATH . '/config/database.php';
+
+    $categoriaId = isset($_GET['categoria_id']) && $_GET['categoria_id'] !== '' ? (int)$_GET['categoria_id'] : null;
+    $estado      = isset($_GET['estado'])       && $_GET['estado']       !== '' ? $_GET['estado']       : null;
+    $proveedorId = isset($_GET['proveedor_id']) && $_GET['proveedor_id'] !== '' ? (int)$_GET['proveedor_id'] : null;
+    $desde       = $_GET['desde'] ?? null;
+    $hasta       = $_GET['hasta'] ?? null;
+
+    $modelo  = new Publicacion();
+    $reporte = $modelo->obtenerReporteServiciosOfrecidos($categoriaId, $estado, $proveedorId, $desde, $hasta);
+
+    // Etiquetas legibles para los filtros del PDF
+    $filtros = [];
+    if ($estado)     $filtros['estado']    = ucfirst($estado);
+    if ($desde)      $filtros['desde']     = $desde;
+    if ($hasta)      $filtros['hasta']     = $hasta;
+
+    if ($categoriaId) {
+        $catModelo  = new Categoria();
+        $cat        = $catModelo->mostrarId($categoriaId);
+        if ($cat)   $filtros['categoria'] = $cat['nombre'];
+    }
+    if ($proveedorId) {
+        $db   = new Conexion();
+        $pdo  = $db->getConexion();
+        $stmt = $pdo->prepare("SELECT CONCAT(nombres, ' ', apellidos) AS nombre FROM proveedores WHERE id = :id LIMIT 1");
+        $stmt->bindParam(':id', $proveedorId, PDO::PARAM_INT);
+        $stmt->execute();
+        $prov = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($prov) $filtros['proveedor'] = $prov['nombre'];
+    }
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/servicios-ofrecidos-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_servicios_ofrecidos.pdf', false);
+}
+
+function reporteProveedoresPDF()
+{
+    require_once BASE_PATH . '/app/models/proveedor-perfil.php';
+
+    $nivelConfianza = isset($_GET['nivel_confianza']) && $_GET['nivel_confianza'] !== '' ? $_GET['nivel_confianza'] : null;
+    $verificado     = isset($_GET['verificado'])     && $_GET['verificado']     !== '' ? (int)$_GET['verificado'] : null;
+    $calMin         = isset($_GET['cal_min'])        && $_GET['cal_min']        !== '' ? (float)$_GET['cal_min'] : null;
+    $calMax         = isset($_GET['cal_max'])        && $_GET['cal_max']        !== '' ? (float)$_GET['cal_max'] : null;
+
+    $modelo  = new ProveedorPerfil();
+    $reporte = $modelo->obtenerReporteProveedores($nivelConfianza, $verificado, $calMin, $calMax);
+
+    $filtros = [
+        'nivel_confianza' => $nivelConfianza,
+        'verificado'      => $verificado,
+        'cal_min'         => $calMin,
+        'cal_max'         => $calMax,
+    ];
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/proveedores-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_proveedores.pdf', false);
+}
+
+function reporteServiciosFechaPDF()
+{
+    require_once BASE_PATH . '/app/models/servicio-contratado.php';
+
+    $desde      = $_GET['desde']      ?? null;
+    $hasta      = $_GET['hasta']      ?? null;
+    $estado     = isset($_GET['estado']) && $_GET['estado'] !== '' ? $_GET['estado'] : null;
+    $agrupacion = $_GET['agrupacion'] ?? 'mes';
+
+    $modelo  = new ServicioContratado();
+    $reporte = $modelo->obtenerReportePorFecha($desde, $hasta, $estado, $agrupacion);
+
+    $filtros = array_filter([
+        'desde'  => $desde,
+        'hasta'  => $hasta,
+        'estado' => $estado ? ucfirst(str_replace('_', ' ', $estado)) : null,
+    ]);
+
+    ob_start();
+    require BASE_PATH . '/app/views/pdf/servicios-fecha-pdf.php';
+    $html = ob_get_clean();
+
+    generarPDF($html, 'reporte_servicios_por_fecha.pdf', false);
+}
+
+// ===================================================================
+// GESTIÓN DE PAGOS (#188 / #189)
+// ===================================================================
+
+function liberarPago(): void
+{
+    $pagoId = (int)($_POST['pago_id'] ?? 0);
+    if ($pagoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Pago no válido.', BASE_URL . '/admin/pagos');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+
+        // Obtener datos del pago antes de liberar
+        $stPago = $pdo->prepare("
+            SELECT ps.monto, ps.proveedor_id, pr.usuario_id AS prov_usuario_id
+            FROM pagos_servicios ps
+            INNER JOIN proveedores pr ON ps.proveedor_id = pr.id
+            WHERE ps.id = :id AND ps.mp_status = 'approved' AND ps.liberado = 0
+            LIMIT 1
+        ");
+        $stPago->execute([':id' => $pagoId]);
+        $pago = $stPago->fetch(PDO::FETCH_ASSOC);
+
+        if (!$pago) {
+            mostrarSweetAlert('error', 'Sin cambios', 'El pago no existe o ya fue liberado.', BASE_URL . '/admin/pagos');
+            exit;
+        }
+
+        // Liberar el pago
+        $pdo->prepare("
+            UPDATE pagos_servicios SET liberado = 1, fecha_liberacion = NOW() WHERE id = :id
+        ")->execute([':id' => $pagoId]);
+
+        // Registrar liquidación (#187) — sin comisión
+        $pdo->exec("CREATE TABLE IF NOT EXISTS liquidaciones (
+            id                 INT AUTO_INCREMENT PRIMARY KEY,
+            pagos_servicios_id INT           NOT NULL,
+            proveedor_id       INT           NOT NULL,
+            monto              DECIMAL(12,2) NOT NULL,
+            created_at         DATETIME      DEFAULT NOW()
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+        $pdo->prepare("
+            INSERT INTO liquidaciones (pagos_servicios_id, proveedor_id, monto, created_at)
+            VALUES (:pago_id, :prov_id, :monto, NOW())
+        ")->execute([
+            ':pago_id' => $pagoId,
+            ':prov_id' => $pago['proveedor_id'],
+            ':monto'   => $pago['monto'],
+        ]);
+
+        // Notificar al proveedor (#187)
+        $adminId = (int)$_SESSION['user']['id'];
+        $monto   = number_format((float)$pago['monto'], 0, ',', '.');
+        $pdo->prepare("
+            INSERT INTO mensajes (emisor_id, receptor_id, contenido, leido, fecha_hora, created_at)
+            VALUES (:emisor, :receptor, :msg, 0, NOW(), NOW())
+        ")->execute([
+            ':emisor'   => $adminId,
+            ':receptor' => $pago['prov_usuario_id'],
+            ':msg'      => "✅ Tu pago de \$$monto ha sido liberado. Ya puedes ver el ingreso en tu historial de pagos.",
+        ]);
+
+        mostrarSweetAlert('success', 'Pago liberado', 'Los fondos fueron liberados al proveedor.', BASE_URL . '/admin/pagos');
+    } catch (PDOException $e) {
+        error_log('liberarPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo liberar el pago.', BASE_URL . '/admin/pagos');
+    }
+    exit;
+}
+
+function reembolsarPago(): void
+{
+    $pagoId = (int)($_POST['pago_id'] ?? 0);
+    if ($pagoId <= 0) {
+        mostrarSweetAlert('error', 'Error', 'Pago no válido.', BASE_URL . '/admin/pagos');
+        exit;
+    }
+    try {
+        $db  = new Conexion();
+        $pdo = $db->getConexion();
+        $st  = $pdo->prepare("
+            UPDATE pagos_servicios
+            SET mp_status = 'refunded'
+            WHERE id = :id AND mp_status IN ('charged_back','in_process')
+        ");
+        $st->execute([':id' => $pagoId]);
+        if ($st->rowCount() > 0) {
+            mostrarSweetAlert('success', 'Reembolso aplicado', 'El pago fue marcado como reembolsado.', BASE_URL . '/admin/pagos');
+        } else {
+            mostrarSweetAlert('error', 'Sin cambios', 'El pago no está en estado de disputa o ya fue procesado.', BASE_URL . '/admin/pagos');
+        }
+    } catch (PDOException $e) {
+        error_log('reembolsarPago: ' . $e->getMessage());
+        mostrarSweetAlert('error', 'Error', 'No se pudo aplicar el reembolso.', BASE_URL . '/admin/pagos');
+    }
+    exit;
 }

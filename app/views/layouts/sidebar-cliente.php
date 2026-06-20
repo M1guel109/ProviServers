@@ -1,5 +1,9 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
+$_notifCount = isset($_SESSION['user']['id'])
+    ? Notificacion::contarNoLeidas((int)$_SESSION['user']['id'])
+    : 0;
 ?>
 
 <aside class="sidebar" id="mainSidebar">
@@ -44,6 +48,15 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     </a>
                 </li>
 
+                <!-- Mis necesidades -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/necesidades" data-title="Mis necesidades"
+                       class="<?= ($currentPage ?? '') === 'necesidades' ? 'active' : '' ?>">
+                        <i class="bi bi-lightbulb"></i>
+                        <span class="nav-text">Mis necesidades</span>
+                    </a>
+                </li>
+
                 <!-- Servicios contratados -->
                 <li>
                     <a href="<?= BASE_URL ?>/cliente/servicios-contratados" data-title="<?= __('cliente_servicios_contratados') ?>">
@@ -57,6 +70,15 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     <a href="<?= BASE_URL ?>/cliente/historial" data-title="<?= __('cliente_historial') ?>">
                         <i class="bi bi-clock-history"></i>
                         <span class="nav-text"><?= __('cliente_historial') ?></span>
+                    </a>
+                </li>
+
+                <!-- Historial de pagos -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/historial-pagos" data-title="Historial de pagos"
+                       class="<?= ($currentPage ?? '') === 'historial-pagos' ? 'active' : '' ?>">
+                        <i class="bi bi-receipt"></i>
+                        <span class="nav-text">Historial de pagos</span>
                     </a>
                 </li>
 
@@ -78,6 +100,20 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     </a>
                 </li>
 
+                <!-- Notificaciones -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/notificaciones" data-title="Notificaciones"
+                       class="<?= ($currentPage ?? '') === 'notificaciones' ? 'active' : '' ?>">
+                        <i class="bi bi-bell<?= $_notifCount > 0 ? '-fill text-warning' : '' ?>"></i>
+                        <span class="nav-text d-flex align-items-center justify-content-between">
+                            Notificaciones
+                            <?php if ($_notifCount > 0): ?>
+                                <span class="badge bg-danger rounded-pill"><?= $_notifCount > 99 ? '99+' : $_notifCount ?></span>
+                            <?php endif; ?>
+                        </span>
+                    </a>
+                </li>
+
                 <li class="menu-header"><?= __('cliente_header_configuracion') ?></li>
 
                 <!-- Mi Perfil -->
@@ -85,6 +121,15 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                     <a href="<?= BASE_URL ?>/cliente/perfil" data-title="<?= __('cliente_mi_perfil') ?>">
                         <i class="bi bi-person-circle"></i>
                         <span class="nav-text"><?= __('cliente_mi_perfil') ?></span>
+                    </a>
+                </li>
+
+                <!-- Métodos de pago -->
+                <li>
+                    <a href="<?= BASE_URL ?>/cliente/metodos-pago" data-title="Métodos de pago"
+                       class="<?= ($currentPage ?? '') === 'metodos-pago' ? 'active' : '' ?>">
+                        <i class="bi bi-credit-card"></i>
+                        <span class="nav-text">Métodos de pago</span>
                     </a>
                 </li>
 

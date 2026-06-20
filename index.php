@@ -236,13 +236,38 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/admin/reportes-calificaciones.php';
         break;
 
+    case '/admin/calificaciones-proveedor':
+        require BASE_PATH . '/app/views/dashboard/admin/calificaciones-proveedor.php';
+        break;
+
     case '/admin/reportes-ingresos':
         require BASE_PATH . '/app/views/dashboard/admin/reportes-ingresos.php';
+        break;
+
+    case '/admin/reportes-servicios':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-servicios.php';
+        break;
+
+    case '/admin/reportes-servicios-fecha':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-servicios-fecha.php';
+        break;
+
+    case '/admin/reportes-proveedores':
+        require BASE_PATH . '/app/views/dashboard/admin/reportes-proveedores.php';
         break;
 
     case '/admin/reporte':
         require_once BASE_PATH . '/app/controllers/admin-controller.php';
         reportesPdfController();
+        break;
+
+    case '/admin/pagos':
+        require BASE_PATH . '/app/views/dashboard/admin/pagos.php';
+        break;
+
+    case '/admin/pagos/liberar':
+    case '/admin/pagos/reembolsar':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
         break;
 
     // ADMINISTRADOR — Moderación
@@ -285,6 +310,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/proveedor/finanzas.php';
         break;
 
+    case '/proveedor/historial-pagos':
+        require BASE_PATH . '/app/views/dashboard/proveedor/historial-pagos.php';
+        break;
+
     case '/proveedor/facturacion':
         require BASE_PATH . '/app/views/dashboard/proveedor/facturacion.php';
         break;
@@ -310,6 +339,8 @@ switch ($request) {
         break;
 
     case '/proveedor/notificaciones':
+    case '/proveedor/notificaciones/marcar-leida':
+    case '/proveedor/notificaciones/marcar-todas':
         require BASE_PATH . '/app/views/dashboard/proveedor/notificaciones.php';
         break;
 
@@ -360,6 +391,20 @@ switch ($request) {
     case '/proveedor/actualizar-estado':
     case '/proveedor/oportunidades':
     case '/proveedor/oportunidades/enviar-cotizacion':
+    case '/proveedor/contrato/seguimiento':
+    case '/proveedor/contrato/comentario':
+        require BASE_PATH . '/app/controllers/proveedor-controller.php';
+        break;
+
+    case '/cliente/contrato/seguimiento':
+    case '/cliente/contrato/comentario':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
+    case '/proveedor/calificaciones-cliente':
+        require BASE_PATH . '/app/views/dashboard/proveedor/calificaciones-cliente.php';
+        break;
+
     case '/proveedor/resenas':
     case '/proveedor/resenas/responder':
     case '/proveedor/guardar-perfil-profesional':
@@ -370,6 +415,7 @@ switch ($request) {
     case '/proveedor/guardar-notificaciones':
     case '/proveedor/guardar-pagos':
     case '/proveedor/guardar-politicas':
+    case '/proveedor/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
@@ -405,7 +451,13 @@ switch ($request) {
         break;
 
     case '/cliente/notificaciones':
+    case '/cliente/notificaciones/marcar-leida':
+    case '/cliente/notificaciones/marcar-todas':
         require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
+        break;
+
+    case '/cliente/guardar-notificaciones':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     // CLIENTE — Servicios
@@ -417,6 +469,7 @@ switch ($request) {
     case '/cliente/servicios-contratados':
     case '/cliente/mis-solicitudes':
     case '/cliente/necesidades':
+    case '/cliente/mapa/datos':
         require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
@@ -450,6 +503,14 @@ switch ($request) {
             exit;
         }
         require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
+    case '/cliente/necesidades/confirmar-cotizacion':
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            header('Location: ' . BASE_URL . '/cliente/necesidades');
+            exit;
+        }
+        require BASE_PATH . '/app/views/dashboard/cliente/confirmar-cotizacion.php';
         break;
 
     case '/cliente/necesidades/aceptar-cotizacion':
@@ -487,7 +548,35 @@ switch ($request) {
         break;
 
     case '/cliente/perfil/cambiar-clave':
+    case '/cliente/perfil/cambiar-email':
+    case '/cliente/perfil/eliminar-cuenta':
         require BASE_PATH . '/app/controllers/perfil-controller.php';
+        break;
+
+    // CLIENTE — Métodos de pago
+
+    case '/cliente/metodos-pago':
+        require BASE_PATH . '/app/views/dashboard/cliente/metodos-pago.php';
+        break;
+
+    case '/cliente/historial-pagos':
+        require BASE_PATH . '/app/views/dashboard/cliente/historial-pagos.php';
+        break;
+
+    case '/cliente/checkout':
+        require BASE_PATH . '/app/views/dashboard/cliente/checkout.php';
+        break;
+
+    case '/cliente/metodos-pago/agregar-tarjeta':
+        require BASE_PATH . '/app/views/dashboard/cliente/agregar-tarjeta.php';
+        break;
+
+    case '/cliente/metodos-pago/guardar':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/cliente/metodos-pago');
+            exit;
+        }
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
         break;
 
     // CLIENTE — Mensajes

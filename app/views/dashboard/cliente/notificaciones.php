@@ -1,8 +1,43 @@
 ﻿<?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
-require_once BASE_PATH . '/app/helpers/notificaciones-cliente.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
+require_once BASE_PATH . '/app/models/cliente-notificaciones.php';
 
-$notificaciones = obtenerNotificacionesCliente((int)($_SESSION['user']['id'] ?? 0));
+$uid     = (int)$_SESSION['user']['id'];
+$request ??= ''; // definido por index.php; fallback para el linter
+
+// ── AJAX: marcar una como leída ──────────────────────────────────────
+if ($request === '/cliente/notificaciones/marcar-leida' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_clean();
+    header('Content-Type: application/json');
+    $id = (int)($_POST['id'] ?? 0);
+    echo json_encode(['ok' => $id > 0 && Notificacion::marcarLeida($id, $uid)]);
+    exit;
+}
+
+// ── AJAX: marcar todas como leídas ──────────────────────────────────
+if ($request === '/cliente/notificaciones/marcar-todas' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    ob_clean();
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => Notificacion::marcarTodasLeidas($uid)]);
+    exit;
+}
+
+// ── Datos para la vista ──────────────────────────────────────────────
+$filtro         = $_GET['filtro'] ?? 'todas';
+$soloNoLeidas   = $filtro === 'no-leidas' ? true : null;
+$notificaciones = Notificacion::listar($uid, $soloNoLeidas, 100);
+$totalNoLeidas  = Notificacion::contarNoLeidas($uid);
+$prefNotif      = (new ClienteNotificaciones())->obtenerPorUsuario($uid) ?? [];
+
+function tiempoAtrasNotifCl(string $fecha): string {
+    $diff = time() - strtotime($fecha);
+    if ($diff < 60)     return 'Hace un momento';
+    if ($diff < 3600)   return 'Hace ' . floor($diff / 60) . ' min';
+    if ($diff < 86400)  return 'Hace ' . floor($diff / 3600) . ' h';
+    if ($diff < 604800) return 'Hace ' . floor($diff / 86400) . ' días';
+    return date('d/m/Y', strtotime($fecha));
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -11,91 +46,292 @@ $notificaciones = obtenerNotificacionesCliente((int)($_SESSION['user']['id'] ?? 
     <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ProviServers | Notificaciones</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/estilosGenerales/style.css">
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/dashboard/css/dashboard-cliente.css">
 </head>
 <body>
+<?php
+$currentPage = 'notificaciones';
+include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
+?>
+<main class="contenido">
+    <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
 
-    <?php
-    $currentPage = 'notificaciones';
-    include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
-    ?>
-
-    <main class="contenido">
-
-        <?php include_once __DIR__ . '/../../layouts/header-cliente.php'; ?>
-
-        <section class="p-3">
-            <div id="titulo-principal" class="section-hero mb-4">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h1 class="mb-1">Notificaciones</h1>
-                        <p class="text-muted mb-0">Historial de alertas y eventos relacionados con tus servicios.</p>
-                    </div>
-                    <div class="col-md-4">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb mb-0 justify-content-md-end">
-                                <li class="breadcrumb-item">
-                                    <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
-                                </li>
-                                <li class="breadcrumb-item active" aria-current="page">Notificaciones</li>
-                            </ol>
-                        </nav>
-                    </div>
-                </div>
+    <section id="titulo-principal" class="section-hero mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-1">Notificaciones</h1>
+                <p class="text-muted mb-0">
+                    <?= $totalNoLeidas > 0
+                        ? $totalNoLeidas . ' notificación(es) sin leer'
+                        : 'Estás al día con todas tus notificaciones' ?>
+                </p>
             </div>
+            <div class="col-md-4">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 justify-content-md-end">
+                        <li class="breadcrumb-item">
+                            <a href="<?= BASE_URL ?>/cliente/dashboard"><i class="bi bi-house-door-fill"></i> Inicio</a>
+                        </li>
+                        <li class="breadcrumb-item active">Notificaciones</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </section>
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body p-0">
+    <div class="container-fluid px-4 pb-5">
 
-                    <?php if (!empty($notificaciones)): ?>
-                        <ul class="list-group list-group-flush">
-                            <?php foreach ($notificaciones as $notif): ?>
-                                <?php $estilo = estiloNotificacion($notif['tipo'] ?? 'info'); ?>
-                                <li class="list-group-item d-flex align-items-start py-3 px-4">
+        <!-- Filtros + acción masiva -->
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <ul class="nav nav-pills">
+                <li class="nav-item">
+                    <a class="nav-link <?= $filtro === 'todas' ? 'active' : '' ?>"
+                       href="<?= BASE_URL ?>/cliente/notificaciones?filtro=todas">Todas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= $filtro === 'no-leidas' ? 'active' : '' ?>"
+                       href="<?= BASE_URL ?>/cliente/notificaciones?filtro=no-leidas">
+                        No leídas
+                        <?php if ($totalNoLeidas > 0): ?>
+                            <span class="badge bg-danger ms-1"><?= $totalNoLeidas ?></span>
+                        <?php endif; ?>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= $filtro === 'preferencias' ? 'active' : '' ?>"
+                       href="<?= BASE_URL ?>/cliente/notificaciones?filtro=preferencias">
+                        <i class="bi bi-gear me-1"></i> Preferencias
+                    </a>
+                </li>
+            </ul>
+            <?php if ($totalNoLeidas > 0 && $filtro !== 'preferencias'): ?>
+                <button class="btn btn-outline-secondary btn-sm" id="btn-marcar-todas">
+                    <i class="bi bi-check2-all"></i> Marcar todas como leídas
+                </button>
+            <?php endif; ?>
+        </div>
 
-                                    <div class="me-3 fs-5 <?= $estilo['color'] ?> <?= $estilo['bg'] ?> rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                                         style="width:42px; height:42px;">
-                                        <i class="bi <?= $estilo['icon'] ?>"></i>
-                                    </div>
+        <!-- Preferencias -->
+        <?php if ($filtro === 'preferencias'): ?>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>Preferencias de notificaciones</h5>
+                <p class="text-muted small mb-4">Elige qué eventos te generan notificaciones y por qué canal recibirlas.</p>
 
-                                    <div class="flex-grow-1">
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <h6 class="mb-1 fw-bold text-dark">
-                                                <?= htmlspecialchars($notif['titulo']) ?>
-                                            </h6>
-                                            <small class="text-muted ms-3 flex-shrink-0">
-                                                <i class="bi bi-clock me-1"></i>
-                                                <?= htmlspecialchars($notif['hora']) ?>
-                                            </small>
-                                        </div>
-                                        <p class="mb-0 text-secondary small">
-                                            <?= htmlspecialchars($notif['mensaje']) ?>
-                                        </p>
-                                    </div>
+                <form action="<?= BASE_URL ?>/cliente/guardar-notificaciones" method="POST">
 
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
+                    <p class="fw-semibold small mb-2">Eventos que quiero recibir</p>
 
-                    <?php else: ?>
-                        <div class="text-center py-5 text-muted">
-                            <i class="bi bi-bell-slash fs-1 d-block mb-3"></i>
-                            <h5>Sin notificaciones</h5>
-                            <p class="small">No tienes alertas pendientes en este momento.</p>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_cambios_estado"
+                               name="noti_cambios_estado" value="1"
+                               <?= !empty($prefNotif['noti_cambios_estado']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_cambios_estado">
+                            <i class="bi bi-arrow-repeat text-warning me-1"></i> Cambios de estado en mis contratos
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_nueva_cotizacion"
+                               name="noti_nueva_cotizacion" value="1"
+                               <?= !empty($prefNotif['noti_nueva_cotizacion']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_nueva_cotizacion">
+                            <i class="bi bi-file-earmark-text text-primary me-1"></i> Nueva cotización de un proveedor
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_recordatorio_pago"
+                               name="noti_recordatorio_pago" value="1"
+                               <?= !empty($prefNotif['noti_recordatorio_pago']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_recordatorio_pago">
+                            <i class="bi bi-credit-card text-success me-1"></i> Recordatorio de pago pendiente
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="noti_resenas"
+                               name="noti_resenas" value="1"
+                               <?= !empty($prefNotif['noti_resenas']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_resenas">
+                            <i class="bi bi-star text-warning me-1"></i> Respuesta a mis reseñas
+                        </label>
+                    </div>
+
+                    <hr>
+                    <p class="fw-semibold small mb-2">Canales de notificación</p>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="canal_interna"
+                               name="canal_interna" value="1"
+                               <?= !empty($prefNotif['canal_interna']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="canal_interna">
+                            <i class="bi bi-bell me-1"></i> Notificaciones en la plataforma
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canal_email"
+                               name="canal_email" value="1"
+                               <?= !empty($prefNotif['canal_email']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="canal_email">
+                            <i class="bi bi-envelope me-1"></i> Correo electrónico
+                        </label>
+                    </div>
+
+                    <hr>
+                    <p class="fw-semibold small mb-2">Resúmenes periódicos</p>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="resumen_diario"
+                               name="resumen_diario" value="1"
+                               <?= !empty($prefNotif['resumen_diario']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="resumen_diario">
+                            Resumen diario de actividad
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="resumen_semanal"
+                               name="resumen_semanal" value="1"
+                               <?= !empty($prefNotif['resumen_semanal']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="resumen_semanal">
+                            Resumen semanal de actividad
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Guardar preferencias
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista -->
+        <?php elseif (empty($notificaciones)): ?>
+            <div class="text-center py-5">
+                <i class="bi bi-bell-slash fs-1 text-muted"></i>
+                <p class="mt-3 text-muted">
+                    <?= $filtro === 'no-leidas' ? 'No tienes notificaciones sin leer.' : 'Aún no tienes notificaciones.' ?>
+                </p>
+            </div>
+        <?php else: ?>
+            <div class="list-group shadow-sm" id="lista-notificaciones">
+                <?php foreach ($notificaciones as $n): ?>
+                    <div class="list-group-item list-group-item-action d-flex gap-3 py-3 notif-item <?= !$n['leida'] ? 'fw-semibold bg-light' : '' ?>"
+                         data-id="<?= $n['id'] ?>" data-leida="<?= $n['leida'] ?>">
+
+                        <div class="fs-4 pt-1 flex-shrink-0">
+                            <i class="bi <?= htmlspecialchars($n['icono']) ?> <?= htmlspecialchars($n['color']) ?>"></i>
                         </div>
-                    <?php endif; ?>
 
-                </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <span><?= htmlspecialchars($n['titulo']) ?></span>
+                                <small class="text-muted text-nowrap"><?= tiempoAtrasNotifCl($n['created_at']) ?></small>
+                            </div>
+                            <p class="mb-1 small text-muted fw-normal"><?= htmlspecialchars($n['mensaje']) ?></p>
+                            <div class="d-flex gap-2 mt-1">
+                                <?php if ($n['url']): ?>
+                                    <a href="<?= htmlspecialchars($n['url']) ?>" class="btn btn-sm btn-outline-primary">
+                                        Ver detalle <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                <?php endif; ?>
+                                <?php if (!$n['leida']): ?>
+                                    <button class="btn btn-sm btn-outline-secondary btn-marcar-leida" data-id="<?= $n['id'] ?>">
+                                        <i class="bi bi-check2"></i> Marcar como leída
+                                    </button>
+                                <?php else: ?>
+                                    <span class="badge bg-secondary-subtle text-secondary align-self-center">
+                                        <i class="bi bi-check2-all"></i> Leída
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
             </div>
-        </section>
+        <?php endif; ?>
 
-    </main>
+    </div>
+</main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script>const BASE_URL = "<?= BASE_URL ?>";</script>
-    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+<script>const BASE_URL = "<?= BASE_URL ?>";</script>
+<script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    async function jsonPost(url, body = null) {
+        try {
+            const opts = { method: 'POST' };
+            if (body) {
+                opts.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                opts.body = body;
+            }
+            const res  = await fetch(url, opts);
+            const text = await res.text();
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('notif AJAX error:', e);
+            return { ok: false };
+        }
+    }
+
+    document.querySelectorAll('.btn-marcar-leida').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const id   = btn.dataset.id;
+            const item = btn.closest('.notif-item');
+            const data = await jsonPost(BASE_URL + '/cliente/notificaciones/marcar-leida', 'id=' + id);
+            if (data.ok) {
+                item.classList.remove('fw-semibold', 'bg-light');
+                btn.replaceWith(Object.assign(document.createElement('span'), {
+                    className  : 'badge bg-secondary-subtle text-secondary align-self-center',
+                    innerHTML  : '<i class="bi bi-check2-all"></i> Leída',
+                }));
+                cambiarContador(-1);
+            }
+        });
+    });
+
+    const btnTodas = document.getElementById('btn-marcar-todas');
+    if (btnTodas) {
+        btnTodas.addEventListener('click', async () => {
+            const data = await jsonPost(BASE_URL + '/cliente/notificaciones/marcar-todas');
+            if (data.ok) {
+                document.querySelectorAll('.notif-item').forEach(item => {
+                    item.classList.remove('fw-semibold', 'bg-light');
+                    const b = item.querySelector('.btn-marcar-leida');
+                    if (b) b.replaceWith(Object.assign(document.createElement('span'), {
+                        className: 'badge bg-secondary-subtle text-secondary align-self-center',
+                        innerHTML: '<i class="bi bi-check2-all"></i> Leída',
+                    }));
+                });
+                btnTodas.remove();
+                cambiarContador(0, true);
+            }
+        });
+    }
+
+    function cambiarContador(delta, reset = false) {
+        const targets = [
+            document.querySelector('.nav-pills .badge'),
+            document.querySelector('.sidebar a[href*="notificaciones"] .badge'),
+            document.querySelector('.hdr-badge'),
+        ];
+        targets.forEach(b => {
+            if (!b) return;
+            if (reset) { b.remove(); return; }
+            const n = parseInt(b.textContent) + delta;
+            n <= 0 ? b.remove() : (b.textContent = n);
+        });
+    }
+});
+</script>
 </body>
 </html>

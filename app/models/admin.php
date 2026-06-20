@@ -455,25 +455,28 @@ class Usuario
                 $pid = $stmtPid->fetchColumn();
 
                 if ($pid) {
-                    // Si tienes tabla de servicios, descomenta esto:
-                    /*
-                    $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE proveedor_id = :pid"); 
+                    $stmtCheck = $this->conexion->prepare(
+                        "SELECT COUNT(*) FROM servicios_contratados
+                         WHERE proveedor_id = :pid
+                           AND estado IN ('pendiente','confirmado','en_proceso')"
+                    );
                     $stmtCheck->execute([':pid' => $pid]);
                     if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
-                    */
                 }
             } elseif ($rol === 'cliente') {
                 $stmtCid = $this->conexion->prepare("SELECT id FROM clientes WHERE usuario_id = :id");
                 $stmtCid->execute([':id' => $id]);
                 $cid = $stmtCid->fetchColumn();
 
-                /*
                 if ($cid) {
-                   $stmtCheck = $this->conexion->prepare("SELECT COUNT(*) FROM servicios WHERE cliente_id = :cid");
-                   $stmtCheck->execute([':cid' => $cid]);
-                   if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
+                    $stmtCheck = $this->conexion->prepare(
+                        "SELECT COUNT(*) FROM servicios_contratados
+                         WHERE cliente_id = :cid
+                           AND estado IN ('pendiente','confirmado','en_proceso')"
+                    );
+                    $stmtCheck->execute([':cid' => $cid]);
+                    if ($stmtCheck->fetchColumn() > 0) $tieneHistorial = true;
                 }
-                */
             }
 
             // =========================================================
@@ -493,13 +496,16 @@ class Usuario
 
                 // --- LIMPIEZA DE DEPENDENCIAS (Solo Proveedores) ---
                 if ($rol === 'proveedor' && $pid) {
-                    // Categorías (Asegúrate de usar el nombre de columna correcto que te funcionó)
-                    $delCat = $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid");
-                    $delCat->execute([':pid' => $pid]);
-
-                    // Documentos (Asegúrate de usar el nombre de columna correcto)
-                    $delDoc = $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid");
-                    $delDoc->execute([':pid' => $pid]);
+                    foreach ([
+                        "DELETE FROM proveedor_categorias          WHERE proveedor_id = :pid",
+                        "DELETE FROM documentos_proveedor          WHERE proveedor_id = :pid",
+                        "DELETE FROM proveedores_disponibilidad    WHERE proveedor_id = :pid",
+                        "DELETE FROM proveedores_politicas_servicio WHERE proveedor_id = :pid",
+                    ] as $sql) {
+                        $this->conexion->prepare($sql)->execute([':pid' => $pid]);
+                    }
+                    $this->conexion->prepare("DELETE FROM proveedor_perfil WHERE id_usuario = :id")
+                        ->execute([':id' => $id]);
                 }
 
                 // 3. Borrar Perfil
@@ -752,6 +758,104 @@ class Usuario
                 'clientes_total'      => 0,
                 'proveedores_total'   => 0
             ];
+        }
+    }
+
+    public function obtenerReporteUsuarios($desde = null, $hasta = null, $rol = null, $estadoId = null)
+    {
+        try {
+            $where  = [];
+            $params = [];
+
+            if ($desde) {
+                $where[]          = 'u.created_at >= :desde';
+                $params[':desde'] = $desde . ' 00:00:00';
+            }
+            if ($hasta) {
+                $where[]          = 'u.created_at <= :hasta';
+                $params[':hasta'] = $hasta . ' 23:59:59';
+            }
+            if ($rol) {
+                $where[]       = 'u.rol = :rol';
+                $params[':rol'] = $rol;
+            }
+            if ($estadoId !== null) {
+                $where[]            = 'u.estado_id = :estado_id';
+                $params[':estado_id'] = $estadoId;
+            }
+
+            $whereSQL = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+            // 1. Global
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    COUNT(*)                                              AS total,
+                    SUM(u.rol = 'cliente')                               AS clientes,
+                    SUM(u.rol = 'proveedor')                             AS proveedores,
+                    SUM(u.rol = 'admin')                                 AS admins,
+                    SUM(ue.nombre = 'activo')                            AS activos,
+                    SUM(ue.nombre = 'pendiente')                         AS pendientes,
+                    SUM(ue.nombre = 'suspendido')                        AS suspendidos,
+                    SUM(ue.nombre IN ('inactivo','bloqueado'))            AS inactivos
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $global = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // 2. Crecimiento mensual (últimos 12 meses o rango filtrado)
+            $crecWhere = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    DATE_FORMAT(u.created_at, '%Y-%m')           AS periodo,
+                    DATE_FORMAT(MIN(u.created_at), '%b %Y')      AS label,
+                    COUNT(*)                                      AS total,
+                    SUM(u.rol = 'cliente')                        AS clientes,
+                    SUM(u.rol = 'proveedor')                      AS proveedores
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $crecWhere
+                GROUP BY periodo
+                ORDER BY periodo ASC
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $crecimiento = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Por estado
+            $stmt = $this->conexion->prepare("
+                SELECT ue.nombre AS estado, COUNT(*) AS total
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+                GROUP BY ue.id
+                ORDER BY total DESC
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Detalle
+            $stmt = $this->conexion->prepare("
+                SELECT u.id, u.email, u.rol, u.created_at,
+                       ue.nombre AS estado
+                FROM usuarios u
+                JOIN usuario_estados ue ON ue.id = u.estado_id
+                $whereSQL
+                ORDER BY u.created_at DESC
+                LIMIT 200
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $detalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return compact('global', 'crecimiento', 'porEstado', 'detalle');
+
+        } catch (PDOException $e) {
+            error_log('Error en Usuario::obtenerReporteUsuarios -> ' . $e->getMessage());
+            return ['global' => [], 'crecimiento' => [], 'porEstado' => [], 'detalle' => []];
         }
     }
 }

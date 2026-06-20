@@ -3,6 +3,7 @@ require_once BASE_PATH . '/app/controllers/perfil-controller.php';
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
 require_once BASE_PATH . '/app/helpers/notificaciones-proveedor.php';
 require_once BASE_PATH . '/app/helpers/plan-helper.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
 
 $id = $_SESSION['user']['id'] ?? null;
 
@@ -18,8 +19,8 @@ $rolPerfil    = ucfirst($usuarioP['rol'] ?? 'Proveedor');
 
 $langActual = $_SESSION['lang'] ?? 'es';
 
-$misNotificaciones = obtenerNotificacionesProveedor((int)($_SESSION['user']['id'] ?? 0));
-$cantidadNotif     = count($misNotificaciones);
+$misNotificaciones = $id ? Notificacion::listar((int)$id, true, 5) : [];
+$cantidadNotif     = $id ? Notificacion::contarNoLeidas((int)$id) : 0;
 
 $planActivo    = $id ? obtenerPlanActivoProveedor((int)$id) : null;
 $planNombre    = $planActivo['nombre']         ?? 'Básico';
@@ -105,18 +106,18 @@ $badgeLabel = strtoupper(explode(' ', $planNombre)[0]);
 
                 <div class="notificaciones-scroll" style="max-height:300px;overflow-y:auto;">
                     <?php if (!empty($misNotificaciones)): ?>
-                        <?php foreach ($misNotificaciones as $notif): ?>
-                            <?php $estilo = estiloNotificacion($notif['tipo'] ?? 'info'); ?>
+                        <?php foreach ($misNotificaciones as $n): ?>
+                            <?php $bgCls = str_replace('text-', 'bg-', $n['color']) . '-subtle'; ?>
                             <li class="notification-item d-flex align-items-start p-3 border-bottom">
-                                <div class="me-3 fs-5 <?= $estilo['color'] ?> <?= $estilo['bg'] ?> rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                <div class="me-3 fs-5 <?= $n['color'] ?> <?= $bgCls ?> rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
                                      style="width:38px;height:38px;">
-                                    <i class="bi <?= $estilo['icon'] ?>"></i>
+                                    <i class="bi <?= htmlspecialchars($n['icono']) ?>"></i>
                                 </div>
                                 <div>
-                                    <h6 class="mb-1 fw-bold fs-6 text-dark"><?= htmlspecialchars($notif['titulo']) ?></h6>
-                                    <p class="mb-1 small text-secondary lh-sm"><?= htmlspecialchars($notif['mensaje']) ?></p>
+                                    <h6 class="mb-1 fw-bold fs-6 text-dark"><?= htmlspecialchars($n['titulo']) ?></h6>
+                                    <p class="mb-1 small text-secondary lh-sm"><?= htmlspecialchars($n['mensaje']) ?></p>
                                     <small class="text-muted" style="font-size:0.75rem;">
-                                        <i class="bi bi-clock me-1"></i><?= $notif['hora'] ?>
+                                        <i class="bi bi-clock me-1"></i><?= calcularTiempoNotif($n['created_at']) ?>
                                     </small>
                                 </div>
                             </li>

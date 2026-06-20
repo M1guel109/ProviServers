@@ -124,8 +124,11 @@ if ($usuarioId) {
                             $tituloShort = mb_substr($tituloShort, 0, 60) . '...';
                         }
 
-                        $precioValor = isset($pub['precio']) ? (float)$pub['precio'] : 0;
-                        $precio = number_format($precioValor, 2, ',', '.');
+                        $precioValor        = isset($pub['precio']) ? (float)$pub['precio'] : 0;
+                        $precio             = number_format($precioValor, 2, ',', '.');
+                        $promoDescuento     = (int)($pub['promo_descuento'] ?? 0);
+                        $precioConDescuento = isset($pub['precio_con_descuento']) ? (float)$pub['precio_con_descuento'] : $precioValor;
+                        $promoHasta         = $pub['promo_hasta'] ?? null;
 
                         $fechaRaw = $pub['fecha_publicacion'] ?? $pub['publicacion_created_at'] ?? $pub['created_at'] ?? '';
                         if (!empty($fechaRaw) && strtotime($fechaRaw)) {
@@ -149,9 +152,19 @@ if ($usuarioId) {
                                         <span class="badge <?= $badgeClass ?>">
                                             <?= htmlspecialchars($estadoTexto) ?>
                                         </span>
-                                        <span class="badge bg-dark">
-                                            $ <?= htmlspecialchars($precio) ?>
-                                        </span>
+                                        <?php if ($promoDescuento > 0): ?>
+                                            <div class="text-end">
+                                                <span class="badge bg-danger mb-1">
+                                                    <i class="bi bi-tag-fill me-1"></i>-<?= $promoDescuento ?>%
+                                                </span>
+                                                <div class="small text-muted text-decoration-line-through lh-1">$<?= $precio ?></div>
+                                                <div class="fw-bold text-danger" style="font-size:.85rem;">$<?= number_format($precioConDescuento, 2, ',', '.') ?></div>
+                                            </div>
+                                        <?php else: ?>
+                                            <span class="badge bg-dark">
+                                                $ <?= htmlspecialchars($precio) ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </div>
 
                                     <h5 class="card-title fw-bold mb-2">

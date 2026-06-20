@@ -185,13 +185,10 @@
                       $yaPagado   = (int)($srv['ya_pagado']   ?? 0);
                       ?>
                       <?php if ($montoSrv > 0 && !$yaPagado && $estadoContrato === 'en_proceso'): ?>
-                        <button type="button"
-                          class="btn btn-success w-100 btn-pagar-servicio"
-                          data-contrato-id="<?= $contratoId ?>"
-                          data-monto="<?= number_format($montoSrv, 0, ',', '.') ?>"
-                          data-titulo="<?= htmlspecialchars($tituloServicio) ?>">
+                        <a href="<?= BASE_URL ?>/cliente/checkout?sc_id=<?= $contratoId ?>"
+                           class="btn btn-success w-100">
                           <i class="bi bi-credit-card me-1"></i> Pagar servicio
-                        </button>
+                        </a>
                       <?php elseif ($yaPagado): ?>
                         <span class="badge bg-success w-100 py-2">
                           <i class="bi bi-check-circle me-1"></i> Pagado
@@ -294,13 +291,10 @@
                       $yaPagado2 = (int)($srv['ya_pagado']   ?? 0);
                       ?>
                       <?php if ($montoSrv2 > 0 && !$yaPagado2 && $estadoContrato === 'confirmado'): ?>
-                        <button type="button"
-                          class="btn btn-success w-100 mb-2 btn-pagar-servicio"
-                          data-contrato-id="<?= $contratoId ?>"
-                          data-monto="<?= number_format($montoSrv2, 0, ',', '.') ?>"
-                          data-titulo="<?= htmlspecialchars($tituloServicio) ?>">
+                        <a href="<?= BASE_URL ?>/cliente/checkout?sc_id=<?= $contratoId ?>"
+                           class="btn btn-success w-100 mb-2">
                           <i class="bi bi-credit-card me-1"></i> Pagar servicio
-                        </button>
+                        </a>
                       <?php elseif ($yaPagado2): ?>
                         <span class="badge bg-success w-100 py-2 mb-2">
                           <i class="bi bi-check-circle me-1"></i> Pagado
@@ -546,8 +540,33 @@
           <h5 class="modal-title fw-bold" id="det-titulo">Detalles del servicio</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body" id="det-body">
-          <!-- llenado por JS -->
+        <div class="modal-body">
+          <div id="det-info"></div>
+          <hr class="my-3">
+          <h6 class="fw-semibold mb-2">
+            <i class="bi bi-clock-history me-1 text-primary"></i> Historial de seguimiento
+          </h6>
+          <div id="det-seguimiento" style="max-height:240px;overflow-y:auto;" class="mb-3"></div>
+          <div id="det-form-comentario" style="display:none;">
+            <h6 class="small fw-semibold mb-2">
+              <i class="bi bi-chat-dots me-1"></i> Agregar comentario
+            </h6>
+            <form id="form-seg-cliente" enctype="multipart/form-data">
+              <input type="hidden" name="contrato_id" id="seg-contrato-id">
+              <div class="mb-2">
+                <textarea name="comentario" class="form-control form-control-sm" rows="2"
+                  placeholder="Escribe un comentario…" required maxlength="1000"></textarea>
+              </div>
+              <div class="mb-2">
+                <input type="file" name="archivo" class="form-control form-control-sm"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt">
+                <small class="text-muted">Opcional — PDF, imagen o doc (máx 5 MB)</small>
+              </div>
+              <button type="submit" class="btn btn-primary btn-sm">
+                <i class="bi bi-send me-1"></i> Enviar
+              </button>
+            </form>
+          </div>
         </div>
         <div class="modal-footer justify-content-between">
           <a href="#" id="det-pdf-link" class="btn btn-outline-secondary btn-sm" target="_blank">
@@ -660,8 +679,9 @@
     });
   </script>
 
-  <!-- ── Modal detalles ──────────────────────────────── -->
+  <!-- ── Modal detalles + seguimiento ──────────────────────────────── -->
   <script>
+    const BASE_URL_CLI = '<?= BASE_URL ?>';
     const ESTADO_LABELS = {
       pendiente: 'Pendiente', confirmado: 'Confirmado', en_proceso: 'En proceso',
       finalizado: 'Finalizado', cancelado: 'Cancelado',
@@ -672,6 +692,52 @@
       finalizado: 'success', cancelado: 'danger',
       cancelado_cliente: 'danger', cancelado_proveedor: 'danger'
     };
+    const ESTADOS_ACTIVOS = ['pendiente', 'confirmado', 'en_proceso'];
+
+    function renderTimelineCli(entries) {
+      if (!entries.length) {
+        return '<p class="text-muted small fst-italic text-center">Sin actualizaciones aún.</p>';
+      }
+      return entries.map(function(e) {
+        const esEstado = e.estado_nuevo !== null;
+        const icon = esEstado ? 'bi-arrow-right-circle-fill text-primary' : 'bi-chat-dots-fill text-secondary';
+        const fecha = new Date(e.created_at).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+        const estadoHtml = esEstado
+          ? `<div class="mb-1"><span class="badge bg-secondary">${e.estado_anterior || '—'}</span> <i class="bi bi-arrow-right small"></i> <span class="badge bg-primary">${e.estado_nuevo}</span></div>`
+          : '';
+        const texto = e.descripcion || e.comentario || '';
+        const archivoHtml = e.archivo_adjunto
+          ? `<a href="${BASE_URL_CLI}/${e.archivo_adjunto}" target="_blank" class="d-block small mt-1"><i class="bi bi-paperclip me-1"></i>Archivo adjunto</a>`
+          : '';
+        return `<div class="d-flex gap-2 mb-3">
+          <div class="pt-1"><i class="bi ${icon} fs-6"></i></div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="fw-semibold small">${e.responsable_nombre}</span>
+              <span class="text-muted" style="font-size:.72rem;">${fecha}</span>
+            </div>
+            ${estadoHtml}
+            ${texto ? `<p class="mb-0 small">${texto}</p>` : ''}
+            ${archivoHtml}
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function cargarSeguimientoCliente(contratoId) {
+      const cont = document.getElementById('det-seguimiento');
+      cont.innerHTML = '<div class="text-center py-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+      fetch(BASE_URL_CLI + '/cliente/contrato/seguimiento?id=' + contratoId, { credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          cont.innerHTML = res.ok
+            ? renderTimelineCli(res.data)
+            : '<p class="text-danger small">No se pudo cargar el historial.</p>';
+        })
+        .catch(function() {
+          cont.innerHTML = '<p class="text-muted small">Error al conectar.</p>';
+        });
+    }
 
     document.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn-ver-detalles');
@@ -697,7 +763,7 @@
         ? `<dt class="col-sm-5">Descripción</dt><dd class="col-sm-7"><small class="text-muted">${descripcion}</small></dd>`
         : '';
 
-      document.getElementById('det-body').innerHTML = `
+      document.getElementById('det-info').innerHTML = `
         <dl class="row mb-0">
           <dt class="col-sm-5">Proveedor</dt><dd class="col-sm-7">${proveedor}</dd>
           <dt class="col-sm-5">Estado</dt><dd class="col-sm-7">${badge}</dd>
@@ -707,64 +773,43 @@
           ${descHtml}
         </dl>`;
 
+      const formCont = document.getElementById('det-form-comentario');
+      document.getElementById('seg-contrato-id').value = contratoId;
+      formCont.style.display = ESTADOS_ACTIVOS.includes(estado) ? 'block' : 'none';
+
       const pdfLink = document.getElementById('det-pdf-link');
-      if (pdfLink) pdfLink.href = '<?= BASE_URL ?>/cliente/contrato-pdf?id=' + contratoId;
+      if (pdfLink) pdfLink.href = BASE_URL_CLI + '/cliente/contrato-pdf?id=' + contratoId;
+
+      if (contratoId) cargarSeguimientoCliente(parseInt(contratoId));
 
       bootstrap.Modal.getOrCreateInstance(document.getElementById('modalDetalleServicio')).show();
     });
-  </script>
 
-  <!-- ── Pagar servicio ─────────────────────────────── -->
-  <script>
-    document.addEventListener('click', function (e) {
-      const btn = e.target.closest('.btn-pagar-servicio');
-      if (!btn) return;
-
-      const contratoId = btn.dataset.contratoId;
-      const monto      = btn.dataset.monto;
-      const titulo     = btn.dataset.titulo || 'este servicio';
-
-      Swal.fire({
-        title: 'Confirmar pago',
-        html: `<p class="mb-1">Servicio: <strong>${titulo}</strong></p>
-               <p>Monto: <strong class="text-success">$${monto} COP</strong></p>`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: '<i class="bi bi-credit-card me-1"></i> Ir a pagar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#198754'
-      }).then(result => {
-        if (!result.isConfirmed) return;
-
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
-
-        const body = new FormData();
-        body.append('contrato_id', contratoId);
-
-        fetch('<?= BASE_URL ?>/cliente/pagar-servicio', {
-          method: 'POST',
-          body,
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    // Comment form submit
+    document.getElementById('form-seg-cliente')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('[type="submit"]');
+      btn.disabled = true;
+      const fd = new FormData(this);
+      fetch(BASE_URL_CLI + '/cliente/contrato/comentario', { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res.ok) {
+            document.querySelector('#form-seg-cliente textarea').value = '';
+            document.querySelector('#form-seg-cliente input[type="file"]').value = '';
+            cargarSeguimientoCliente(parseInt(document.getElementById('seg-contrato-id').value));
+          } else {
+            Swal.fire('Error', res.message || 'No se pudo enviar.', 'error');
+          }
+          btn.disabled = false;
         })
-          .then(r => r.json())
-          .then(data => {
-            if (data.ok) {
-              window.location.href = data.url;
-            } else {
-              Swal.fire('Error', data.error || 'No se pudo iniciar el pago.', 'error');
-              btn.disabled = false;
-              btn.innerHTML = '<i class="bi bi-credit-card me-1"></i> Pagar servicio';
-            }
-          })
-          .catch(() => {
-            Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="bi bi-credit-card me-1"></i> Pagar servicio';
-          });
-      });
+        .catch(function() {
+          Swal.fire('Error', 'Error de conexión.', 'error');
+          btn.disabled = false;
+        });
     });
   </script>
+
 
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>

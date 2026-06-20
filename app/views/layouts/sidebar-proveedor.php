@@ -1,5 +1,9 @@
 <?php
 require_once BASE_PATH . '/app/helpers/lang-helper.php';
+require_once BASE_PATH . '/app/models/Notificacion.php';
+$_notifCount = isset($_SESSION['user']['id'])
+    ? Notificacion::contarNoLeidas((int)$_SESSION['user']['id'])
+    : 0;
 ?>
 
 <aside class="sidebar" id="mainSidebar">
@@ -107,6 +111,22 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                 </li>
 
                 <li>
+                    <a href="<?= BASE_URL ?>/proveedor/historial-pagos" data-title="Historial de pagos"
+                       class="<?= ($currentPage ?? '') === 'historial-pagos' ? 'active' : '' ?>">
+                        <i class="bi bi-receipt"></i>
+                        <span class="nav-text">Historial de pagos</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="<?= BASE_URL ?>/proveedor/completadas" data-title="Historial de contrataciones"
+                       class="<?= ($currentPage ?? '') === 'completadas' ? 'active' : '' ?>">
+                        <i class="bi bi-clock-history"></i>
+                        <span class="nav-text">Historial de contrataciones</span>
+                    </a>
+                </li>
+
+                <li>
                     <a href="<?= BASE_URL ?>/proveedor/facturacion"
                        data-title="<?= __('proveedor_facturacion') ?>">
                         <i class="bi bi-receipt"></i>
@@ -127,6 +147,22 @@ require_once BASE_PATH . '/app/helpers/lang-helper.php';
                        data-title="<?= __('proveedor_membresia') ?>">
                         <i class="bi bi-gem"></i>
                         <span class="nav-text"><?= __('proveedor_membresia') ?></span>
+                    </a>
+                </li>
+
+                <li class="menu-header">Comunicación</li>
+
+                <!-- Notificaciones -->
+                <li>
+                    <a href="<?= BASE_URL ?>/proveedor/notificaciones" data-title="Notificaciones"
+                       class="<?= ($currentPage ?? '') === 'notificaciones' ? 'active' : '' ?>">
+                        <i class="bi bi-bell<?= $_notifCount > 0 ? '-fill text-warning' : '' ?>"></i>
+                        <span class="nav-text d-flex align-items-center justify-content-between">
+                            Notificaciones
+                            <?php if ($_notifCount > 0): ?>
+                                <span class="badge bg-danger rounded-pill"><?= $_notifCount > 99 ? '99+' : $_notifCount ?></span>
+                            <?php endif; ?>
+                        </span>
                     </a>
                 </li>
 

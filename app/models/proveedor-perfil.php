@@ -463,4 +463,226 @@ class ProveedorPerfil
             return 'error';
         }
     }
+
+    // ======================================================================
+    // ELIMINACIÓN DE CUENTA — proveedor
+    // ======================================================================
+
+    public function eliminarCuenta(int $usuarioId): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+
+            $proveedorId = $this->obtenerProveedorIdPorUsuario($usuarioId);
+            if (!$proveedorId) { $this->conexion->rollBack(); return 'error'; }
+
+            // 1. Verificar contratos activos
+            $stmtAct = $this->conexion->prepare(
+                "SELECT COUNT(*) FROM servicios_contratados
+                 WHERE proveedor_id = :pid
+                   AND estado IN ('pendiente','confirmado','en_proceso')"
+            );
+            $stmtAct->execute([':pid' => $proveedorId]);
+            $tieneActivos = (int)$stmtAct->fetchColumn() > 0;
+
+            if ($tieneActivos) {
+                $this->conexion->prepare("UPDATE usuarios SET estado_id = 4 WHERE id = :uid")
+                    ->execute([':uid' => $usuarioId]);
+                $this->conexion->commit();
+                return 'desactivado';
+            }
+
+            // 2. Hard delete — limpiar dependencias
+            $this->conexion->prepare("DELETE FROM proveedor_categorias WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM documentos_proveedor WHERE proveedor_id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM proveedor_perfil WHERE id_usuario = :uid")
+                ->execute([':uid' => $usuarioId]);
+            $this->conexion->prepare("DELETE FROM proveedores WHERE id = :pid")
+                ->execute([':pid' => $proveedorId]);
+            $this->conexion->prepare("DELETE FROM usuarios WHERE id = :uid")
+                ->execute([':uid' => $usuarioId]);
+
+            $this->conexion->commit();
+            return 'eliminado';
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            error_log('ProveedorPerfil::eliminarCuenta -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
+
+    // ======================================================================
+    // PERFIL PÚBLICO — datos visibles para clientes en el detalle de servicio
+    // ======================================================================
+
+    public function obtenerPerfilPublicoProveedor(int $usuarioId): array
+    {
+        try {
+            $stmtPerfil = $this->conexion->prepare(
+                "SELECT nombre_comercial, tipo_proveedor, eslogan, descripcion,
+                        anios_experiencia, idiomas, ciudad, zona,
+                        telefono_contacto, whatsapp, correo_alternativo, foto
+                 FROM proveedor_perfil WHERE id_usuario = :uid LIMIT 1"
+            );
+            $stmtPerfil->execute([':uid' => $usuarioId]);
+            $perfil = $stmtPerfil->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtPoliticas = $this->conexion->prepare(
+                "SELECT ps.tipo_cancelacion, ps.descripcion_cancelacion,
+                        ps.permite_reprogramar, ps.horas_min_reprogramacion,
+                        ps.cobra_visita, ps.valor_visita,
+                        ps.ofrece_garantia, ps.dias_garantia, ps.detalles_garantia,
+                        ps.tiempo_respuesta_promedio, ps.otras_condiciones
+                 FROM proveedores_politicas_servicio ps
+                 INNER JOIN proveedores p ON ps.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtPoliticas->execute([':uid' => $usuarioId]);
+            $politicas = $stmtPoliticas->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $stmtDisp = $this->conexion->prepare(
+                "SELECT d.dias_semana, d.hora_inicio, d.hora_fin,
+                        d.atiende_fines_semana, d.atiende_festivos,
+                        d.atencion_urgencias, d.detalle_urgencias,
+                        d.tipo_zona, d.radio_km
+                 FROM proveedores_disponibilidad d
+                 INNER JOIN proveedores p ON d.proveedor_id = p.id
+                 WHERE p.usuario_id = :uid LIMIT 1"
+            );
+            $stmtDisp->execute([':uid' => $usuarioId]);
+            $disponibilidad = $stmtDisp->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            return compact('perfil', 'politicas', 'disponibilidad');
+        } catch (PDOException $e) {
+            error_log('ProveedorPerfil::obtenerPerfilPublicoProveedor -> ' . $e->getMessage());
+            return ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
+        }
+    }
+
+    // ======================================================================
+    // REPORTE DE PROVEEDORES (admin)
+    // ======================================================================
+
+    public function obtenerReporteProveedores($nivelConfianza = null, $verificado = null, $calMin = null, $calMax = null)
+    {
+        try {
+            $where  = [];
+            $params = [];
+
+            if ($nivelConfianza !== null) {
+                $where[]  = 'p.nivel_confianza = :nivel';
+                $params[':nivel'] = $nivelConfianza;
+            }
+            if ($verificado !== null) {
+                $where[]  = 'p.verificado = :verificado';
+                $params[':verificado'] = $verificado;
+            }
+            if ($calMin !== null) {
+                $where[]  = 'p.calificacion_promedio >= :calMin';
+                $params[':calMin'] = $calMin;
+            }
+            if ($calMax !== null) {
+                $where[]  = 'p.calificacion_promedio <= :calMax';
+                $params[':calMax'] = $calMax;
+            }
+
+            $whereSQL = $where ? ('WHERE ' . implode(' AND ', $where)) : '';
+
+            // 1. Global
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    COUNT(*)                             AS total,
+                    SUM(p.verificado = 1)                AS verificados,
+                    SUM(p.verificado = 0)                AS no_verificados,
+                    ROUND(AVG(p.calificacion_promedio), 2) AS prom_calificacion,
+                    SUM(p.nivel_confianza = 'nuevo')     AS nuevos,
+                    SUM(p.nivel_confianza = 'validado')  AS validados,
+                    SUM(p.nivel_confianza = 'confiable') AS confiables,
+                    SUM(p.nivel_confianza = 'experto')   AS expertos
+                FROM proveedores p $whereSQL
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $global = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            // 2. Por nivel de confianza
+            $stmt = $this->conexion->prepare("
+                SELECT p.nivel_confianza AS nivel, COUNT(*) AS total
+                FROM proveedores p $whereSQL
+                GROUP BY p.nivel_confianza
+                ORDER BY FIELD(p.nivel_confianza, 'experto', 'confiable', 'validado', 'nuevo')
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porNivel = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Por rango de calificación
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    CASE
+                        WHEN p.calificacion_promedio < 1 THEN '0 - 1'
+                        WHEN p.calificacion_promedio < 2 THEN '1 - 2'
+                        WHEN p.calificacion_promedio < 3 THEN '2 - 3'
+                        WHEN p.calificacion_promedio < 4 THEN '3 - 4'
+                        ELSE '4 - 5'
+                    END AS rango,
+                    COUNT(*) AS total
+                FROM proveedores p $whereSQL
+                GROUP BY rango
+                ORDER BY rango
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porCalificacion = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Por categoría (proveedores con publicaciones aprobadas)
+            $catWhere = $where ? ('WHERE ' . implode(' AND ', array_map(fn($c) => str_replace('p.', 'pr.', $c), $where))) : '';
+            $stmt = $this->conexion->prepare("
+                SELECT cat.nombre AS categoria, COUNT(DISTINCT pr.id) AS proveedores
+                FROM categorias cat
+                JOIN servicios sv  ON sv.id_categoria  = cat.id
+                JOIN publicaciones pub ON pub.servicio_id = sv.id AND pub.estado = 'aprobado'
+                JOIN proveedores pr ON pr.id = pub.proveedor_id
+                $catWhere
+                GROUP BY cat.id
+                ORDER BY proveedores DESC
+                LIMIT 10
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $porCategoria = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 5. Detalle
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    p.id,
+                    CONCAT(p.nombres, ' ', p.apellidos) AS nombre,
+                    p.ubicacion,
+                    p.calificacion_promedio,
+                    p.verificado,
+                    p.nivel_confianza,
+                    p.publicaciones_aprobadas_count,
+                    COUNT(DISTINCT c.id)  AS total_calificaciones,
+                    COUNT(DISTINCT sc.id) AS total_contratos
+                FROM proveedores p
+                LEFT JOIN calificaciones c  ON c.proveedor_id  = p.id
+                LEFT JOIN servicios_contratados sc ON sc.proveedor_id = p.id
+                $whereSQL
+                GROUP BY p.id
+                ORDER BY p.calificacion_promedio DESC, p.nombres ASC
+                LIMIT 200
+            ");
+            foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+            $stmt->execute();
+            $detalle = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return compact('global', 'porNivel', 'porCalificacion', 'porCategoria', 'detalle');
+
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorPerfil::obtenerReporteProveedores -> ' . $e->getMessage());
+            return ['global' => [], 'porNivel' => [], 'porCalificacion' => [], 'porCategoria' => [], 'detalle' => []];
+        }
+    }
 }

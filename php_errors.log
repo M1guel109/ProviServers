@@ -64,3 +64,140 @@ Stack trace:
 Stack trace:
 #0 {main}
   thrown in C:\xampp\htdocs\ProviServers\index.php on line 119
+[11-Jun-2026 23:50:18 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 00:18:25 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 00:32:38 Europe/Berlin] PHP Fatal error:  Uncaught Dompdf\Exception: Box property calculation requires containing block width in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php:188
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(795): Dompdf\FrameReflower\Block->_calculate_restricted_width()
+#1 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\Block))
+#2 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#3 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#4 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableCell.php(95): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\TableCell))
+#5 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableCell->reflow(NULL)
+#6 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRow.php(52): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#7 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRow->reflow(NULL)
+#8 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\TableRowGroup.php(51): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#9 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\TableRowGroup->reflow(NULL)
+#10 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Table.php(489): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#11 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Table->reflow(Object(Dompdf\FrameDecorator\Block))
+#12 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php(845): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow(Object(Dompdf\FrameDecorator\Block))
+#13 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Block->reflow(NULL)
+#14 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Page.php(141): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#15 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameDecorator\AbstractFrameDecorator.php(895): Dompdf\FrameReflower\Page->reflow(NULL)
+#16 C:\xampp\htdocs\ProviServers\vendor\dompdf\src\Dompdf.php(838): Dompdf\FrameDecorator\AbstractFrameDecorator->reflow()
+#17 C:\xampp\htdocs\ProviServers\app\helpers\pdf-helper.php(30): Dompdf\Dompdf->render()
+#18 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(1017): generarPDF('<!DOCTYPE html>...', 'reporte_servici...', false)
+#19 C:\xampp\htdocs\ProviServers\app\controllers\admin-controller.php(869): reporteServiciosFechaPDF()
+#20 C:\xampp\htdocs\ProviServers\index.php(253): reportesPdfController()
+#21 {main}
+  thrown in C:\xampp\htdocs\ProviServers\vendor\dompdf\src\FrameReflower\Block.php on line 188
+[12-Jun-2026 02:42:37 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 220
+[14-Jun-2026 07:05:33 Europe/Berlin] estadisticas.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pub_sol.precio' in 'field list'
+[14-Jun-2026 07:05:35 Europe/Berlin] calendario.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.nombre' in 'field list'
+[14-Jun-2026 07:05:45 Europe/Berlin] estadisticas.php: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'pub_sol.precio' in 'field list'
+[14-Jun-2026 18:21:49 Europe/Berlin] PHP Fatal error:  Uncaught DivisionByZeroError: Division by zero in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php:281
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(309): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php on line 281
+[14-Jun-2026 18:21:56 Europe/Berlin] PHP Fatal error:  Uncaught DivisionByZeroError: Division by zero in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php:281
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(309): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php on line 281
+[14-Jun-2026 18:26:08 Europe/Berlin] PHP Fatal error:  Uncaught DivisionByZeroError: Division by zero in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php:281
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(309): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php on line 281
+[14-Jun-2026 18:26:26 Europe/Berlin] PHP Fatal error:  Uncaught DivisionByZeroError: Division by zero in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php:281
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(309): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php on line 281
+[14-Jun-2026 18:26:28 Europe/Berlin] PHP Fatal error:  Uncaught DivisionByZeroError: Division by zero in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php:281
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(309): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\proveedor\promociones.php on line 281
+[15-Jun-2026 21:19:41 Europe/Berlin] historial-pagos cliente: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u_prov.nombre' in 'field list'
+[15-Jun-2026 22:01:30 Europe/Berlin] PHP Warning:  Uncaught PDOException: SQLSTATE[HY000]: General error: 2006 MySQL server has gone away in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php:20
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php(20): PDOStatement->execute(Array)
+#1 C:\xampp\htdocs\ProviServers\index.php(533): require('C:\\xampp\\htdocs...')
+#2 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php on line 20
+[15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\historial-pagos.php on line 75
+[15-Jun-2026 22:01:30 Europe/Berlin] PHP Fatal error:  Maximum execution time of 120 seconds exceeded in C:\xampp\htdocs\ProviServers\app\helpers\session-cliente.php on line 7
+[17-Jun-2026 06:35:50 Europe/Berlin] Error en Publicacion::listarPublicasActivas -> SQLSTATE[HY000]: General error: 2006 MySQL server has gone away
+[19-Jun-2026 06:20:05 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 297
+[19-Jun-2026 07:26:08 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:11 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:40 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:31:50 Europe/Berlin] PHP Warning:  Undefined array key "id" in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\detalle-publicacion.php on line 396
+[19-Jun-2026 07:52:24 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 07:52:30 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 07:52:38 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method Publicacion::obtenerPublicaActivaPorId() in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php:16
+Stack trace:
+#0 C:\xampp\htdocs\ProviServers\index.php(476): require()
+#1 {main}
+  thrown in C:\xampp\htdocs\ProviServers\app\views\dashboard\cliente\solicitar-servicio.php on line 16
+[19-Jun-2026 19:40:07 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))
+[19-Jun-2026 19:41:53 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))
+[19-Jun-2026 19:42:52 Europe/Berlin] Error en Usuario::eliminar -> SQLSTATE[23000]: Integrity constraint violation: 1451 Cannot delete or update a parent row: a foreign key constraint fails (`proviservers`.`proveedor_membresia`, CONSTRAINT `proveedor_membresia_ibfk_1` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`))

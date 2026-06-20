@@ -48,8 +48,6 @@
         .stat-label  { font-size: 10px; color: #555; margin-top: 4px; }
         .dist-table  { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
         .dist-table td { padding: 5px 8px; font-size: 11px; }
-        .bar-bg  { background: #e9ecef; border-radius: 4px; height: 14px; width: 100%; }
-        .bar-fill { background: #0066ff; border-radius: 4px; height: 14px; }
         .star-label { width: 60px; font-weight: bold; color: #f5a623; }
         .pct-label  { width: 40px; text-align: right; color: #555; }
         .table-reporte { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 10px; }
@@ -118,7 +116,14 @@
             ?>
             <tr>
                 <td class="star-label"><?= str_repeat('*', $estrella) ?> (<?= $estrella ?>)</td>
-                <td style="width:60%;"><div class="bar-bg"><div class="bar-fill" style="width:<?= $ancho ?>%;"></div></div></td>
+                <td style="width:60%; padding:2px 4px;">
+                    <table style="width:100%; height:14px; border-collapse:collapse; font-size:1px; line-height:14px;">
+                        <tr>
+                            <td style="width:<?= $ancho ?>%; background-color:#0066ff; height:14px;"></td>
+                            <td style="background-color:#e9ecef; height:14px;"></td>
+                        </tr>
+                    </table>
+                </td>
                 <td class="pct-label"><?= $pct ?>%</td>
                 <td style="width:50px; color:#555;"><?= $cant ?> votos</td>
             </tr>
