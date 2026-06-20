@@ -183,6 +183,34 @@ class Valoracion
         return $stmt->execute();
     }
 
+    public function responderComoCliente(int $valoracionId, int $clienteUsuarioId, string $respuesta): bool
+    {
+        try {
+            $this->db->exec("ALTER TABLE valoraciones
+                ADD COLUMN IF NOT EXISTS respuesta_cliente TEXT NULL,
+                ADD COLUMN IF NOT EXISTS fecha_respuesta_cliente DATETIME NULL");
+        } catch (PDOException) {}
+
+        $respuesta = mb_substr(trim($respuesta), 0, 500);
+        if ($respuesta === '') return false;
+
+        $sql = "
+            UPDATE valoraciones v
+            INNER JOIN clientes c ON v.cliente_id = c.id
+            SET v.respuesta_cliente = :respuesta, v.fecha_respuesta_cliente = NOW()
+            WHERE v.id = :id
+              AND c.usuario_id = :usuario_id
+              AND v.respuesta_cliente IS NULL
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':respuesta'  => $respuesta,
+            ':id'         => $valoracionId,
+            ':usuario_id' => $clienteUsuarioId,
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
     public function listarProveedores(): array
     {
         $stmt = $this->db->query("

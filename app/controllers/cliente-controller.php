@@ -80,6 +80,8 @@ switch ($method) {
             guardarTarjetaTokenizada();
         } elseif (str_contains($uri, '/cliente/guardar-notificaciones')) {
             guardarNotificacionesCliente();
+        } elseif (str_contains($uri, '/cliente/resenas/responder')) {
+            guardarRespuestaCliente();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -976,6 +978,31 @@ function guardarNotificacionesCliente(): void
         mostrarSweetAlert('success', 'Preferencias guardadas', 'Tus preferencias de notificación se actualizaron correctamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
     } else {
         mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
+    }
+    exit();
+}
+
+// =======================================================================
+// RESPONDER RESEÑA (como cliente evaluado)
+// =======================================================================
+
+function guardarRespuestaCliente(): void
+{
+    $idResena       = (int)($_POST['id_valoracion']  ?? 0);
+    $textoRespuesta = trim($_POST['texto_respuesta'] ?? '');
+    $usuarioId      = (int)$_SESSION['user']['id'];
+
+    if (!$idResena || empty($textoRespuesta)) {
+        mostrarSweetAlert('warning', 'Datos incompletos', 'Escribe una respuesta antes de enviar.', BASE_URL . '/cliente/historial-servicios');
+        exit();
+    }
+
+    $ok = (new Valoracion())->responderComoCliente($idResena, $usuarioId, $textoRespuesta);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Respuesta enviada', 'Tu respuesta fue publicada exitosamente.', BASE_URL . '/cliente/historial-servicios');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo guardar la respuesta. Es posible que ya hayas respondido antes.', BASE_URL . '/cliente/historial-servicios');
     }
     exit();
 }
