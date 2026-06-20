@@ -577,6 +577,20 @@ if ($idUsuario > 0) {
                                         Úsalo si has iniciado sesión en un equipo compartido o sospechas de actividad no autorizada.
                                     </small>
 
+                                    <!-- 🟡 PAUSAR CUENTA TEMPORALMENTE -->
+                                    <hr class="my-3">
+
+                                    <h6 class="text-warning mb-1">
+                                        <i class="bi bi-pause-circle me-1"></i> Pausar cuenta temporalmente
+                                    </h6>
+                                    <p class="text-muted" style="font-size: 0.85rem;">
+                                        Tu perfil dejará de ser visible. Podrás reactivar tu cuenta cuando quieras desde la pantalla de inicio de sesión.
+                                    </p>
+
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalPausarCuenta">
+                                        <i class="bi bi-pause-circle"></i> Pausar cuenta
+                                    </button>
+
                                     <!-- 🔴 ELIMINAR CUENTA (AGREGADO, SIN TOCAR NADA MÁS) -->
                                     <hr class="my-3">
 
@@ -1229,6 +1243,35 @@ if ($idUsuario > 0) {
         </section>
     </main>
 
+    <!-- Modal de confirmación para pausar cuenta -->
+    <div class="modal fade modal-cliente" id="modalPausarCuenta" tabindex="-1" aria-labelledby="modalPausarCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="modalPausarCuentaLabel">
+                        <i class="bi bi-pause-circle-fill"></i> Pausar cuenta temporalmente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tu perfil dejará de ser visible para los clientes mientras esté pausado.</p>
+                    <p>Podrás reactivar tu cuenta en cualquier momento desde la página de inicio de sesión.</p>
+                    <p>Para confirmar, escribe <strong class="text-warning">PAUSAR</strong> en el campo de abajo:</p>
+                    <input type="text" id="confirmarPausarInput" class="form-control" placeholder="Escribe PAUSAR" autocomplete="off">
+                    <small class="text-muted">Debes escribir exactamente en mayúsculas.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="<?= BASE_URL ?>/proveedor/pausar-cuenta" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-warning" id="btnConfirmarPausarCuenta" disabled>
+                            <i class="bi bi-pause-circle"></i> Pausar cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal de confirmación para eliminar cuenta -->
     <div class="modal fade modal-cliente" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -1276,6 +1319,11 @@ if ($idUsuario > 0) {
     });
     document.getElementById('ofrece_garantia').addEventListener('change', function () {
         document.getElementById('campos-garantia').style.display = this.checked ? '' : 'none';
+    });
+
+    // Habilitar botón de pausar sólo cuando se escriba PAUSAR
+    document.getElementById('confirmarPausarInput').addEventListener('input', function () {
+        document.getElementById('btnConfirmarPausarCuenta').disabled = this.value !== 'PAUSAR';
     });
     </script>
 </body>

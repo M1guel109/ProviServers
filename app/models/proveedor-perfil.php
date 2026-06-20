@@ -465,6 +465,62 @@ class ProveedorPerfil
     }
 
     // ======================================================================
+    // PAUSAR / REACTIVAR CUENTA — proveedor
+    // ======================================================================
+
+    private function ensurePausadoEstado(): int
+    {
+        $this->conexion->prepare(
+            "INSERT IGNORE INTO usuario_estados (nombre) VALUES ('pausado')"
+        )->execute();
+        $stmt = $this->conexion->prepare(
+            "SELECT id FROM usuario_estados WHERE nombre = 'pausado' LIMIT 1"
+        );
+        $stmt->execute();
+        return (int)$stmt->fetchColumn();
+    }
+
+    public function pausarCuenta(int $usuarioId): bool
+    {
+        try {
+            $estadoId = $this->ensurePausadoEstado();
+            if (!$estadoId) return false;
+            $stmt = $this->conexion->prepare(
+                "UPDATE usuarios SET estado_id = :estado WHERE id = :uid AND rol = 'proveedor'"
+            );
+            $stmt->execute([':estado' => $estadoId, ':uid' => $usuarioId]);
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log('ProveedorPerfil::pausarCuenta -> ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function reactivarCuentaPorEmail(string $email, string $clave): bool
+    {
+        try {
+            $stmt = $this->conexion->prepare(
+                "SELECT u.id, u.clave FROM usuarios u
+                 INNER JOIN usuario_estados e ON u.estado_id = e.id
+                 WHERE u.email = :email AND e.nombre = 'pausado' AND u.rol = 'proveedor' LIMIT 1"
+            );
+            $stmt->execute([':email' => $email]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$row || !password_verify($clave, $row['clave'])) return false;
+
+            $this->conexion->prepare(
+                "UPDATE usuarios
+                 SET estado_id = (SELECT id FROM usuario_estados WHERE nombre = 'activo' LIMIT 1)
+                 WHERE id = :uid"
+            )->execute([':uid' => $row['id']]);
+            return true;
+        } catch (PDOException $e) {
+            error_log('ProveedorPerfil::reactivarCuentaPorEmail -> ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    // ======================================================================
     // ELIMINACIÓN DE CUENTA — proveedor
     // ======================================================================
 

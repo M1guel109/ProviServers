@@ -87,6 +87,15 @@ switch ($request) {
         require_once BASE_PATH . '/app/controllers/auth-controller.php';
         break;
 
+    case '/reactivar-cuenta':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $_POST['accion'] = 'reactivar_cuenta';
+            require_once BASE_PATH . '/app/controllers/auth-controller.php';
+        } else {
+            require BASE_PATH . '/app/views/auth/reactivar-cuenta.php';
+        }
+        break;
+
     case '/idioma':
         require_once BASE_PATH . '/app/controllers/idioma-controller.php';
         break;
@@ -427,6 +436,7 @@ switch ($request) {
     case '/proveedor/guardar-pagos':
     case '/proveedor/guardar-politicas':
     case '/proveedor/eliminar-cuenta':
+    case '/proveedor/pausar-cuenta':
         require BASE_PATH . '/app/controllers/proveedor-controller.php';
         break;
 
