@@ -80,6 +80,8 @@ switch ($method) {
             guardarTarjetaTokenizada();
         } elseif (str_contains($uri, '/cliente/guardar-notificaciones')) {
             guardarNotificacionesCliente();
+        } elseif (str_contains($uri, '/cliente/resenas/responder')) {
+            guardarRespuestaCliente();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -977,5 +979,31 @@ function guardarNotificacionesCliente(): void
     } else {
         mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
     }
+    exit();
+}
+
+// =======================================================================
+// RESPONDER RESEÑA (como cliente evaluado)
+// =======================================================================
+
+function guardarRespuestaCliente(): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $idResena       = (int)($_POST['id_valoracion']  ?? 0);
+    $textoRespuesta = trim($_POST['texto_respuesta'] ?? '');
+    $usuarioId      = (int)$_SESSION['user']['id'];
+
+    if (!$idResena || empty($textoRespuesta)) {
+        echo json_encode(['ok' => false, 'message' => 'Escribe una respuesta antes de enviar.']);
+        exit();
+    }
+
+    $ok = (new Valoracion())->responderComoCliente($idResena, $usuarioId, $textoRespuesta);
+    echo json_encode([
+        'ok'      => $ok,
+        'message' => $ok ? 'Respuesta enviada exitosamente.' : 'No se pudo guardar. Es posible que ya hayas respondido antes.',
+    ]);
     exit();
 }
