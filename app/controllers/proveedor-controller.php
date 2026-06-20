@@ -109,6 +109,8 @@ switch ($method) {
             guardarPoliticas();
         } elseif (str_contains($uri, '/proveedor/eliminar-cuenta')) {
             eliminarCuentaProveedor();
+        } elseif (str_contains($uri, '/proveedor/pausar-cuenta')) {
+            pausarCuentaProveedor();
         } elseif ($accion === 'actualizar') {
             actualizarServicio();
         } else {
@@ -1180,14 +1182,34 @@ function eliminarCuentaProveedor()
 
     switch ($resultado) {
         case 'eliminado':
-        case 'desactivado':
             $_SESSION = [];
             session_unset();
             session_destroy();
             mostrarSweetAlert('success', 'Cuenta eliminada', 'Tu cuenta ha sido eliminada. ¡Hasta pronto!', BASE_URL . '/login');
             break;
+        case 'desactivado':
+            $_SESSION = [];
+            session_unset();
+            session_destroy();
+            mostrarSweetAlert('warning', 'Cuenta desactivada', 'Tienes servicios activos, por lo que tu cuenta fue desactivada en lugar de eliminada. Contáctanos si necesitas más información.', BASE_URL . '/login');
+            break;
         default:
             mostrarSweetAlert('error', 'Error inesperado', 'No se pudo procesar tu solicitud. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion');
+    }
+    exit();
+}
+
+function pausarCuentaProveedor()
+{
+    $idUsuario = (int)($_SESSION['user']['id'] ?? 0);
+    $ok = (new ProveedorPerfil())->pausarCuenta($idUsuario);
+    if ($ok) {
+        $_SESSION = [];
+        session_unset();
+        session_destroy();
+        mostrarSweetAlert('success', 'Cuenta pausada', 'Tu cuenta ha sido pausada. Puedes reactivarla cuando lo desees.', BASE_URL . '/reactivar-cuenta');
+    } else {
+        mostrarSweetAlert('error', 'Error', 'No se pudo pausar tu cuenta. Intenta nuevamente.', BASE_URL . '/proveedor/configuracion');
     }
     exit();
 }
