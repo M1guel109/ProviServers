@@ -988,21 +988,22 @@ function guardarNotificacionesCliente(): void
 
 function guardarRespuestaCliente(): void
 {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
     $idResena       = (int)($_POST['id_valoracion']  ?? 0);
     $textoRespuesta = trim($_POST['texto_respuesta'] ?? '');
     $usuarioId      = (int)$_SESSION['user']['id'];
 
     if (!$idResena || empty($textoRespuesta)) {
-        mostrarSweetAlert('warning', 'Datos incompletos', 'Escribe una respuesta antes de enviar.', BASE_URL . '/cliente/historial-servicios');
+        echo json_encode(['ok' => false, 'message' => 'Escribe una respuesta antes de enviar.']);
         exit();
     }
 
     $ok = (new Valoracion())->responderComoCliente($idResena, $usuarioId, $textoRespuesta);
-
-    if ($ok) {
-        mostrarSweetAlert('success', 'Respuesta enviada', 'Tu respuesta fue publicada exitosamente.', BASE_URL . '/cliente/historial-servicios');
-    } else {
-        mostrarSweetAlert('error', 'Error', 'No se pudo guardar la respuesta. Es posible que ya hayas respondido antes.', BASE_URL . '/cliente/historial-servicios');
-    }
+    echo json_encode([
+        'ok'      => $ok,
+        'message' => $ok ? 'Respuesta enviada exitosamente.' : 'No se pudo guardar. Es posible que ya hayas respondido antes.',
+    ]);
     exit();
 }

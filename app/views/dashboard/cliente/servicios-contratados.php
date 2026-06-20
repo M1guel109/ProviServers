@@ -359,10 +359,14 @@
                   ? date('d/m/Y', strtotime($fechaRaw))
                   : null;
 
-                $contratoId      = (int)($srv['contrato_id']     ?? 0);
-                $tieneValoracion = (int)($srv['tiene_valoracion'] ?? 0);
-                $miCalif         = (int)($srv['mi_calificacion']  ?? 0);
-                $miCom           = trim((string)($srv['mi_comentario'] ?? ''));
+                $contratoId        = (int)($srv['contrato_id']         ?? 0);
+                $tieneValoracion   = (int)($srv['tiene_valoracion']   ?? 0);
+                $valoracionId      = (int)($srv['valoracion_id']      ?? 0);
+                $miCalif           = (int)($srv['mi_calificacion']    ?? 0);
+                $miCom             = trim((string)($srv['mi_comentario']        ?? ''));
+                $respuestaProveedor = trim((string)($srv['respuesta_proveedor'] ?? ''));
+                $respuestaCliente   = trim((string)($srv['respuesta_cliente']   ?? ''));
+                $fechaRespCli       = $srv['fecha_respuesta_cliente'] ?? '';
                 ?>
                 <div class="col">
                   <div class="card service-card h-100 border-0 shadow-sm">
@@ -399,7 +403,11 @@
                         data-ciudad="<?= htmlspecialchars(($srv['solicitud_ciudad'] ?? '') ?: '—') ?>"
                         data-zona="<?= htmlspecialchars($srv['solicitud_zona'] ?? '') ?>"
                         data-descripcion="<?= htmlspecialchars($srv['solicitud_descripcion'] ?? $srv['cotizacion_mensaje'] ?? '') ?>"
-                        data-monto="<?= (float)($srv['monto'] ?? 0) ?>">
+                        data-monto="<?= (float)($srv['monto'] ?? 0) ?>"
+                        data-valoracion-id="<?= $valoracionId ?>"
+                        data-respuesta-proveedor="<?= htmlspecialchars($respuestaProveedor) ?>"
+                        data-respuesta-cliente="<?= htmlspecialchars($respuestaCliente) ?>"
+                        data-fecha-resp-cli="<?= htmlspecialchars($fechaRespCli) ?>">
                         <i class="bi bi-eye me-1"></i> Ver detalles
                       </button>
 
@@ -435,6 +443,26 @@
                               <p class="small text-muted mt-1 mb-0 fst-italic">
                                 "<?= htmlspecialchars($miCom) ?>"
                               </p>
+                            <?php endif; ?>
+
+                            <?php if ($respuestaProveedor !== ''): ?>
+                              <div class="mt-2 pt-2 border-top">
+                                <small class="fw-bold text-info"><i class="bi bi-person-check me-1"></i> Respuesta del proveedor:</small>
+                                <p class="small text-muted fst-italic mb-1 resp-clamp">"<?= htmlspecialchars($respuestaProveedor) ?>"</p>
+                                <?php if ($respuestaCliente !== ''): ?>
+                                  <div class="mt-1 p-2 bg-white border rounded">
+                                    <small class="fw-bold text-success"><i class="bi bi-reply me-1"></i> Tu respuesta:</small>
+                                    <p class="small text-muted fst-italic mb-0 resp-clamp">"<?= htmlspecialchars($respuestaCliente) ?>"</p>
+                                  </div>
+                                <?php else: ?>
+                                  <button type="button" class="btn btn-sm btn-outline-primary mt-1 btn-responder-resena"
+                                    data-id="<?= $valoracionId ?>"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalResponderCliente">
+                                    <i class="bi bi-reply me-1"></i> Responder
+                                  </button>
+                                <?php endif; ?>
+                              </div>
                             <?php endif; ?>
                           </div>
                         <?php endif; ?>
@@ -573,6 +601,33 @@
             <i class="bi bi-file-pdf me-1"></i> Comprobante PDF
           </a>
           <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Responder reseña del proveedor -->
+  <div class="modal fade modal-cliente" id="modalResponderCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="bi bi-reply me-2"></i>Responder al proveedor</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <input type="hidden" id="resp-valoracion-id">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Tu respuesta:</label>
+            <textarea class="form-control" id="resp-texto" rows="4" maxlength="500"
+              placeholder="Escribe tu respuesta al comentario del proveedor…"></textarea>
+            <div class="form-text text-end"><span id="resp-contador">0</span>/500</div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btn-enviar-respuesta">
+            <i class="bi bi-send me-1"></i> Enviar respuesta
+          </button>
         </div>
       </div>
     </div>
@@ -811,8 +866,78 @@
   </script>
 
 
+  <style>
+    .resp-clamp {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .resp-clamp.expandida {
+      display: block;
+      overflow: visible;
+    }
+  </style>
+
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-cliente.js"></script>
   <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+
+  <script>
+    // Expandir/colapsar textos de respuesta truncados
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.resp-clamp').forEach(function(p) {
+        if (p.scrollHeight <= p.clientHeight + 4) return; // no truncado, no agregar link
+        const link = document.createElement('a');
+        link.href = '#';
+        link.className = 'small text-primary d-block mt-1';
+        link.textContent = 'Ver más';
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          p.classList.toggle('expandida');
+          link.textContent = p.classList.contains('expandida') ? 'Ver menos' : 'Ver más';
+        });
+        p.insertAdjacentElement('afterend', link);
+      });
+    });
+
+    // Modal responder reseña — llenar id al abrir
+    document.addEventListener('click', function(e) {
+      const btn = e.target.closest('.btn-responder-resena');
+      if (!btn) return;
+      document.getElementById('resp-valoracion-id').value = btn.dataset.id || '';
+      document.getElementById('resp-texto').value = '';
+      document.getElementById('resp-contador').textContent = '0';
+    });
+
+    document.getElementById('resp-texto')?.addEventListener('input', function() {
+      document.getElementById('resp-contador').textContent = this.value.length;
+    });
+
+    document.getElementById('btn-enviar-respuesta')?.addEventListener('click', async function() {
+      const id     = document.getElementById('resp-valoracion-id').value;
+      const texto  = document.getElementById('resp-texto').value.trim();
+      if (!texto) {
+        Swal.fire('Atención', 'Escribe una respuesta antes de enviar.', 'warning');
+        return;
+      }
+      this.disabled = true;
+      const body = new URLSearchParams({ id_valoracion: id, texto_respuesta: texto });
+      try {
+        const res  = await fetch(BASE_URL_CLI + '/cliente/resenas/responder', { method: 'POST', body, credentials: 'same-origin' });
+        const data = await res.json();
+        if (data.ok) {
+          bootstrap.Modal.getInstance(document.getElementById('modalResponderCliente')).hide();
+          await Swal.fire('¡Listo!', data.message, 'success');
+          location.reload();
+        } else {
+          Swal.fire('Error', data.message, 'error');
+        }
+      } catch {
+        Swal.fire('Error', 'No se pudo conectar con el servidor.', 'error');
+      }
+      this.disabled = false;
+    });
+  </script>
 </body>
 
 </html>

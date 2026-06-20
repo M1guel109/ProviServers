@@ -118,6 +118,12 @@ class ServicioContratado
      */
     public function listarPorClienteUsuario(int $usuarioId): array
     {
+        try {
+            $this->db->exec("ALTER TABLE valoraciones
+                ADD COLUMN IF NOT EXISTS respuesta_cliente TEXT NULL,
+                ADD COLUMN IF NOT EXISTS fecha_respuesta_cliente DATETIME NULL");
+        } catch (PDOException) {}
+
         $sql = "
         SELECT
             sc.id AS contrato_id,
@@ -164,9 +170,13 @@ class ServicioContratado
             COALESCE(cot.precio, pub_sol.precio, sv.precio, 0) AS monto,
 
             CASE WHEN v.id IS NULL THEN 0 ELSE 1 END AS tiene_valoracion,
+            v.id AS valoracion_id,
             v.calificacion AS mi_calificacion,
             v.comentario AS mi_comentario,
-            v.created_at AS mi_calificado_en
+            v.created_at AS mi_calificado_en,
+            v.respuesta_proveedor,
+            v.respuesta_cliente,
+            v.fecha_respuesta_cliente
 
         FROM servicios_contratados sc
         INNER JOIN clientes c
