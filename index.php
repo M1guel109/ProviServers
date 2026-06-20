@@ -92,6 +92,16 @@ switch ($request) {
         break;
 
     // ==================================================
+    // DASHBOARD PERSONALIZABLE — Config de widgets
+    // ==================================================
+
+    case '/dashboard/config':
+    case '/dashboard/config/guardar':
+    case '/dashboard/config/restaurar':
+        require BASE_PATH . '/app/controllers/dashboard-controller.php';
+        break;
+
+    // ==================================================
     // PANEL ADMINISTRADOR — Vistas generales
     // ==================================================
 
