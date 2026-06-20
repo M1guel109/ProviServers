@@ -491,6 +491,7 @@ function mostrarEnProceso()
 
 function actualizarEstadoServicio()
 {
+    ob_clean();
     header('Content-Type: application/json; charset=utf-8');
 
     $contratoId  = (int)($_POST['contrato_id'] ?? 0);
