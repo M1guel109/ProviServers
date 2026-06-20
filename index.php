@@ -445,6 +445,10 @@ switch ($request) {
         require BASE_PATH . '/app/views/dashboard/cliente/notificaciones.php';
         break;
 
+    case '/cliente/guardar-notificaciones':
+        require BASE_PATH . '/app/controllers/cliente-controller.php';
+        break;
+
     // CLIENTE — Servicios
 
     case '/cliente/explorar-servicios':

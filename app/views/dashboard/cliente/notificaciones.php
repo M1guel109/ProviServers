@@ -1,6 +1,7 @@
 ﻿<?php
 require_once BASE_PATH . '/app/helpers/session-cliente.php';
 require_once BASE_PATH . '/app/models/Notificacion.php';
+require_once BASE_PATH . '/app/models/cliente-notificaciones.php';
 
 $uid     = (int)$_SESSION['user']['id'];
 $request ??= ''; // definido por index.php; fallback para el linter
@@ -27,6 +28,7 @@ $filtro         = $_GET['filtro'] ?? 'todas';
 $soloNoLeidas   = $filtro === 'no-leidas' ? true : null;
 $notificaciones = Notificacion::listar($uid, $soloNoLeidas, 100);
 $totalNoLeidas  = Notificacion::contarNoLeidas($uid);
+$prefNotif      = (new ClienteNotificaciones())->obtenerPorUsuario($uid) ?? [];
 
 function tiempoAtrasNotifCl(string $fecha): string {
     $diff = time() - strtotime($fecha);
@@ -99,16 +101,118 @@ include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
                         <?php endif; ?>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link <?= $filtro === 'preferencias' ? 'active' : '' ?>"
+                       href="<?= BASE_URL ?>/cliente/notificaciones?filtro=preferencias">
+                        <i class="bi bi-gear me-1"></i> Preferencias
+                    </a>
+                </li>
             </ul>
-            <?php if ($totalNoLeidas > 0): ?>
+            <?php if ($totalNoLeidas > 0 && $filtro !== 'preferencias'): ?>
                 <button class="btn btn-outline-secondary btn-sm" id="btn-marcar-todas">
                     <i class="bi bi-check2-all"></i> Marcar todas como leídas
                 </button>
             <?php endif; ?>
         </div>
 
+        <!-- Preferencias -->
+        <?php if ($filtro === 'preferencias'): ?>
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="fw-bold mb-1"><i class="bi bi-bell-fill text-primary me-2"></i>Preferencias de notificaciones</h5>
+                <p class="text-muted small mb-4">Elige qué eventos te generan notificaciones y por qué canal recibirlas.</p>
+
+                <form action="<?= BASE_URL ?>/cliente/guardar-notificaciones" method="POST">
+
+                    <p class="fw-semibold small mb-2">Eventos que quiero recibir</p>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_cambios_estado"
+                               name="noti_cambios_estado" value="1"
+                               <?= !empty($prefNotif['noti_cambios_estado']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_cambios_estado">
+                            <i class="bi bi-arrow-repeat text-warning me-1"></i> Cambios de estado en mis contratos
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_nueva_cotizacion"
+                               name="noti_nueva_cotizacion" value="1"
+                               <?= !empty($prefNotif['noti_nueva_cotizacion']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_nueva_cotizacion">
+                            <i class="bi bi-file-earmark-text text-primary me-1"></i> Nueva cotización de un proveedor
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="noti_recordatorio_pago"
+                               name="noti_recordatorio_pago" value="1"
+                               <?= !empty($prefNotif['noti_recordatorio_pago']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_recordatorio_pago">
+                            <i class="bi bi-credit-card text-success me-1"></i> Recordatorio de pago pendiente
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="noti_resenas"
+                               name="noti_resenas" value="1"
+                               <?= !empty($prefNotif['noti_resenas']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="noti_resenas">
+                            <i class="bi bi-star text-warning me-1"></i> Respuesta a mis reseñas
+                        </label>
+                    </div>
+
+                    <hr>
+                    <p class="fw-semibold small mb-2">Canales de notificación</p>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="canal_interna"
+                               name="canal_interna" value="1"
+                               <?= !empty($prefNotif['canal_interna']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="canal_interna">
+                            <i class="bi bi-bell me-1"></i> Notificaciones en la plataforma
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="canal_email"
+                               name="canal_email" value="1"
+                               <?= !empty($prefNotif['canal_email']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="canal_email">
+                            <i class="bi bi-envelope me-1"></i> Correo electrónico
+                        </label>
+                    </div>
+
+                    <hr>
+                    <p class="fw-semibold small mb-2">Resúmenes periódicos</p>
+
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="resumen_diario"
+                               name="resumen_diario" value="1"
+                               <?= !empty($prefNotif['resumen_diario']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="resumen_diario">
+                            Resumen diario de actividad
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="resumen_semanal"
+                               name="resumen_semanal" value="1"
+                               <?= !empty($prefNotif['resumen_semanal']) ? 'checked' : '' ?>>
+                        <label class="form-check-label" for="resumen_semanal">
+                            Resumen semanal de actividad
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Guardar preferencias
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <!-- Lista -->
-        <?php if (empty($notificaciones)): ?>
+        <?php elseif (empty($notificaciones)): ?>
             <div class="text-center py-5">
                 <i class="bi bi-bell-slash fs-1 text-muted"></i>
                 <p class="mt-3 text-muted">

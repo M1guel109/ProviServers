@@ -8,6 +8,8 @@ require_once __DIR__ . '/../models/solicitud.php';
 require_once __DIR__ . '/../models/necesidad.php';
 require_once __DIR__ . '/../models/cotizacion.php';
 require_once __DIR__ . '/../models/Notificacion.php';
+require_once __DIR__ . '/../models/SeguimientoContrato.php';
+require_once __DIR__ . '/../models/cliente-notificaciones.php';
 
 // ===================================================================
 // GUARD DE SESIÓN Y ROL
@@ -69,6 +71,8 @@ switch ($method) {
             eliminarMetodoPago();
         } elseif ($accion === 'tokenizar_tarjeta') {
             guardarTarjetaTokenizada();
+        } elseif (str_contains($uri, '/cliente/guardar-notificaciones')) {
+            guardarNotificacionesCliente();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -856,4 +860,104 @@ function mpDeleteCard(string $customerId, string $cardId): void
     ]);
     curl_exec($ch);
     curl_close($ch);
+}
+
+// =======================================================================
+// SEGUIMIENTO DE CONTRATO
+// =======================================================================
+
+function seguimientoContratoJSON(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_GET['id'] ?? 0);
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0) {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'ID de contrato inválido.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $historial = SeguimientoContrato::listarPorContrato($contratoId);
+    echo json_encode(['ok' => true, 'data' => $historial]);
+    exit();
+}
+
+function agregarComentarioContrato(string $rol): void
+{
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+
+    $contratoId = (int)($_POST['contrato_id'] ?? 0);
+    $comentario = trim($_POST['comentario']   ?? '');
+    $usuarioId  = (int)$_SESSION['user']['id'];
+
+    if ($contratoId <= 0 || $comentario === '') {
+        http_response_code(400);
+        echo json_encode(['ok' => false, 'message' => 'Datos incompletos.']);
+        exit();
+    }
+
+    if (!SeguimientoContrato::contratoEsDeUsuario($contratoId, $usuarioId, $rol)) {
+        http_response_code(403);
+        echo json_encode(['ok' => false, 'message' => 'Acceso denegado.']);
+        exit();
+    }
+
+    $archivoPath = null;
+    if (!empty($_FILES['archivo']['tmp_name'])) {
+        $archivoPath = SeguimientoContrato::subirArchivo($_FILES['archivo']);
+        if ($archivoPath === null) {
+            http_response_code(422);
+            echo json_encode(['ok' => false, 'message' => 'Archivo no válido (máx 5 MB, formatos: pdf, jpg, png, doc, docx, txt).']);
+            exit();
+        }
+    }
+
+    $ok = SeguimientoContrato::registrar(
+        contratoId:     $contratoId,
+        usuarioId:      $usuarioId,
+        rol:            $rol,
+        comentario:     $comentario,
+        archivoAdjunto: $archivoPath
+    );
+
+    echo json_encode(['ok' => $ok, 'message' => $ok ? 'Comentario registrado.' : 'Error al guardar.']);
+    exit();
+}
+
+// =======================================================================
+// PREFERENCIAS DE NOTIFICACIONES
+// =======================================================================
+
+function guardarNotificacionesCliente(): void
+{
+    $idUsuario = (int)$_SESSION['user']['id'];
+    $data = [
+        'noti_cambios_estado'    => isset($_POST['noti_cambios_estado'])    ? 1 : 0,
+        'noti_nueva_cotizacion'  => isset($_POST['noti_nueva_cotizacion'])  ? 1 : 0,
+        'noti_recordatorio_pago' => isset($_POST['noti_recordatorio_pago']) ? 1 : 0,
+        'noti_resenas'           => isset($_POST['noti_resenas'])           ? 1 : 0,
+        'canal_email'            => isset($_POST['canal_email'])            ? 1 : 0,
+        'canal_interna'          => isset($_POST['canal_interna'])          ? 1 : 0,
+        'resumen_diario'         => isset($_POST['resumen_diario'])         ? 1 : 0,
+        'resumen_semanal'        => isset($_POST['resumen_semanal'])        ? 1 : 0,
+    ];
+
+    $ok = (new ClienteNotificaciones())->guardarDesdeFormulario($idUsuario, $data);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Preferencias guardadas', 'Tus preferencias de notificación se actualizaron correctamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
+    } else {
+        mostrarSweetAlert('error', 'Error al guardar', 'No se pudieron guardar tus preferencias. Intenta nuevamente.', BASE_URL . '/cliente/notificaciones?filtro=preferencias');
+    }
+    exit();
 }
