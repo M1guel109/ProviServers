@@ -6,6 +6,7 @@ require_once __DIR__ . '/../models/cotizacion.php';
 require_once __DIR__ . '/../models/solicitud.php';
 require_once __DIR__ . '/../models/servicio-contratado.php';
 require_once __DIR__ . '/../models/publicacion.php';
+require_once __DIR__ . '/../models/Notificacion.php';
 
 // 1. VALIDACIÓN GLOBAL DE SESIÓN Y ROL
 if (session_status() === PHP_SESSION_NONE) {
@@ -404,6 +405,29 @@ function aceptarSolicitud($id)
         $resultado = $modelo->aceptar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT c.usuario_id, s.titulo
+                    FROM solicitudes s
+                    INNER JOIN clientes c ON s.cliente_id = c.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => $id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row && $row['usuario_id']) {
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud aceptada',
+                        'Tu solicitud para "' . ($row['titulo'] ?? 'servicio') . '" fue aceptada. Ya puedes coordinar el pago.',
+                        BASE_URL . '/cliente/servicios-contratados'
+                    );
+                }
+            } catch (Throwable $ne) {
+                error_log('aceptarSolicitud::notif: ' . $ne->getMessage());
+            }
             mostrarSweetAlert('success', 'Solicitud aceptada', 'El servicio se marcó como en proceso.', BASE_URL . '/proveedor/nuevas-solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo aceptar la solicitud.');
@@ -433,6 +457,29 @@ function rechazarSolicitud($id)
         $resultado = $modelo->rechazar((int)$id, $proveedorUsuarioId);
 
         if ($resultado) {
+            try {
+                $db  = new Conexion();
+                $pdo = $db->getConexion();
+                $st  = $pdo->prepare("
+                    SELECT c.usuario_id, s.titulo
+                    FROM solicitudes s
+                    INNER JOIN clientes c ON s.cliente_id = c.id
+                    WHERE s.id = :id LIMIT 1
+                ");
+                $st->execute([':id' => $id]);
+                $row = $st->fetch(PDO::FETCH_ASSOC);
+                if ($row && $row['usuario_id']) {
+                    Notificacion::crear(
+                        (int)$row['usuario_id'],
+                        Notificacion::TIPO_ESTADO,
+                        'Solicitud rechazada',
+                        'Tu solicitud para "' . ($row['titulo'] ?? 'servicio') . '" no fue aceptada en esta ocasión.',
+                        BASE_URL . '/cliente/explorar-servicios'
+                    );
+                }
+            } catch (Throwable $ne) {
+                error_log('rechazarSolicitud::notif: ' . $ne->getMessage());
+            }
             mostrarSweetAlert('success', 'Solicitud rechazada', 'La solicitud fue rechazada.', BASE_URL . '/proveedor/solicitudes');
         } else {
             mostrarSweetAlert('error', 'Error', 'No se pudo rechazar la solicitud.');
