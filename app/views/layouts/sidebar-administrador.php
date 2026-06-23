@@ -102,6 +102,7 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
                     <ul class="submenu">
                         <li><a href="<?= BASE_URL ?>/admin/finanzas" class="submenu-link"><?= __('admin_sub_balance') ?></a></li>
                         <li><a href="<?= BASE_URL ?>/admin/facturacion" class="submenu-link"><?= __('admin_sub_facturacion') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/pagos" class="submenu-link">Gestión de pagos</a></li>
                     </ul>
                 </li>
 
@@ -115,6 +116,12 @@ $_contactoNoLeidos = (new Contacto())->contarNoLeidos();
                     </button>
                     <ul class="submenu">
                         <li><a href="<?= BASE_URL ?>/admin/reportes-usuarios" class="submenu-link"><?= __('admin_sub_general') ?></a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-calificaciones" class="submenu-link">Calificaciones</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/calificaciones-proveedor" class="submenu-link">Cal. por proveedor</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-ingresos" class="submenu-link">Ingresos</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-servicios" class="submenu-link">Servicios ofrecidos</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-servicios-fecha" class="submenu-link">Servicios por fecha</a></li>
+                        <li><a href="<?= BASE_URL ?>/admin/reportes-proveedores" class="submenu-link">Proveedores</a></li>
                     </ul>
                 </li>
             </ul>

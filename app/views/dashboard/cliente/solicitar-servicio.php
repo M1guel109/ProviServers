@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // (Opcional) Solo clientes logueados
 // require_once BASE_PATH . '/app/helpers/session-cliente.php';
 
@@ -23,8 +23,11 @@ if (!$publicacion) {
 // Datos auxiliares
 $tituloSugerido = $publicacion['titulo'] ?? 'Solicitud de servicio';
 $nombreServicio = $publicacion['servicio_nombre'] ?? '';
-$precioBase     = isset($publicacion['precio']) ? (float)$publicacion['precio'] : 0;
-$precioTexto    = $precioBase > 0 ? number_format($precioBase, 0) : null;
+$precioBase          = isset($publicacion['precio']) ? (float)$publicacion['precio'] : 0;
+$descuento           = (int)($publicacion['promo_descuento'] ?? 0);
+$precioConDescuento  = isset($publicacion['precio_con_descuento']) ? (float)$publicacion['precio_con_descuento'] : $precioBase;
+$promoHasta          = $publicacion['promo_hasta'] ?? null;
+$precioTexto         = $precioBase > 0 ? number_format($precioBase, 0) : null;
 $descripcionPub = $publicacion['descripcion'] ?? '';
 
 // Imagen (si tu tabla/modelo tiene una columna tipo "imagen" o similar, úsala aquí)
@@ -39,6 +42,7 @@ $imagenUrl = (!empty($imagen))
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Solicitar servicio</title>
 
@@ -247,7 +251,16 @@ $imagenUrl = (!empty($imagen))
                                 </p>
                                 <?php if ($precioTexto): ?>
                                     <p class="mb-0 text-muted" style="font-size: 0.85rem;">
-                                        Precio ref.: <strong>$ <?= $precioTexto ?></strong>
+                                        <?php if ($descuento > 0): ?>
+                                            <span class="badge bg-danger me-1">-<?= $descuento ?>%</span>
+                                            <span class="text-decoration-line-through text-muted me-1">$<?= $precioTexto ?></span>
+                                            <strong class="text-danger">$<?= number_format($precioConDescuento, 0) ?></strong>
+                                            <?php if ($promoHasta): ?>
+                                                <small class="text-muted d-block">Promo hasta <?= date('d/m/Y', strtotime($promoHasta)) ?></small>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            Precio ref.: <strong>$<?= $precioTexto ?></strong>
+                                        <?php endif; ?>
                                     </p>
                                 <?php endif; ?>
                             </div>

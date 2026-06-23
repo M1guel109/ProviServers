@@ -1,6 +1,8 @@
-<?php
+﻿<?php
 // Aquí asumimos que $publicacion viene desde el controlador
 // y que ya se validó que no es null.
+
+require_once BASE_PATH . '/app/models/valoracion.php';
 
 $titulo          = $publicacion['titulo'] ?? $publicacion['servicio_nombre'] ?? 'Servicio';
 $servicioNombre  = $publicacion['servicio_nombre'] ?? '';
@@ -19,12 +21,35 @@ $proveedorUbicacion = $publicacion['proveedor_ubicacion'] ?? 'Ubicación no espe
 $proveedorFoto      = $publicacion['proveedor_foto'] ?? 'default_user.png';
 
 $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
+
+// Reseñas del proveedor
+$proveedorUsuarioId = (int)($publicacion['proveedor_usuario_id'] ?? 0);
+$perfilPublico      = $perfilPublico ?? ['perfil' => [], 'politicas' => [], 'disponibilidad' => []];
+$ppPerfil           = $perfilPublico['perfil']         ?? [];
+$ppPoliticas        = $perfilPublico['politicas']      ?? [];
+$ppDisp             = $perfilPublico['disponibilidad'] ?? [];
+
+$resenasProveedor   = [];
+$promedioCalif      = 0.0;
+$totalResenas       = 0;
+if ($proveedorUsuarioId > 0) {
+    try {
+        $resenasProveedor = (new Valoracion())->obtenerResenasPorProveedor($proveedorUsuarioId);
+        $totalResenas     = count($resenasProveedor);
+        if ($totalResenas > 0) {
+            $promedioCalif = array_sum(array_column($resenasProveedor, 'calificacion')) / $totalResenas;
+        }
+    } catch (Exception $e) {
+        error_log('detalle-publicacion reseñas: ' . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Detalle del servicio</title>
 
@@ -121,22 +146,144 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                         </div>
                     </div>
 
-                    <!-- Políticas de servicio (resumen) -->
+                    <!-- Políticas de servicio -->
                     <div class="card mb-4">
                         <div class="card-body">
                             <h5 class="card-title mb-3">
                                 <i class="bi bi-file-earmark-text me-1"></i>
                                 Políticas de servicio
                             </h5>
-                            <p class="text-muted mb-2" style="font-size: 0.92rem;">
-                                Aquí se mostrará un resumen de las políticas definidas por el proveedor
-                                (cancelaciones, garantías, tiempos de respuesta, etc.).
-                            </p>
-                            <ul class="mb-0" style="font-size: 0.9rem;">
-                                <li>Política de cancelación: <em>Próximamente desde configuración del proveedor.</em></li>
-                                <li>Garantía del servicio: <em>Próximamente desde configuración del proveedor.</em></li>
-                                <li>Tiempos de respuesta: <em>Próximamente desde configuración del proveedor.</em></li>
-                            </ul>
+
+                            <?php if (empty($ppPoliticas)): ?>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    El proveedor aún no ha configurado sus políticas de servicio.
+                                </p>
+                            <?php else: ?>
+                                <ul class="list-unstyled mb-0" style="font-size: 0.9rem;">
+
+                                    <?php
+                                    $labelCancelacion = [
+                                        'flexible' => 'Flexible',
+                                        'moderada' => 'Moderada',
+                                        'estricta' => 'Estricta',
+                                    ];
+                                    $tipoCan = $ppPoliticas['tipo_cancelacion'] ?? '';
+                                    ?>
+                                    <li class="mb-2">
+                                        <i class="bi bi-x-circle text-danger me-1"></i>
+                                        <strong>Cancelación:</strong>
+                                        <?= htmlspecialchars($labelCancelacion[$tipoCan] ?? ucfirst($tipoCan)) ?>
+                                        <?php if (!empty($ppPoliticas['descripcion_cancelacion'])): ?>
+                                            <span class="text-muted">— <?= htmlspecialchars($ppPoliticas['descripcion_cancelacion']) ?></span>
+                                        <?php endif; ?>
+                                    </li>
+
+                                    <?php if (!empty($ppPoliticas['permite_reprogramar'])): ?>
+                                        <li class="mb-2">
+                                            <i class="bi bi-calendar-check text-success me-1"></i>
+                                            <strong>Reprogramación:</strong> Permitida
+                                            <?php if (!empty($ppPoliticas['horas_min_reprogramacion'])): ?>
+                                                <span class="text-muted">(mín. <?= (int)$ppPoliticas['horas_min_reprogramacion'] ?> h de anticipación)</span>
+                                            <?php endif; ?>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($ppPoliticas['cobra_visita']) && !empty($ppPoliticas['valor_visita'])): ?>
+                                        <li class="mb-2">
+                                            <i class="bi bi-cash-coin text-warning me-1"></i>
+                                            <strong>Visita:</strong> $<?= number_format((float)$ppPoliticas['valor_visita'], 0, ',', '.') ?>
+                                            <span class="text-muted small">(cobro por visita de diagnóstico)</span>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($ppPoliticas['ofrece_garantia'])): ?>
+                                        <li class="mb-2">
+                                            <i class="bi bi-shield-check text-success me-1"></i>
+                                            <strong>Garantía:</strong>
+                                            <?php if (!empty($ppPoliticas['dias_garantia'])): ?>
+                                                <?= (int)$ppPoliticas['dias_garantia'] ?> días
+                                            <?php endif; ?>
+                                            <?php if (!empty($ppPoliticas['detalles_garantia'])): ?>
+                                                <span class="text-muted">— <?= htmlspecialchars($ppPoliticas['detalles_garantia']) ?></span>
+                                            <?php endif; ?>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($ppPoliticas['tiempo_respuesta_promedio'])): ?>
+                                        <li class="mb-2">
+                                            <i class="bi bi-clock me-1"></i>
+                                            <strong>Tiempo de respuesta:</strong>
+                                            <?= htmlspecialchars($ppPoliticas['tiempo_respuesta_promedio']) ?>
+                                        </li>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($ppPoliticas['otras_condiciones'])): ?>
+                                        <li class="mb-0">
+                                            <i class="bi bi-card-text me-1"></i>
+                                            <strong>Otras condiciones:</strong>
+                                            <span class="text-muted"><?= htmlspecialchars($ppPoliticas['otras_condiciones']) ?></span>
+                                        </li>
+                                    <?php endif; ?>
+
+                                </ul>
+                            <?php endif; ?>
+
+                            <div class="alert alert-info d-flex gap-2 align-items-start mb-0 mt-3 p-2">
+                                <i class="bi bi-shield-lock-fill mt-1"></i>
+                                <small>Toda comunicación y contratación se realiza exclusivamente a través de ProviServers.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reseñas del proveedor -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                <i class="bi bi-chat-square-text me-1"></i>
+                                Reseñas del proveedor
+                            </h5>
+                            <?php if ($totalResenas > 0): ?>
+                                <p class="text-muted small mb-3">
+                                    <?= number_format($promedioCalif, 1) ?> de 5 &middot; <?= $totalResenas ?> reseña<?= $totalResenas !== 1 ? 's' : '' ?>
+                                </p>
+                                <?php foreach ($resenasProveedor as $r): ?>
+                                    <div class="border rounded p-3 mb-3">
+                                        <div class="d-flex align-items-center gap-2 mb-2">
+                                            <img src="<?= BASE_URL ?>/public/uploads/usuarios/<?= htmlspecialchars($r['cliente_foto'] ?: 'default_user.png') ?>"
+                                                 alt="avatar" class="rounded-circle"
+                                                 style="width:36px;height:36px;object-fit:cover;">
+                                            <div>
+                                                <div class="fw-semibold" style="font-size:.9rem;"><?= htmlspecialchars($r['cliente_nombre']) ?></div>
+                                                <div style="font-size:.75rem;color:#aaa;">
+                                                    <?= date('d M Y', strtotime($r['fecha'])) ?>
+                                                    &middot; <?= htmlspecialchars($r['servicio_nombre']) ?>
+                                                </div>
+                                            </div>
+                                            <div class="ms-auto" style="font-size:.85rem;">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="bi bi-star<?= $i <= (int)$r['calificacion'] ? '-fill text-warning' : ' text-secondary opacity-50' ?>"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                        </div>
+                                        <?php if (!empty($r['comentario'])): ?>
+                                            <p class="mb-2 small text-muted fst-italic">"<?= htmlspecialchars($r['comentario']) ?>"</p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($r['respuesta_proveedor'])): ?>
+                                            <div class="p-2 rounded bg-light border-start border-3 border-primary mt-2">
+                                                <small class="fw-bold text-primary d-block mb-1">
+                                                    <i class="bi bi-person-check me-1"></i>Respuesta del proveedor
+                                                </small>
+                                                <small class="text-muted"><?= htmlspecialchars($r['respuesta_proveedor']) ?></small>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <p class="text-muted small mt-2 mb-0">
+                                    <i class="bi bi-star me-1"></i>Este proveedor aún no tiene reseñas.
+                                </p>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -166,10 +313,40 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                                 </div>
                             </div>
 
-                            <p class="mb-1" style="font-size: 0.9rem;">
+                            <?php if (!empty($ppPerfil['eslogan'])): ?>
+                                <p class="fst-italic text-muted small mb-2">
+                                    "<?= htmlspecialchars($ppPerfil['eslogan']) ?>"
+                                </p>
+                            <?php endif; ?>
+
+                            <?php if (!empty($ppPerfil['anios_experiencia'])): ?>
+                                <p class="mb-2" style="font-size: 0.88rem;">
+                                    <i class="bi bi-award me-1 text-primary"></i>
+                                    <?= (int)$ppPerfil['anios_experiencia'] ?> años de experiencia
+                                </p>
+                            <?php endif; ?>
+
+                            <?php if (!empty($ppDisp['hora_inicio']) && !empty($ppDisp['hora_fin'])): ?>
+                                <p class="mb-2" style="font-size: 0.88rem;">
+                                    <i class="bi bi-clock me-1 text-primary"></i>
+                                    <?= htmlspecialchars($ppDisp['hora_inicio']) ?> – <?= htmlspecialchars($ppDisp['hora_fin']) ?>
+                                    <?php if (!empty($ppDisp['atiende_fines_semana'])): ?>
+                                        <span class="badge bg-light text-dark border ms-1">Fines de semana</span>
+                                    <?php endif; ?>
+                                </p>
+                            <?php endif; ?>
+
+                            <p class="mb-0" style="font-size: 0.9rem;">
                                 <strong>Calificación:</strong>
-                                <span class="text-warning">★ ★ ★ ★ ☆</span>
-                                <span class="text-muted">(próximamente)</span>
+                                <?php if ($totalResenas > 0): ?>
+                                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                                        <i class="bi bi-star<?= $i <= round($promedioCalif) ? '-fill text-warning' : ' text-secondary opacity-50' ?>"></i>
+                                    <?php endfor; ?>
+                                    <span class="ms-1 fw-semibold"><?= number_format($promedioCalif, 1) ?></span>
+                                    <span class="text-muted small">(<?= $totalResenas ?> reseña<?= $totalResenas !== 1 ? 's' : '' ?>)</span>
+                                <?php else: ?>
+                                    <span class="text-muted small">Sin reseñas aún</span>
+                                <?php endif; ?>
                             </p>
                         </div>
                     </div>
@@ -216,7 +393,7 @@ $disponible = (int)($publicacion['servicio_disponible'] ?? 0) === 1;
                             </p>
 
                             <!-- Botón para iniciar solicitud (flujo a implementar) -->
-                            <a href="<?= BASE_URL ?>/cliente/solicitar-servicio?id=<?= (int)$publicacion['id'] ?>"
+                            <a href="<?= BASE_URL ?>/cliente/solicitar-servicio?id=<?= (int)$publicacion['publicacion_id'] ?>"
                                 class="btn btn-primary w-100 mt-2">
                                 <i class="bi bi-hand-index-thumb me-1"></i>
                                 Solicitar este servicio

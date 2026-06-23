@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once BASE_PATH . '/app/helpers/session-admin.php';
 ?>
 
@@ -7,6 +7,7 @@ require_once BASE_PATH . '/app/helpers/session-admin.php';
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Plataforma de servicios locales</title>
     <!-- Bootstrap CSS -->
@@ -56,7 +57,25 @@ require_once BASE_PATH . '/app/helpers/session-admin.php';
             </div>
         </section>
 
-        <!-- Grafica Principal -->
+        <!-- BARRA DE CONTROL DEL DASHBOARD -->
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <div id="hidden-widgets-container" class="d-none">
+                <span class="small text-muted me-2">Widgets ocultos:</span>
+                <div id="hidden-widgets-panel" class="d-inline"></div>
+            </div>
+            <button id="btn-restaurar-dashboard" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar configuración
+            </button>
+        </div>
+
+        <div id="dashboard-grid">
+
+        <!-- WIDGET: GRÁFICA -->
+        <div class="widget-card mb-4" data-widget-id="grafica" data-label="Gráfica principal">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="grafica" title="Ocultar">✕</button>
+            </div>
         <section id="grafica-principal">
             <h2>Total servicios publicados</h2>
             <select id="periodo">
@@ -67,7 +86,14 @@ require_once BASE_PATH . '/app/helpers/session-admin.php';
             <div id="chart"></div>
         </section>
 
-        <!-- tarjetas inferiores -->
+        </section></div><!-- /widget grafica -->
+
+        <!-- WIDGET: TARJETAS INFERIORES -->
+        <div class="widget-card mb-4" data-widget-id="usuarios" data-label="Métricas y reportes">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="usuarios" title="Ocultar">✕</button>
+            </div>
         <section id="tarjetas-inferiores">
             <!-- tarjeta usuarios -->
             <div class="tarjeta">
@@ -97,8 +123,10 @@ require_once BASE_PATH . '/app/helpers/session-admin.php';
         </section>
 
 
-    </main>
+        </section></div><!-- /widget usuarios -->
 
+        </div><!-- /#dashboard-grid -->
+    </main>
 
     <footer>
         <!-- Enlaces / Información -->
@@ -116,6 +144,8 @@ require_once BASE_PATH . '/app/helpers/session-admin.php';
     <script>const BASE_URL = "<?= BASE_URL ?>";</script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-personalizable.js"></script>
 </body>
 
 </html>

@@ -102,6 +102,59 @@ class Valoracion
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerReporteCalificaciones(): array
+    {
+        $stGlobal = $this->db->query("
+            SELECT
+                COUNT(*)                        AS total,
+                ROUND(AVG(calificacion), 2)     AS promedio,
+                SUM(calificacion = 5)           AS cinco,
+                SUM(calificacion = 4)           AS cuatro,
+                SUM(calificacion = 3)           AS tres,
+                SUM(calificacion = 2)           AS dos,
+                SUM(calificacion = 1)           AS uno
+            FROM valoraciones
+        ");
+        $global = $stGlobal->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stTop = $this->db->query("
+            SELECT
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                ROUND(AVG(v.calificacion), 2)        AS promedio,
+                COUNT(v.id)                          AS total
+            FROM valoraciones v
+            INNER JOIN proveedores p ON v.proveedor_id = p.id
+            GROUP BY p.id, p.nombres, p.apellidos
+            ORDER BY promedio DESC, total DESC
+            LIMIT 10
+        ");
+        $topProveedores = $stTop->fetchAll(PDO::FETCH_ASSOC);
+
+        $stRecientes = $this->db->query("
+            SELECT
+                v.calificacion,
+                v.comentario,
+                v.created_at,
+                CONCAT(c.nombres, ' ', c.apellidos) AS cliente,
+                CONCAT(p.nombres, ' ', p.apellidos) AS proveedor,
+                sv.nombre                           AS servicio
+            FROM valoraciones v
+            INNER JOIN clientes c                ON v.cliente_id             = c.id
+            INNER JOIN proveedores p             ON v.proveedor_id           = p.id
+            INNER JOIN servicios_contratados sc  ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv              ON sc.servicio_id           = sv.id
+            ORDER BY v.created_at DESC
+            LIMIT 50
+        ");
+        $recientes = $stRecientes->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'global'         => $global,
+            'topProveedores' => $topProveedores,
+            'recientes'      => $recientes,
+        ];
+    }
+
     public function responderResena(int $valoracionId, int $proveedorUsuarioId, string $respuesta): bool
     {
         // 1. Obtenemos el ID del proveedor basado en el usuario logueado
@@ -128,5 +181,150 @@ class Valoracion
         $stmt->bindParam(':pid', $proveedorId);
 
         return $stmt->execute();
+    }
+
+    public function responderComoCliente(int $valoracionId, int $clienteUsuarioId, string $respuesta): bool
+    {
+        try {
+            $this->db->exec("ALTER TABLE valoraciones
+                ADD COLUMN IF NOT EXISTS respuesta_cliente TEXT NULL,
+                ADD COLUMN IF NOT EXISTS fecha_respuesta_cliente DATETIME NULL");
+        } catch (PDOException) {}
+
+        $respuesta = mb_substr(trim($respuesta), 0, 500);
+        if ($respuesta === '') return false;
+
+        $sql = "
+            UPDATE valoraciones v
+            INNER JOIN clientes c ON v.cliente_id = c.id
+            SET v.respuesta_cliente = :respuesta, v.fecha_respuesta_cliente = NOW()
+            WHERE v.id = :id
+              AND c.usuario_id = :usuario_id
+              AND v.respuesta_cliente IS NULL
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':respuesta'  => $respuesta,
+            ':id'         => $valoracionId,
+            ':usuario_id' => $clienteUsuarioId,
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
+    public function listarProveedores(): array
+    {
+        $stmt = $this->db->query("
+            SELECT p.id, CONCAT(p.nombres, ' ', p.apellidos) AS nombre
+            FROM proveedores p
+            INNER JOIN usuarios u ON p.usuario_id = u.id
+            ORDER BY p.nombres, p.apellidos
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerCalificacionesProveedorFiltradas(
+        int $proveedorId,
+        ?string $desde = null,
+        ?string $hasta = null,
+        ?int $calificacion = null
+    ): array {
+        $where  = ['v.proveedor_id = :proveedor_id'];
+        $params = [':proveedor_id' => $proveedorId];
+
+        if ($desde) {
+            $where[]           = 'DATE(v.created_at) >= :desde';
+            $params[':desde']  = $desde;
+        }
+        if ($hasta) {
+            $where[]           = 'DATE(v.created_at) <= :hasta';
+            $params[':hasta']  = $hasta;
+        }
+        if ($calificacion !== null) {
+            $where[]                = 'v.calificacion = :calificacion';
+            $params[':calificacion'] = $calificacion;
+        }
+
+        $w = implode(' AND ', $where);
+
+        $stResumen = $this->db->prepare("
+            SELECT
+                COUNT(*)                    AS total,
+                ROUND(AVG(v.calificacion), 2) AS promedio,
+                SUM(v.calificacion = 5)     AS cinco,
+                SUM(v.calificacion = 4)     AS cuatro,
+                SUM(v.calificacion = 3)     AS tres,
+                SUM(v.calificacion = 2)     AS dos,
+                SUM(v.calificacion = 1)     AS uno
+            FROM valoraciones v
+            WHERE $w
+        ");
+        $stResumen->execute($params);
+        $resumen = $stResumen->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stDetalle = $this->db->prepare("
+            SELECT
+                v.id,
+                v.calificacion,
+                v.comentario,
+                v.created_at                              AS fecha,
+                v.respuesta_proveedor,
+                CONCAT(c.nombres, ' ', c.apellidos)       AS cliente_nombre,
+                c.foto                                    AS cliente_foto,
+                sv.nombre                                 AS servicio_nombre
+            FROM valoraciones v
+            INNER JOIN clientes c              ON v.cliente_id             = c.id
+            INNER JOIN servicios_contratados sc ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv            ON sc.servicio_id           = sv.id
+            WHERE $w
+            ORDER BY v.created_at DESC
+            LIMIT 200
+        ");
+        $stDetalle->execute($params);
+        $detalle = $stDetalle->fetchAll(PDO::FETCH_ASSOC);
+
+        return compact('resumen', 'detalle');
+    }
+
+    public function obtenerCalificacionesCliente(int $clienteId): array
+    {
+        $stCliente = $this->db->prepare("
+            SELECT CONCAT(c.nombres, ' ', c.apellidos) AS nombre, c.foto
+            FROM clientes c
+            WHERE c.id = :id
+        ");
+        $stCliente->bindParam(':id', $clienteId, PDO::PARAM_INT);
+        $stCliente->execute();
+        $cliente = $stCliente->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stResumen = $this->db->prepare("
+            SELECT
+                COUNT(*)                      AS total,
+                ROUND(AVG(calificacion), 2)   AS promedio_dado
+            FROM valoraciones
+            WHERE cliente_id = :id
+        ");
+        $stResumen->bindParam(':id', $clienteId, PDO::PARAM_INT);
+        $stResumen->execute();
+        $resumen = $stResumen->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        $stDetalle = $this->db->prepare("
+            SELECT
+                v.calificacion,
+                v.comentario,
+                v.created_at                              AS fecha,
+                CONCAT(p.nombres, ' ', p.apellidos)       AS proveedor_nombre,
+                sv.nombre                                 AS servicio_nombre
+            FROM valoraciones v
+            INNER JOIN proveedores p           ON v.proveedor_id           = p.id
+            INNER JOIN servicios_contratados sc ON v.servicio_contratado_id = sc.id
+            INNER JOIN servicios sv            ON sc.servicio_id           = sv.id
+            WHERE v.cliente_id = :id
+            ORDER BY v.created_at DESC
+        ");
+        $stDetalle->bindParam(':id', $clienteId, PDO::PARAM_INT);
+        $stDetalle->execute();
+        $detalle = $stDetalle->fetchAll(PDO::FETCH_ASSOC);
+
+        return compact('cliente', 'resumen', 'detalle');
     }
 }

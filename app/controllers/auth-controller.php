@@ -21,6 +21,8 @@ switch ($method) {
             registrarUsuario();
         } elseif ($accion === 'recuperar_password') {
             recuperarPassword();
+        } elseif ($accion === 'reactivar_cuenta') {
+            procesarReactivarCuenta();
         } else {
             http_response_code(400);
             mostrarSweetAlert('error', 'Acción no válida', 'La acción POST solicitada no existe.');
@@ -78,6 +80,9 @@ function iniciarSesion()
             exit();
         case 'inactivo':
             mostrarSweetAlert('warning', 'Cuenta inactiva', 'Tu cuenta está desactivada. Contacta al soporte.');
+            exit();
+        case 'pausado':
+            mostrarSweetAlert('warning', 'Cuenta pausada', 'Tu cuenta está pausada temporalmente. Puedes reactivarla cuando quieras.', BASE_URL . '/reactivar-cuenta');
             exit();
         case 'activo':
             break;
@@ -283,6 +288,30 @@ function cerrarSesion()
     }
 
     header('Location: ' . BASE_URL . '/login');
+    exit();
+}
+
+// -------------------------------------------------------------------
+// REACTIVAR CUENTA PAUSADA — proveedor
+// -------------------------------------------------------------------
+function procesarReactivarCuenta()
+{
+    $email = trim($_POST['email'] ?? '');
+    $clave = $_POST['clave']     ?? '';
+
+    if (empty($email) || empty($clave)) {
+        mostrarSweetAlert('error', 'Campos vacíos', 'Por favor completa correo y contraseña.', BASE_URL . '/reactivar-cuenta');
+        exit();
+    }
+
+    require_once BASE_PATH . '/app/models/proveedor-perfil.php';
+    $ok = (new ProveedorPerfil())->reactivarCuentaPorEmail($email, $clave);
+
+    if ($ok) {
+        mostrarSweetAlert('success', 'Cuenta reactivada', '¡Tu cuenta ha sido reactivada! Ya puedes iniciar sesión.', BASE_URL . '/login');
+    } else {
+        mostrarSweetAlert('error', 'Error al reactivar', 'Correo o contraseña incorrectos, o tu cuenta no está pausada.', BASE_URL . '/reactivar-cuenta');
+    }
     exit();
 }
 

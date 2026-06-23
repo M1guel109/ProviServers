@@ -61,20 +61,13 @@ class Perfil
             $this->conexion->beginTransaction();
             $tabla = $this->getTablaDetalle($rol);
 
-            // 1. Actualizar Usuario (Email y Clave si existe)
-            $sqlUser = "UPDATE usuarios SET email = :email";
-            $paramsUser = [':email' => $data['email'], ':id' => $id];
-            if (!empty($data['clave'])) {
-                $sqlUser .= ", clave = :clave";
-                $paramsUser[':clave'] = password_hash($data['clave'], PASSWORD_DEFAULT);
-            }
-            $sqlUser .= " WHERE id = :id";
-            $this->conexion->prepare($sqlUser)->execute($paramsUser);
-
-            // 2. Actualizar Tabla de Detalle
-            $sqlDetalle = "UPDATE $tabla SET 
-                            nombres = :nom, apellidos = :ape, 
-                            telefono = :tel, ubicacion = :ubi, foto = :foto 
+            // Solo actualiza datos del detalle — email se cambia en flujo separado con contraseña
+            $sqlDetalle = "UPDATE $tabla SET
+                            nombres   = :nom,
+                            apellidos = :ape,
+                            telefono  = :tel,
+                            ubicacion = :ubi,
+                            foto      = :foto
                            WHERE usuario_id = :id";
             $this->conexion->prepare($sqlDetalle)->execute([
                 ':nom'  => $data['nombres'],
@@ -82,14 +75,95 @@ class Perfil
                 ':tel'  => $data['telefono'],
                 ':ubi'  => $data['ubicacion'],
                 ':foto' => $data['foto'],
-                ':id'   => $id
+                ':id'   => $id,
             ]);
 
             $this->conexion->commit();
             return true;
         } catch (Exception $e) {
             $this->conexion->rollBack();
+            error_log('Perfil::actualizarPerfil -> ' . $e->getMessage());
             return false;
+        }
+    }
+
+    public function cambiarEmail(int $id, string $claveActual, string $emailNuevo): string
+    {
+        try {
+            $stmt = $this->conexion->prepare("SELECT clave FROM usuarios WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) return 'error';
+            if (!password_verify($claveActual, $usuario['clave'])) return 'clave_incorrecta';
+
+            $stmtCheck = $this->conexion->prepare(
+                "SELECT id FROM usuarios WHERE email = :email AND id <> :id LIMIT 1"
+            );
+            $stmtCheck->execute([':email' => $emailNuevo, ':id' => $id]);
+            if ($stmtCheck->fetch()) return 'email_duplicado';
+
+            $this->conexion->prepare("UPDATE usuarios SET email = :email WHERE id = :id")
+                ->execute([':email' => $emailNuevo, ':id' => $id]);
+
+            return 'ok';
+        } catch (Exception $e) {
+            error_log('Perfil::cambiarEmail -> ' . $e->getMessage());
+            return 'error';
+        }
+    }
+
+    public function eliminarCuentaCliente(int $id, string $clave): string
+    {
+        try {
+            $this->conexion->beginTransaction();
+
+            // 1. Verificar contraseña
+            $stmt = $this->conexion->prepare("SELECT clave FROM usuarios WHERE id = :id LIMIT 1");
+            $stmt->execute([':id' => $id]);
+            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$usuario) { $this->conexion->rollBack(); return 'error'; }
+            if (!password_verify($clave, $usuario['clave'])) { $this->conexion->rollBack(); return 'clave_incorrecta'; }
+
+            // 2. Verificar contratos activos
+            $stmtCid = $this->conexion->prepare(
+                "SELECT id FROM clientes WHERE usuario_id = :uid LIMIT 1"
+            );
+            $stmtCid->execute([':uid' => $id]);
+            $clienteId = $stmtCid->fetchColumn();
+
+            $tieneActivos = false;
+            if ($clienteId) {
+                $stmtAct = $this->conexion->prepare(
+                    "SELECT COUNT(*) FROM servicios_contratados
+                     WHERE cliente_id = :cid
+                       AND estado IN ('pendiente','confirmado','en_proceso')"
+                );
+                $stmtAct->execute([':cid' => $clienteId]);
+                $tieneActivos = (int)$stmtAct->fetchColumn() > 0;
+            }
+
+            if ($tieneActivos) {
+                // Soft delete — desactiva sin borrar historial
+                $this->conexion->prepare("UPDATE usuarios SET estado_id = 4 WHERE id = :id")
+                    ->execute([':id' => $id]);
+                $this->conexion->commit();
+                return 'desactivado';
+            }
+
+            // 3. Hard delete — sin contratos activos
+            $this->conexion->prepare("DELETE FROM clientes WHERE usuario_id = :id")
+                ->execute([':id' => $id]);
+            $this->conexion->prepare("DELETE FROM usuarios WHERE id = :id")
+                ->execute([':id' => $id]);
+
+            $this->conexion->commit();
+            return 'eliminado';
+        } catch (Exception $e) {
+            $this->conexion->rollBack();
+            error_log('Perfil::eliminarCuentaCliente -> ' . $e->getMessage());
+            return 'error';
         }
     }
 

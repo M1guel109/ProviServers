@@ -39,6 +39,58 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Preview de precio con descuento en tiempo real (#190)
+    const selectPub    = document.getElementById('select-publicacion-promo');
+    const inputDesc    = document.getElementById('input-descuento-promo');
+    const previewBox   = document.getElementById('preview-precio');
+    const previewBase  = document.getElementById('preview-precio-base');
+    const previewFinal = document.getElementById('preview-precio-final');
+    const previewAhorro = document.getElementById('preview-ahorro');
+
+    function actualizarPreview() {
+        if (!selectPub || !inputDesc || !previewBox) return;
+        const opt      = selectPub.options[selectPub.selectedIndex];
+        const precio   = parseFloat(opt?.dataset?.precio || 0);
+        const desc     = parseInt(inputDesc.value) || 0;
+        if (precio <= 0 || desc < 1 || desc > 100) { previewBox.classList.add('d-none'); return; }
+        const final  = Math.round(precio * (1 - desc / 100));
+        const ahorro = Math.round(precio - final);
+        const fmt    = v => '$' + Math.round(v).toLocaleString('es-CO');
+        previewBase.textContent   = fmt(precio);
+        previewFinal.textContent  = fmt(final);
+        previewAhorro.textContent = fmt(ahorro);
+        previewBox.classList.remove('d-none');
+    }
+
+    if (selectPub) selectPub.addEventListener('change', actualizarPreview);
+    if (inputDesc) inputDesc.addEventListener('input',  actualizarPreview);
+
+    // Limpiar preview al cerrar el modal
+    const modalCrear = document.getElementById('modalCrearPromocion');
+    if (modalCrear) {
+        modalCrear.addEventListener('hidden.bs.modal', function () {
+            if (previewBox) previewBox.classList.add('d-none');
+            if (inputDesc)  inputDesc.value = '';
+            if (selectPub)  selectPub.selectedIndex = 0;
+        });
+    }
+
+    // Sincronizar min de fecha_fin cuando fecha_inicio cambia (#192)
+    const inputFechaInicio = document.querySelector('#modalCrearPromocion [name="fecha_inicio"]');
+    const inputFechaFin    = document.querySelector('#modalCrearPromocion [name="fecha_fin"]');
+    if (inputFechaInicio && inputFechaFin) {
+        inputFechaInicio.addEventListener('change', function () {
+            if (!this.value) return;
+            const d = new Date(this.value + 'T00:00:00');
+            d.setDate(d.getDate() + 1);
+            const minFin = d.toISOString().split('T')[0];
+            inputFechaFin.setAttribute('min', minFin);
+            if (inputFechaFin.value && inputFechaFin.value <= this.value) {
+                inputFechaFin.value = '';
+            }
+        });
+    }
+
     // Inicializar gráfica solo cuando el modal se abre (no sobre canvas oculto)
     let chartInicializado = false;
     const modalEstadisticas = document.getElementById('modalEstadisticas');

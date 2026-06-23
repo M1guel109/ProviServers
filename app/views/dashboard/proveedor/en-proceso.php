@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // $servicios y $stats son inyectados por mostrarEnProceso() en proveedor-controller.php
 ?>
 
@@ -7,6 +7,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Servicios en Proceso</title>
     
@@ -71,7 +72,9 @@
             <?php if (!empty($servicios)): ?>
                 <?php foreach ($servicios as $servicio): ?>
 
-                    <div class="tarjeta-proceso" data-contrato-id="<?= $servicio['contrato_id'] ?>">
+                    <div class="tarjeta-proceso"
+                         data-contrato-id="<?= $servicio['contrato_id'] ?>"
+                         data-estado="<?= htmlspecialchars($servicio['estado'] ?? 'pendiente') ?>">
 
                         <div class="proceso-header">
                             <div class="proceso-info-principal">
@@ -144,6 +147,68 @@
             crossorigin="anonymous"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Modal Seguimiento Proveedor -->
+    <div class="modal fade" id="modalSeguimientoProveedor" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+          <div class="modal-header">
+            <h5 class="modal-title fw-bold" id="prov-titulo">Seguimiento del servicio</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+
+            <h6 class="fw-semibold mb-2">
+              <i class="bi bi-arrow-clockwise me-1 text-primary"></i> Actualizar estado
+            </h6>
+            <form id="form-estado-proveedor" class="d-flex gap-2 align-items-center mb-3">
+              <input type="hidden" name="contrato_id" id="prov-contrato-id">
+              <select name="estado_actual" id="prov-estado-select" class="form-select form-select-sm">
+                <option value="confirmado">Confirmado</option>
+                <option value="en_proceso">En proceso</option>
+                <option value="finalizado">Finalizado</option>
+                <option value="cancelado_proveedor">Cancelar servicio</option>
+              </select>
+              <button type="submit" class="btn btn-primary btn-sm text-nowrap">
+                <i class="bi bi-check-circle me-1"></i> Guardar
+              </button>
+            </form>
+
+            <hr>
+
+            <h6 class="fw-semibold mb-2">
+              <i class="bi bi-chat-dots me-1 text-secondary"></i> Agregar comentario
+            </h6>
+            <form id="form-seg-proveedor" enctype="multipart/form-data" class="mb-3">
+              <input type="hidden" name="contrato_id" id="prov-seg-contrato-id">
+              <div class="mb-2">
+                <textarea name="comentario" class="form-control form-control-sm" rows="2"
+                  placeholder="Comentario o nota para el cliente…" required maxlength="1000"></textarea>
+              </div>
+              <div class="mb-2">
+                <input type="file" name="archivo" class="form-control form-control-sm"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.txt">
+                <small class="text-muted">Opcional — PDF, imagen o doc (máx 5 MB)</small>
+              </div>
+              <button type="submit" class="btn btn-secondary btn-sm">
+                <i class="bi bi-send me-1"></i> Enviar comentario
+              </button>
+            </form>
+
+            <hr>
+
+            <h6 class="fw-semibold mb-2">
+              <i class="bi bi-clock-history me-1 text-primary"></i> Historial
+            </h6>
+            <div id="prov-seguimiento" style="max-height:240px;overflow-y:auto;"></div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
         const BASE_URL = "<?= BASE_URL ?>";

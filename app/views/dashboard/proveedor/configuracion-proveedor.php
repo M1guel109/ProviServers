@@ -12,6 +12,7 @@ $seguridad        = [];
 $disponibilidad   = [];
 $notificaciones   = [];
 $pagosFacturacion = [];
+$politicas        = [];
 
 if ($idUsuario > 0) {
     try {
@@ -25,6 +26,9 @@ if ($idUsuario > 0) {
 
         $dispBD = $modeloPerfil->obtenerDisponibilidadPorUsuario($idUsuario);
         if ($dispBD) $disponibilidad = $dispBD;
+
+        $politicasBD = $modeloPerfil->obtenerPoliticasPorUsuario($idUsuario);
+        if ($politicasBD) $politicas = $politicasBD;
 
         $modeloNotif = new ProveedorNotificaciones();
         $notifBD = $modeloNotif->obtenerPorUsuario($idUsuario);
@@ -44,6 +48,7 @@ if ($idUsuario > 0) {
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Configuración del Proveedor</title>
 
@@ -112,6 +117,12 @@ if ($idUsuario > 0) {
                     <button class="nav-link" id="pagos-tab" data-bs-toggle="tab"
                         data-bs-target="#pagos" type="button" role="tab">
                         <i class="bi bi-cash-stack me-1"></i> Pagos
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="politicas-tab" data-bs-toggle="tab"
+                        data-bs-target="#politicas" type="button" role="tab">
+                        <i class="bi bi-file-earmark-text me-1"></i> Políticas
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -439,75 +450,107 @@ if ($idUsuario > 0) {
 
                             <!-- Columna derecha: preferencias de seguridad -->
                             <div class="col-lg-6">
-                                <div class="tarjeta-config-inner mb-4">
-                                    <h5 class="mb-2">Alertas y notificaciones</h5>
-                                    <p class="text-muted" style="font-size: 0.9rem;">
-                                        Elige sobre qué eventos quieres recibir alertas como proveedor.
+                                <div class="tarjeta-config-inner mb-4" id="notificaciones">
+                                    <h5 class="mb-1">Preferencias de notificaciones</h5>
+                                    <p class="text-muted mb-3" style="font-size:0.9rem;">
+                                        Elige qué eventos generan notificaciones en la plataforma y por qué canales recibirlas.
                                     </p>
 
-                                    <?php
-                                    $alertaSolicitudes = !empty($seguridad['alerta_solicitudes']);
-                                    $alertaResenas     = !empty($seguridad['alerta_resenas']);
-                                    $alertaPagos       = !empty($seguridad['alerta_pagos']);
-                                    $canalSeleccionado = $seguridad['canal_notificaciones'] ?? 'ambos';
-                                    $tiempoSesion      = isset($seguridad['tiempo_sesion']) ? (int) $seguridad['tiempo_sesion'] : 60;
-                                    ?>
+                                    <form action="<?= BASE_URL ?>/proveedor/guardar-notificaciones" method="POST">
 
-                                    <form action="<?= BASE_URL ?>/proveedor/actualizar-seguridad" method="POST">
-                                        <div class="mb-3">
-                                            <label class="form-label d-block">Alertas que quiero recibir</label>
+                                        <p class="fw-semibold small mb-2">Eventos que quiero recibir</p>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_solicitudes"
-                                                    name="alerta_solicitudes" value="1" <?= $alertaSolicitudes ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_solicitudes">
-                                                    Nuevas solicitudes y cambios de estado de servicios
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_solicitudes_nuevas"
+                                                   name="noti_solicitudes_nuevas" value="1"
+                                                   <?= !empty($notificaciones['noti_solicitudes_nuevas']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_solicitudes_nuevas">
+                                                <i class="bi bi-send text-primary me-1"></i> Nuevas solicitudes de clientes
+                                            </label>
+                                        </div>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_resenas"
-                                                    name="alerta_resenas" value="1" <?= $alertaResenas ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_resenas">
-                                                    Nuevas reseñas y calificaciones de clientes
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_cambios_estado"
+                                                   name="noti_cambios_estado" value="1"
+                                                   <?= !empty($notificaciones['noti_cambios_estado']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_cambios_estado">
+                                                <i class="bi bi-arrow-repeat text-warning me-1"></i> Cambios de estado en servicios
+                                            </label>
+                                        </div>
 
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="alerta_pagos"
-                                                    name="alerta_pagos" value="1" <?= $alertaPagos ? 'checked' : '' ?>>
-                                                <label class="form-check-label" for="alerta_pagos">
-                                                    Pagos, abonos y temas de facturación
-                                                </label>
-                                            </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="noti_resenas"
+                                                   name="noti_resenas" value="1"
+                                                   <?= !empty($notificaciones['noti_resenas']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_resenas">
+                                                <i class="bi bi-star text-warning me-1"></i> Calificaciones y reseñas de clientes
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="noti_pagos"
+                                                   name="noti_pagos" value="1"
+                                                   <?= !empty($notificaciones['noti_pagos']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="noti_pagos">
+                                                <i class="bi bi-credit-card text-success me-1"></i> Pagos y liberaciones de fondos
+                                            </label>
                                         </div>
 
                                         <hr>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Canal principal de notificaciones</label>
-                                            <select name="canal_notificaciones" class="form-select">
-                                                <option value="ambos" <?= $canalSeleccionado === 'ambos' ? 'selected' : '' ?>>Correo y plataforma</option>
-                                                <option value="correo" <?= $canalSeleccionado === 'correo' ? 'selected' : '' ?>>Solo correo</option>
-                                                <option value="plataforma" <?= $canalSeleccionado === 'plataforma' ? 'selected' : '' ?>>Solo dentro de la plataforma</option>
-                                            </select>
+                                        <p class="fw-semibold small mb-2">Canales de entrega</p>
+
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="canal_interna"
+                                                   name="canal_interna" value="1"
+                                                   <?= !empty($notificaciones['canal_interna']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_interna">
+                                                <i class="bi bi-bell me-1"></i> Notificaciones dentro de la plataforma
+                                            </label>
                                         </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">Tiempo de cierre de sesión por inactividad</label>
-                                            <select name="tiempo_sesion" class="form-select">
-                                                <option value="30" <?= $tiempoSesion === 30 ? 'selected' : '' ?>>30 minutos</option>
-                                                <option value="60" <?= $tiempoSesion === 60 ? 'selected' : '' ?>>1 hora</option>
-                                                <option value="120" <?= $tiempoSesion === 120 ? 'selected' : '' ?>>2 horas</option>
-                                            </select>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="canal_email"
+                                                   name="canal_email" value="1"
+                                                   <?= !empty($notificaciones['canal_email']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_email">
+                                                <i class="bi bi-envelope me-1"></i> Correo electrónico
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="canal_whatsapp"
+                                                   name="canal_whatsapp" value="1"
+                                                   <?= !empty($notificaciones['canal_whatsapp']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="canal_whatsapp">
+                                                <i class="bi bi-whatsapp text-success me-1"></i> WhatsApp
+                                                <span class="badge bg-secondary ms-1" style="font-size:0.65rem;">Próximamente</span>
+                                            </label>
                                         </div>
 
                                         <hr>
 
-                                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                            <small class="text-muted">
-                                                Puedes ajustar estas preferencias en cualquier momento.
-                                            </small>
+                                        <p class="fw-semibold small mb-2">Resúmenes periódicos</p>
+
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="resumen_diario"
+                                                   name="resumen_diario" value="1"
+                                                   <?= !empty($notificaciones['resumen_diario']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_diario">
+                                                Resumen diario de actividad
+                                            </label>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="resumen_semanal"
+                                                   name="resumen_semanal" value="1"
+                                                   <?= !empty($notificaciones['resumen_semanal']) ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="resumen_semanal">
+                                                Resumen semanal de actividad
+                                            </label>
+                                        </div>
+
+                                        <div class="d-flex justify-content-end">
                                             <button type="submit" class="btn-modern btn-sm">
                                                 <i class="bi bi-save"></i> Guardar preferencias
                                             </button>
@@ -533,6 +576,20 @@ if ($idUsuario > 0) {
                                     <small class="text-muted d-block mt-2" style="font-size: 0.8rem;">
                                         Úsalo si has iniciado sesión en un equipo compartido o sospechas de actividad no autorizada.
                                     </small>
+
+                                    <!-- 🟡 PAUSAR CUENTA TEMPORALMENTE -->
+                                    <hr class="my-3">
+
+                                    <h6 class="text-warning mb-1">
+                                        <i class="bi bi-pause-circle me-1"></i> Pausar cuenta temporalmente
+                                    </h6>
+                                    <p class="text-muted" style="font-size: 0.85rem;">
+                                        Tu perfil dejará de ser visible. Podrás reactivar tu cuenta cuando quieras desde la pantalla de inicio de sesión.
+                                    </p>
+
+                                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modalPausarCuenta">
+                                        <i class="bi bi-pause-circle"></i> Pausar cuenta
+                                    </button>
 
                                     <!-- 🔴 ELIMINAR CUENTA (AGREGADO, SIN TOCAR NADA MÁS) -->
                                     <hr class="my-3">
@@ -1047,10 +1104,173 @@ if ($idUsuario > 0) {
 
 
                 <!-- Políticas de servicio -->
+                <div class="tab-pane fade" id="politicas" role="tabpanel" aria-labelledby="politicas-tab">
+                    <div class="card border-0 shadow-sm p-4">
+                        <h4 class="mb-1">Políticas de servicio</h4>
+                        <p class="text-muted mb-4">Define tus condiciones de cancelación, garantías y normas de trabajo.</p>
+
+                        <?php
+                        $tipoCancelacionActual       = $politicas['tipo_cancelacion']            ?? 'moderada';
+                        $descCancelacionActual       = $politicas['descripcion_cancelacion']     ?? '';
+                        $permiteReprogramarActual    = !empty($politicas['permite_reprogramar']);
+                        $horasReprogramarActual      = $politicas['horas_min_reprogramacion']    ?? '';
+                        $cobraVisitaActual           = !empty($politicas['cobra_visita']);
+                        $valorVisitaActual           = $politicas['valor_visita']                ?? '';
+                        $ofreceGarantiaActual        = !empty($politicas['ofrece_garantia']);
+                        $diasGarantiaActual          = $politicas['dias_garantia']               ?? '';
+                        $detallesGarantiaActual      = $politicas['detalles_garantia']           ?? '';
+                        $soloPlataformaActual        = !empty($politicas['solo_contacto_por_plataforma']);
+                        $tiempoRespuestaActual       = $politicas['tiempo_respuesta_promedio']   ?? '';
+                        $otrasCondicionesActual      = $politicas['otras_condiciones']           ?? '';
+                        ?>
+
+                        <form action="<?= BASE_URL ?>/proveedor/guardar-politicas" method="POST">
+                            <div class="row g-4">
+
+                                <!-- Columna izquierda: Cancelación y reprogramación -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Cancelación y reprogramación</h5>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Política de cancelación <span class="text-danger">*</span></label>
+                                        <select name="tipo_cancelacion" class="form-select">
+                                            <option value="flexible"  <?= $tipoCancelacionActual === 'flexible'  ? 'selected' : '' ?>>Flexible — El cliente puede cancelar sin costo</option>
+                                            <option value="moderada"  <?= $tipoCancelacionActual === 'moderada'  ? 'selected' : '' ?>>Moderada — Cancelación con aviso previo</option>
+                                            <option value="estricta"  <?= $tipoCancelacionActual === 'estricta'  ? 'selected' : '' ?>>Estricta — No se permiten cancelaciones</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción de tu política de cancelación</label>
+                                        <textarea name="descripcion_cancelacion" class="form-control" rows="3"
+                                            placeholder="Describe tus condiciones de cancelación..."><?= htmlspecialchars($descCancelacionActual) ?></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="permite_reprogramar"
+                                                name="permite_reprogramar" <?= $permiteReprogramarActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="permite_reprogramar">Permito reprogramar citas</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="campo-horas-reprogramar" <?= $permiteReprogramarActual ? '' : 'style="display:none"' ?>>
+                                        <label class="form-label">Horas mínimas de aviso para reprogramar</label>
+                                        <input type="number" name="horas_min_reprogramacion" class="form-control"
+                                            min="0" placeholder="Ej: 24"
+                                            value="<?= htmlspecialchars((string)$horasReprogramarActual) ?>">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="cobra_visita"
+                                                name="cobra_visita" <?= $cobraVisitaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="cobra_visita">Cobro visita de diagnóstico</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3" id="campo-valor-visita" <?= $cobraVisitaActual ? '' : 'style="display:none"' ?>>
+                                        <label class="form-label">Valor de la visita ($)</label>
+                                        <input type="number" name="valor_visita" class="form-control"
+                                            min="0" step="1000" placeholder="Ej: 30000"
+                                            value="<?= htmlspecialchars((string)$valorVisitaActual) ?>">
+                                    </div>
+                                </div>
+
+                                <!-- Columna derecha: Garantía y condiciones generales -->
+                                <div class="col-lg-6">
+                                    <h5 class="mb-3">Garantía y condiciones generales</h5>
+
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="ofrece_garantia"
+                                                name="ofrece_garantia" <?= $ofreceGarantiaActual ? 'checked' : '' ?>>
+                                            <label class="form-check-label" for="ofrece_garantia">Ofrezco garantía por el trabajo</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="campos-garantia" <?= $ofreceGarantiaActual ? '' : 'style="display:none"' ?>>
+                                        <div class="mb-3">
+                                            <label class="form-label">Días de garantía</label>
+                                            <input type="number" name="dias_garantia" class="form-control"
+                                                min="1" placeholder="Ej: 30"
+                                                value="<?= htmlspecialchars((string)$diasGarantiaActual) ?>">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Detalles de la garantía</label>
+                                            <textarea name="detalles_garantia" class="form-control" rows="2"
+                                                placeholder="¿Qué cubre la garantía?"><?= htmlspecialchars($detallesGarantiaActual) ?></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info d-flex gap-2 align-items-start mb-3">
+                                        <i class="bi bi-shield-check fs-5 mt-1"></i>
+                                        <div>
+                                            <strong>Contacto exclusivo por la plataforma</strong><br>
+                                            <small>Toda comunicación y contratación debe realizarse a través de ProviServers. No está permitido acordar servicios por WhatsApp, llamadas u otros canales externos.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Tiempo de respuesta promedio</label>
+                                        <input type="text" name="tiempo_respuesta_promedio" class="form-control"
+                                            maxlength="50" placeholder="Ej: Menos de 2 horas"
+                                            value="<?= htmlspecialchars($tiempoRespuestaActual) ?>">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Otras condiciones</label>
+                                        <textarea name="otras_condiciones" class="form-control" rows="3"
+                                            placeholder="Cualquier condición adicional que el cliente deba saber..."><?= htmlspecialchars($otrasCondicionesActual) ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="reset" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Restablecer
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-floppy me-1"></i> Guardar políticas
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
             </div>
         </section>
     </main>
+
+    <!-- Modal de confirmación para pausar cuenta -->
+    <div class="modal fade modal-cliente" id="modalPausarCuenta" tabindex="-1" aria-labelledby="modalPausarCuentaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="modalPausarCuentaLabel">
+                        <i class="bi bi-pause-circle-fill"></i> Pausar cuenta temporalmente
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tu perfil dejará de ser visible para los clientes mientras esté pausado.</p>
+                    <p>Podrás reactivar tu cuenta en cualquier momento desde la página de inicio de sesión.</p>
+                    <p>Para confirmar, escribe <strong class="text-warning">PAUSAR</strong> en el campo de abajo:</p>
+                    <input type="text" id="confirmarPausarInput" class="form-control" placeholder="Escribe PAUSAR" autocomplete="off">
+                    <small class="text-muted">Debes escribir exactamente en mayúsculas.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form action="<?= BASE_URL ?>/proveedor/pausar-cuenta" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-warning" id="btnConfirmarPausarCuenta" disabled>
+                            <i class="bi bi-pause-circle"></i> Pausar cuenta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal de confirmación para eliminar cuenta -->
     <div class="modal fade modal-cliente" id="modalEliminarCuenta" tabindex="-1" aria-labelledby="modalEliminarCuentaLabel" aria-hidden="true">
@@ -1089,6 +1309,23 @@ if ($idUsuario > 0) {
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-proveedor.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/configuracion-proveedor.js"></script>
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/main.js"></script>
+    <script>
+    // Toggles condicionales del tab Políticas
+    document.getElementById('permite_reprogramar').addEventListener('change', function () {
+        document.getElementById('campo-horas-reprogramar').style.display = this.checked ? '' : 'none';
+    });
+    document.getElementById('cobra_visita').addEventListener('change', function () {
+        document.getElementById('campo-valor-visita').style.display = this.checked ? '' : 'none';
+    });
+    document.getElementById('ofrece_garantia').addEventListener('change', function () {
+        document.getElementById('campos-garantia').style.display = this.checked ? '' : 'none';
+    });
+
+    // Habilitar botón de pausar sólo cuando se escriba PAUSAR
+    document.getElementById('confirmarPausarInput').addEventListener('input', function () {
+        document.getElementById('btnConfirmarPausarCuenta').disabled = this.value !== 'PAUSAR';
+    });
+    </script>
 </body>
 
 </html>

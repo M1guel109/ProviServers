@@ -1,7 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Pago Exitoso</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,6 +39,16 @@ include_once __DIR__ . '/../../layouts/sidebar-cliente.php';
                 </span>
             </div>
             <h2 class="fw-bold text-success mb-2">¡Pago realizado!</h2>
+            <?php if (!empty($montoDisplay) && $montoDisplay > 0): ?>
+                <div class="mb-3">
+                    <span class="fs-3 fw-bold text-success">
+                        $<?= number_format($montoDisplay, 0, ',', '.') ?>
+                    </span>
+                    <?php if ($mpRefDisplay): ?>
+                        <div class="text-muted small mt-1">Ref. #<?= htmlspecialchars((string)$mpRefDisplay) ?></div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
             <p class="text-muted mb-4">
                 Tu pago fue procesado correctamente. El proveedor ha sido notificado y ya puede continuar con el servicio.
             </p>

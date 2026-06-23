@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once BASE_PATH . '/app/helpers/session-proveedor.php';
 require_once BASE_PATH . '/app/models/servicio-contratado.php';
 require_once BASE_PATH . '/app/models/solicitud.php';
@@ -22,6 +22,7 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="<?= BASE_URL ?>/public/assets/img/logos/favicon.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proviservers | Panel de Proveedores</title>
     <!-- Bootstrap CSS -->
@@ -88,7 +89,25 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
             </div>
         </section>
 
-        <!-- Tarjetas de estadísticas principales -->
+        <!-- BARRA DE CONTROL DEL DASHBOARD -->
+        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+            <div id="hidden-widgets-container" class="d-none">
+                <span class="small text-muted me-2">Widgets ocultos:</span>
+                <div id="hidden-widgets-panel" class="d-inline"></div>
+            </div>
+            <button id="btn-restaurar-dashboard" class="btn btn-sm btn-outline-secondary ms-auto">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Restaurar configuración
+            </button>
+        </div>
+
+        <div id="dashboard-grid">
+
+        <!-- WIDGET: ESTADÍSTICAS -->
+        <div class="widget-card mb-4" data-widget-id="estadisticas" data-label="Estadísticas">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="estadisticas" title="Ocultar">✕</button>
+            </div>
         <section id="tarjetas-superiores">
             <div class="tarjeta tarjeta-estadistica">
                 <i class="bi bi-cash-coin icono-estadistica"></i>
@@ -136,7 +155,14 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
             </div>
         </section>
 
-        <!-- Gráfica Principal -->
+        </section></div><!-- /widget estadisticas -->
+
+        <!-- WIDGET: GRÁFICA -->
+        <div class="widget-card mb-4" data-widget-id="grafica" data-label="Gráfica de rendimiento">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="grafica" title="Ocultar">✕</button>
+            </div>
         <section id="grafica-principal">
             <div class="grafica-header">
                 <h2>Rendimiento de Servicios</h2>
@@ -149,7 +175,14 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
             <div id="chart"></div>
         </section>
 
-        <!-- tarjetas inferiores -->
+        </section></div><!-- /widget grafica -->
+
+        <!-- WIDGET: TARJETAS INFERIORES (servicios, reseñas, citas) -->
+        <div class="widget-card mb-4" data-widget-id="servicios-recientes" data-label="Actividad reciente">
+            <div class="d-flex justify-content-end gap-2 mb-1">
+                <span class="widget-handle text-muted" style="cursor:grab;" title="Arrastrar"><i class="bi bi-grip-vertical fs-5"></i></span>
+                <button class="btn-ocultar-widget btn btn-sm btn-link text-muted p-0" data-id="servicios-recientes" title="Ocultar">✕</button>
+            </div>
         <section id="tarjetas-inferiores">
             <!-- tarjeta servicios recientes -->
             <div class="tarjeta">
@@ -252,7 +285,9 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
                     <?php endif; ?>
                 </div>
             </div>
-        </section>
+        </section></div><!-- /widget servicios-recientes -->
+
+        </div><!-- /#dashboard-grid -->
     </main>
 
     <footer>
@@ -272,6 +307,8 @@ $totalPendientes    = count($solModel->listarPorProveedor($uid));
 
     <!-- JS específico del dashboard -->
     <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-proveedor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.3/Sortable.min.js"></script>
+    <script src="<?= BASE_URL ?>/public/assets/dashboard/js/dashboard-personalizable.js"></script>
 </body>
 
 </html>
