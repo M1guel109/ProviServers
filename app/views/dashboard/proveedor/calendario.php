@@ -50,12 +50,11 @@ try {
         $stEvt = $pdo->prepare("
             SELECT sc.fecha_ejecucion, sc.estado,
                    COALESCE(c.titulo, sol.titulo, 'Servicio') AS titulo,
-                   TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido,''))) AS cliente
+                   TRIM(CONCAT(cl.nombres, ' ', cl.apellidos)) AS cliente
             FROM servicios_contratados sc
             LEFT JOIN cotizaciones c  ON sc.cotizacion_id = c.id
             LEFT JOIN solicitudes sol ON sc.solicitud_id  = sol.id
             LEFT JOIN clientes cl     ON sc.cliente_id    = cl.id
-            LEFT JOIN usuarios u      ON cl.usuario_id    = u.id
             WHERE sc.proveedor_id = :pid
               AND sc.fecha_ejecucion >= CURDATE()
               AND sc.fecha_ejecucion <= DATE_ADD(CURDATE(), INTERVAL 90 DAY)

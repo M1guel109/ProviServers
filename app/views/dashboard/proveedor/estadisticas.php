@@ -58,8 +58,9 @@ try {
                COALESCE(SUM(COALESCE(cot.precio, pub_sol.precio, 0)), 0) AS total
         FROM servicios_contratados sc
         INNER JOIN proveedores p ON p.id = sc.proveedor_id
-        LEFT JOIN cotizaciones cot ON cot.id = sc.cotizacion_id
-        LEFT JOIN solicitudes sol  ON sol.id  = sc.solicitud_id
+        LEFT JOIN cotizaciones cot      ON cot.id             = sc.cotizacion_id
+        LEFT JOIN solicitudes sol       ON sol.id             = sc.solicitud_id
+        LEFT JOIN publicaciones pub_sol ON sol.publicacion_id = pub_sol.id
         WHERE p.usuario_id = :uid AND sc.estado = 'finalizado'
           AND COALESCE(sc.fecha_ejecucion, sc.created_at) >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
         GROUP BY mes_key, mes

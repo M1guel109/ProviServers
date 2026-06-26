@@ -9,9 +9,16 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/config/config.php';
 
-// Logging de errores PHP en archivo (nunca expuesto al usuario)
+// Logging de errores PHP en archivo fuera del directorio público
 ini_set('log_errors', 1);
-ini_set('error_log', BASE_PATH . '/php_errors.log');
+ini_set('error_log', __DIR__ . '/../logs/php_errors.log');
+
+// Configuración de sesión segura (cookie_secure solo en HTTPS)
+if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+    ini_set('session.cookie_secure', '1');
+}
+ini_set('session.cookie_httponly', '1');
+ini_set('session.cookie_samesite', 'Lax');
 
 // Obtener la URL actual
 $requestUri = $_SERVER['REQUEST_URI'];
@@ -182,6 +189,11 @@ switch ($request) {
     case '/admin/usuario-detalle':
         require BASE_PATH . '/app/controllers/admin-controller.php';
         obtenerDetalleUsuarioAjax();
+        break;
+
+    case '/admin/documento-estado':
+        require BASE_PATH . '/app/controllers/admin-controller.php';
+        procesarEstadoDocumento();
         break;
 
     // ADMINISTRADOR — Categorías

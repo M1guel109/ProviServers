@@ -160,12 +160,11 @@ try {
     $stE = $pdo2->prepare("
         SELECT ps.id, ps.monto, ps.liberado, ps.fecha_liberacion, ps.created_at,
                COALESCE(sv.nombre, sol.titulo, cot.titulo, 'Servicio') AS servicio,
-               TRIM(CONCAT(u.nombre, ' ', COALESCE(u.apellido,''))) AS cliente
+               TRIM(CONCAT(cl.nombres, ' ', cl.apellidos)) AS cliente
         FROM pagos_servicios ps
         JOIN servicios_contratados sc ON ps.servicio_contratado_id = sc.id
         JOIN servicios sv             ON sc.servicio_id = sv.id
         JOIN clientes cl              ON ps.cliente_id  = cl.id
-        JOIN usuarios u               ON cl.usuario_id  = u.id
         LEFT JOIN solicitudes sol     ON sc.solicitud_id = sol.id
         LEFT JOIN cotizaciones cot    ON sc.cotizacion_id = cot.id
         WHERE ps.proveedor_id = :pid

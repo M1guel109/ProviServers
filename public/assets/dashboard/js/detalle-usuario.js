@@ -1,6 +1,28 @@
 // Variable global para la URL base (asegúrate que esté definida en tu HTML)
 // const BASE_URL = "http://localhost/ProviServers";
 
+function cambiarEstadoDocumento(docId, nuevoEstado, itemEl) {
+  const fd = new FormData();
+  fd.append("id_doc", docId);
+  fd.append("nuevo_estado", nuevoEstado);
+
+  fetch(`${BASE_URL}/admin/documento-estado`, { method: "POST", body: fd })
+    .then((r) => r.json())
+    .then((res) => {
+      if (res.success) {
+        const badge = itemEl.querySelector(".doc-estado-badge");
+        if (badge) {
+          badge.textContent = nuevoEstado;
+          badge.className   = `badge doc-estado-badge ${nuevoEstado === "aprobado" ? "bg-success" : "bg-danger"}`;
+        }
+        itemEl.querySelectorAll(".btn-doc-aprobar, .btn-doc-rechazar").forEach((b) => b.remove());
+      } else {
+        alert("Error al actualizar el documento. Intenta de nuevo.");
+      }
+    })
+    .catch(() => alert("Fallo de conexión al actualizar el documento."));
+}
+
 function cargarDetalleUsuario(id) {
   // 1. Mostrar loader y ocultar contenido anterior
   document.getElementById("loader-detalle").classList.remove("d-none");
@@ -65,15 +87,41 @@ function cargarDetalleUsuario(id) {
         if (data.documentos && data.documentos.length > 0) {
           data.documentos.forEach((doc) => {
             const rutaDoc = `${BASE_URL}/public/uploads/documentos/${doc.archivo}`;
+            const estadoColor = doc.estado === 'aprobado' ? 'bg-success'
+                              : doc.estado === 'rechazado' ? 'bg-danger'
+                              : 'bg-secondary';
+            const botonesDoc = doc.estado === 'pendiente' ? `
+              <div class="d-flex gap-1 mt-1">
+                <button class="btn btn-sm btn-success py-0 px-2 btn-doc-aprobar"
+                        data-id="${doc.id}" style="font-size:.75rem">
+                  <i class="bi bi-check-lg"></i> Aprobar
+                </button>
+                <button class="btn btn-sm btn-danger py-0 px-2 btn-doc-rechazar"
+                        data-id="${doc.id}" style="font-size:.75rem">
+                  <i class="bi bi-x-lg"></i> Rechazar
+                </button>
+              </div>` : '';
             contDoc.innerHTML += `
-              <a href="${rutaDoc}" target="_blank" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <div>
-                  <i class="bi bi-file-earmark-text text-danger me-2"></i>
-                  ${doc.tipo_documento}
+              <div class="list-group-item" data-doc-id="${doc.id}">
+                <div class="d-flex justify-content-between align-items-start">
+                  <a href="${rutaDoc}" target="_blank" class="text-decoration-none text-dark">
+                    <i class="bi bi-file-earmark-text text-danger me-2"></i>
+                    ${doc.tipo_documento}
+                  </a>
+                  <span class="badge ${estadoColor} doc-estado-badge">${doc.estado}</span>
                 </div>
-                <span class="badge bg-secondary">${doc.estado}</span>
-              </a>
+                ${botonesDoc}
+              </div>
             `;
+          });
+
+          // Delegación de eventos para los botones de documentos
+          contDoc.querySelectorAll(".btn-doc-aprobar, .btn-doc-rechazar").forEach((btn) => {
+            btn.addEventListener("click", function () {
+              const docId    = this.dataset.id;
+              const nuevoEst = this.classList.contains("btn-doc-aprobar") ? "aprobado" : "rechazado";
+              cambiarEstadoDocumento(docId, nuevoEst, this.closest(".list-group-item"));
+            });
           });
         } else {
           contDoc.innerHTML =

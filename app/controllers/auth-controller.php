@@ -67,7 +67,17 @@ function iniciarSesion()
     $resultado = $modelo->autenticar($correo, $clave);
 
     if (isset($resultado['error'])) {
-        mostrarSweetAlert('error', 'Error de autenticación', $resultado['error']);
+        if (!empty($resultado['bloqueado_temp'])) {
+            mostrarSweetAlert('error', 'Cuenta bloqueada temporalmente', $resultado['error']);
+        } elseif (isset($resultado['restantes'])) {
+            $r = (int)$resultado['restantes'];
+            $aviso = $r === 1
+                ? 'Contraseña incorrecta. ¡Cuidado! Te queda 1 intento antes del bloqueo.'
+                : "Contraseña incorrecta. Te quedan {$r} intentos antes del bloqueo.";
+            mostrarSweetAlert('warning', 'Credenciales incorrectas', $aviso);
+        } else {
+            mostrarSweetAlert('error', 'Error de autenticación', $resultado['error']);
+        }
         exit();
     }
 

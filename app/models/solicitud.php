@@ -211,13 +211,12 @@ class Solicitud
                     sv.imagen             AS servicio_imagen,
 
                     -- Datos del proveedor
-                    u.nombre              AS proveedor_nombre
+                    CONCAT(pr.nombres, ' ', pr.apellidos) AS proveedor_nombre
 
                 FROM solicitudes s
                 INNER JOIN publicaciones p  ON s.publicacion_id = p.id
                 LEFT JOIN servicios sv      ON p.servicio_id    = sv.id
                 INNER JOIN proveedores pr   ON s.proveedor_id   = pr.id
-                INNER JOIN usuarios u       ON pr.usuario_id    = u.id
 
                 WHERE s.cliente_id = :cliente_id
                 ORDER BY s.fecha_preferida DESC, s.id DESC

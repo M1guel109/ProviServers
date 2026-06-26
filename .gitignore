@@ -6,5 +6,9 @@ config/config.php
 config/database.php
 config/mercadopago.php
 
+# Logs
+php_errors.log
+*.log
+
 # Configuraciones de asistentes IA
 .claude/
