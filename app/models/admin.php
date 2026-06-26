@@ -572,7 +572,7 @@ class Usuario
                 }
 
                 try {
-                    $sqlDoc = "SELECT tipo_documento, archivo, estado
+                    $sqlDoc = "SELECT id, tipo_documento, archivo, estado
                            FROM documentos_proveedor
                            WHERE proveedor_id = :pid";
                     $stmtDoc = $this->conexion->prepare($sqlDoc);
@@ -675,8 +675,9 @@ class Usuario
             $publicaciones = $stmtPub->fetchAll(PDO::FETCH_ASSOC);
 
             // --- Query 2: Servicios contratados por período ---
-            $sqlSc = "SELECT 
+            $sqlSc = "SELECT
                     DATE_FORMAT(created_at, :fmt_sql) AS periodo,
+                    DATE_FORMAT(MIN(created_at), :fmt_label) AS label,
                     COUNT(*) AS total
                   FROM servicios_contratados
                   WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$intervalo})
@@ -684,7 +685,7 @@ class Usuario
                   ORDER BY periodo ASC";
 
             $stmtSc = $this->conexion->prepare($sqlSc);
-            $stmtSc->execute([':fmt_sql' => $formato_sql]);
+            $stmtSc->execute([':fmt_sql' => $formato_sql, ':fmt_label' => $formato_label]);
             $contratados = $stmtSc->fetchAll(PDO::FETCH_ASSOC);
 
             // --- Unificar períodos para que ambas series tengan los mismos labels ---
@@ -701,7 +702,7 @@ class Usuario
                 $mapSc[$row['periodo']] = (int)$row['total'];
                 // Si este período no estaba en publicaciones, lo agregamos igual
                 if (!isset($labels[$row['periodo']])) {
-                    $labels[$row['periodo']] = $row['periodo'];
+                    $labels[$row['periodo']] = $row['label'];
                 }
             }
 

@@ -360,3 +360,20 @@ function llenarModalSuscripcion(data) {
 
     // ... resto de tu lógica de colores ...
 }
+
+function confirmarCancelacion(id) {
+    Swal.fire({
+        title: '¿Cancelar suscripción?',
+        text: 'Esta acción marcará la suscripción como cancelada. El proveedor perderá acceso al plan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc3545',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Sí, cancelar',
+        cancelButtonText: 'No, volver'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = `${BASE_URL}/admin/consultar-suscripciones?accion=cancelar_suscripcion&id=${id}`;
+        }
+    });
+}

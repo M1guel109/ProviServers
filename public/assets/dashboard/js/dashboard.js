@@ -107,15 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (chartUsuarios) chartUsuarios.destroy();
 
+        const c = parseInt(metricas.clientes_activos)    || 0;
+        const p = parseInt(metricas.proveedores_activos) || 0;
+
+        if (c === 0 && p === 0) {
+            el.innerHTML = '<p class="text-center text-muted py-4 small">Sin usuarios activos</p>';
+            return;
+        }
+
         chartUsuarios = new ApexCharts(el, {
             chart: {
                 type: 'donut',
                 height: 220
             },
-            series: [
-                parseInt(metricas.clientes_activos)    || 0,
-                parseInt(metricas.proveedores_activos) || 0
-            ],
+            series: [c, p],
             labels: ['Clientes activos', 'Proveedores activos'],
             colors: ['#007bff', '#000000'],
             dataLabels: { enabled: false },

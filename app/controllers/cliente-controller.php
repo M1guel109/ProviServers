@@ -886,6 +886,43 @@ function mpDeleteCard(string $customerId, string $cardId): void
 // SEGUIMIENTO DE CONTRATO
 // =======================================================================
 
+function datosMapaJSON(): void
+{
+    $ciudad   = trim($_GET['ciudad'] ?? '');
+    $cat      = isset($_GET['cat'])   && ctype_digit($_GET['cat'])   ? (int)$_GET['cat']   : null;
+    $lat      = isset($_GET['lat'])   && is_numeric($_GET['lat'])    ? (float)$_GET['lat'] : null;
+    $lng      = isset($_GET['lng'])   && is_numeric($_GET['lng'])    ? (float)$_GET['lng'] : null;
+    $radio    = isset($_GET['radio']) && ctype_digit($_GET['radio']) ? (int)$_GET['radio'] : null;
+
+    $filas = (new Publicacion())->obtenerParaMapa(
+        ciudad:      $ciudad ?: null,
+        lat:         $lat,
+        lng:         $lng,
+        radioKm:     $radio,
+        categoriaId: $cat
+    );
+
+    $marcadores = array_map(fn($f) => [
+        'titulo'       => $f['titulo'],
+        'servicio'     => $f['servicio_nombre']  ?? '',
+        'categoria'    => $f['categoria_nombre'] ?? '',
+        'proveedor'    => $f['proveedor_nombre'] ?? '',
+        'ciudad'       => $f['proveedor_ciudad'] ?? '',
+        'calificacion' => round((float)($f['calificacion_promedio'] ?? 0), 1),
+        'resenas'      => (int)($f['total_resenas'] ?? 0),
+        'precio'       => (float)($f['precio'] ?? 0),
+        'descuento'    => (int)($f['promo_descuento'] ?? 0),
+        'lat'          => (float)($f['lat'] ?? 0),
+        'lng'          => (float)($f['lng'] ?? 0),
+        'url'          => BASE_URL . '/cliente/publicacion?id=' . $f['id'],
+    ], $filas);
+
+    ob_clean();
+    header('Content-Type: application/json');
+    echo json_encode(['ok' => true, 'total' => count($marcadores), 'marcadores' => $marcadores]);
+    exit();
+}
+
 function seguimientoContratoJSON(string $rol): void
 {
     ob_clean();

@@ -16,6 +16,20 @@ class Auth
     // 1. AUTENTICACIÓN (LOGIN)
     // ======================================================================
 
+    private const MAX_INTENTOS   = 3;
+    private const BLOQUEO_MINUTOS = 30;
+
+    private function autoMigrarColumnasBruteForce(): void
+    {
+        try {
+            $this->conexion->exec("
+                ALTER TABLE usuarios
+                    ADD COLUMN IF NOT EXISTS intentos_login   INT          NOT NULL DEFAULT 0,
+                    ADD COLUMN IF NOT EXISTS bloqueado_hasta  DATETIME     NULL
+            ");
+        } catch (PDOException) {}
+    }
+
     public function autenticar($correo, $clave)
     {
         try {
@@ -23,6 +37,8 @@ class Auth
             if (empty($correo) || empty($clave)) {
                 return ['error' => 'Correo y contraseña son requeridos'];
             }
+
+            $this->autoMigrarColumnasBruteForce();
 
             // 2. Búsqueda de usuario en BD
             $sql = "SELECT u.*, e.nombre AS estado_nombre
@@ -39,12 +55,56 @@ class Auth
                 return ['error' => 'Usuario no encontrado o inactivo'];
             }
 
-            // 4. Validación de contraseña encriptada
-            if (!password_verify($clave, $usuario['clave'])) {
-                return ['error' => 'Contraseña incorrecta'];
+            // 4. Verificar bloqueo temporal por fuerza bruta
+            if (!empty($usuario['bloqueado_hasta'])) {
+                $hasta = strtotime($usuario['bloqueado_hasta']);
+                if ($hasta > time()) {
+                    $minutos = ceil(($hasta - time()) / 60);
+                    return [
+                        'error'       => "Tu cuenta está bloqueada temporalmente. Intenta de nuevo en {$minutos} min.",
+                        'bloqueado_temp' => true,
+                    ];
+                }
+                // Bloqueo expirado — limpiar contador
+                $this->conexion->prepare(
+                    "UPDATE usuarios SET intentos_login = 0, bloqueado_hasta = NULL WHERE id = :id"
+                )->execute([':id' => $usuario['id']]);
+                $usuario['intentos_login'] = 0;
             }
 
-            // 5. Retornar datos del usuario autenticado
+            // 5. Validación de contraseña encriptada
+            if (!password_verify($clave, $usuario['clave'])) {
+                $intentos = (int)($usuario['intentos_login'] ?? 0) + 1;
+
+                if ($intentos >= self::MAX_INTENTOS) {
+                    $hasta = date('Y-m-d H:i:s', time() + self::BLOQUEO_MINUTOS * 60);
+                    $this->conexion->prepare(
+                        "UPDATE usuarios SET intentos_login = :i, bloqueado_hasta = :h WHERE id = :id"
+                    )->execute([':i' => $intentos, ':h' => $hasta, ':id' => $usuario['id']]);
+
+                    return [
+                        'error'          => 'Has superado el límite de intentos. Tu cuenta queda bloqueada ' . self::BLOQUEO_MINUTOS . ' minutos.',
+                        'bloqueado_temp' => true,
+                    ];
+                }
+
+                $this->conexion->prepare(
+                    "UPDATE usuarios SET intentos_login = :i WHERE id = :id"
+                )->execute([':i' => $intentos, ':id' => $usuario['id']]);
+
+                $restantes = self::MAX_INTENTOS - $intentos;
+                return [
+                    'error'      => 'Contraseña incorrecta.',
+                    'restantes'  => $restantes,
+                ];
+            }
+
+            // 6. Contraseña correcta — resetear contador
+            $this->conexion->prepare(
+                "UPDATE usuarios SET intentos_login = 0, bloqueado_hasta = NULL WHERE id = :id"
+            )->execute([':id' => $usuario['id']]);
+
+            // 7. Retornar datos del usuario autenticado
             return [
                 'id'     => $usuario['id'],
                 'rol'    => $usuario['rol'],

@@ -17,6 +17,13 @@ function procesarContacto(): void {
         exit;
     }
 
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        mostrarSweetAlert('error', 'Email inválido',
+            'El correo electrónico ingresado no tiene un formato válido.',
+            BASE_URL . '/#contact');
+        exit;
+    }
+
     $modelo = new Contacto();
     $exito  = $modelo->registrarMensaje([
         'nombre'  => $nombre,
